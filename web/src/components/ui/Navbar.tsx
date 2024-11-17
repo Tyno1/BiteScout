@@ -33,16 +33,16 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 bg-black text-white relative z-50 overflow-none">
+    <nav className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 bg-white sticky top-0 z-50 overflow-none">
       <Link href="/" className="flex-shrink-0">
         <img src="" alt="Company Logo" />
       </Link>
       {/* web view */}
-      <ul className="hidden md:flex ml-10 flex items-center">
+      <ul className="hidden md:flex ml-10 flex items-center text-black">
         <li>
           <Link
             href="/"
-            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
           >
             Home
           </Link>
@@ -50,7 +50,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/about"
-            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
           >
             About
           </Link>
@@ -58,7 +58,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/services"
-            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
           >
             Services
           </Link>
@@ -66,7 +66,7 @@ const Navbar = () => {
         <li>
           <Link
             href="/contact"
-            className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
           >
             Contact
           </Link>
@@ -77,7 +77,7 @@ const Navbar = () => {
             <ul className="auth flex ml-20 items-center">
               <li>
                 <Link
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                  className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black"
                   href="/dashboard"
                 >
                   Dashboard
@@ -87,7 +87,7 @@ const Navbar = () => {
                 <button
                   aria-label="logout"
                   onClick={() => signOut()}
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                  className="px-3 py-2 text-sm font-medium  hover:border-b-2 hover:border-black"
                 >
                   Logout
                 </button>
