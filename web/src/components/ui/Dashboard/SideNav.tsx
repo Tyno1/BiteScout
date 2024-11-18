@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useRef } from "react";
 import {
   Home,
@@ -10,17 +11,27 @@ import {
   Users,
   Mic,
 } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
-const NavItem = ({ icon, text, active = false }: any) => {
-  const router = useRouter();
-  const HandleNav = () => {
-    router.push(router.pathname === "/dashboard" ? "/" : "/dashboard");
-  };
+interface NavItemProps {
+  icon: React.ReactElement;
+  text: string;
+  path?: string;
+  active?: boolean;
+  HandleNav?: (navName: string) => void;
+}
+
+const NavItem = ({
+  icon,
+  text,
+  path,
+  active = false,
+  HandleNav,
+}: NavItemProps) => {
   return (
     <li className="w-full">
       <button
-        onClick={HandleNav}
+        onClick={() => HandleNav && HandleNav(path ? path : "/")}
         className={`
           flex items-center 
           p-2 rounded-md 
@@ -43,6 +54,10 @@ const NavItem = ({ icon, text, active = false }: any) => {
 };
 
 const SideNav = () => {
+  const router = useRouter();
+  const HandleNav = (navName: string) => {
+    router.push(navName);
+  };
   return (
     <div className="h-screen w-full bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200 flex items-center">
@@ -52,16 +67,37 @@ const SideNav = () => {
 
       <nav className="flex-1 p-4 w-full">
         <ul className="space-y-2 w-full">
-          <NavItem icon={<Home />} text="Dashboard" />
-          <NavItem icon={<UtensilsCrossed />} text="Menu Management" />
-          <NavItem icon={<Star />} text="Reviews" />
-          <NavItem icon={<AudioLines />} text="AI Audio Reviews" />
-          <NavItem icon={<Mic />} text="Review Recording" />
-          <NavItem icon={<Users />} text="Customer Insights" />
+          <NavItem
+            HandleNav={HandleNav}
+            icon={<Home />}
+            text="Dashboard"
+            path="/dashboard"
+          />
+          <NavItem
+            HandleNav={HandleNav}
+            icon={<UtensilsCrossed />}
+            text="Menu Management"
+            path="/dashboard/menu-management"
+          />
+          <NavItem icon={<Star />} text="Reviews" path="/dashboard/reviews" />
+          <NavItem
+            icon={<AudioLines />}
+            text="AI Audio Reviews"
+            path="/dashboard/ai-reviews"
+          />
+          <NavItem
+            icon={<Users />}
+            text="Customer Insights"
+            path="/dashboard/customer-insight"
+          />
           <li className="border-t border-gray-200 w-full mt-auto">
             <ul className="w-full">
-              <NavItem icon={<Settings />} text="Settings" />
-              <NavItem icon={<Settings />} text="Leave CRM" />
+              <NavItem
+                icon={<Settings />}
+                text="Settings"
+                path="/dashboard/settings"
+              />
+              <NavItem icon={<Settings />} text="Leave CRM" path="/" />
               <NavItem icon={<Settings />} text="Logout" />
             </ul>
           </li>
