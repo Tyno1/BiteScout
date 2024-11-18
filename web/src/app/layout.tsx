@@ -26,7 +26,6 @@ export default async function RootLayout({
         <Provider session={session}>
           <ToastContainer />
           <main className="">
-            <Navbar />
             {children}
             <Footer />
           </main>
