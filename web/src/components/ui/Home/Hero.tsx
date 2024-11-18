@@ -26,10 +26,10 @@ export default function Hero() {
             restaurants, brought to life by immersive AI-powered audio reviews.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none ">
+            <button aria-label="explore-local-flavors" className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none ">
               Explore Local Flavors
             </button>
-            <button className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none ">
+            <button aria-label="listen-to-tasty-reviews" className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none ">
               Listen to Tasty Reviews
             </button>
           </div>
