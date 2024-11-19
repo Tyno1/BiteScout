@@ -1,3 +1,4 @@
+import Footer from "@/components/ui/Footer";
 import CallToAction from "@/components/ui/Home/CallToAction";
 import Features from "@/components/ui/Home/Features";
 import Hero from "@/components/ui/Home/Hero";
@@ -14,6 +15,7 @@ export default function Home() {
       <PopularDestinations />
       <Testimonials />
       <CallToAction />
+      <Footer />
     </div>
   );
 }

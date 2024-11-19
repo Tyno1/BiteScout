@@ -2,7 +2,7 @@ import Footer from "@/components/ui/Footer";
 import Navbar from "@/components/ui/Navbar";
 import React from "react";
 
-export default function About() {
+export default function Services() {
   return (
     <div>
       <Navbar />

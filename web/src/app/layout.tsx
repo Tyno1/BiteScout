@@ -25,10 +25,7 @@ export default async function RootLayout({
       <body>
         <Provider session={session}>
           <ToastContainer />
-          <main className="">
-            {children}
-            <Footer />
-          </main>
+          <main className="">{children}</main>
         </Provider>
       </body>
     </html>
