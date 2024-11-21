@@ -524,6 +524,8 @@ export default function RestaurantProfile() {
             : "View mode. Click the edit button to make changes."}
         </div>
       </div>
+      {/* Remember to Add Gallery Section */}
+      
     </main>
   );
 }
