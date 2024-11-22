@@ -525,7 +525,6 @@ export default function RestaurantProfile() {
         </div>
       </div>
       {/* Remember to Add Gallery Section */}
-      
     </main>
   );
 }

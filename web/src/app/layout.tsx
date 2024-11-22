@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
-import Navbar from "@/components/ui/Navbar";
-import Footer from "@/components/ui/Footer";
+import { Montserrat } from "next/font/google";
 import Provider from "@/components/Provider";
 import { getServerSession } from "next-auth";
 import { ToastContainer } from "react-toastify";
 
-const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Food App",
@@ -21,7 +19,7 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession();
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en" className={montserrat.className}>
       <body>
         <Provider session={session}>
           <ToastContainer />
