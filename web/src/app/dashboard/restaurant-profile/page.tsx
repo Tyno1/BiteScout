@@ -196,6 +196,7 @@ export default function RestaurantProfile() {
                   Cuisine Type
                 </label>
                 <select
+                  multiple
                   value={restaurantData.cuisine}
                   onChange={(e) =>
                     setRestaurantData((prev) => ({

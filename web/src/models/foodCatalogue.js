@@ -1,6 +1,32 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
+const PriceSchema = new Schema({
+  amount: {
+    type: Number,
+    required: true,
+  },
+  currency: {
+    type: String,
+    required: true,
+    enum: [
+      "USD",
+      "EUR",
+      "GBP",
+      "CAD",
+      "AUD",
+      "JPY",
+      "CNY",
+      "KRW",
+      "MYR",
+      "TWD",
+      "VND",
+      "THB",
+      "ZAR",
+    ],
+  },
+});
+
 const foodCatalogueSchema = new Schema({
   foodName: {
     type: String,
@@ -48,7 +74,7 @@ const foodCatalogueSchema = new Schema({
       "Zambian",
     ],
     allergens: {
-      type: String,
+      type: [String],
       required: true,
       enum: [
         "Gluten",
@@ -81,7 +107,7 @@ const foodCatalogueSchema = new Schema({
       ],
     },
     price: {
-      type: Number,
+      type: PriceSchema,
       required: true,
     },
     images: {
@@ -90,3 +116,5 @@ const foodCatalogueSchema = new Schema({
     },
   },
 });
+
+module.exports = model("FoodCatalogue", foodCatalogueSchema);

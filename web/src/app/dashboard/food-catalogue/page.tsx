@@ -202,7 +202,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             onChange={handleImageUpload}
             className="w-full border p-2 rounded"
           />
-          {newFood.images.map((image, index) => (
+          {newFood.images.map((image: any, index) => (
             <img
               key={index}
               src={URL.createObjectURL(image)}

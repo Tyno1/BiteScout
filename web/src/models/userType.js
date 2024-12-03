@@ -6,6 +6,10 @@ const userTypeSchema = new Schema({
     type: String, // Root, Admin or User
     required: true,
   },
+  level: {
+    type: Number,
+    required: true,
+  },
   description: {
     type: String,
     required: true,

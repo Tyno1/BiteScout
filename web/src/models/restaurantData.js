@@ -31,7 +31,7 @@ const BusinessHourSchema = new mongoose.Schema({
   },
 });
 
-const restaurantDataSchema = new Schema({
+const restaurantData = new Schema({
   name: {
     type: String,
     required: true,
@@ -47,7 +47,7 @@ const restaurantDataSchema = new Schema({
     trim: true,
   },
   cuisine: {
-    type: String,
+    type: [String],
     required: true,
   },
   priceRange: {
@@ -96,6 +96,9 @@ const restaurantDataSchema = new Schema({
     type: [String],
     required: true,
   },
+  meta: {
+    type: Object,
+  },
 });
 
-module.exports = model("RestaurantData", restaurantDataSchema);
+module.exports = model("RestaurantData", restaurantData);

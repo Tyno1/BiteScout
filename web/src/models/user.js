@@ -27,6 +27,20 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
+  // remember to set up service to validate hometown, currency, country
+  hometown: {
+    type: String,
+    required: true,
+  },
+  currentCity: { 
+    type: String,
+    required: true,
+  },
+  country:{
+    type: String,
+    required: true,
+  }
+  ,
   hashedEmail: {
     type: String,
     unique: true,
