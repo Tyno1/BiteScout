@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const BusinessHourSchema = new mongoose.Schema({
+const BusinessHourSchema = new Schema({
   day: {
     type: String,
     required: true,
@@ -98,7 +98,13 @@ const restaurantData = new Schema({
   },
   meta: {
     type: Object,
-  },
+  }, 
 });
 
 module.exports = model("RestaurantData", restaurantData);
+
+// const RestaurantData =
+//   mongoose.models.RestaurantData ||
+//   mongoose.model("RestaurantData", restaurantData);
+
+// export default RestaurantData;
