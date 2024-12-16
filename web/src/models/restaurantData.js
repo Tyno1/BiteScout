@@ -102,9 +102,3 @@ const restaurantData = new Schema({
 });
 
 module.exports = model("RestaurantData", restaurantData);
-
-// const RestaurantData =
-//   mongoose.models.RestaurantData ||
-//   mongoose.model("RestaurantData", restaurantData);
-
-// export default RestaurantData;
