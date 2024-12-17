@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { Provider as ReduxProvider } from "react-redux";
-import store from "@/state/store";
+import { store } from "@/state/store";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 

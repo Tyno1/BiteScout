@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface businessHours {
   day: string;
@@ -46,7 +47,17 @@ const initialState: RestaurantDataState = {
   meta: {},
 };
 
-const RestaurantDataSlice = createSlice({
+
+// finish setting up async fetch
+export const getRestaurantData = createAsyncThunk(
+  "restaurantData/getRestaurantData",
+  async () => {
+    const response = await axios.get(`${process.env.NEXTAUTH_URL}/api/restaurant`);
+    return response.data;
+  }
+);
+
+const restaurantDataSlice = createSlice({
   name: "restaurantData",
   initialState,
   reducers: {
@@ -56,6 +67,5 @@ const RestaurantDataSlice = createSlice({
   },
 });
 
-export const { updateRestaurantData } = RestaurantDataSlice.actions;
-
-export default RestaurantDataSlice.reducer;
+export const { updateRestaurantData } = restaurantDataSlice.actions;
+export default restaurantDataSlice.reducer;

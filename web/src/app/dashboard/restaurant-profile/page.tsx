@@ -14,6 +14,8 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/state/store";
 
 interface BusinessHours {
   day: string;
@@ -23,6 +25,9 @@ interface BusinessHours {
 }
 
 export default function RestaurantProfile() {
+  const restaurant = useSelector((state: RootState) => state.restaurantData);
+  const dispatch = useDispatch();
+
   const [isEditing, setIsEditing] = useState(false);
   const [restaurantData, setRestaurantData] = useState({
     name: "The Restaurant",
