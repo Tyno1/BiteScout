@@ -5,8 +5,7 @@ import Provider from "@/components/Provider";
 import { getServerSession } from "next-auth";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { Provider as ReduxProvider } from "react-redux";
-import { store } from "@/state/store";
+import { ReduxProvider } from "@/components/ReduxProvider";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -24,7 +23,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={montserrat.className}>
       <body>
-        <ReduxProvider store={store}>
+        <ReduxProvider>
           <Provider session={session}>
             <ToastContainer />
             <main className="">{children}</main>

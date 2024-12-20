@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 import {
   Upload,
@@ -15,7 +15,11 @@ import {
   X,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/state/store";
+import { AppDispatch, RootState } from "@/state/store";
+import {
+  updateRestaurantData,
+  getRestaurantData,
+} from "@/state/restaurantData/restaurantDataSlice";
 
 interface BusinessHours {
   day: string;
@@ -25,32 +29,12 @@ interface BusinessHours {
 }
 
 export default function RestaurantProfile() {
-  const restaurant = useSelector((state: RootState) => state.restaurantData);
-  const dispatch = useDispatch();
+  const { restaurantData, error, status } = useSelector(
+    (state: RootState) => state.restaurantData
+  );
+  const dispatch = useDispatch<AppDispatch>();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [restaurantData, setRestaurantData] = useState({
-    name: "The Restaurant",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cuisine: "italian",
-    priceRange: "$$",
-    address: "123 Restaurant Street, Foodville",
-    phone: "+1 234 567 8900",
-    email: "contact@therestaurant.com",
-    website: "www.therestaurant.com",
-    businessHours: [
-      { day: "Monday", open: "09:00", close: "22:00", closed: false },
-      { day: "Tuesday", open: "09:00", close: "22:00", closed: false },
-      { day: "Wednesday", open: "09:00", close: "22:00", closed: false },
-      { day: "Thursday", open: "09:00", close: "22:00", closed: false },
-      { day: "Friday", open: "09:00", close: "23:00", closed: false },
-      { day: "Saturday", open: "10:00", close: "23:00", closed: false },
-      { day: "Sunday", open: "10:00", close: "22:00", closed: false },
-    ] as BusinessHours[],
-    features: ["Outdoor Seating", "WiFi", "Parking"] as string[],
-    gallery: [] as string[],
-  });
-
   const [newFeature, setNewFeature] = useState("");
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,19 +52,19 @@ export default function RestaurantProfile() {
       newFeature.trim() &&
       !restaurantData.features.includes(newFeature.trim())
     ) {
-      setRestaurantData((prev) => ({
-        ...prev,
-        features: [...prev.features, newFeature.trim()],
-      }));
+      // setRestaurantData((prev) => ({
+      //   ...prev,
+      //   features: [...prev.features, newFeature.trim()],
+      // }));
       setNewFeature("");
     }
   };
 
   const removeFeature = (feature: string) => {
-    setRestaurantData((prev) => ({
-      ...prev,
-      features: prev.features.filter((f) => f !== feature),
-    }));
+    // setRestaurantData((prev) => ({
+    //   ...prev,
+    //   features: prev.features.filter((f) => f !== feature),
+    // }));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -88,6 +72,11 @@ export default function RestaurantProfile() {
       addFeature();
     }
   };
+
+  useEffect(() => {
+    dispatch(getRestaurantData());
+  }, [dispatch]);
+  console.log(restaurantData);
 
   return (
     <main className="w-full min-h-screen bg-gray-50">
@@ -116,12 +105,12 @@ export default function RestaurantProfile() {
                 <input
                   type="text"
                   value={restaurantData.name}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
+                  // onChange={(e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     name: e.target.value,
+                  //   }))
+                  // }
                   className="w-full text-6xl font-bold bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
                   aria-label="Restaurant name"
                 />
@@ -134,12 +123,12 @@ export default function RestaurantProfile() {
                 <input
                   type="text"
                   value={restaurantData.description}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
+                  // onChange={(e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     description: e.target.value,
+                  //   }))
+                  // }
                   className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
                   aria-label="Restaurant description"
                 />
@@ -203,12 +192,13 @@ export default function RestaurantProfile() {
                 <select
                   multiple
                   value={restaurantData.cuisine}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      cuisine: e.target.value,
-                    }))
-                  }
+                  // onChange={
+                  //   (e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     cuisine: e.target.value,
+                  //   }))
+                  // }
                   disabled={!isEditing}
                   className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
                   aria-labelledby="cuisine-label"
@@ -227,12 +217,12 @@ export default function RestaurantProfile() {
                 </label>
                 <select
                   value={restaurantData.priceRange}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      priceRange: e.target.value,
-                    }))
-                  }
+                  // onChange={(e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     priceRange: e.target.value,
+                  //   }))
+                  // }
                   disabled={!isEditing}
                   className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
                   aria-labelledby="price-label"
@@ -251,12 +241,12 @@ export default function RestaurantProfile() {
               </label>
               <textarea
                 value={restaurantData.description}
-                onChange={(e) =>
-                  setRestaurantData((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
+                // onChange={(e) =>
+                //   setRestaurantData((prev) => ({
+                //     ...prev,
+                //     description: e.target.value,
+                //   }))
+                // }
                 placeholder="Describe your restaurant"
                 disabled={!isEditing}
                 rows={4}
@@ -291,12 +281,12 @@ export default function RestaurantProfile() {
                   type="text"
                   className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
                   value={restaurantData.address}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      address: e.target.value,
-                    }))
-                  }
+                  // onChange={(e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     address: e.target.value,
+                  //   }))
+                  // }
                   disabled={!isEditing}
                   aria-labelledby="address-label"
                 />
@@ -317,12 +307,12 @@ export default function RestaurantProfile() {
                     type="tel"
                     className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
                     value={restaurantData.phone}
-                    onChange={(e) =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        phone: e.target.value,
-                      }))
-                    }
+                    // onChange={(e) =>
+                    //   setRestaurantData((prev) => ({
+                    //     ...prev,
+                    //     phone: e.target.value,
+                    //   }))
+                    // }
                     disabled={!isEditing}
                     aria-labelledby="phone-label"
                   />
@@ -342,12 +332,12 @@ export default function RestaurantProfile() {
                     type="email"
                     className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
                     value={restaurantData.email}
-                    onChange={(e) =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
+                    // onChange={(e) =>
+                    //   setRestaurantData((prev) => ({
+                    //     ...prev,
+                    //     email: e.target.value,
+                    //   }))
+                    // }
                     disabled={!isEditing}
                     aria-labelledby="email-label"
                   />
@@ -368,12 +358,12 @@ export default function RestaurantProfile() {
                   type="url"
                   className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
                   value={restaurantData.website}
-                  onChange={(e) =>
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      website: e.target.value,
-                    }))
-                  }
+                  // onChange={(e) =>
+                  //   setRestaurantData((prev) => ({
+                  //     ...prev,
+                  //     website: e.target.value,
+                  //   }))
+                  // }
                   disabled={!isEditing}
                   aria-labelledby="website-label"
                 />
@@ -393,7 +383,7 @@ export default function RestaurantProfile() {
             </h2>
           </div>
           <div className="space-y-4" role="table" aria-label="Business hours">
-            {restaurantData.businessHours.map((hours, index) => (
+            {restaurantData.businessHours?.map((hours, index) => (
               <div
                 key={hours.day}
                 className="grid grid-cols-4 gap-4 items-center"
@@ -408,10 +398,10 @@ export default function RestaurantProfile() {
                   onChange={(e) => {
                     const newHours = [...restaurantData.businessHours];
                     newHours[index].open = e.target.value;
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      businessHours: newHours,
-                    }));
+                    // setRestaurantData((prev) => ({
+                    //   ...prev,
+                    //   businessHours: newHours,
+                    // }));
                   }}
                   disabled={!isEditing || hours.closed}
                   className="rounded-md border px-3 py-2 disabled:bg-gray-100"
@@ -423,10 +413,10 @@ export default function RestaurantProfile() {
                   onChange={(e) => {
                     const newHours = [...restaurantData.businessHours];
                     newHours[index].close = e.target.value;
-                    setRestaurantData((prev) => ({
-                      ...prev,
-                      businessHours: newHours,
-                    }));
+                    // setRestaurantData((prev) => ({
+                    //   ...prev,
+                    //   businessHours: newHours,
+                    // }));
                   }}
                   disabled={!isEditing || hours.closed}
                   className="rounded-md border px-3 py-2 disabled:bg-gray-100"
@@ -439,10 +429,10 @@ export default function RestaurantProfile() {
                     onChange={(e) => {
                       const newHours = [...restaurantData.businessHours];
                       newHours[index].closed = e.target.checked;
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        businessHours: newHours,
-                      }));
+                      // setRestaurantData((prev) => ({
+                      //   ...prev,
+                      //   businessHours: newHours,
+                      // }));
                     }}
                     disabled={!isEditing}
                     className="mr-2"
@@ -497,7 +487,7 @@ export default function RestaurantProfile() {
             role="list"
             aria-label="Restaurant features"
           >
-            {restaurantData.features.map((feature) => (
+            {restaurantData.features?.map((feature) => (
               <div
                 key={feature}
                 className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
@@ -515,7 +505,7 @@ export default function RestaurantProfile() {
                 )}
               </div>
             ))}
-            {restaurantData.features.length === 0 && (
+            {restaurantData.features?.length === 0 && (
               <p className="text-gray-500 italic" role="status">
                 No features added yet
               </p>

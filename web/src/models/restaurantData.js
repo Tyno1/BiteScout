@@ -32,6 +32,10 @@ const BusinessHourSchema = new Schema({
 });
 
 const restaurantData = new Schema({
+  _id: {
+    type: Schema.Types.ObjectId,
+    ref: "Restaurant",
+  },
   name: {
     type: String,
     required: true,
@@ -101,4 +105,4 @@ const restaurantData = new Schema({
   }, 
 });
 
-module.exports = model("RestaurantData", restaurantData);
+module.exports = mongoose.models.RestaurantData || model("RestaurantData", restaurantData);
