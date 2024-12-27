@@ -8,7 +8,7 @@ interface BusinessHours {
   closed: boolean;
 }
 
-interface RestaurantDataState {
+export interface RestaurantDataState {
   name: string;
   logo: string;
   description: string;
@@ -62,9 +62,9 @@ const initialState: RestaurantState = {
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
   async () => {
-    console.log(API_URL);
-    
     const response = await axios.get(`${API_URL}/api/restaurant`);
+    console.log(response.data);
+    
     return response.data;
   }
 );

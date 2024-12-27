@@ -19,6 +19,7 @@ import { AppDispatch, RootState } from "@/state/store";
 import {
   updateRestaurantData,
   getRestaurantData,
+  RestaurantDataState,
 } from "@/state/restaurantData/restaurantDataSlice";
 
 interface BusinessHours {
@@ -33,9 +34,15 @@ export default function RestaurantProfile() {
     (state: RootState) => state.restaurantData
   );
   const dispatch = useDispatch<AppDispatch>();
-
   const [isEditing, setIsEditing] = useState(false);
+  const [editableData, setEditableData] = useState<RestaurantDataState | null>(
+    null
+  );
   const [newFeature, setNewFeature] = useState("");
+  const [newCuisine, setNewCuisine] = useState<string>("");
+
+  // Use editableData when in edit mode, otherwise use restaurantData
+  const displayData = isEditing ? editableData : restaurantData;
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,28 +50,44 @@ export default function RestaurantProfile() {
   };
 
   const handleSave = () => {
+    if (editableData) {
+      dispatch(updateRestaurantData(editableData));
+      setIsEditing(false);
+      setEditableData(null);
+    }
+  };
+
+  const handleEdit = () => {
+    setEditableData(restaurantData);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
     setIsEditing(false);
-    // Handle save logic here
+    setEditableData(null);
   };
 
   const addFeature = () => {
     if (
       newFeature.trim() &&
-      !restaurantData.features.includes(newFeature.trim())
+      editableData &&
+      !editableData.features.includes(newFeature.trim())
     ) {
-      // setRestaurantData((prev) => ({
-      //   ...prev,
-      //   features: [...prev.features, newFeature.trim()],
-      // }));
+      setEditableData((prev) => ({
+        ...prev!,
+        features: [...prev!.features, newFeature.trim()],
+      }));
       setNewFeature("");
     }
   };
 
   const removeFeature = (feature: string) => {
-    // setRestaurantData((prev) => ({
-    //   ...prev,
-    //   features: prev.features.filter((f) => f !== feature),
-    // }));
+    if (editableData) {
+      setEditableData((prev) => ({
+        ...prev!,
+        features: prev!.features.filter((f) => f !== feature),
+      }));
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -73,10 +96,38 @@ export default function RestaurantProfile() {
     }
   };
 
+  const handleInputChange = (field: keyof RestaurantDataState, value: any) => {
+    if (editableData) {
+      setEditableData((prev) => ({
+        ...prev!,
+        [field]: value,
+      }));
+    }
+  };
+
+  const handleBusinessHoursChange = (
+    index: number,
+    field: keyof BusinessHours,
+    value: any
+  ) => {
+    if (editableData && editableData.businessHours) {
+      const newHours = [...editableData.businessHours];
+      newHours[index] = {
+        ...newHours[index],
+        [field]: value,
+      };
+      setEditableData((prev) => ({
+        ...prev!,
+        businessHours: newHours,
+      }));
+    }
+  };
+
   useEffect(() => {
     dispatch(getRestaurantData());
   }, [dispatch]);
-  console.log(restaurantData);
+
+  if (!displayData) return null;
 
   return (
     <main className="w-full min-h-screen bg-gray-50">
@@ -104,36 +155,28 @@ export default function RestaurantProfile() {
               {isEditing ? (
                 <input
                   type="text"
-                  value={restaurantData.name}
-                  // onChange={(e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     name: e.target.value,
-                  //   }))
-                  // }
+                  value={displayData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   className="w-full text-6xl font-bold bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
                   aria-label="Restaurant name"
                 />
               ) : (
-                restaurantData.name
+                displayData.name
               )}
             </h1>
             <p role="contentinfo">
               {isEditing ? (
                 <input
                   type="text"
-                  value={restaurantData.description}
-                  // onChange={(e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     description: e.target.value,
-                  //   }))
-                  // }
+                  value={displayData.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
                   aria-label="Restaurant description"
                 />
               ) : (
-                restaurantData.description
+                displayData.description
               )}
             </p>
           </div>
@@ -142,17 +185,32 @@ export default function RestaurantProfile() {
             role="toolbar"
             aria-label="Profile actions"
           >
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
-              aria-label={isEditing ? "Save changes" : "Edit profile"}
-            >
-              {isEditing ? (
-                <Save className="w-4 h-4" />
-              ) : (
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+                  aria-label="Save changes"
+                >
+                  <Save className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+                  aria-label="Cancel editing"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEdit}
+                className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+                aria-label="Edit profile"
+              >
                 <Edit className="w-4 h-4" />
-              )}
-            </button>
+              </button>
+            )}
             <label className="cursor-pointer">
               <button
                 className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
@@ -183,32 +241,55 @@ export default function RestaurantProfile() {
               Basic Information
             </h2>
           </div>
+
+          {/* finsh setting up cuisine */}
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label id="cuisine-label" className="text-sm font-medium">
                   Cuisine Type
                 </label>
-                <select
-                  multiple
-                  value={restaurantData.cuisine}
-                  // onChange={
-                  //   (e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     cuisine: e.target.value,
-                  //   }))
-                  // }
-                  disabled={!isEditing}
-                  className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
-                  aria-labelledby="cuisine-label"
-                >
-                  <option value="italian">Italian</option>
-                  <option value="japanese">Japanese</option>
-                  <option value="indian">Indian</option>
-                  <option value="mexican">Mexican</option>
-                  <option value="chinese">Chinese</option>
-                </select>
+                {isEditing ? (
+                  <>
+                    <div className="flex gap-4">
+                      <input
+                        className="rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
+                        value={newCuisine}
+                        type="text"
+                        onChange={(e) => setNewCuisine(e.target.value)}
+                      />
+                      <button
+                      className="rounded-md px-3 py-2 bg-teal-400"
+                        onClick={() => {
+                          if (editableData && newCuisine) {
+                            setEditableData((prev) => ({
+                              ...prev!,
+                              cuisine: [...prev!.cuisine, newCuisine],
+                            }));
+                          }
+                          setNewCuisine("");
+                        }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    <div>
+                      <ul>
+                        {displayData.cuisine?.map((cuisine) => (
+                          <li key={cuisine}>{cuisine.trim()}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <ul>
+                      {displayData.cuisine?.map((cuisine) => (
+                        <li key={cuisine}>{cuisine.trim()}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -216,13 +297,10 @@ export default function RestaurantProfile() {
                   Price Range
                 </label>
                 <select
-                  value={restaurantData.priceRange}
-                  // onChange={(e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     priceRange: e.target.value,
-                  //   }))
-                  // }
+                  value={displayData.priceRange}
+                  onChange={(e) =>
+                    handleInputChange("priceRange", e.target.value)
+                  }
                   disabled={!isEditing}
                   className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
                   aria-labelledby="price-label"
@@ -240,13 +318,10 @@ export default function RestaurantProfile() {
                 Full Description
               </label>
               <textarea
-                value={restaurantData.description}
-                // onChange={(e) =>
-                //   setRestaurantData((prev) => ({
-                //     ...prev,
-                //     description: e.target.value,
-                //   }))
-                // }
+                value={displayData.description}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 placeholder="Describe your restaurant"
                 disabled={!isEditing}
                 rows={4}
@@ -280,13 +355,8 @@ export default function RestaurantProfile() {
                 <input
                   type="text"
                   className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
-                  value={restaurantData.address}
-                  // onChange={(e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     address: e.target.value,
-                  //   }))
-                  // }
+                  value={displayData.address}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
                   disabled={!isEditing}
                   aria-labelledby="address-label"
                 />
@@ -306,13 +376,8 @@ export default function RestaurantProfile() {
                   <input
                     type="tel"
                     className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
-                    value={restaurantData.phone}
-                    // onChange={(e) =>
-                    //   setRestaurantData((prev) => ({
-                    //     ...prev,
-                    //     phone: e.target.value,
-                    //   }))
-                    // }
+                    value={displayData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
                     disabled={!isEditing}
                     aria-labelledby="phone-label"
                   />
@@ -331,13 +396,8 @@ export default function RestaurantProfile() {
                   <input
                     type="email"
                     className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
-                    value={restaurantData.email}
-                    // onChange={(e) =>
-                    //   setRestaurantData((prev) => ({
-                    //     ...prev,
-                    //     email: e.target.value,
-                    //   }))
-                    // }
+                    value={displayData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
                     disabled={!isEditing}
                     aria-labelledby="email-label"
                   />
@@ -357,13 +417,8 @@ export default function RestaurantProfile() {
                 <input
                   type="url"
                   className="w-full rounded-md border pl-10 pr-3 py-2 disabled:bg-gray-100"
-                  value={restaurantData.website}
-                  // onChange={(e) =>
-                  //   setRestaurantData((prev) => ({
-                  //     ...prev,
-                  //     website: e.target.value,
-                  //   }))
-                  // }
+                  value={displayData.website}
+                  onChange={(e) => handleInputChange("website", e.target.value)}
                   disabled={!isEditing}
                   aria-labelledby="website-label"
                 />
@@ -383,7 +438,7 @@ export default function RestaurantProfile() {
             </h2>
           </div>
           <div className="space-y-4" role="table" aria-label="Business hours">
-            {restaurantData.businessHours?.map((hours, index) => (
+            {displayData.businessHours?.map((hours, index) => (
               <div
                 key={hours.day}
                 className="grid grid-cols-4 gap-4 items-center"
@@ -395,14 +450,9 @@ export default function RestaurantProfile() {
                 <input
                   type="time"
                   value={hours.open}
-                  onChange={(e) => {
-                    const newHours = [...restaurantData.businessHours];
-                    newHours[index].open = e.target.value;
-                    // setRestaurantData((prev) => ({
-                    //   ...prev,
-                    //   businessHours: newHours,
-                    // }));
-                  }}
+                  onChange={(e) =>
+                    handleBusinessHoursChange(index, "open", e.target.value)
+                  }
                   disabled={!isEditing || hours.closed}
                   className="rounded-md border px-3 py-2 disabled:bg-gray-100"
                   aria-label={`${hours.day} opening time`}
@@ -410,14 +460,9 @@ export default function RestaurantProfile() {
                 <input
                   type="time"
                   value={hours.close}
-                  onChange={(e) => {
-                    const newHours = [...restaurantData.businessHours];
-                    newHours[index].close = e.target.value;
-                    // setRestaurantData((prev) => ({
-                    //   ...prev,
-                    //   businessHours: newHours,
-                    // }));
-                  }}
+                  onChange={(e) =>
+                    handleBusinessHoursChange(index, "close", e.target.value)
+                  }
                   disabled={!isEditing || hours.closed}
                   className="rounded-md border px-3 py-2 disabled:bg-gray-100"
                   aria-label={`${hours.day} closing time`}
@@ -426,14 +471,13 @@ export default function RestaurantProfile() {
                   <input
                     type="checkbox"
                     checked={hours.closed}
-                    onChange={(e) => {
-                      const newHours = [...restaurantData.businessHours];
-                      newHours[index].closed = e.target.checked;
-                      // setRestaurantData((prev) => ({
-                      //   ...prev,
-                      //   businessHours: newHours,
-                      // }));
-                    }}
+                    onChange={(e) =>
+                      handleBusinessHoursChange(
+                        index,
+                        "closed",
+                        e.target.checked
+                      )
+                    }
                     disabled={!isEditing}
                     className="mr-2"
                     aria-label={`${hours.day} closed`}
@@ -487,7 +531,7 @@ export default function RestaurantProfile() {
             role="list"
             aria-label="Restaurant features"
           >
-            {restaurantData.features?.map((feature) => (
+            {displayData.features?.map((feature) => (
               <div
                 key={feature}
                 className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
@@ -505,7 +549,7 @@ export default function RestaurantProfile() {
                 )}
               </div>
             ))}
-            {restaurantData.features?.length === 0 && (
+            {displayData.features?.length === 0 && (
               <p className="text-gray-500 italic" role="status">
                 No features added yet
               </p>
@@ -520,7 +564,6 @@ export default function RestaurantProfile() {
             : "View mode. Click the edit button to make changes."}
         </div>
       </div>
-      {/* Remember to Add Gallery Section */}
     </main>
   );
 }

@@ -5,7 +5,7 @@ import restaurantData from "@/models/restaurantData";
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    const restaurant = await (restaurantData as any).find();
+    const restaurant = await (restaurantData as any).findOne();
 
     if (!restaurant) {
       return NextResponse.json(
