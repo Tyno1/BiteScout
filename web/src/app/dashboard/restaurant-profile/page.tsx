@@ -44,6 +44,29 @@ export default function RestaurantProfile() {
   // Use editableData when in edit mode, otherwise use restaurantData
   const displayData = isEditing ? editableData : restaurantData;
 
+  const DEFAULT_BUSINESS_HOURS = [
+    { day: "Monday", open: "09:00", close: "17:00", closed: false },
+    { day: "Tuesday", open: "09:00", close: "17:00", closed: false },
+    { day: "Wednesday", open: "09:00", close: "17:00", closed: false },
+    { day: "Thursday", open: "09:00", close: "17:00", closed: false },
+    { day: "Friday", open: "09:00", close: "17:00", closed: false },
+    { day: "Saturday", open: "10:00", close: "15:00", closed: false },
+    { day: "Sunday", open: "10:00", close: "15:00", closed: true },
+  ] as BusinessHours[];
+
+  // check why businessHours isnt updating
+  const [businessHours, setBusinessHours] = useState(() => {
+    if (displayData?.businessHours && displayData?.businessHours.length >= 1) {
+      return DEFAULT_BUSINESS_HOURS.map((defaultHours) => {
+        const existingHours = displayData?.businessHours.find(
+          (h) => h.day === defaultHours.day
+        );
+        return existingHours || defaultHours;
+      });
+    }
+    return DEFAULT_BUSINESS_HOURS;
+  });
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     // Handle image upload logic here
@@ -253,19 +276,24 @@ export default function RestaurantProfile() {
                   <>
                     <div className="flex gap-4">
                       <input
+                        placeholder="Italian"
                         className="rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
                         value={newCuisine}
                         type="text"
                         onChange={(e) => setNewCuisine(e.target.value)}
                       />
                       <button
-                      className="rounded-md px-3 py-2 bg-teal-400"
+                        className="rounded-md px-3 py-2 bg-teal-400"
                         onClick={() => {
                           if (editableData && newCuisine) {
-                            setEditableData((prev) => ({
-                              ...prev!,
-                              cuisine: [...prev!.cuisine, newCuisine],
-                            }));
+                            if (newCuisine.length > 0) {
+                              setEditableData((prev) => ({
+                                ...prev!,
+                                cuisine: [...prev!.cuisine, newCuisine],
+                              }));
+                            } else {
+                              throw new Error("please type in a cuisine");
+                            }
                           }
                           setNewCuisine("");
                         }}
@@ -438,7 +466,7 @@ export default function RestaurantProfile() {
             </h2>
           </div>
           <div className="space-y-4" role="table" aria-label="Business hours">
-            {displayData.businessHours?.map((hours, index) => (
+            {businessHours.map((hours, index) => (
               <div
                 key={hours.day}
                 className="grid grid-cols-4 gap-4 items-center"
