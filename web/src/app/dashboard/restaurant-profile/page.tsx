@@ -21,6 +21,7 @@ import {
   getRestaurantData,
   RestaurantDataState,
 } from "@/state/restaurantData/restaurantDataSlice";
+import { log } from "console";
 
 interface BusinessHours {
   day: string;
@@ -55,17 +56,7 @@ export default function RestaurantProfile() {
   ] as BusinessHours[];
 
   // check why businessHours isnt updating
-  const [businessHours, setBusinessHours] = useState(() => {
-    if (displayData?.businessHours && displayData?.businessHours.length >= 1) {
-      return DEFAULT_BUSINESS_HOURS.map((defaultHours) => {
-        const existingHours = displayData?.businessHours.find(
-          (h) => h.day === defaultHours.day
-        );
-        return existingHours || defaultHours;
-      });
-    }
-    return DEFAULT_BUSINESS_HOURS;
-  });
+  const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -81,7 +72,7 @@ export default function RestaurantProfile() {
   };
 
   const handleEdit = () => {
-    setEditableData(restaurantData);
+    setEditableData({ ...restaurantData, businessHours: businessHours });
     setIsEditing(true);
   };
 
@@ -149,6 +140,19 @@ export default function RestaurantProfile() {
   useEffect(() => {
     dispatch(getRestaurantData());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (displayData?.businessHours && displayData.businessHours.length >= 1) {
+      setBusinessHours(
+        DEFAULT_BUSINESS_HOURS.map((defaultHours) => {
+          const existingHours = displayData.businessHours.find(
+            (h) => h.day === defaultHours.day
+          );
+          return existingHours || defaultHours;
+        })
+      );
+    }
+  }, [displayData]);
 
   if (!displayData) return null;
 
@@ -456,6 +460,7 @@ export default function RestaurantProfile() {
         </section>
 
         {/* Business Hours */}
+        {console.log(businessHours)}
         <section
           className="bg-white rounded-lg shadow-sm border p-6"
           aria-labelledby="hours-heading"
