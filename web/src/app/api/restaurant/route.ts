@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     await dbConnect();
+
     const id = request.nextUrl.searchParams.get("id");
 
     if (!id) {
@@ -75,9 +76,13 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const updatedRestaurant = await (restaurantData as any).findByIdAndUpdate(id, body, {
-      new: true,
-    });
+    const updatedRestaurant = await (restaurantData as any).findByIdAndUpdate(
+      id,
+      body,
+      {
+        new: true,
+      }
+    );
 
     if (!updatedRestaurant) {
       return NextResponse.json(
@@ -113,7 +118,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const deletedRestaurant = await (restaurantData as any).findByIdAndDelete(id);
+    const deletedRestaurant = await (restaurantData as any).findByIdAndDelete(
+      id
+    );
 
     if (!deletedRestaurant) {
       return NextResponse.json(

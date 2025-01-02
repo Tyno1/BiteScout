@@ -65,14 +65,16 @@ export default function RestaurantProfile() {
 
   const handleSave = () => {
     if (editableData) {
-      dispatch(updateRestaurantData(editableData));
+      dispatch(
+        updateRestaurantData({ data: editableData, id: editableData._id })
+      );
       setIsEditing(false);
       setEditableData(null);
     }
   };
 
   const handleEdit = () => {
-    setEditableData({ ...restaurantData, businessHours: businessHours });
+    setEditableData({ ...restaurantData!, businessHours: businessHours });
     setIsEditing(true);
   };
 
@@ -460,7 +462,6 @@ export default function RestaurantProfile() {
         </section>
 
         {/* Business Hours */}
-        {console.log(businessHours)}
         <section
           className="bg-white rounded-lg shadow-sm border p-6"
           aria-labelledby="hours-heading"
