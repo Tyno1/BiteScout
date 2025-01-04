@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
         }
       );
     }
-    console.log(body);
     const newRestaurant = await (restaurantData as any).create(body);
     if (!newRestaurant) {
       return NextResponse.json(
