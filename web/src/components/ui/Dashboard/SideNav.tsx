@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import UserManagement from "@/app/dashboard/user-management/page";
 import Notifications from "@/app/dashboard/notifications/page";
 import Analytics from "@/app/dashboard/analytics/page";
+import { signOut } from "next-auth/react";
 
 interface NavItemProps {
   icon: React.ReactElement;
@@ -37,7 +38,11 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
   return (
     <li className="w-full">
       <button
-        onClick={() => HandleNav && HandleNav(path ? path : "/")}
+        onClick={() =>
+          text === "Logout"
+            ? signOut()
+            : HandleNav && HandleNav(path ? path : "/")
+        }
         className={`
           flex items-center 
           px-2 py-4 rounded-md 
@@ -140,11 +145,7 @@ const SideNav = () => {
                 text="Home"
                 path="/"
               />
-              <NavItem
-                HandleNav={HandleNav}
-                icon={<LogOut />}
-                text="Logout"
-              />
+              <NavItem HandleNav={HandleNav} icon={<LogOut />} text="Logout" />
             </ul>
           </li>
         </ul>

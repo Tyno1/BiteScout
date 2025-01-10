@@ -7,13 +7,13 @@ import { AppDispatch, RootState } from "@/state/store";
 import {
   updateRestaurantData,
   getRestaurantData,
-  RestaurantDataState,
 } from "@/state/restaurantData/restaurantDataSlice";
 import Hero from "../components/restaurant-profile/Hero";
 import BasicInformation from "../components/restaurant-profile/BasicInformation";
-import ContactInformation from "../components/restaurant-profile/contactInformation";
+import ContactInformation from "../components/restaurant-profile/ContactInformation";
 import BusinessHours from "../components/restaurant-profile/BusinessHours";
 import Features from "../components/restaurant-profile/Features";
+import { RestaurantDataState } from "@/types/restaurantData";
 
 interface BusinessHours {
   day: string;

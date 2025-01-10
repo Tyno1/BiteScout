@@ -36,6 +36,10 @@ const restaurantData = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Restaurant",
   },
+  ownerId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
   name: {
     type: String,
     required: true,
@@ -102,7 +106,8 @@ const restaurantData = new Schema({
   },
   meta: {
     type: Object,
-  }, 
+  },
 });
 
-module.exports = mongoose.models.RestaurantData || model("RestaurantData", restaurantData);
+module.exports =
+  mongoose.models.RestaurantData || model("RestaurantData", restaurantData);

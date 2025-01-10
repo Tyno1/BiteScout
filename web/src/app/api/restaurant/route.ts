@@ -1,35 +1,13 @@
-import dbConnect from "@/utils/db";
+import { dbConnect } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import restaurantData from "@/models/restaurantData";
-
-export async function GET(request: NextRequest) {
-  try {
-    await dbConnect();
-    const restaurant = await (restaurantData as any).findOne();
-
-    if (!restaurant) {
-      return NextResponse.json(
-        { error: "Restaurant data not found" },
-        {
-          status: 404,
-        }
-      );
-    }
-    return NextResponse.json(restaurant);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message },
-      {
-        status: 500,
-      }
-    );
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
+    console.log(body);
+
     if (!body) {
       return NextResponse.json(
         { error: "Invalid request body" },
@@ -52,6 +30,30 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: `${error} Failed to Create Restaurant Data` },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    await dbConnect();
+    const restaurant = await (restaurantData as any).findOne();
+
+    if (!restaurant) {
+      return NextResponse.json(
+        { error: "Restaurant data not found" },
+        {
+          status: 404,
+        }
+      );
+    }
+    return NextResponse.json(restaurant);
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message },
       {
         status: 500,
       }

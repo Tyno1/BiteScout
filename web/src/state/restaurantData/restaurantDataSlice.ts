@@ -1,29 +1,6 @@
+import { RestaurantDataState } from "@/types/restaurantData";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-
-interface BusinessHours {
-  day: string;
-  open: string;
-  close: string;
-  closed: boolean;
-}
-
-export interface RestaurantDataState {
-  _id?: string;
-  name: string;
-  logo: string;
-  description: string;
-  cuisine: string[];
-  priceRange: string;
-  address: string;
-  phone: string;
-  email: string;
-  website: string;
-  businessHours: BusinessHours[];
-  features: string[];
-  gallery: string[];
-  meta: any;
-}
 
 interface RestaurantState {
   restaurantData: RestaurantDataState;
@@ -55,10 +32,21 @@ const initialState: RestaurantState = {
     features: [],
     gallery: [],
     meta: {},
+    owner: false,
+    employee: false,
+    ownerId: "",
   },
   status: "idle",
   error: null,
 };
+
+export const createRestaurantData = createAsyncThunk(
+  "restaurantData/createRestaurantData",
+  async (data: RestaurantDataState) => {
+    const response = await axios.post(`${API_URL}/api/restaurant`, data);
+    return response.data;
+  }
+);
 
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
@@ -69,8 +57,17 @@ export const getRestaurantData = createAsyncThunk(
 );
 export const updateRestaurantData = createAsyncThunk(
   "restaurantData/updateRestaurantData",
-  async ({ data, id }: { data: RestaurantDataState; id: string }) => {
-    const response = await axios.put(`${API_URL}/api/restaurant/?id=${id}`, data);
+  async ({
+    data,
+    id,
+  }: {
+    data: RestaurantDataState;
+    id: string | undefined;
+  }) => {
+    const response = await axios.put(
+      `${API_URL}/api/restaurant/?id=${id}`,
+      data
+    );
     return response.data;
   }
 );
@@ -81,6 +78,22 @@ const restaurantDataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(
+        createRestaurantData.fulfilled,
+        (state, action: PayloadAction<RestaurantDataState>) => {
+          state.restaurantData = action.payload;
+          state.status = "succeeded";
+          state.error = null;
+        }
+      )
+      .addCase(createRestaurantData.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error has occurred";
+      })
+      .addCase(createRestaurantData.pending, (state, action) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(getRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;

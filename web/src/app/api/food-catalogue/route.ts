@@ -5,7 +5,7 @@ import foodCatalogue from "@/models/foodCatalogue";
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    const id  = await request.
+    // const id  = await request
     const foodCatalogueData = await foodCatalogue.findById(request.)
     if (!foodCatalogueData) {
       return NextResponse.json(

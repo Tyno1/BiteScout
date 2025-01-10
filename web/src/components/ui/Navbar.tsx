@@ -8,11 +8,14 @@ import Image from "next/image";
 import ProfileImg from "@/assets/images/profile.png";
 import "animate.css";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const [providers, setProviders] = useState<any>();
+  const router = useRouter();
+  console.log(session);
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
@@ -102,19 +105,24 @@ const Navbar = () => {
               </li>
             </ul>
           ) : (
-            <ul className="flex items-center gap-4">
-              {providers &&
-                Object.values(providers).map((provider: any) => (
-                  <li key={provider?.name}>
-                    <button
-                      aria-label={`Sign in with ${provider.name}`}
-                      type="button"
-                      onClick={() => signIn(provider?.id)}
-                    >
-                      {provider.name} Sign In
-                    </button>
-                  </li>
-                ))}
+            <ul className="flex items-center gap-4 ml-10">
+              <li>
+                <button
+                  className="px-4 py-2 bg-red text-white rounded-lg"
+                  type="button"
+                  onClick={() => router.push("/login")}
+                >
+                  Log In
+                </button>
+              </li>
+              <li>
+                <button
+                  className="px-4 py-2 bg-green-800 text-white rounded-lg"
+                  type="button"
+                >
+                  Register
+                </button>
+              </li>
             </ul>
           )}
         </li>
@@ -196,19 +204,24 @@ const Navbar = () => {
                 </li>
               </ul>
             ) : (
-              <ul className="">
-                {providers &&
-                  Object.values(providers).map((provider: any) => (
-                    <li key={provider?.name}>
-                      <button
-                        aria-label={`Sign in with ${provider.name}`}
-                        type="button"
-                        onClick={() => signIn(provider?.id)}
-                      >
-                        {provider.name} Sign In
-                      </button>
-                    </li>
-                  ))}
+              <ul className="flex items-center gap-4 ml-10">
+                <li>
+                  <button
+                    className="px-4 py-2 bg-red text-white rounded-lg"
+                    type="button"
+                    onClick={() => router.push("/login")}
+                  >
+                    Log In
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="px-4 py-2 bg-green-800 text-white rounded-lg"
+                    type="button"
+                  >
+                    Register
+                  </button>
+                </li>
               </ul>
             )}
           </li>
