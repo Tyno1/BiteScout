@@ -1,9 +1,10 @@
-import { RestaurantDataState } from "@/types/restaurantData";
+import { RestaurantList, RestaurantDataState } from "@/types/restaurantData";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface RestaurantState {
   restaurantData: RestaurantDataState;
+  allRestaurants: RestaurantList[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -33,9 +34,9 @@ const initialState: RestaurantState = {
     gallery: [],
     meta: {},
     owner: false,
-    employee: false,
     ownerId: "",
   },
+  allRestaurants: [],
   status: "idle",
   error: null,
 };
@@ -50,11 +51,19 @@ export const createRestaurantData = createAsyncThunk(
 
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
+  async (id: string) => {
+    const response = await axios.get(`${API_URL}/api/restaurant?id=${id}`);
+    return response.data;
+  }
+);
+export const getAllRestaurants = createAsyncThunk(
+  "restaurantData/getAllRestaurants",
   async () => {
     const response = await axios.get(`${API_URL}/api/restaurant`);
     return response.data;
   }
 );
+
 export const updateRestaurantData = createAsyncThunk(
   "restaurantData/updateRestaurantData",
   async ({
@@ -78,6 +87,10 @@ const restaurantDataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(createRestaurantData.pending, (state, action) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(
         createRestaurantData.fulfilled,
         (state, action: PayloadAction<RestaurantDataState>) => {
@@ -90,10 +103,7 @@ const restaurantDataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-      .addCase(createRestaurantData.pending, (state, action) => {
-        state.status = "loading";
-        state.error = null;
-      })
+
       .addCase(getRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -109,6 +119,17 @@ const restaurantDataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
+      .addCase(getAllRestaurants.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getAllRestaurants.fulfilled,
+        (state, action: PayloadAction<RestaurantList[]>) => {
+          state.status = "succeeded";
+          state.allRestaurants = action.payload;
+        }
+      )
       .addCase(updateRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;

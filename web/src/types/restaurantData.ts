@@ -23,3 +23,8 @@ export interface RestaurantDataState {
   owner: boolean;
   ownerId?: string;
 }
+
+export interface RestaurantList {
+  _id: string;
+  name: string;
+}

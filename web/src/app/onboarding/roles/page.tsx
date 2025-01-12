@@ -1,19 +1,18 @@
 "use client";
 
-import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
-import { AppDispatch, RootState } from "@/state/store";
+import Button from "@/components/buttons/Button";
+import {
+  createRestaurantData,
+  getAllRestaurants,
+} from "@/state/restaurantData/restaurantDataSlice";
+import { AppDispatch } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export default function Onboarding() {
-  const {
-    restaurantData: restaurant,
-    error,
-    status,
-  } = useSelector((state: RootState) => state.restaurantData);
   const dispatch = useDispatch<AppDispatch>();
   const session = useSession();
   const router = useRouter();
@@ -66,8 +65,10 @@ export default function Onboarding() {
   };
 
   useEffect(() => {
-    // get all resta
-  }, []);
+    if (!restaurantData.owner) {
+      dispatch(getAllRestaurants());
+    }
+  }, [dispatch, restaurantData.owner]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -79,8 +80,8 @@ export default function Onboarding() {
           <div className="space-y-8">
             {/* Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Restaurant Onboarding
+              <h1 className="text-3xl text-gray-900">
+                Welcome <span className="font-bold">{session.data?.user.name}</span>
               </h1>
               <p className="text-gray-500">
                 Please tell us about your role and restaurant
@@ -100,7 +101,6 @@ export default function Onboarding() {
                       setRestaurantData((prev) => ({
                         ...prev,
                         owner: true,
-                        employee: false,
                       }))
                     }
                     className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
@@ -140,12 +140,11 @@ export default function Onboarding() {
                     onClick={() =>
                       setRestaurantData((prev) => ({
                         ...prev,
-                        employee: true,
                         owner: false,
                       }))
                     }
                     className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      restaurantData.employee
+                      !restaurantData.owner
                         ? "border-blue-500 bg-blue-50 text-blue-700"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -157,11 +156,11 @@ export default function Onboarding() {
                     onClick={() =>
                       setRestaurantData((prev) => ({
                         ...prev,
-                        employee: false,
+                        owner: true,
                       }))
                     }
                     className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      !restaurantData.employee
+                      restaurantData.owner
                         ? "border-blue-500 bg-blue-50 text-blue-700"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -194,12 +193,8 @@ export default function Onboarding() {
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-              Continue
-            </button>
+
+            <Button type="submit" text="Continue" fullWidth />
           </div>
         </form>
       </div>

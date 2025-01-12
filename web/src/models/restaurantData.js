@@ -32,10 +32,6 @@ const BusinessHourSchema = new Schema({
 });
 
 const restaurantData = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    ref: "Restaurant",
-  },
   ownerId: {
     type: Schema.Types.ObjectId,
     ref: "User",

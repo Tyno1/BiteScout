@@ -2,122 +2,117 @@ import { dbConnect } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import restaurantData from "@/models/restaurantData";
 
+// Helper function to handle errors
+const handleError = (error: any, message: string, status = 500) => {
+  return NextResponse.json({ error: `${error} ${message}` }, { status });
+};
+
+// Helper function to validate request ID
+const validateId = (request: NextRequest) => {
+  const id = request.nextUrl.searchParams.get("id");
+  if (!id) {
+    throw new Error("No id provided");
+  }
+  return id;
+};
+
+// Create new restaurant
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
-    console.log(body);
 
     if (!body) {
       return NextResponse.json(
         { error: "Invalid request body" },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
+
     const newRestaurant = await (restaurantData as any).create(body);
     if (!newRestaurant) {
       return NextResponse.json(
-        { error: "could not create" },
-        {
-          status: 400,
-        }
+        { error: "Could not create restaurant" },
+        { status: 400 }
       );
     }
 
     return NextResponse.json(newRestaurant, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: `${error} Failed to Create Restaurant Data` },
-      {
-        status: 500,
-      }
-    );
+    return handleError(error, "Failed to Create Restaurant Data");
   }
 }
 
+// Get single restaurant by ID or get all restaurants
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    const restaurant = await (restaurantData as any).findOne();
+    const id = request.nextUrl.searchParams.get("id");
 
-    if (!restaurant) {
+    // If ID is provided, return single restaurant
+    if (id) {
+      const restaurant = await (restaurantData as any).findById(id);
+
+      if (!restaurant) {
+        return NextResponse.json(
+          { error: "Restaurant not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(restaurant);
+    }
+
+    // If no ID is provided, return all restaurants
+    const allRestaurants = await (restaurantData as any).find();
+
+    if (!allRestaurants || allRestaurants.length === 0) {
       return NextResponse.json(
-        { error: "Restaurant data not found" },
-        {
-          status: 404,
-        }
+        { error: "No restaurants found" },
+        { status: 404 }
       );
     }
-    return NextResponse.json(restaurant);
+    const restaurantList = allRestaurants.map((restaurant: any) => ({
+      _id: restaurant._id,
+      name: restaurant.name,
+    }));
+    return NextResponse.json(restaurantList);
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message },
-      {
-        status: 500,
-      }
-    );
+    return handleError(error, error.message);
   }
 }
 
+// Update restaurant data
 export async function PUT(request: NextRequest) {
   try {
     await dbConnect();
-
-    const id = request.nextUrl.searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "No id provided" },
-        {
-          status: 400,
-        }
-      );
-    }
-
+    const id = validateId(request);
     const body = await request.json();
+
     const updatedRestaurant = await (restaurantData as any).findByIdAndUpdate(
       id,
       body,
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     if (!updatedRestaurant) {
       return NextResponse.json(
         { error: "Restaurant data not updated" },
-        {
-          status: 404,
-        }
+        { status: 404 }
       );
     }
 
     return NextResponse.json(updatedRestaurant);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to edit Restaurant Data" },
-      {
-        status: 500,
-      }
-    );
+    return handleError(error, "Failed to edit Restaurant Data");
   }
 }
 
+// Delete restaurant data
 export async function DELETE(request: NextRequest) {
   try {
     await dbConnect();
-    const id = request.nextUrl.searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "No id provided" },
-        {
-          status: 400,
-        }
-      );
-    }
+    const id = validateId(request);
 
     const deletedRestaurant = await (restaurantData as any).findByIdAndDelete(
       id
@@ -126,19 +121,12 @@ export async function DELETE(request: NextRequest) {
     if (!deletedRestaurant) {
       return NextResponse.json(
         { error: "Restaurant data not found" },
-        {
-          status: 404,
-        }
+        { status: 404 }
       );
     }
 
     return NextResponse.json(deletedRestaurant);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete Restaurant Data" },
-      {
-        status: 500,
-      }
-    );
+    return handleError(error, "Failed to delete Restaurant Data");
   }
 }
