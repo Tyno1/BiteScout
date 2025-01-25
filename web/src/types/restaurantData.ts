@@ -27,4 +27,5 @@ export interface RestaurantDataState {
 export interface RestaurantList {
   _id: string;
   name: string;
+  ownerId: string;
 }

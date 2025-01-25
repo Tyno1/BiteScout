@@ -43,8 +43,11 @@ const initialState: RestaurantState = {
 
 export const createRestaurantData = createAsyncThunk(
   "restaurantData/createRestaurantData",
-  async (data: RestaurantDataState) => {
-    const response = await axios.post(`${API_URL}/api/restaurant`, data);
+  async (restaurantData: RestaurantDataState) => {
+    const response = await axios.post(
+      `${API_URL}/api/restaurant`,
+      restaurantData
+    );
     return response.data;
   }
 );
@@ -60,6 +63,8 @@ export const getAllRestaurants = createAsyncThunk(
   "restaurantData/getAllRestaurants",
   async () => {
     const response = await axios.get(`${API_URL}/api/restaurant`);
+    console.log(response.data);
+
     return response.data;
   }
 );

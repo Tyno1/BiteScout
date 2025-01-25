@@ -1,7 +1,6 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+import mongoose from "mongoose";
 
-const userTypeSchema = new Schema({
+const userTypeSchema = new mongoose.Schema({
   name: {
     type: String, // Root, Admin or User
     required: true,
@@ -16,6 +15,6 @@ const userTypeSchema = new Schema({
   },
 });
 
-const UserType = model("UserType", userTypeSchema);
+export default  mongoose.models.UserType || mongoose.model("UserType", userTypeSchema);
 
-module.exports = UserType;
+

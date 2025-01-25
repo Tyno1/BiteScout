@@ -4,22 +4,29 @@ import Button from "@/components/buttons/Button";
 import {
   createRestaurantData,
   getAllRestaurants,
+  getRestaurantData,
 } from "@/state/restaurantData/restaurantDataSlice";
-import { AppDispatch } from "@/state/store";
-import { RestaurantDataState } from "@/types/restaurantData";
+import { AppDispatch, RootState } from "@/state/store";
+import { RestaurantDataState, RestaurantList } from "@/types/restaurantData";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Onboarding() {
+  const {
+    allRestaurants,
+    restaurantData: restaurant,
+    error,
+    status,
+  } = useSelector((state: RootState) => state.restaurantData);
   const dispatch = useDispatch<AppDispatch>();
   const session = useSession();
   const router = useRouter();
 
   const defaultRestaurantData: RestaurantDataState = {
     name: "",
-    logo: "",
+    logo: "ttt",
     description: "",
     cuisine: [],
     priceRange: "",
@@ -50,25 +57,85 @@ export default function Onboarding() {
       [name]: value,
     }));
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // handle form submission
-    if (restaurantData.owner && session && session?.data?.user?.id) {
-      const newRestaurantData = {
+
+    if (restaurantData.owner && session?.data?.user?.id) {
+      // Ensure all required fields are present
+      const businessHours = restaurantData.businessHours.map((hour) => ({
+        day: hour.day || "Monday", // Default value
+        open: hour.open || "09:00", // Default value
+        close: hour.close || "17:00", // Default value
+        closed: hour.closed || false,
+      }));
+
+      const newRestaurantData: RestaurantDataState = {
         ...restaurantData,
         ownerId: session.data.user.id,
+        logo: restaurantData.logo || "default-logo-url", // Required
+        description: restaurantData.description || "Restaurant description", // Required
+        priceRange: restaurantData.priceRange || "$", // Required
+        address: restaurantData.address || "Restaurant address", // Required
+        phone: restaurantData.phone || "123-456-7890", // Required
+        email: restaurantData.email || "email@restaurant.com", // Required
+        website: restaurantData.website || "www.restaurant.com", // Required
+        businessHours: businessHours, // Required with proper structure
+        features: restaurantData.features || [],
+        gallery: restaurantData.gallery || [],
+        meta: restaurantData.meta || {},
       };
-      dispatch(createRestaurantData(newRestaurantData));
+
+      console.log("Submitting complete restaurant data:", newRestaurantData);
+
+      try {
+        const resultAction = await dispatch(
+          createRestaurantData(newRestaurantData)
+        );
+        if (createRestaurantData.fulfilled.match(resultAction)) {
+          console.log("Restaurant created successfully:", resultAction.payload);
+          router.push("/dashboard");
+        } else {
+          console.error("Failed to create restaurant:", resultAction.error);
+        }
+      } catch (error) {
+        console.error("Error creating restaurant:", error);
+      }
     } else {
       router.push("/onboarding/restaurant-search");
     }
   };
 
   useEffect(() => {
-    if (!restaurantData.owner) {
-      dispatch(getAllRestaurants());
+    if (!session?.data?.user?.id) {
+      return;
     }
-  }, [dispatch, restaurantData.owner]);
+
+    // First dispatch the action
+    dispatch(getAllRestaurants());
+  }, [dispatch, session?.data?.user?.id]);
+
+  // Separate useEffect to handle the status change
+  useEffect(() => {
+    const handleRestaurantData = async () => {
+      if (status === "succeeded" && session?.data?.user?.id) {
+        const ownerRestaurant = allRestaurants.find(
+          (restaurant) => restaurant.ownerId === session?.data?.user?.id
+        );
+        console.log("Restaurants:", allRestaurants);
+        console.log("Owner restaurant:", ownerRestaurant);
+
+        if (ownerRestaurant) {
+          await dispatch(getRestaurantData(ownerRestaurant._id));
+          router.push("/dashboard");
+        }
+      }else{
+        console.log("something is wrog");
+        
+      }
+    };
+
+    handleRestaurantData();
+  }, [status, allRestaurants, session?.data?.user?.id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -81,7 +148,8 @@ export default function Onboarding() {
             {/* Header */}
             <div className="space-y-2">
               <h1 className="text-3xl text-gray-900">
-                Welcome <span className="font-bold">{session.data?.user.name}</span>
+                Welcome{" "}
+                <span className="font-bold">{session.data?.user.name}</span>
               </h1>
               <p className="text-gray-500">
                 Please tell us about your role and restaurant
@@ -89,85 +157,37 @@ export default function Onboarding() {
             </div>
 
             {/* Role Selection */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-700">
-                  Are you a restaurant owner?
-                </h2>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        owner: true,
-                      }))
-                    }
-                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      restaurantData.owner
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        owner: false,
-                      }))
-                    }
-                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      !restaurantData.owner
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-700">
-                  Are you an employee?
-                </h2>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        owner: false,
-                      }))
-                    }
-                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      !restaurantData.owner
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRestaurantData((prev) => ({
-                        ...prev,
-                        owner: true,
-                      }))
-                    }
-                    className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                      restaurantData.owner
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    No
-                  </button>
-                </div>
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Select your role:
+              </h2>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRestaurantData((prev) => ({ ...prev, owner: true }))
+                  }
+                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                    restaurantData.owner
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  Restaurant Owner
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRestaurantData((prev) => ({ ...prev, owner: false }))
+                  }
+                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
+                    !restaurantData.owner
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  Employee
+                </button>
               </div>
             </div>
 
@@ -184,11 +204,20 @@ export default function Onboarding() {
                   value={restaurantData.name}
                   name="name"
                   onChange={handleInputChange}
-                  className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                  className={`${
+                    error && restaurantData.name === "" && "border-orange"
+                  } w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors `}
                   type="text"
                   id="restaurant-name"
                   placeholder="Enter your restaurant name"
                 />
+                {error && restaurantData.name === "" && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-orange">
+                      You must enter a restaurant name
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

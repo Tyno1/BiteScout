@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const BusinessHourSchema = new Schema({
   day: {
@@ -33,8 +33,8 @@ const BusinessHourSchema = new Schema({
 
 const restaurantData = new Schema({
   ownerId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
+    required: true,
   },
   name: {
     type: String,
@@ -105,5 +105,4 @@ const restaurantData = new Schema({
   },
 });
 
-module.exports =
-  mongoose.models.RestaurantData || model("RestaurantData", restaurantData);
+export default mongoose.models.RestaurantData || model("RestaurantData", restaurantData);

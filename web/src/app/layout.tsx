@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Montserrat } from "next/font/google";
 import Provider from "@/components/Provider";
-import { getServerSession } from "next-auth";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { ReduxProvider } from "@/components/ReduxProvider";
+import { auth } from "@/auth";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -19,7 +19,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await auth();
   return (
     <html lang="en" className={montserrat.className}>
       <body>

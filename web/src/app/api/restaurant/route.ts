@@ -1,6 +1,6 @@
-import { dbConnect } from "@/utils/db";
+import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import restaurantData from "@/models/restaurantData";
+import restaurantData from "@/app/api/models/restaurantData";
 
 // Helper function to handle errors
 const handleError = (error: any, message: string, status = 500) => {
@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
     }
 
     const newRestaurant = await (restaurantData as any).create(body);
+    console.log(newRestaurant);
+
     if (!newRestaurant) {
       return NextResponse.json(
         { error: "Could not create restaurant" },
@@ -75,6 +77,7 @@ export async function GET(request: NextRequest) {
     const restaurantList = allRestaurants.map((restaurant: any) => ({
       _id: restaurant._id,
       name: restaurant.name,
+      ownerId: restaurant.ownerId,
     }));
     return NextResponse.json(restaurantList);
   } catch (error: any) {
