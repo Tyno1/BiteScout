@@ -3,14 +3,12 @@
 import React, { useState } from "react";
 
 import { doCrednentialLogin } from "@/app/actions/index";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [payload, setPayload] = useState({
-    email: "",
-    password: "",
-  });
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,13 +22,10 @@ const LoginForm = () => {
 
       if (!!response?.error) {
         setError(response.error.message);
-        setPayload({ email: "", password: "" });
       } else {
         setLoading(false);
-
         console.log("Login successful");
-        // redirect("/dashboard");
-        // navigate to dashboard page
+        router.replace("/onboarding/roles");
       }
     } catch (error) {
       console.log(error);

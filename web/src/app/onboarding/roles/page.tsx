@@ -113,6 +113,8 @@ export default function Onboarding() {
     // First dispatch the action
     dispatch(getAllRestaurants());
   }, [dispatch, session?.data?.user?.id]);
+  console.log(session);
+  
 
   // Separate useEffect to handle the status change
   useEffect(() => {

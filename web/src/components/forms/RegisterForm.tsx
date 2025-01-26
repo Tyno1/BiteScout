@@ -25,7 +25,12 @@ const RegisterForm = () => {
 
       const response: any = await axios.post(
         `${API_URL}/api/register`,
-        payload
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       if (response?.error) {

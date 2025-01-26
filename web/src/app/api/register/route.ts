@@ -5,9 +5,10 @@ import userType from "../models/userType";
 
 export const POST = async (request: NextRequest) => {
   const { firstName, lastName, email, password } = await request.json();
+  const name = `${firstName} ${lastName}`;
   try {
     await dbConnect();
-    
+
     // get default userType - lowest priviledge - highest number
     const lowestPrivilegeType = await userType
       .findOne()
@@ -24,11 +25,11 @@ export const POST = async (request: NextRequest) => {
     }
     // Create new user
     const user = new User({
-      firstName,
-      lastName,
+      name,
       email,
       password,
       userType: lowestPrivilegeType._id,
+      loginMethod: "credentials",
     });
     await user.save();
 

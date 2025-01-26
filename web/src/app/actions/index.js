@@ -20,10 +20,11 @@ export async function doCrednentialLogin(formData) {
     const response = await signIn("credentials", {
       email,
       password,
-      redirectTo: "/onboarding/roles",
+      redirect: false,
     });
     console.log(response);
   } catch (error) {
+    console.error(error);
     throw new Error(error);
   }
 }

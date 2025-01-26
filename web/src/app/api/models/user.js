@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-// import bcrypt from 'bcrypt';
-// import * as argon from 'argon2';
-const argon = require("argon2");
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
@@ -15,11 +13,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
+    name: {
       type: String,
       required: true,
     },
@@ -43,6 +37,13 @@ const userSchema = new mongoose.Schema(
     address: String,
     password: {
       type: String,
+      required: function () {
+        return this.loginMethod === "credentials";
+      },
+    },
+    loginMethod: {
+      type: String,
+      enum: ["credentials", "oauth"],
       required: true,
     },
     isVerified: {
@@ -59,23 +60,20 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Password hashing before saving the user
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    try {
-      // this.password = await argon.hash(this.password);
-    } catch (error) {
-      return next(error);
-    }
+  if (
+    this.loginMethod === "credentials" &&
+    (this.isModified("password") || this.isNew)
+  ) {
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
-userSchema.method.comparePassword = async function (candidatePassword) {
-  try {
-    // return await argon.verify(this.password, candidatePassword);
-  } catch (error) {
-    throw new Error("Error comparing passwords");
-  }
+// Method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models?.User || mongoose.model("User", userSchema);
+export default mongoose.models.User || mongoose.model("User", userSchema);

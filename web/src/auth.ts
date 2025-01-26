@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import User from "@/app/api/models/user";
 import dbConnect from "./utils/db";
+import userType from "./app/api/models/userType";
 
 export const {
   handlers: { GET, POST },
@@ -48,8 +48,7 @@ export const {
           console.log(user);
 
           if (user) {
-            // const isMatch = user?.password === credentials?.password;
-            const isMatch = user.comparePassword(credentials);
+            const isMatch = user.comparePassword(credentials.password);
 
             if (isMatch) {
               return {
@@ -74,4 +73,38 @@ export const {
       },
     }),
   ],
+  callbacks: {
+    async session({ session }) {
+      return session;
+    },
+    async signIn({ profile }) {
+      console.log(profile);
+      try {
+        await dbConnect();
+        // get default userType - lowest priviledge - highest number
+        const lowestPrivilegeType = await userType
+          .findOne()
+          .sort({ level: -1 })
+          .limit(1);
+        const userExists = await User.findOne({ email: profile?.email });
+        if (!userExists) {
+          const newUser = new User({
+            email: profile?.email,
+            name: profile?.name,
+            image: profile?.image,
+            userType: lowestPrivilegeType._id,
+            loginMethod: "oauth",
+          });
+          await newUser.save();
+        } else {
+          console.log("User already exists");
+          throw new Error("User already exists");
+        }
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
+      }
+    },
+  },
 });
