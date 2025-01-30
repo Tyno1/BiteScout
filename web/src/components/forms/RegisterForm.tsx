@@ -1,6 +1,9 @@
 "use client";
 
+import { doCrednentialLogin } from "@/app/actions";
+import { signIn } from "@/auth";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -8,6 +11,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const RegisterForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,9 +41,11 @@ const RegisterForm = () => {
         setError(response.error.message);
       } else {
         setLoading(false);
-
         console.log("Registration successful");
-        // redirect("/dashboard");
+
+        await doCrednentialLogin(formData);
+        router.push("/onboarding/roles");
+        console.log("Login successful");
       }
     } catch (error) {
       console.log(error);

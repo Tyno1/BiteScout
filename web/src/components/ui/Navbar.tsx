@@ -13,26 +13,11 @@ import { useRouter } from "next/navigation";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
-  const [providers, setProviders] = useState<any>();
   const router = useRouter();
   console.log(session);
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
-  }, []);
-
-  const fetchProviders = async () => {
-    try {
-      const providersData = await getProviders();
-      setProviders(providersData);
-      console.log(providersData);
-    } catch (error) {
-      toast("error fetching");
-    }
-  };
-
-  useEffect(() => {
-    fetchProviders();
   }, []);
 
   return (

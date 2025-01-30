@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import User from "@/app/api/models/user";
 import dbConnect from "./utils/db";
 import userType from "./app/api/models/userType";
+import restaurantData from "./app/api/models/restaurantData";
 
 export const {
   handlers: { GET, POST },
@@ -53,8 +54,9 @@ export const {
             if (isMatch) {
               return {
                 id: user._id.toString(),
-                name: user.username,
+                name: user.name,
                 email: user.email,
+                userType: user.userType,
               };
             } else {
               throw new Error("Check your password");
@@ -75,10 +77,23 @@ export const {
   ],
   callbacks: {
     async session({ session }) {
+      const sessionUser = await User.findOne({ email: session.user.email });
+      session.user.id = sessionUser._id;
+      const restaurant = await restaurantData.find({
+        ownerId: session.user.id,
+      });
+      const restaurantCount = restaurant.length;
+
+      session.user.restaurantCount = restaurantCount;
       return session;
     },
-    async signIn({ profile }) {
-      console.log(profile);
+    async signIn(data) {
+      const { profile } = data;
+
+      // if login method is oauth
+      if (!profile) {
+        return true;
+      }
       try {
         await dbConnect();
         // get default userType - lowest priviledge - highest number
@@ -96,9 +111,6 @@ export const {
             loginMethod: "oauth",
           });
           await newUser.save();
-        } else {
-          console.log("User already exists");
-          throw new Error("User already exists");
         }
         return true;
       } catch (error) {

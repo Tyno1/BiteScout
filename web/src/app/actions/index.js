@@ -5,7 +5,7 @@ import { signIn, signOut } from "@/auth";
 export async function doSocialLogin(formData) {
   // Implement social login logic here
   const action = formData.get("action");
-  await signIn(action, { redirectTo: "/onboarding/roles" });
+  await signIn(action, { redirectTo: "/login/loading" });
   console.log(action);
 }
 export async function doLogout() {
@@ -17,12 +17,11 @@ export async function doCrednentialLogin(formData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const response = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
-    console.log(response);
   } catch (error) {
     console.error(error);
     throw new Error(error);

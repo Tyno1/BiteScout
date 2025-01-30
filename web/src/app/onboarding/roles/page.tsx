@@ -1,21 +1,16 @@
 "use client";
 
 import Button from "@/components/buttons/Button";
-import {
-  createRestaurantData,
-  getAllRestaurants,
-  getRestaurantData,
-} from "@/state/restaurantData/restaurantDataSlice";
+import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { RestaurantDataState, RestaurantList } from "@/types/restaurantData";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Onboarding() {
   const {
-    allRestaurants,
     restaurantData: restaurant,
     error,
     status,
@@ -57,6 +52,7 @@ export default function Onboarding() {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -72,13 +68,6 @@ export default function Onboarding() {
       const newRestaurantData: RestaurantDataState = {
         ...restaurantData,
         ownerId: session.data.user.id,
-        logo: restaurantData.logo || "default-logo-url", // Required
-        description: restaurantData.description || "Restaurant description", // Required
-        priceRange: restaurantData.priceRange || "$", // Required
-        address: restaurantData.address || "Restaurant address", // Required
-        phone: restaurantData.phone || "123-456-7890", // Required
-        email: restaurantData.email || "email@restaurant.com", // Required
-        website: restaurantData.website || "www.restaurant.com", // Required
         businessHours: businessHours, // Required with proper structure
         features: restaurantData.features || [],
         gallery: restaurantData.gallery || [],
@@ -104,40 +93,6 @@ export default function Onboarding() {
       router.push("/onboarding/restaurant-search");
     }
   };
-
-  useEffect(() => {
-    if (!session?.data?.user?.id) {
-      return;
-    }
-
-    // First dispatch the action
-    dispatch(getAllRestaurants());
-  }, [dispatch, session?.data?.user?.id]);
-  console.log(session);
-  
-
-  // Separate useEffect to handle the status change
-  useEffect(() => {
-    const handleRestaurantData = async () => {
-      if (status === "succeeded" && session?.data?.user?.id) {
-        const ownerRestaurant = allRestaurants.find(
-          (restaurant) => restaurant.ownerId === session?.data?.user?.id
-        );
-        console.log("Restaurants:", allRestaurants);
-        console.log("Owner restaurant:", ownerRestaurant);
-
-        if (ownerRestaurant) {
-          await dispatch(getRestaurantData(ownerRestaurant._id));
-          router.push("/dashboard");
-        }
-      }else{
-        console.log("something is wrog");
-        
-      }
-    };
-
-    handleRestaurantData();
-  }, [status, allRestaurants, session?.data?.user?.id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -225,7 +180,15 @@ export default function Onboarding() {
 
             {/* Submit Button */}
 
-            <Button type="submit" text="Continue" fullWidth />
+            <Button
+              type="submit"
+              text={
+                restaurantData.owner
+                  ? `Create Restaurant Profile`
+                  : `Find Your Restaurant`
+              }
+              fullWidth
+            />
           </div>
         </form>
       </div>

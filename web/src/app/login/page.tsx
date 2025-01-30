@@ -11,7 +11,7 @@ const Page = () => {
   const router = useRouter();
 
   if (session?.data?.user) {
-    redirect("/onboarding");
+    redirect("/login/loading");
   }
 
   return (
@@ -23,7 +23,9 @@ const Page = () => {
         <LoginForm />
         <div className="flex flex-col ">
           <p className="text-sm">You dont have an account?</p>
-          <button className="text-red" onClick={() => router.push("/register")}>Register</button>
+          <button className="text-red" onClick={() => router.push("/register")}>
+            Register
+          </button>
         </div>
       </div>
     </div>

@@ -43,46 +43,37 @@ const restaurantData = new Schema({
   },
   logo: {
     type: String,
-    required: true,
   },
   description: {
     type: String,
-    required: true,
     trim: true,
   },
   cuisine: {
     type: [String],
-    required: true,
   },
   priceRange: {
     type: String,
-    required: true,
     enum: ["$", "$$", "$$$", "$$$$"],
   },
   address: {
     type: String,
-    required: true,
     trim: true,
   },
   phone: {
     type: String,
-    required: true,
     match: /^\+?[\d\s-()]+$/,
   },
   email: {
     type: String,
-    required: true,
     lowercase: true,
     trim: true,
     match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
   },
   website: {
     type: String,
-    required: true,
   },
   businessHours: {
     type: [BusinessHourSchema],
-    required: true,
   },
   features: {
     type: [String],
@@ -98,7 +89,6 @@ const restaurantData = new Schema({
   },
   gallery: {
     type: [String],
-    required: true,
   },
   meta: {
     type: Object,

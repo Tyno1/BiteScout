@@ -11,7 +11,7 @@ const Page = () => {
   const router = useRouter();
 
   if (session?.data?.user) {
-    redirect("/onboarding");
+    redirect("/onboarding/roles");
   }
 
   return (

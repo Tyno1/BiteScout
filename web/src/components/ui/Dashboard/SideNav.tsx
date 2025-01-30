@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Home,
   UtensilsCrossed,
@@ -18,9 +18,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import UserManagement from "@/app/dashboard/user-management/page";
-import Notifications from "@/app/dashboard/notifications/page";
-import Analytics from "@/app/dashboard/analytics/page";
 import { doLogout } from "@/app/actions";
 
 interface NavItemProps {
@@ -145,7 +142,7 @@ const SideNav = () => {
                 text="Home"
                 path="/"
               />
-              <NavItem HandleNav={HandleNav} icon={<LogOut />} text="Logout" />
+              <NavItem icon={<LogOut />} text="Logout" />
             </ul>
           </li>
         </ul>

@@ -25,13 +25,14 @@ const LoginForm = () => {
       } else {
         setLoading(false);
         console.log("Login successful");
-        router.replace("/onboarding/roles");
+        router.replace("/login/loading");
       }
     } catch (error) {
       console.log(error);
       setError("Check your credentials");
     }
   };
+  
 
   return (
     <form

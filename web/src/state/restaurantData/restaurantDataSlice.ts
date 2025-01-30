@@ -59,6 +59,15 @@ export const getRestaurantData = createAsyncThunk(
     return response.data;
   }
 );
+
+export const getRestaurantDataByOwnerId = createAsyncThunk(
+  "restaurantData/getRestaurantDataByUserId",
+  async (id: string) => {
+    const response = await axios.get(`${API_URL}/api/restaurant/owner?id=${id}`);
+    return response.data;
+  }
+);
+
 export const getAllRestaurants = createAsyncThunk(
   "restaurantData/getAllRestaurants",
   async () => {
@@ -109,6 +118,7 @@ const restaurantDataSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
+
       .addCase(getRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -124,6 +134,26 @@ const restaurantDataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
+
+
+      .addCase(getRestaurantDataByOwnerId.pending, (state, action) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getRestaurantDataByOwnerId.fulfilled,
+        (state, action: PayloadAction<RestaurantDataState>) => {
+          state.status = "succeeded";
+          state.restaurantData = action.payload;
+          state.error = null;
+        }
+      )
+      .addCase(getRestaurantDataByOwnerId.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error has occurred";
+      })
+   
+
       .addCase(getAllRestaurants.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -135,6 +165,12 @@ const restaurantDataSlice = createSlice({
           state.allRestaurants = action.payload;
         }
       )
+      .addCase(getAllRestaurants.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error has occurred";
+      })
+
+
       .addCase(updateRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;
