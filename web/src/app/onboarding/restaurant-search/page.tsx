@@ -29,9 +29,9 @@ export default function RestaurantSearch() {
     setSearchTerm(e.target.value);
   };
 
-  useEffect(() => {
-    dispatch(getAllRestaurants());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getAllRestaurants());
+  // }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -56,7 +56,7 @@ export default function RestaurantSearch() {
               className="w-full p-4 border-b-2 border-black rounded outline-none focus:ring-0 focus:border-b-2 focus:border-red transition-colors duration-200"
             />
 
-            {status === "loading" ? (
+            {/* {status === "loading" ? (
               <p className="text-center text-gray-600">
                 Loading restaurants...
               </p>
@@ -87,7 +87,7 @@ export default function RestaurantSearch() {
                   )}
                 </ul>
               )
-            )}
+            )} */}
             <Button
               onClick={() => router.replace("/dashboard")}
               text="Request Authorization"

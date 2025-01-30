@@ -24,10 +24,17 @@ export default async function RootLayout({
     <html lang="en" className={montserrat.className}>
       <body>
         <ReduxProvider>
-          <Provider session={session}>
-            <ToastContainer />
-            <main className="">{children}</main>
-          </Provider>
+          {typeof window !== "undefined" ? (
+            <Provider session={session}>
+              <ToastContainer />
+              <main className="">{children}</main>
+            </Provider>
+          ) : (
+            <Provider session={session}>
+              <ToastContainer />
+              <main className="">{children}</main>
+            </Provider>
+          )}
         </ReduxProvider>
       </body>
     </html>

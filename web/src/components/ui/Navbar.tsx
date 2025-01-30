@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { signIn, signOut, getProviders, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileImg from "@/assets/images/profile.png";
 import "animate.css";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 const Navbar = () => {
@@ -23,7 +22,7 @@ const Navbar = () => {
   return (
     <nav className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 bg-white sticky top-0 z-50 overflow-none">
       <Link href="/" className="flex-shrink-0">
-        <img src="" alt="Company Logo" />
+        {/* <img src="none" alt="Company Logo" /> */}
       </Link>
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center text-black">

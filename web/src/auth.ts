@@ -78,7 +78,8 @@ export const {
   callbacks: {
     async session({ session }) {
       const sessionUser = await User.findOne({ email: session.user.email });
-      session.user.id = sessionUser._id;
+
+      session.user.id = sessionUser._id.toString();
       const restaurant = await restaurantData.find({
         ownerId: session.user.id,
       });

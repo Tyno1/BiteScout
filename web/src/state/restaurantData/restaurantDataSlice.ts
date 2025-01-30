@@ -1,10 +1,9 @@
-import { RestaurantList, RestaurantDataState } from "@/types/restaurantData";
+import { RestaurantDataState } from "@/types/restaurantData";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface RestaurantState {
   restaurantData: RestaurantDataState;
-  allRestaurants: RestaurantList[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -13,6 +12,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: RestaurantState = {
   restaurantData: {
+    _id: "",
     name: "",
     logo: "",
     description: "",
@@ -36,7 +36,6 @@ const initialState: RestaurantState = {
     owner: false,
     ownerId: "",
   },
-  allRestaurants: [],
   status: "idle",
   error: null,
 };
@@ -63,17 +62,9 @@ export const getRestaurantData = createAsyncThunk(
 export const getRestaurantDataByOwnerId = createAsyncThunk(
   "restaurantData/getRestaurantDataByUserId",
   async (id: string) => {
-    const response = await axios.get(`${API_URL}/api/restaurant/owner?id=${id}`);
-    return response.data;
-  }
-);
-
-export const getAllRestaurants = createAsyncThunk(
-  "restaurantData/getAllRestaurants",
-  async () => {
-    const response = await axios.get(`${API_URL}/api/restaurant`);
-    console.log(response.data);
-
+    const response = await axios.get(
+      `${API_URL}/api/restaurant/owner?id=${id}`
+    );
     return response.data;
   }
 );
@@ -118,7 +109,6 @@ const restaurantDataSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
-
       .addCase(getRestaurantData.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -134,7 +124,6 @@ const restaurantDataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-
 
       .addCase(getRestaurantDataByOwnerId.pending, (state, action) => {
         state.status = "loading";
@@ -152,24 +141,6 @@ const restaurantDataSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-   
-
-      .addCase(getAllRestaurants.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        getAllRestaurants.fulfilled,
-        (state, action: PayloadAction<RestaurantList[]>) => {
-          state.status = "succeeded";
-          state.allRestaurants = action.payload;
-        }
-      )
-      .addCase(getAllRestaurants.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "An error has occurred";
-      })
-
 
       .addCase(updateRestaurantData.pending, (state) => {
         state.status = "loading";

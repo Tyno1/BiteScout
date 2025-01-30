@@ -3,7 +3,7 @@
 import Button from "@/components/buttons/Button";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch, RootState } from "@/state/store";
-import { RestaurantDataState, RestaurantList } from "@/types/restaurantData";
+import { RestaurantDataState } from "@/types/restaurantData";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -69,9 +69,8 @@ export default function Onboarding() {
         ...restaurantData,
         ownerId: session.data.user.id,
         businessHours: businessHours, // Required with proper structure
-        features: restaurantData.features || [],
-        gallery: restaurantData.gallery || [],
-        meta: restaurantData.meta || {},
+        priceRange: restaurantData.priceRange || "$",
+
       };
 
       console.log("Submitting complete restaurant data:", newRestaurantData);
@@ -80,6 +79,8 @@ export default function Onboarding() {
         const resultAction = await dispatch(
           createRestaurantData(newRestaurantData)
         );
+        console.log(resultAction);
+
         if (createRestaurantData.fulfilled.match(resultAction)) {
           console.log("Restaurant created successfully:", resultAction.payload);
           router.push("/dashboard");

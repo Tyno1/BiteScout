@@ -132,7 +132,9 @@ export default function RestaurantProfile() {
   };
 
   useEffect(() => {
-    dispatch(getRestaurantData(restaurantData?._id));
+    console.log(restaurantData);
+    
+    dispatch(getRestaurantData(restaurantData._id));
   }, [dispatch]);
 
   useEffect(() => {
