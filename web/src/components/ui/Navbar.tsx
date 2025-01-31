@@ -22,7 +22,7 @@ const Navbar = () => {
   return (
     <nav className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 bg-white sticky top-0 z-50 overflow-none">
       <Link href="/" className="flex-shrink-0">
-        {/* <img src="none" alt="Company Logo" /> */}
+        <img src="none" alt="Bite Scout" />
       </Link>
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center text-black">
@@ -101,7 +101,7 @@ const Navbar = () => {
               </li>
               <li>
                 <button
-                  className="px-4 py-2 bg-green-800 text-white rounded-lg"
+                  className="px-4 py-2 bg-black text-white rounded-lg"
                   type="button"
                 >
                   Register
