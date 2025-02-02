@@ -20,7 +20,7 @@ const Page = () => {
         <h2 className="font-bold text-2xl">Register</h2>
         <RegisterForm />
         <p>Or</p>
-        <SocialLogin />
+        <SocialLogin loginType="Register" />
         <div className="flex flex-col ">
           <p className="text-sm">Already have an account?</p>
           <button className="text-red" onClick={() => router.push("/login")}>

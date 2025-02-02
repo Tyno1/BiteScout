@@ -70,7 +70,6 @@ export default function Onboarding() {
         ownerId: session.data.user.id,
         businessHours: businessHours, // Required with proper structure
         priceRange: restaurantData.priceRange || "$",
-
       };
 
       console.log("Submitting complete restaurant data:", newRestaurantData);

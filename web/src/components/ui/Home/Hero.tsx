@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import img1 from "@/assets/hero/lum3n-cHc5H3_FKhs-unsplash.jpg";
+import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";
 import { motion } from "motion/react";
 
 export default function Hero() {
   return (
     <section className="w-screen h-screen flex justify-center">
-      <div className="relative w-[95%] h-[85%] flex flex-col justify-center text-white rounded-3xl overflow-hidden">
+      <div className="relative w-full h-full flex flex-col justify-center text-white overflow-hidden">
         <Image
           src={img1}
           alt="Delicious local cuisine spread"
@@ -15,8 +15,8 @@ export default function Hero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black bg-opacity-50" />
-        <div className="relative flex flex-col items-start z-10 w-full md:w-[60%] md:ml-10 p-4">
+        <div className="absolute inset-0 bg-black bg-opacity-60" />
+        <div className="relative flex flex-col items-start z-10 w-full md:w-[70%] md:ml-10 p-4">
           <motion.h1
             initial={{ opacity: 0, y: -50 }}
             animate={{

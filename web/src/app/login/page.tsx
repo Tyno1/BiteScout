@@ -18,7 +18,7 @@ const Page = () => {
     <div className="bg-black w-[100vw] h-[100vh] flex items-center justify-center">
       <div className="text-white w-[25%] min-h-[50%] flex flex-col items-center gap-6">
         <h2 className="font-bold text-2xl">Sign In</h2>
-        <SocialLogin />
+        <SocialLogin loginType="Sign In" />
         <p>Or</p>
         <LoginForm />
         <div className="flex flex-col ">

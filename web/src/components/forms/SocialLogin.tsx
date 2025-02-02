@@ -1,7 +1,11 @@
 import React from "react";
 import { doSocialLogin } from "@/app/actions/index";
 
-export default function SocialLogin() {
+interface LoginProp {
+  loginType: string;
+}
+
+export default function SocialLogin({ loginType }: LoginProp) {
   return (
     <form action={doSocialLogin} className="flex flex-col gap-2 w-full">
       <button
@@ -10,7 +14,7 @@ export default function SocialLogin() {
         name="action"
         value="google"
       >
-        Sign in with Google
+        {loginType} with Google
       </button>
       <button
         className="text-sm font-bold w-full py-2 px-4 bg-white rounded text-black"
@@ -18,7 +22,7 @@ export default function SocialLogin() {
         name="action"
         value="github"
       >
-        Sign in with GitHub
+        {loginType} with GitHub
       </button>
     </form>
   );
