@@ -1,0 +1,120 @@
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
+
+const PriceSchema = new Schema({
+  amount: {
+    type: Number,
+    required: true,
+  },
+  currency: {
+    type: String,
+    required: true,
+    enum: [
+      "USD",
+      "EUR",
+      "GBP",
+      "CAD",
+      "AUD",
+      "JPY",
+      "CNY",
+      "KRW",
+      "MYR",
+      "TWD",
+      "VND",
+      "THB",
+      "ZAR",
+    ],
+  },
+});
+
+const foodCatalogueSchema = new Schema({
+  foodName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  ingredents: {
+    type: [String],
+    required: true,
+  },
+  cuisineTypes: {
+    type: String,
+    required: true,
+    enum: [
+      "American",
+      "Italian",
+      "Mexican",
+      "Chinese",
+      "Japanese",
+      "Indian",
+      "Thai",
+      "French",
+      "German",
+      "Spanish",
+      "Russian",
+      "Turkish",
+      "Vietnamese",
+      "Greek",
+      "Indonesian",
+      "Korean",
+      "Lebanese",
+      "Malaysian",
+      "Mexican",
+      "Nepali",
+      "Pakistani",
+      "Persian",
+      "Nigerian",
+      "Romanian",
+      "Scottish",
+      "Taiwanese",
+      "Vietnamese",
+      "Welsh",
+      "Yemenite",
+      "Yugoslavian",
+      "Zambian",
+    ],
+    allergens: {
+      type: [String],
+      required: true,
+      enum: [
+        "Gluten",
+        "Dairy",
+        "Egg",
+        "Crustaceans",
+        "Celery",
+        "Fish",
+        "Lupin",
+        "Milk",
+        "Molluscs",
+        "Mustard",
+        "Peanuts",
+        "Sesame",
+        "Soybeans",
+        "Sulphur dioxide",
+        "Sulphites",
+      ],
+    },
+    mealComponent: {
+      type: String,
+      required: true,
+      enum: [
+        "Appetizer",
+        "Main Course",
+        "Dessert",
+        "Beverage",
+        "Salad",
+        "Side Dish",
+      ],
+    },
+    price: {
+      type: PriceSchema,
+      required: true,
+    },
+    images: {
+      type: [String],
+      required: true,
+    },
+  },
+});
+
+module.exports = model("FoodCatalogue", foodCatalogueSchema);
