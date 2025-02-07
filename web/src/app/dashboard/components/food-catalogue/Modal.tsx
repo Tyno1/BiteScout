@@ -4,13 +4,15 @@ export default function Modal({
   setIsModalOpen,
   setNewFood,
   newFood,
-  CUISINE_TYPES,
-  MEAL_COMPONENTS,
+  CUISINE,
+  COURSES,
   ALLERGENS,
   handleAddFood,
   handleImageUpload,
   toggleAllergen,
 }: any) {
+  console.log(ALLERGENS);
+  
   return (
     <>
       {/* Modal Backdrop */}
@@ -82,7 +84,7 @@ export default function Modal({
                     className="w-full border p-2 rounded"
                   >
                     <option value="">Select Cuisine Type</option>
-                    {CUISINE_TYPES.map((type: any) => (
+                    {CUISINE.map((type: any) => (
                       <option key={type} value={type}>
                         {type}
                       </option>
@@ -103,7 +105,7 @@ export default function Modal({
                     className="w-full border p-2 rounded"
                   >
                     <option value="">Select Meal Component</option>
-                    {MEAL_COMPONENTS.map((component: any) => (
+                    {COURSES.map((component: any) => (
                       <option key={component} value={component}>
                         {component}
                       </option>

@@ -134,7 +134,7 @@ export default function RestaurantProfile() {
   useEffect(() => {
     console.log(restaurantData);
     
-    dispatch(getRestaurantData(restaurantData._id));
+    dispatch(getRestaurantData(restaurantData?._id));
   }, [dispatch]);
 
   useEffect(() => {
@@ -152,7 +152,6 @@ export default function RestaurantProfile() {
 
   if (!displayData) return null;
 
-  console.log(restaurantData);
   
   return (
     <main className="w-full min-h-screen bg-gray-50">

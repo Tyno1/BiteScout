@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
 
-const CUISINE_TYPES = [
+
+
+const CUISINE = [
   "Italian",
   "Mexican",
   "Chinese",
@@ -18,7 +20,7 @@ const CUISINE_TYPES = [
   "Other",
 ] as const;
 
-const MEAL_COMPONENTS = [
+const COURSES = [
   "Appetizer",
   "Main Course",
   "Dessert",
@@ -42,7 +44,7 @@ const ALLERGENS = [
   "Sulfur dioxide and sulfites",
   "Lupin",
   "Mollusks",
-] as const;
+];
 
 export type FoodItem = {
   name: string;
@@ -102,7 +104,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          className="bg-black hover:bg-green-600 text-white px-4 py-2 rounded"
         >
           Add New Item
         </button>
@@ -117,8 +119,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           setIsModalOpen={setIsModalOpen}
           setNewFood={setNewFood}
           newFood={newFood}
-          CUISINE_TYPES={CUISINE_TYPES}
-          MEAL_COMPONENTS={MEAL_COMPONENTS}
+          CUISINE={CUISINE}
+          COURSES={COURSES}
           ALLERGENS={ALLERGENS}
           handleAddFood={handleAddFood}
           handleImageUpload={handleImageUpload}

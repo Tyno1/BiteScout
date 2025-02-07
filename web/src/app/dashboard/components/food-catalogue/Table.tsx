@@ -16,7 +16,7 @@ export default function Table({ foods }: any) {
               Cuisine
             </th>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Component
+              Course
             </th>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
               Price

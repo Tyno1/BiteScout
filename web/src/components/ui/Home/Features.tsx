@@ -1,5 +1,6 @@
 import React from "react";
-import { TrendingUp, Utensils, Camera } from "lucide-react";
+import { TrendingUp, Utensils, Camera, MoveRight } from "lucide-react";
+import Link from "next/link";
 
 const features = [
   {
@@ -37,7 +38,8 @@ const features = [
   {
     icon: <Utensils className="w-12 h-12 text-red-500" />,
     title: "Restaurant Profile",
-    description: "Customize your restaurant details, photos, and special offerings",
+    description:
+      "Customize your restaurant details, photos, and special offerings",
     featureType: "Restaurant Admin",
   },
 ];
@@ -46,7 +48,7 @@ export default function Features() {
     <section className="w-screen py-20 flex justify-center bg-gray-50">
       <div className="w-[90%] flex flex-col items-center">
         <h2 className="text-5xl font-bold mb-16">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -67,6 +69,13 @@ export default function Features() {
             </div>
           ))}
         </div>
+        <Link
+          href="/about"
+          className="mt-8 text-2xls flex items-center text-black hover:text-red transition duration-300 ease-in-out"
+        >
+          Explore more Bite Scout Features{" "}
+          <MoveRight size={30} className="ml-10" />
+        </Link>
       </div>
     </section>
   );
