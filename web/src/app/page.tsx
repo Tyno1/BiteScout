@@ -11,12 +11,12 @@ export default function Home() {
   return (
     <div className="max-w-[100vw] min-h-[100vh] flex flex-col items-center">
       <Navbar theme="dark" />
-      <Hero />
+      <Hero /> 
       <Features />
       <TopMeals />
-      <PopularDestinations />
+       <PopularDestinations />
       <Testimonials />
-      <CallToAction />
+      <CallToAction /> 
       <Footer />
     </div>
   );

@@ -1,18 +1,19 @@
+import { Allergen, Course, Cuisine } from "@/types/foodCatalogue";
 import React from "react";
 
 export default function Modal({
   setIsModalOpen,
   setNewFood,
   newFood,
-  CUISINE,
-  COURSES,
-  ALLERGENS,
+  cuisineData,
+  courseData,
+  allergenData,
   handleAddFood,
   handleImageUpload,
   toggleAllergen,
 }: any) {
-  console.log(ALLERGENS);
-  
+  console.log(allergenData);
+
   return (
     <>
       {/* Modal Backdrop */}
@@ -84,9 +85,9 @@ export default function Modal({
                     className="w-full border p-2 rounded"
                   >
                     <option value="">Select Cuisine Type</option>
-                    {CUISINE.map((type: any) => (
-                      <option key={type} value={type}>
-                        {type}
+                    {cuisineData.map((cuisine: Cuisine) => (
+                      <option key={cuisine?._id} value={cuisine?.name}>
+                        {cuisine?.name}
                       </option>
                     ))}
                   </select>
@@ -105,9 +106,9 @@ export default function Modal({
                     className="w-full border p-2 rounded"
                   >
                     <option value="">Select Meal Component</option>
-                    {COURSES.map((component: any) => (
-                      <option key={component} value={component}>
-                        {component}
+                    {courseData.map((course: Course) => (
+                      <option key={course?._id} value={course?.name}>
+                        {course?.name}
                       </option>
                     ))}
                   </select>
@@ -144,9 +145,9 @@ export default function Modal({
               <div className="mt-4">
                 <label className="block mb-2">Allergens</label>
                 <div className="flex flex-wrap gap-2">
-                  {ALLERGENS.map((allergen: string) => (
+                  {allergenData.map((allergen: Allergen) => (
                     <button
-                      key={allergen}
+                      key={allergen._id}
                       onClick={() => toggleAllergen(allergen)}
                       className={`px-3 py-1 rounded ${
                         newFood.allergens.includes(allergen)
@@ -154,7 +155,7 @@ export default function Modal({
                           : "bg-gray-200"
                       }`}
                     >
-                      {allergen}
+                      {allergen.name}
                     </button>
                   ))}
                 </div>

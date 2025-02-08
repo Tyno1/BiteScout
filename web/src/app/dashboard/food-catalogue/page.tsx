@@ -1,82 +1,53 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
-
-
-
-const CUISINE = [
-  "Italian",
-  "Mexican",
-  "Chinese",
-  "Indian",
-  "Japanese",
-  "Thai",
-  "French",
-  "Mediterranean",
-  "American",
-  "Greek",
-  "Other",
-] as const;
-
-const COURSES = [
-  "Appetizer",
-  "Main Course",
-  "Dessert",
-  "Beverage",
-  "Salad",
-  "Side Dish",
-] as const;
-
-const ALLERGENS = [
-  "Gluten",
-  "Shellfish",
-  "Eggs",
-  "Fish",
-  "Peanuts",
-  "Soybeans",
-  "Milk",
-  "Tree nuts",
-  "Celery",
-  "Mustard",
-  "Sesame seeds",
-  "Sulfur dioxide and sulfites",
-  "Lupin",
-  "Mollusks",
-];
-
-export type FoodItem = {
-  name: string;
-  ingredients: string;
-  cuisineType: string[];
-  mealComponent: string[];
-  price: string;
-  allergens: string[];
-  images: string[];
-};
+import { FoodCatalogue } from "@/types/foodCatalogue";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
+import { getAllergens } from "@/state/allergen/allergenSlice";
+import { getCuisine } from "@/state/cuisine/cuisineSlice";
+import { getCourse } from "@/state/course/courseSlice";
 
 export default function FoodCatalogueManagement(): React.ReactElement {
-  const [foods, setFoods] = useState<FoodItem[]>([]);
+  const {
+    allergenData,
+    status: allergenStatus,
+    error: allergenError,
+  } = useSelector((state: RootState) => state.allergen);
+  const {
+    courseData,
+    status: courseStatus,
+    error: courseError,
+  } = useSelector((state: RootState) => state.course);
+  const {
+    cuisineData,
+    status: cuisineStatus,
+    error: cuisineError,
+  } = useSelector((state: RootState) => state.cuisine);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [foods, setFoods] = useState<FoodCatalogue[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newFood, setNewFood] = useState<FoodItem>({
+  const [newFood, setNewFood] = useState<FoodCatalogue>({
     name: "",
-    ingredients: "",
-    cuisineType: [],
-    mealComponent: [],
+    ingredients: [],
+    cuisineType: "",
+    course: "",
     price: "",
     allergens: [],
     images: [],
   });
 
   const handleAddFood = (): void => {
-    if (newFood.name && newFood.cuisineType && newFood.mealComponent) {
+    if (newFood.name && newFood.cuisineType && newFood.course) {
       setFoods([...foods, newFood]);
       setNewFood({
         name: "",
-        ingredients: "",
-        cuisineType: [],
-        mealComponent: [],
+        ingredients: [],
+        cuisineType: "",
+        course: "",
         price: "",
         allergens: [],
         images: [],
@@ -97,6 +68,23 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const handleImageUpload = (): void => {
     // Handle image upload logic here
   };
+
+  useEffect(() => {
+    dispatch(getAllergens());
+    dispatch(getCuisine());
+    dispatch(getCourse());
+
+    console.log(
+      "Allergens:",
+      allergenData,
+      "Cuisine:",
+      cuisineData,
+      "Courses:",
+      courseData
+    );
+
+    // Fetch foods data from the server here and update the foods state accordingly.
+  }, [dispatch]);
 
   return (
     <div className="container mx-auto p-4">
@@ -119,9 +107,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           setIsModalOpen={setIsModalOpen}
           setNewFood={setNewFood}
           newFood={newFood}
-          CUISINE={CUISINE}
-          COURSES={COURSES}
-          ALLERGENS={ALLERGENS}
+          cuisineData={cuisineData}
+          courseData={courseData}
+          allergenData={allergenData}
           handleAddFood={handleAddFood}
           handleImageUpload={handleImageUpload}
           toggleAllergen={toggleAllergen}

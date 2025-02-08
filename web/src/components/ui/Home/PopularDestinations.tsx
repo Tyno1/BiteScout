@@ -4,7 +4,7 @@ import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 
 export default function PopularDestinations() {
   return (
-    <section className="w-screen py-20 flex justify-center">
+    <section className="w-full py-20 flex justify-center">
       <div className="w-full flex flex-col items-center">
         <h2 className="text-5xl font-bold mb-4">Popular Destinations</h2>
         <p className="text-gray-600 mb-16 text-center max-w-2xl">

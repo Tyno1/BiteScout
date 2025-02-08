@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import CuisineType from "@/app/api/models/foodCatalogue";
+import CuisineType from "@/app/api/models/cuisinetype";
 import dbConnect from "@/utils/db";
 
 // get all cusisine Types by restaurant Id

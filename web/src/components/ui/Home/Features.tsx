@@ -45,7 +45,7 @@ const features = [
 ];
 export default function Features() {
   return (
-    <section className="w-screen py-20 flex justify-center bg-gray-50">
+    <section className="w-full py-20 flex justify-center bg-gray-50">
       <div className="w-[90%] flex flex-col items-center">
         <h2 className="text-5xl font-bold mb-16">How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
