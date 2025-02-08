@@ -8,6 +8,17 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        red: "#d62828",
+        orange: "#f77f00",
+        green: "#16a34a",
+        yellow: "#fcbf49",
+        gray: {
+          lighter: "#F2F2F2",
+          DEFAULT: "#E5E5E5",
+          darker: "#C4C4C4",
+        },
+      },
     },
   },
   plugins: [],
