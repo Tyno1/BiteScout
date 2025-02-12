@@ -16,13 +16,19 @@ export interface Cuisine {
   description: string;
 }
 
-export interface FoodCatalogue {
+interface price {
+  currency: string;
+  amount: number;
+}
+
+export interface FoodData {
   _id?: string;
   name: string;
   ingredients: string[];
   cuisineType: string;
   course: string;
-  price: string;
+  price: price;
   allergens: string[];
   images?: string[];
+  restaurant: string;
 }

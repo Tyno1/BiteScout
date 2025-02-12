@@ -1,6 +1,9 @@
+import { FoodData } from "@/types/foodCatalogue";
 import React from "react";
 
-export default function Table({ foods }: any) {
+export default function Table( {foodDatas} : any) {
+  console.log(foodDatas);
+  
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full border-collapse">
@@ -30,13 +33,13 @@ export default function Table({ foods }: any) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {foods.map((food: any, index: number) => (
+          {foodDatas?.map((food: any, index: number) => (
             <tr key={index} className="hover:bg-gray-50">
               <td className="px-6 py-4">{food.name}</td>
               <td className="px-6 py-4">{food.ingredients}</td>
               <td className="px-6 py-4">{food.cuisineType}</td>
               <td className="px-6 py-4">{food.mealComponent}</td>
-              <td className="px-6 py-4">${food.price}</td>
+              <td className="px-6 py-4">{food.price.currency}{food.price.amount}</td>
               <td className="px-6 py-4">{food.allergens.join(", ")}</td>
               <td className="px-6 py-4">{food.images.length} images</td>
             </tr>

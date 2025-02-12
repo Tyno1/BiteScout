@@ -3,12 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
-import { FoodCatalogue } from "@/types/foodCatalogue";
+import { FoodData } from "@/types/foodCatalogue";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { getAllergens } from "@/state/allergen/allergenSlice";
 import { getCuisine } from "@/state/cuisine/cuisineSlice";
 import { getCourse } from "@/state/course/courseSlice";
+import {
+  createFoodCatalogue,
+  getFoodCatalogue,
+} from "@/state/foodCatalogueData/foodCatalogueSlice";
 
 export default function FoodCatalogueManagement(): React.ReactElement {
   const {
@@ -26,32 +30,60 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     status: cuisineStatus,
     error: cuisineError,
   } = useSelector((state: RootState) => state.cuisine);
-  const dispatch = useDispatch<AppDispatch>();
+  const {
+    restaurantData,
+    status: restaurantStatus,
+    error: restaurantError,
+  } = useSelector((state: RootState) => state.restaurantData);
+  const {
+    foodData,
+    foodDatas,
+    status: foodDataStatus,
+    error: foodDataError,
+  } = useSelector((state: RootState) => state.foodCatalogue);
 
-  const [foods, setFoods] = useState<FoodCatalogue[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newFood, setNewFood] = useState<FoodCatalogue>({
+  const currencies = [
+    "GBP",
+    "USD",
+    "EUR",
+    "CAD",
+    "AUD",
+    "JPY",
+    "CNY",
+    "KRW",
+    "MYR",
+    "TWD",
+    "VND",
+    "THB",
+    "ZAR",
+  ];
+  const DefaultFoodData = {
     name: "",
     ingredients: [],
     cuisineType: "",
     course: "",
-    price: "",
+    price: {
+      currency: currencies[0],
+      amount: 0,
+    },
     allergens: [],
     images: [],
-  });
+    restaurant: "",
+  };
 
-  const handleAddFood = (): void => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [newFood, setNewFood] = useState<FoodData>(DefaultFoodData);
+
+  const handleAddFood = async () => {
     if (newFood.name && newFood.cuisineType && newFood.course) {
-      setFoods([...foods, newFood]);
-      setNewFood({
-        name: "",
-        ingredients: [],
-        cuisineType: "",
-        course: "",
-        price: "",
-        allergens: [],
-        images: [],
-      });
+      setNewFood(DefaultFoodData);
+      console.log(newFood);
+      dispatch(createFoodCatalogue(newFood));
+      dispatch(getFoodCatalogue());
+
       setIsModalOpen(false);
     }
   };
@@ -74,17 +106,17 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     dispatch(getCuisine());
     dispatch(getCourse());
 
-    console.log(
-      "Allergens:",
-      allergenData,
-      "Cuisine:",
-      cuisineData,
-      "Courses:",
-      courseData
-    );
-
     // Fetch foods data from the server here and update the foods state accordingly.
   }, [dispatch]);
+
+  useEffect(() => {
+    if (restaurantData._id) {
+      setNewFood({ ...newFood, restaurant: restaurantData?._id });
+      dispatch(getFoodCatalogue(restaurantData?._id));
+    }
+  }, [dispatch, restaurantData]);
+
+  console.log(foodDatas);
 
   return (
     <div className="container mx-auto p-4">
@@ -99,7 +131,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       </div>
 
       {/* Food Catalogue Table */}
-      <Table foods={foods} />
+      <Table foodDatas={foodDatas} />
 
       {/* Modal */}
       {isModalOpen && (
@@ -113,6 +145,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           handleAddFood={handleAddFood}
           handleImageUpload={handleImageUpload}
           toggleAllergen={toggleAllergen}
+          currencies={currencies}
         />
       )}
     </div>

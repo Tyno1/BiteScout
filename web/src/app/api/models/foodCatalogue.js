@@ -27,8 +27,8 @@ const PriceSchema = new Schema({
   },
 });
 
-const foodCatalogueSchema = new Schema({
-  foodName: {
+const foodCatalogue = new Schema({
+  name: {
     type: String,
     required: true,
     trim: true,
@@ -37,7 +37,7 @@ const foodCatalogueSchema = new Schema({
     type: [String],
     required: true,
   },
-  cuisineTypes: {
+  cuisineType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "cuisineType",
     required: true,
@@ -62,6 +62,12 @@ const foodCatalogueSchema = new Schema({
     type: [String],
     required: true,
   },
+  restaurant: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "restaurantData",
+    required: true,
+  },
 });
 
-module.exports = model("FoodCatalogue", foodCatalogueSchema);
+export default mongoose.models.FoodCatalogue ||
+  model("FoodCatalogue", foodCatalogue);

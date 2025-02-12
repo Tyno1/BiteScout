@@ -11,9 +11,8 @@ export default function Modal({
   handleAddFood,
   handleImageUpload,
   toggleAllergen,
+  currencies,
 }: any) {
-  console.log(allergenData);
-
   return (
     <>
       {/* Modal Backdrop */}
@@ -86,7 +85,7 @@ export default function Modal({
                   >
                     <option value="">Select Cuisine Type</option>
                     {cuisineData.map((cuisine: Cuisine) => (
-                      <option key={cuisine?._id} value={cuisine?.name}>
+                      <option key={cuisine?._id} value={cuisine?._id}>
                         {cuisine?.name}
                       </option>
                     ))}
@@ -94,20 +93,20 @@ export default function Modal({
                 </div>
 
                 <div>
-                  <label className="block mb-2">Meal Component</label>
+                  <label className="block mb-2">Course</label>
                   <select
-                    value={newFood.mealComponent}
+                    value={newFood.course}
                     onChange={(e) =>
                       setNewFood((prev: any) => ({
                         ...prev,
-                        mealComponent: e.target.value,
+                        course: e.target.value,
                       }))
                     }
                     className="w-full border p-2 rounded"
                   >
                     <option value="">Select Meal Component</option>
                     {courseData.map((course: Course) => (
-                      <option key={course?._id} value={course?.name}>
+                      <option key={course?._id} value={course?._id}>
                         {course?.name}
                       </option>
                     ))}
@@ -116,18 +115,44 @@ export default function Modal({
 
                 <div>
                   <label className="block mb-2">Price</label>
-                  <input
-                    type="number"
-                    placeholder="Enter price"
-                    value={newFood.price}
-                    onChange={(e) =>
-                      setNewFood((prev: any) => ({
-                        ...prev,
-                        price: e.target.value,
-                      }))
-                    }
-                    className="w-full border p-2 rounded"
-                  />
+                  <div className="flex space-x-2">
+                    <input
+                      type="number"
+                      placeholder="Enter price"
+                      value={newFood.price.value}
+                      onChange={(e) =>
+                        setNewFood((prev: any) => ({
+                          ...prev,
+                          price: {
+                            ...prev.price,
+                            value: parseFloat(e.target.value),
+                          },
+                        }))
+                      }
+                      className="w-2/3 border p-2 rounded"
+                      step="0.01"
+                      min="0"
+                    />
+                    <select
+                      value={newFood.price.currency}
+                      onChange={(e) =>
+                        setNewFood((prev: any) => ({
+                          ...prev,
+                          price: {
+                            ...prev.price,
+                            currency: e.target.value,
+                          },
+                        }))
+                      }
+                      className="w-1/3 border p-2 rounded"
+                    >
+                      {currencies.map((currency: string) => (
+                        <option key={currency} value={currency}>
+                          {currency}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -148,9 +173,9 @@ export default function Modal({
                   {allergenData.map((allergen: Allergen) => (
                     <button
                       key={allergen._id}
-                      onClick={() => toggleAllergen(allergen)}
+                      onClick={() => toggleAllergen(allergen._id)}
                       className={`px-3 py-1 rounded ${
-                        newFood.allergens.includes(allergen)
+                        newFood.allergens.includes(allergen._id)
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200"
                       }`}
@@ -172,7 +197,7 @@ export default function Modal({
               </button>
               <button
                 onClick={handleAddFood}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                className="px-4 py-2 bg-black hover:bg-green-600 text-white rounded"
               >
                 Add Food Item
               </button>

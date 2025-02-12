@@ -11,7 +11,7 @@ interface CuisineState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: CuisineState = {
-  cuisineData: { id: "", name: "", description: "" },
+  cuisineData: { _id: "", name: "", description: "" },
   status: "idle",
   error: null,
 };

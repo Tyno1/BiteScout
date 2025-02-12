@@ -11,7 +11,7 @@ interface CourseState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: CourseState = {
-  courseData: { id: "", name: "", description: "" },
+  courseData: { _id: "", name: "", description: "" },
   status: "idle",
   error: null,
 };

@@ -11,7 +11,7 @@ interface AllergenState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: AllergenState = {
-  allergenData: { id: "", name: "", description: "" },
+  allergenData: { _id: "", name: "", description: "" },
   status: "idle",
   error: null,
 };
