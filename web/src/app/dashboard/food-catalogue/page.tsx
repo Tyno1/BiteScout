@@ -82,7 +82,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       setNewFood(DefaultFoodData);
       console.log(newFood);
       dispatch(createFoodCatalogue(newFood));
-      dispatch(getFoodCatalogue());
 
       setIsModalOpen(false);
     }

@@ -1,6 +1,6 @@
 import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import restaurantData from "@/app/api/models/restaurantData";
+import restaurantData from "@/app/api/models/RestaurantData";
 
 // Helper function to handle errors
 const handleError = (error: any, message: string, status = 500) => {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Allergen from "@/app/api/models/allergen";
+import Allergen from "@/app/api/models/Allergen";
 import dbConnect from "@/utils/db";
 
 

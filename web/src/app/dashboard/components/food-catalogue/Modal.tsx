@@ -104,7 +104,7 @@ export default function Modal({
                     }
                     className="w-full border p-2 rounded"
                   >
-                    <option value="">Select Meal Component</option>
+                    <option value="">Select Meal Course</option>
                     {courseData.map((course: Course) => (
                       <option key={course?._id} value={course?._id}>
                         {course?.name}

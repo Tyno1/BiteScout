@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/utils/db"
-import Course from "@/app/api/models/course"
+import Course from "@/app/api/models/Course"
 
 // GET all courses
 export async function GET() {

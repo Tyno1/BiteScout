@@ -1,21 +1,30 @@
 import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import foodCatalogue from "@/app/api/models/foodCatalogue";
+import foodCatalogue from "@/app/api/models/FoodCatalogue";
+import allergen from "../models/Allergen";
 
 // Get food catalogue by restaurantId
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     const restaurantId = await request.nextUrl.searchParams.get("id");
-    const foodCatalogueData = await foodCatalogue.find({
-      restaurant: restaurantId,
-    });
+
+    const foodCatalogueData = await foodCatalogue
+      .find({
+        restaurant: restaurantId,
+      })
+      .populate("course")
+      .populate("cuisineType")
+      .populate("allergens");
+
     if (!foodCatalogueData) {
       return NextResponse.json(
         { error: "Food catalogue data not found" },
         { status: 404 }
       );
     }
+    console.log(foodCatalogueData);
+    
     return NextResponse.json(foodCatalogueData);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

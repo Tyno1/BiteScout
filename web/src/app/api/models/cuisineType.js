@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema, model, models } from "mongoose";
 
-const cuisineType = new mongoose.Schema({
+const cuisineType = new Schema({
   name: {
     type: String,
     required: true,
@@ -13,5 +13,4 @@ const cuisineType = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.CuisineType ||
-  mongoose.model("CuisineType", cuisineType);
+export default models.CuisineType || model("CuisineType", cuisineType);

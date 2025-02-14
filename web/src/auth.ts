@@ -2,10 +2,10 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import User from "@/app/api/models/user";
+import User from "@/app/api/models/User";
 import dbConnect from "./utils/db";
-import userType from "./app/api/models/userType";
-import restaurantData from "./app/api/models/restaurantData";
+import userType from "./app/api/models/UserType";
+import restaurantData from "./app/api/models/RestaurantData";
 
 export const {
   handlers: { GET, POST },

@@ -39,18 +39,18 @@ const foodCatalogue = new Schema({
   },
   cuisineType: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "cuisineType",
+    ref: "CuisineType",
     required: true,
   },
   allergens: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "allergen",
+      ref: "Allergen",
     },
   ],
   course: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "course",
+    ref: "Course",
     required: true,
   },
 

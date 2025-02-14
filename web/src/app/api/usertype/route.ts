@@ -1,6 +1,6 @@
 import dbConnect from "@/utils/db";
 import { type NextRequest, NextResponse } from "next/server";
-import UserType from "@/app/api/models/userType";
+import UserType from "@/app/api/models/UserType";
 
 export async function POST(request: NextRequest) {
   try {

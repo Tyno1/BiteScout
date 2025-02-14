@@ -1,7 +1,7 @@
 import dbConnect from "@/utils/db";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
-import restaurantData from "../../models/restaurantData";
+import restaurantData from "../../models/RestaurantData";
 
 const handleError = (error: any, message: string, status = 500) => {
   return NextResponse.json({ error: `${error} ${message}` }, { status });

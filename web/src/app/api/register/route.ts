@@ -1,7 +1,7 @@
 import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/app/api/models/user";
-import userType from "../models/userType";
+import User from "@/app/api/models/User";
+import userType from "../models/UserType";
 
 export const POST = async (request: NextRequest) => {
   const { firstName, lastName, email, password } = await request.json();
