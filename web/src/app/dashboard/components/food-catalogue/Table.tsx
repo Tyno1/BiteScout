@@ -36,7 +36,7 @@ export default function Table({ foodDatas }: any) {
           {foodDatas?.map((food: any, index: number) => (
             <tr key={index} className="hover:bg-gray-50">
               <td className="px-6 py-4">{food.name}</td>
-              <td className="px-6 py-4">{food.ingredients}</td>
+              <td className="px-6 py-4">{food.ingredients.map((i:string)=> i).join(", ")}</td>
               <td className="px-6 py-4">{food.cuisineType.name}</td>
               <td className="px-6 py-4">{food.course.name}</td>
               <td className="px-6 py-4">

@@ -12,6 +12,10 @@ export default function Modal({
   handleImageUpload,
   toggleAllergen,
   currencies,
+  handleAddIngredients,
+  handleRemoveIngredients,
+  setIngredient,
+  ingredient,
 }: any) {
   return (
     <>
@@ -57,18 +61,40 @@ export default function Modal({
 
                 <div>
                   <label className="block mb-2">Ingredients</label>
-                  <input
-                    type="text"
-                    placeholder="List ingredients"
-                    value={newFood.ingredients}
-                    onChange={(e) =>
-                      setNewFood((prev: any) => ({
-                        ...prev,
-                        ingredients: e.target.value,
-                      }))
-                    }
-                    className="w-full border p-2 rounded"
-                  />
+                  <div className="w-full border rounded flex items-center">
+                    <input
+                      id="ingredient"
+                      type="text"
+                      placeholder="List ingredients"
+                      value={ingredient}
+                      onChange={(e) => setIngredient(e.target.value)}
+                      className="p-2 flex-4 w-[80%]"
+                    />
+                    <button
+                      onClick={(e) => handleAddIngredients(ingredient)}
+                      className="bg-black text-white h-full w-[20%] p-2 rounded"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    {newFood.ingredients.map(
+                      (ingredient: string, index: number) => (
+                        <div
+                          key={index}
+                          className="flex gap-2 text-sm bg-black text-white rounded px-2 py-1"
+                        >
+                          <span>{ingredient}</span>
+                          <button
+                            onClick={() => handleRemoveIngredients(ingredient)}
+                            className=" hover:text-gray-700"
+                          >
+                            X
+                          </button>
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
 
                 <div>

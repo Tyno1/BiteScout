@@ -73,7 +73,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [ingredient, setIngredient] = useState<string>("");
+  const [formError, setFormError] = useState<string>("");
 
   const [newFood, setNewFood] = useState<FoodData>(DefaultFoodData);
 
@@ -93,6 +95,29 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       allergens: prev.allergens.includes(allergen)
         ? prev.allergens.filter((a) => a !== allergen)
         : [...prev.allergens, allergen],
+    }));
+  };
+
+  const handleAddIngredients = (ingredient: string) => {
+    if (!ingredient) {
+      return;
+    }
+    if (newFood.ingredients.includes(ingredient)) {
+      setFormError("ingredient already included");
+      return;
+    }
+
+    setNewFood((prev) => ({
+      ...prev,
+      ingredients: [...prev.ingredients, ingredient.trim()],
+    }));
+    setIngredient("");
+    setFormError("");
+  };
+  const handleRemoveIngredients = (ingredient: string): void => {
+    setNewFood((prev) => ({
+      ...prev,
+      ingredients: prev.ingredients.filter((i) => i !== ingredient),
     }));
   };
 
@@ -145,6 +170,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           handleImageUpload={handleImageUpload}
           toggleAllergen={toggleAllergen}
           currencies={currencies}
+          handleAddIngredients={handleAddIngredients}
+          handleRemoveIngredients={handleRemoveIngredients}
+          setIngredient={setIngredient}
+          ingredient={ingredient}
         />
       )}
     </div>
