@@ -33,7 +33,7 @@ const foodCatalogue = new Schema({
     required: true,
     trim: true,
   },
-  ingredents: {
+  ingredients: {
     type: [String],
     required: true,
   },

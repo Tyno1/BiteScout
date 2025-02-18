@@ -1,7 +1,7 @@
 import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import foodCatalogue from "@/app/api/models/FoodCatalogue";
 import allergen from "../models/Allergen";
+import FoodCatalogue from "@/app/api/models/FoodCatalogue";
 
 // Get food catalogue by restaurantId
 export async function GET(request: NextRequest) {
@@ -9,10 +9,9 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const restaurantId = await request.nextUrl.searchParams.get("id");
 
-    const foodCatalogueData = await foodCatalogue
-      .find({
-        restaurant: restaurantId,
-      })
+    const foodCatalogueData = await FoodCatalogue.find({
+      restaurant: restaurantId,
+    })
       .populate("course")
       .populate("cuisineType")
       .populate("allergens");
@@ -24,7 +23,7 @@ export async function GET(request: NextRequest) {
       );
     }
     console.log(foodCatalogueData);
-    
+
     return NextResponse.json(foodCatalogueData);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -37,10 +36,24 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     const body = await request.json();
 
-    const newFoodItem = new foodCatalogue(body);
+    const newFoodItem = new FoodCatalogue(body);
     const savedFoodItem = await newFoodItem.save();
+    console.log(savedFoodItem);
 
-    return NextResponse.json(savedFoodItem, { status: 201 });
+    const populatedFoodItem = await FoodCatalogue.findById(savedFoodItem._id)
+      .populate("course")
+      .populate("cuisineType")
+      .populate("allergens");
+    // Assuming you want to include the restaurant name
+
+    if (!populatedFoodItem) {
+      return NextResponse.json(
+        { error: "Failed to retrieve the created food item" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(populatedFoodItem, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -53,7 +66,7 @@ export async function PUT(request: NextRequest) {
     const itemId = request.nextUrl.searchParams.get("id");
     const body = await request.json();
 
-    const updatedFoodItem = await foodCatalogue.findByIdAndUpdate(
+    const updatedFoodItem = await FoodCatalogue.findByIdAndUpdate(
       itemId,
       body,
       { new: true, runValidators: true }
@@ -78,7 +91,7 @@ export async function DELETE(request: NextRequest) {
     await dbConnect();
     const itemId = request.nextUrl.searchParams.get("id");
 
-    const deletedFoodItem = await foodCatalogue.findByIdAndDelete(itemId);
+    const deletedFoodItem = await FoodCatalogue.findByIdAndDelete(itemId);
 
     if (!deletedFoodItem) {
       return NextResponse.json(

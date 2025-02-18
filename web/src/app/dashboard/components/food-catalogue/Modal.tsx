@@ -59,10 +59,15 @@ export default function Modal({
                   />
                 </div>
 
-                <div>
+                <div className="w-[100%] overflow-hidden">
                   <label className="block mb-2">Ingredients</label>
                   <div className="w-full border rounded flex items-center">
                     <input
+                      onKeyDown={(e) =>
+                        e.key === "Enter"
+                          ? handleAddIngredients(ingredient)
+                          : null
+                      }
                       id="ingredient"
                       type="text"
                       placeholder="List ingredients"
@@ -77,7 +82,7 @@ export default function Modal({
                       Add
                     </button>
                   </div>
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-2 mt-2 overflow-x-auto">
                     {newFood.ingredients.map(
                       (ingredient: string, index: number) => (
                         <div

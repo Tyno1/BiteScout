@@ -50,8 +50,6 @@ export const getFoodCatalogue = createAsyncThunk(
     const response = await axios.get(
       `${API_URL}/api/food-catalogue/?id=${restaurantId}`
     );
-    console.log(response.data);
-
     return response.data;
   }
 );

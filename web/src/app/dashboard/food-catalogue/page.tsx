@@ -73,19 +73,21 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<string>("");
 
   const [newFood, setNewFood] = useState<FoodData>(DefaultFoodData);
 
+  // functions for modal
   const handleAddFood = async () => {
     if (newFood.name && newFood.cuisineType && newFood.course) {
-      setNewFood(DefaultFoodData);
       console.log(newFood);
       dispatch(createFoodCatalogue(newFood));
 
       setIsModalOpen(false);
+      setNewFood(DefaultFoodData);
     }
   };
 
@@ -109,11 +111,12 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
     setNewFood((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, ingredient.trim()],
+      ingredients: [...prev.ingredients, ingredient],
     }));
     setIngredient("");
     setFormError("");
   };
+
   const handleRemoveIngredients = (ingredient: string): void => {
     setNewFood((prev) => ({
       ...prev,
@@ -123,6 +126,12 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   const handleImageUpload = (): void => {
     // Handle image upload logic here
+  };
+
+  // functions for table
+
+  const handleRowClick = (id: string) => {
+    router.push(`food-catalogue/${id}`);
   };
 
   useEffect(() => {
@@ -138,7 +147,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       setNewFood({ ...newFood, restaurant: restaurantData?._id });
       dispatch(getFoodCatalogue(restaurantData?._id));
     }
-  }, [dispatch, restaurantData]);
+  }, [dispatch, restaurantData, foodData]);
 
   console.log(foodDatas);
 
@@ -155,7 +164,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       </div>
 
       {/* Food Catalogue Table */}
-      <Table foodDatas={foodDatas} />
+      <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
 
       {/* Modal */}
       {isModalOpen && (

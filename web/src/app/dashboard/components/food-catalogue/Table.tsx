@@ -1,9 +1,7 @@
 import { FoodData } from "@/types/foodCatalogue";
 import React from "react";
 
-export default function Table({ foodDatas }: any) {
-  console.log(foodDatas);
-
+export default function Table({ foodDatas, handleRowClick }: any) {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full border-collapse">
@@ -34,14 +32,21 @@ export default function Table({ foodDatas }: any) {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {foodDatas?.map((food: any, index: number) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="px-6 py-4">{food.name}</td>
-              <td className="px-6 py-4">{food.ingredients.map((i:string)=> i).join(", ")}</td>
-              <td className="px-6 py-4">{food.cuisineType.name}</td>
-              <td className="px-6 py-4">{food.course.name}</td>
+            <tr
+              onClick={() => handleRowClick(food._id)}
+              key={index}
+              className="hover:bg-gray-50 cursor-pointer
+"
+            >
+              <td className="px-6 py-4">{food?.name}</td>
               <td className="px-6 py-4">
-                {food.price.currency}
-                {food.price.amount}
+                {food?.ingredients?.map((i: string) => i).join(", ")}
+              </td>
+              <td className="px-6 py-4">{food?.cuisineType?.name}</td>
+              <td className="px-6 py-4">{food?.course?.name}</td>
+              <td className="px-6 py-4">
+                {food?.price?.currency}
+                {food?.price?.amount}
               </td>
               <td className="px-6 py-4">
                 {food.allergens.map((a: any) => a.name).join(", ")}
