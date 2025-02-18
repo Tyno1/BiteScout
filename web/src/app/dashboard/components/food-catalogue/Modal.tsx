@@ -1,6 +1,24 @@
-import { Allergen, Course, Cuisine } from "@/types/foodCatalogue";
+import { Allergen, Course, Cuisine, FoodData } from "@/types/foodCatalogue";
 import React from "react";
+import { formErrorType } from "../../food-catalogue/page";
 
+interface ModalType {
+  setIsModalOpen: (isOpen: boolean) => void;
+  setNewFood: (food: FoodData) => void;
+  newFood: FoodData;
+  cuisineData: Cuisine[];
+  courseData: Course[];
+  allergenData: Allergen[];
+  handleAddFood: () => void;
+  handleImageUpload: (e: any) => void;
+  toggleAllergen: (allergen: string) => void;
+  currencies: string[];
+  handleAddIngredients: (ingredient: string) => void;
+  handleRemoveIngredients: (ingredient: string) => void;
+  setIngredient: (ingredient: string) => void;
+  ingredient: string;
+  formError: formErrorType;
+}
 export default function Modal({
   setIsModalOpen,
   setNewFood,
@@ -16,6 +34,7 @@ export default function Modal({
   handleRemoveIngredients,
   setIngredient,
   ingredient,
+  formError,
 }: any) {
   return (
     <>
@@ -76,7 +95,7 @@ export default function Modal({
                       className="p-2 flex-4 w-[80%]"
                     />
                     <button
-                      onClick={(e) => handleAddIngredients(ingredient)}
+                      onClick={() => handleAddIngredients(ingredient)}
                       className="bg-black text-white h-full w-[20%] p-2 rounded"
                     >
                       Add

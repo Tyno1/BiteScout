@@ -1,5 +1,4 @@
 import dbConnect from "@/utils/db";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import restaurantData from "../../models/RestaurantData";
 

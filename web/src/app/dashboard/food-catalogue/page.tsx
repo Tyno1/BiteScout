@@ -14,6 +14,17 @@ import {
   getFoodCatalogue,
 } from "@/state/foodCatalogueData/foodCatalogueSlice";
 
+export interface formErrorType {
+  name: string;
+  ingredients: string;
+  cuisineType: string;
+  course: string;
+  price: string;
+  allergens: string;
+  images: string;
+  restaurant: string;
+}
+
 export default function FoodCatalogueManagement(): React.ReactElement {
   const {
     allergenData,
@@ -60,8 +71,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const DefaultFoodData = {
     name: "",
     ingredients: [],
-    cuisineType: "",
-    course: "",
+    cuisineType: {
+      name: "",
+      description: "",
+    },
+    course: { name: "", description: "" },
     price: {
       currency: currencies[0],
       amount: 0,
@@ -70,13 +84,23 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     images: [],
     restaurant: "",
   };
+  const DefaultFormError = {
+    name: "",
+    ingredients: "",
+    cuisineType: "",
+    course: "",
+    price: "",
+    allergens: "",
+    images: "",
+    restaurant: "",
+  };
 
   const dispatch = useDispatch<AppDispatch>();
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
-  const [formError, setFormError] = useState<string>("");
+  const [formError, setFormError] = useState<formErrorType>(DefaultFormError);
 
   const [newFood, setNewFood] = useState<FoodData>(DefaultFoodData);
 
@@ -149,7 +173,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }
   }, [dispatch, restaurantData, foodData]);
 
-  console.log(foodDatas);
 
   return (
     <div className="container mx-auto p-4">
@@ -183,6 +206,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           handleRemoveIngredients={handleRemoveIngredients}
           setIngredient={setIngredient}
           ingredient={ingredient}
+          formError={formError}
         />
       )}
     </div>

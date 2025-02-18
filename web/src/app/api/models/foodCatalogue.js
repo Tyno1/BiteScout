@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+import mongoose, { Schema, model } from "mongoose";
 
 const PriceSchema = new Schema({
   amount: {

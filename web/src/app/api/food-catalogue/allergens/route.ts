@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import Allergen from "@/app/api/models/Allergen";
 import dbConnect from "@/utils/db";
 
-
 // GET all allergens
 export async function GET() {
   await dbConnect();
   try {
     const allergens = await Allergen.find({});
     return NextResponse.json(allergens);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch allergens" },
       { status: 500 }
@@ -58,7 +57,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(updatedAllergen);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update allergen" },
       { status: 500 }
@@ -90,7 +89,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: "Allergen deleted successfully" });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete allergen" },
       { status: 500 }

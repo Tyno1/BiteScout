@@ -132,10 +132,10 @@ export default function RestaurantProfile() {
   };
 
   useEffect(() => {
-    console.log(restaurantData);
-    
-    dispatch(getRestaurantData(restaurantData?._id));
-  }, [dispatch]);
+    if (restaurantData._id) {
+      dispatch(getRestaurantData(restaurantData._id));
+    }
+  }, [dispatch, restaurantData._id]);
 
   useEffect(() => {
     if (displayData?.businessHours && displayData.businessHours.length >= 1) {
@@ -152,7 +152,6 @@ export default function RestaurantProfile() {
 
   if (!displayData) return null;
 
-  
   return (
     <main className="w-full min-h-screen bg-gray-50">
       {/* Hero Section */}

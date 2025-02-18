@@ -5,7 +5,7 @@ import React from "react";
 export default function Contact() {
   return (
     <div>
-      <Navbar />
+      <Navbar theme="dark" />
       Contact
       <Footer />
     </div>

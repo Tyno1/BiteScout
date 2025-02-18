@@ -1,7 +1,12 @@
 import { FoodData } from "@/types/foodCatalogue";
 import React from "react";
 
-export default function Table({ foodDatas, handleRowClick }: any) {
+interface TableProps {
+  foodDatas: FoodData[];
+  handleRowClick: (id: string) => void;
+}
+
+export default function Table({ foodDatas, handleRowClick }: TableProps) {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full border-collapse">
@@ -31,9 +36,9 @@ export default function Table({ foodDatas, handleRowClick }: any) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {foodDatas?.map((food: any, index: number) => (
+          {foodDatas?.map((food: FoodData, index: number) => (
             <tr
-              onClick={() => handleRowClick(food._id)}
+              onClick={() => food._id && handleRowClick(food._id)}
               key={index}
               className="hover:bg-gray-50 cursor-pointer
 "
@@ -51,7 +56,7 @@ export default function Table({ foodDatas, handleRowClick }: any) {
               <td className="px-6 py-4">
                 {food.allergens.map((a: any) => a.name).join(", ")}
               </td>
-              <td className="px-6 py-4">{food.images.length} images</td>
+              <td className="px-6 py-4">{food?.images?.length} images</td>
             </tr>
           ))}
         </tbody>

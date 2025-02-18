@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const cuisineTypes = await CuisineType.find();
     return NextResponse.json(cuisineTypes);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch cuisine types" },
       { status: 500 }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const newCuisineType = await CuisineType.create(body);
     return NextResponse.json(newCuisineType, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create cuisine type" },
       { status: 500 }
@@ -53,7 +53,7 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(updatedCuisineType);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update cuisine type" },
       { status: 500 }
@@ -82,7 +82,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ message: "Cuisine type deleted successfully" });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete cuisine type" },
       { status: 500 }

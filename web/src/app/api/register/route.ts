@@ -2,6 +2,8 @@ import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/app/api/models/User";
 import userType from "../models/UserType";
+import { MongooseError } from "mongoose";
+
 
 export const POST = async (request: NextRequest) => {
   const { firstName, lastName, email, password } = await request.json();
@@ -34,7 +36,7 @@ export const POST = async (request: NextRequest) => {
     await user.save();
 
     return NextResponse.json(user);
-  } catch (error: any) {
+  } catch (error : any) {
     return NextResponse.json(
       { error: error.message },
       {

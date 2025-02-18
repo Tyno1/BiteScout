@@ -25,8 +25,16 @@ export interface FoodData {
   _id?: string;
   name: string;
   ingredients: string[];
-  cuisineType: string;
-  course: string;
+  cuisineType: {
+    _id?: string;
+    name: string;
+    description: string;
+  };
+  course: {
+    _id?: string;
+    name: string;
+    description: string;
+  };
   price: price;
   allergens: string[];
   images?: string[];
