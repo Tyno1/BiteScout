@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface CourseState {
-  courseData: Course;
+  courseData: Course[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -11,7 +11,7 @@ interface CourseState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: CourseState = {
-  courseData: { _id: "", name: "", description: "" },
+  courseData: [{ _id: "", name: "", description: "" }],
   status: "idle",
   error: null,
 };

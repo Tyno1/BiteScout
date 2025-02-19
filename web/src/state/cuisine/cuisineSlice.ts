@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface CuisineState {
-  cuisineData: Cuisine;
+  cuisineData: Cuisine[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -11,7 +11,7 @@ interface CuisineState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: CuisineState = {
-  cuisineData: { _id: "", name: "", description: "" },
+  cuisineData: [{ _id: "", name: "", description: "" }],
   status: "idle",
   error: null,
 };

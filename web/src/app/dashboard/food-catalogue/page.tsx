@@ -106,13 +106,41 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   // functions for modal
   const handleAddFood = async () => {
-    if (newFood.name && newFood.cuisineType && newFood.course) {
-      console.log(newFood);
-      dispatch(createFoodCatalogue(newFood));
+    const errors: formErrorType = {
+      name: !newFood.name ? "Name is required" : "",
+      ingredients:
+        newFood.ingredients.length < 1 ? "Ingredients are required" : "",
+      cuisineType: !newFood.cuisineType ? "Cuisine type is required" : "",
+      course: !newFood.course ? "Course is required" : "",
+      price:
+        !newFood.price.amount || !newFood.price.currency
+          ? "Price is required"
+          : "",
+      allergens: newFood.allergens.length < 1 ? "Allergens are required" : "",
+      images: !newFood.images ? "At least one image is required" : "",
+      restaurant: !newFood.restaurant ? "Restaurant is required" : "",
+    };
 
-      setIsModalOpen(false);
-      setNewFood(DefaultFoodData);
+    // Check if there are any errors
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+
+    if (hasErrors) {
+      setFormError(errors);
+      console.log(errors);
+      return;
     }
+
+    // If no errors, proceed with form submission
+    dispatch(createFoodCatalogue(newFood));
+    setIsModalOpen(false);
+    setNewFood(DefaultFoodData);
+    setFormError(DefaultFormError);
+  };
+  // create a component for form warning
+  const FormWarning = ({}) => {
+    return <div>
+
+    </div>;
   };
 
   const toggleAllergen = (allergen: string): void => {
@@ -172,7 +200,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       dispatch(getFoodCatalogue(restaurantData?._id));
     }
   }, [dispatch, restaurantData, foodData]);
-
 
   return (
     <div className="container mx-auto p-4">

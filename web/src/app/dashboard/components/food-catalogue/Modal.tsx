@@ -2,9 +2,9 @@ import { Allergen, Course, Cuisine, FoodData } from "@/types/foodCatalogue";
 import React from "react";
 import { formErrorType } from "../../food-catalogue/page";
 
-interface ModalType {
+interface FoodCatalogueModalType {
   setIsModalOpen: (isOpen: boolean) => void;
-  setNewFood: (food: FoodData) => void;
+  setNewFood: React.Dispatch<React.SetStateAction<FoodData>>;
   newFood: FoodData;
   cuisineData: Cuisine[];
   courseData: Course[];
@@ -35,7 +35,7 @@ export default function Modal({
   setIngredient,
   ingredient,
   formError,
-}: any) {
+}: FoodCatalogueModalType) {
   return (
     <>
       {/* Modal Backdrop */}
@@ -64,23 +64,43 @@ export default function Modal({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-2">Food Name</label>
+                  {formError.name && (
+                  <div className="text-xs text-red">
+                    Food Name is required
+                  </div>
+                )}
                   <input
                     type="text"
                     placeholder="Enter food name"
                     value={newFood.name}
                     onChange={(e) =>
-                      setNewFood((prev: any) => ({
+                      setNewFood((prev) => ({
                         ...prev,
                         name: e.target.value,
                       }))
                     }
-                    className="w-full border p-2 rounded"
+                    className={`w-full border p-2 rounded ${
+                      formError.name
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    }`}
                   />
                 </div>
 
                 <div className="w-[100%] overflow-hidden">
                   <label className="block mb-2">Ingredients</label>
-                  <div className="w-full border rounded flex items-center">
+                  {formError.ingredients && (
+                  <div className="text-xs text-red-500">
+                    Ingredient is required
+                  </div>
+                )}
+                  <div
+                    className={`w-full border rounded flex items-center  ${
+                      formError.ingredients
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    }`}
+                  >
                     <input
                       onKeyDown={(e) =>
                         e.key === "Enter"
@@ -123,15 +143,24 @@ export default function Modal({
 
                 <div>
                   <label className="block mb-2">Cuisine Type</label>
+                  {formError.cuisineType && (
+                  <div className="text-xs text-red-500">
+                    CuisineType is required
+                  </div>
+                )}
                   <select
-                    value={newFood.cuisineType}
+                    value={newFood?.cuisineType._id}
                     onChange={(e) =>
                       setNewFood((prev: any) => ({
                         ...prev,
                         cuisineType: e.target.value,
                       }))
                     }
-                    className="w-full border p-2 rounded"
+                    className={`w-full border p-2 rounded  ${
+                      formError.cuisineType
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    }`}
                   >
                     <option value="">Select Cuisine Type</option>
                     {cuisineData.map((cuisine: Cuisine) => (
@@ -144,15 +173,24 @@ export default function Modal({
 
                 <div>
                   <label className="block mb-2">Course</label>
+                  {formError.course && (
+                  <div className="text-xs text-red-500">
+                    Course is required
+                  </div>
+                )}
                   <select
-                    value={newFood.course}
+                    value={newFood.course._id}
                     onChange={(e) =>
                       setNewFood((prev: any) => ({
                         ...prev,
                         course: e.target.value,
                       }))
                     }
-                    className="w-full border p-2 rounded"
+                    className={`w-full border p-2 rounded  ${
+                      formError.course
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    }`}
                   >
                     <option value="">Select Meal Course</option>
                     {courseData.map((course: Course) => (
@@ -165,17 +203,22 @@ export default function Modal({
 
                 <div>
                   <label className="block mb-2">Price</label>
+                  {formError.price && (
+                  <div className="text-xs text-red-500">
+                    Price is required
+                  </div>
+                )}
                   <div className="flex space-x-2">
                     <input
                       type="number"
                       placeholder="Enter price"
-                      value={newFood.price.value}
+                      value={newFood.price.amount}
                       onChange={(e) =>
                         setNewFood((prev: any) => ({
                           ...prev,
                           price: {
                             ...prev.price,
-                            value: parseFloat(e.target.value),
+                            amount: parseFloat(e.target.value),
                           },
                         }))
                       }
@@ -194,7 +237,11 @@ export default function Modal({
                           },
                         }))
                       }
-                      className="w-1/3 border p-2 rounded"
+                      className={`w-1/3 border p-2 rounded  ${
+                        formError.price
+                          ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                          : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                      }`}
                     >
                       {currencies.map((currency: string) => (
                         <option key={currency} value={currency}>
@@ -219,13 +266,21 @@ export default function Modal({
 
               <div className="mt-4">
                 <label className="block mb-2">Allergens</label>
+                {formError.allergens && (
+                  <div className="text-xs text-red-500">
+                    Allergen is required
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {allergenData.map((allergen: Allergen) => (
                     <button
                       key={allergen._id}
-                      onClick={() => toggleAllergen(allergen._id)}
+                      onClick={() =>
+                        allergen._id && toggleAllergen(allergen._id)
+                      }
                       className={`px-3 py-1 rounded ${
-                        newFood.allergens.includes(allergen._id)
+                        allergen._id &&
+                        newFood?.allergens?.includes(allergen._id)
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200"
                       }`}

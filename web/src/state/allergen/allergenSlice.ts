@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface AllergenState {
-  allergenData: Allergen;
+  allergenData: Allergen[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -11,7 +11,7 @@ interface AllergenState {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const initialState: AllergenState = {
-  allergenData: { _id: "", name: "", description: "" },
+  allergenData: [{ _id: "", name: "", description: "" }],
   status: "idle",
   error: null,
 };
