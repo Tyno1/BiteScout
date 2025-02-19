@@ -21,7 +21,19 @@ interface price {
   amount: number;
 }
 
-export interface FoodData {
+export interface FoodDataSent {
+  _id?: string;
+  name: string;
+  ingredients: string[];
+  cuisineType: string;
+  course: string
+  price: price;
+  allergens: string[];
+  images?: string[];
+  restaurant: string;
+}
+
+export interface FoodDataReceived {
   _id?: string;
   name: string;
   ingredients: string[];

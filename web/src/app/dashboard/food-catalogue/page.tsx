@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
-import { FoodData } from "@/types/foodCatalogue";
+import { FoodDataSent } from "@/types/foodCatalogue";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { getAllergens } from "@/state/allergen/allergenSlice";
@@ -52,6 +52,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     status: foodDataStatus,
     error: foodDataError,
   } = useSelector((state: RootState) => state.foodCatalogue);
+  const dispatch = useDispatch<AppDispatch>();
 
   const currencies = [
     "GBP",
@@ -71,11 +72,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const DefaultFoodData = {
     name: "",
     ingredients: [],
-    cuisineType: {
-      name: "",
-      description: "",
-    },
-    course: { name: "", description: "" },
+    cuisineType: "",
+    course: "",
     price: {
       currency: currencies[0],
       amount: 0,
@@ -95,14 +93,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     restaurant: "",
   };
 
-  const dispatch = useDispatch<AppDispatch>();
-
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<formErrorType>(DefaultFormError);
-
-  const [newFood, setNewFood] = useState<FoodData>(DefaultFoodData);
+  const [newFood, setNewFood] = useState<FoodDataSent>(DefaultFoodData);
 
   // functions for modal
   const handleAddFood = async () => {
@@ -136,11 +131,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     setNewFood(DefaultFoodData);
     setFormError(DefaultFormError);
   };
-  // create a component for form warning
-  const FormWarning = ({}) => {
-    return <div>
 
-    </div>;
+  // create a component for form warning
+  const FormWarning = (message: string) => {
+    return <div className="text-xs text-red">{message}</div>;
   };
 
   const toggleAllergen = (allergen: string): void => {
@@ -195,7 +189,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   }, [dispatch]);
 
   useEffect(() => {
-    if (restaurantData._id) {
+    if (restaurantData?._id) {
       setNewFood({ ...newFood, restaurant: restaurantData?._id });
       dispatch(getFoodCatalogue(restaurantData?._id));
     }
@@ -234,6 +228,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           setIngredient={setIngredient}
           ingredient={ingredient}
           formError={formError}
+          FormWarning={FormWarning}
         />
       )}
     </div>
