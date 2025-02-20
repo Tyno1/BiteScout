@@ -19,6 +19,7 @@ interface FoodCatalogueModalType {
   ingredient: string;
   formError: formErrorType;
   FormWarning: (message: string) => ReactNode;
+  closeModal: () => void;
 }
 export default function Modal({
   setIsModalOpen,
@@ -37,6 +38,7 @@ export default function Modal({
   ingredient,
   formError,
   FormWarning,
+  closeModal,
 }: FoodCatalogueModalType) {
   return (
     <>
@@ -54,7 +56,7 @@ export default function Modal({
             <div className="flex justify-between items-center p-6 border-b">
               <h2 className="text-xl font-bold">Add New Food Item</h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ×
@@ -284,8 +286,8 @@ export default function Modal({
             {/* Modal Footer */}
             <div className="border-t p-6 flex justify-end gap-2">
               <button
-              // set onclick to clear error and foodData
-                onClick={() => setIsModalOpen(false)}
+                // set onclick to clear error and foodData
+                onClick={closeModal}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded"
               >
                 Cancel

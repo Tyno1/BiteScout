@@ -132,6 +132,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     setFormError(DefaultFormError);
   };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setNewFood(DefaultFoodData);
+    setFormError(DefaultFormError);
+  };
   // create a component for form warning
   const FormWarning = (message: string) => {
     return <div className="text-xs text-red">{message}</div>;
@@ -229,6 +234,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           ingredient={ingredient}
           formError={formError}
           FormWarning={FormWarning}
+          closeModal={closeModal} 
         />
       )}
     </div>

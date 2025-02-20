@@ -3,32 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import allergen from "../models/Allergen";
 import FoodCatalogue from "@/app/api/models/FoodCatalogue";
 
-// Get food catalogue by restaurantId
-export async function GET(request: NextRequest) {
-  try {
-    await dbConnect();
-    const restaurantId = await request.nextUrl.searchParams.get("id");
-
-    const foodCatalogueData = await FoodCatalogue.find({
-      restaurant: restaurantId,
-    })
-      .populate("course")
-      .populate("cuisineType")
-      .populate("allergens");
-
-    if (!foodCatalogueData) {
-      return NextResponse.json(
-        { error: "Food catalogue data not found" },
-        { status: 404 }
-      );
-    }
-    console.log(foodCatalogueData);
-
-    return NextResponse.json(foodCatalogueData);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
 
 // Create new food catalogue item
 export async function POST(request: NextRequest) {
