@@ -19,8 +19,22 @@ export async function GET(
     }
     await dbConnect();
 
-    const result = await FoodCatalogue.findById(id);
+    const result = await FoodCatalogue.findById(id)
+      .populate("course")
+      .populate("cuisineType")
+      .populate("allergens");
 
+    if (!result) {
+      return NextResponse.json(
+        { error: "Food Catalogue not found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(result, { status: 200 });
-  } catch {}
+  } catch {
+    return NextResponse.json(
+      { error: "An error occurred while fetching the Food Catalogue" },
+      { status: 500 }
+    );
+  }
 }

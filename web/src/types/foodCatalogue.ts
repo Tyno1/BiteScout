@@ -48,7 +48,7 @@ export interface FoodDataReceived {
     description: string;
   };
   price: price;
-  allergens: string[];
+  allergens: Allergen[];
   images?: string[];
   restaurant: string;
 }

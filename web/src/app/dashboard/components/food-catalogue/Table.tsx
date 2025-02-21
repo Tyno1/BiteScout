@@ -1,8 +1,8 @@
-import { FoodData } from "@/types/foodCatalogue";
+import { FoodDataReceived } from "@/types/foodCatalogue";
 import React from "react";
 
 interface TableProps {
-  foodDatas: FoodData[];
+  foodDatas: FoodDataReceived[];
   handleRowClick: (id: string) => void;
 }
 
@@ -36,7 +36,7 @@ export default function Table({ foodDatas, handleRowClick }: TableProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {foodDatas?.map((food: FoodData, index: number) => (
+          {foodDatas?.map((food: FoodDataReceived, index: number) => (
             <tr
               onClick={() => food._id && handleRowClick(food._id)}
               key={index}
