@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { doCrednentialLogin } from "@/app/actions/index";
 import { useRouter } from "next/navigation";
 
-const LoginForm: React.FC = () => {
+export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -32,7 +32,6 @@ const LoginForm: React.FC = () => {
       setError("Check your credentials");
     }
   };
-  
 
   return (
     <form
@@ -60,6 +59,4 @@ const LoginForm: React.FC = () => {
       </button>
     </form>
   );
-};
-
-export default LoginForm;
+}
