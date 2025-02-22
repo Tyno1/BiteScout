@@ -3,10 +3,11 @@ import React from "react";
 import Image from "next/image";
 import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";
 import { motion } from "motion/react";
+import axios from "axios";
 
 export default function Hero() {
   return (
-    <section className="w-screen h-screen flex justify-center">
+    <section className="w-full h-screen flex justify-center">
       <div className="relative w-full h-full flex flex-col justify-center text-white overflow-hidden">
         <Image
           src={img1}

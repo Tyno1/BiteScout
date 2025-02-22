@@ -1,5 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import restaurantDataReducer from "@/state/restaurantData/restaurantDataSlice";
+import courseReducer from "@/state/course/courseSlice";
+import cuisineReducer from "@/state/cuisine/cuisineSlice";
+import allergenReducer from "@/state/allergen/allergenSlice";
+import foodCatalogueReducer from "@/state/foodCatalogueData/foodCatalogueSlice";
+
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import {
   persistReducer,
@@ -39,6 +45,10 @@ const persistConfig = {
 
 const reducer = combineReducers({
   restaurantData: restaurantDataReducer,
+  course: courseReducer,
+  cuisine: cuisineReducer,
+  allergen: allergenReducer,
+  foodCatalogue: foodCatalogueReducer,
 });
 const persistedReducer = persistReducer(persistConfig, reducer);
 

@@ -5,7 +5,7 @@ import React from "react";
 export default function Services() {
   return (
     <div>
-      <Navbar />
+      <Navbar theme="dark" />
       About
       <Footer />
     </div>

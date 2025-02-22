@@ -1,6 +1,12 @@
+import { FoodDataReceived } from "@/types/foodCatalogue";
 import React from "react";
 
-export default function Table({ foods }: any) {
+interface TableProps {
+  foodDatas: FoodDataReceived[];
+  handleRowClick: (id: string) => void;
+}
+
+export default function Table({ foodDatas, handleRowClick }: TableProps) {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full border-collapse">
@@ -16,7 +22,7 @@ export default function Table({ foods }: any) {
               Cuisine
             </th>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Component
+              Course
             </th>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
               Price
@@ -30,15 +36,27 @@ export default function Table({ foods }: any) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {foods.map((food: any, index: number) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="px-6 py-4">{food.name}</td>
-              <td className="px-6 py-4">{food.ingredients}</td>
-              <td className="px-6 py-4">{food.cuisineType}</td>
-              <td className="px-6 py-4">{food.mealComponent}</td>
-              <td className="px-6 py-4">${food.price}</td>
-              <td className="px-6 py-4">{food.allergens.join(", ")}</td>
-              <td className="px-6 py-4">{food.images.length} images</td>
+          {foodDatas?.map((food: FoodDataReceived, index: number) => (
+            <tr
+              onClick={() => food._id && handleRowClick(food._id)}
+              key={index}
+              className="hover:bg-gray-50 cursor-pointer
+"
+            >
+              <td className="px-6 py-4">{food?.name}</td>
+              <td className="px-6 py-4">
+                {food?.ingredients?.map((i: string) => i).join(", ")}
+              </td>
+              <td className="px-6 py-4">{food?.cuisineType?.name}</td>
+              <td className="px-6 py-4">{food?.course?.name}</td>
+              <td className="px-6 py-4">
+                {food?.price?.currency}
+                {food?.price?.amount}
+              </td>
+              <td className="px-6 py-4">
+                {food.allergens.map((a: any) => a.name).join(", ")}
+              </td>
+              <td className="px-6 py-4">{food?.images?.length} images</td>
             </tr>
           ))}
         </tbody>

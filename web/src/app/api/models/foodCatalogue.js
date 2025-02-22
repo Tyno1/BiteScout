@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+import mongoose, { Schema, model } from "mongoose";
 
 const PriceSchema = new Schema({
   amount: {
@@ -27,94 +26,47 @@ const PriceSchema = new Schema({
   },
 });
 
-const foodCatalogueSchema = new Schema({
-  foodName: {
+const foodCatalogue = new Schema({
+  name: {
     type: String,
     required: true,
     trim: true,
   },
-  ingredents: {
+  ingredients: {
     type: [String],
     required: true,
   },
-  cuisineTypes: {
-    type: String,
+  cuisineType: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CuisineType",
     required: true,
-    enum: [
-      "American",
-      "Italian",
-      "Mexican",
-      "Chinese",
-      "Japanese",
-      "Indian",
-      "Thai",
-      "French",
-      "German",
-      "Spanish",
-      "Russian",
-      "Turkish",
-      "Vietnamese",
-      "Greek",
-      "Indonesian",
-      "Korean",
-      "Lebanese",
-      "Malaysian",
-      "Mexican",
-      "Nepali",
-      "Pakistani",
-      "Persian",
-      "Nigerian",
-      "Romanian",
-      "Scottish",
-      "Taiwanese",
-      "Vietnamese",
-      "Welsh",
-      "Yemenite",
-      "Yugoslavian",
-      "Zambian",
-    ],
-    allergens: {
-      type: [String],
-      required: true,
-      enum: [
-        "Gluten",
-        "Dairy",
-        "Egg",
-        "Crustaceans",
-        "Celery",
-        "Fish",
-        "Lupin",
-        "Milk",
-        "Molluscs",
-        "Mustard",
-        "Peanuts",
-        "Sesame",
-        "Soybeans",
-        "Sulphur dioxide",
-        "Sulphites",
-      ],
+  },
+  allergens: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Allergen",
     },
-    mealComponent: {
-      type: String,
-      required: true,
-      enum: [
-        "Appetizer",
-        "Main Course",
-        "Dessert",
-        "Beverage",
-        "Salad",
-        "Side Dish",
-      ],
-    },
-    price: {
-      type: PriceSchema,
-      required: true,
-    },
-    images: {
-      type: [String],
-      required: true,
-    },
+  ],
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+    required: true,
+  },
+
+  price: {
+    type: PriceSchema,
+    required: true,
+  },
+  images: {
+    type: [String],
+    required: true,
+  },
+  restaurant: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "restaurantData",
+    required: true,
   },
 });
 
-module.exports = model("FoodCatalogue", foodCatalogueSchema);
+export default mongoose.models.FoodCatalogue ||
+  model("FoodCatalogue", foodCatalogue);

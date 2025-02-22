@@ -47,13 +47,15 @@ export default function Hero({
           </h1>
           <p role="contentinfo">
             {isEditing ? (
+              
               <input
                 type="text"
+                placeholder="Add description here"
                 value={displayData.description}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
+                className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded "
                 aria-label="Restaurant description"
               />
             ) : (

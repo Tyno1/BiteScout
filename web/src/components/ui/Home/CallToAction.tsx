@@ -1,6 +1,6 @@
 export default function CallToAction() {
   return (
-    <section className="w-screen py-20 flex justify-center">
+    <section className="w-full py-20 flex justify-center">
       <div className="w-[90%] flex flex-col items-center text-center">
         <h2 className="text-5xl font-bold mb-6">
           Ready to Start Your Food Journey?

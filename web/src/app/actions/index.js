@@ -6,7 +6,6 @@ export async function doSocialLogin(formData) {
   // Implement social login logic here
   const action = formData.get("action");
   await signIn(action, { redirectTo: "/login/loading" });
-  console.log(action);
 }
 export async function doLogout() {
   await signOut({ redirectTo: "/" });

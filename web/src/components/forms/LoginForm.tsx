@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { doCrednentialLogin } from "@/app/actions/index";
 import { useRouter } from "next/navigation";
 
-const LoginForm = () => {
+export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -32,7 +32,6 @@ const LoginForm = () => {
       setError("Check your credentials");
     }
   };
-  
 
   return (
     <form
@@ -43,14 +42,14 @@ const LoginForm = () => {
       {error && <div className="text-red">{error}</div>}
       <input
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="john@doe.com"
+        placeholder="email"
         type="email"
         name="email"
         id="email"
       />
       <input
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="*******"
+        placeholder="password"
         type="password"
         name="password"
         id="password"
@@ -60,6 +59,4 @@ const LoginForm = () => {
       </button>
     </form>
   );
-};
-
-export default LoginForm;
+}

@@ -1,4 +1,15 @@
+import { RestaurantDataState } from "@/types/restaurantData";
 import React from "react";
+
+interface BasicInformation {
+  isEditing: boolean;
+  newCuisine: string;
+  setNewCuisine: (value: string) => void;
+  editableData: RestaurantDataState | null;
+  setEditableData: (value: RestaurantDataState) => void;
+  displayData: RestaurantDataState | null;
+  handleInputChange: (field: keyof RestaurantDataState, value: any) => void;
+}
 
 export default function BasicInformation({
   isEditing,
@@ -8,7 +19,7 @@ export default function BasicInformation({
   setEditableData,
   displayData,
   handleInputChange,
-}: any) {
+}: BasicInformation) {
   return (
     <section
       className="bg-white rounded-lg shadow-sm border p-6"
@@ -40,15 +51,16 @@ export default function BasicInformation({
                   <button
                     className="rounded-md px-3 py-2 bg-teal-400"
                     onClick={() => {
-                      if (editableData && newCuisine) {
-                        if (newCuisine.length > 0) {
-                          setEditableData((prev: any) => ({
-                            ...prev!,
-                            cuisine: [...prev!.cuisine, newCuisine],
-                          }));
-                        } else {
-                          throw new Error("please type in a cuisine");
-                        }
+                      if (editableData && newCuisine.trim()) {
+                        setEditableData({
+                          ...editableData,
+                          cuisine: [...editableData.cuisine, newCuisine.trim()],
+                        });
+                        setNewCuisine("");
+                      } else {
+                        throw new Error(
+                          "Please enter a cuisine before adding."
+                        );
                       }
                       setNewCuisine("");
                     }}
@@ -58,7 +70,7 @@ export default function BasicInformation({
                 </div>
                 <div>
                   <ul>
-                    {displayData.cuisine?.map((cuisine: any) => (
+                    {displayData?.cuisine?.map((cuisine: any) => (
                       <li key={cuisine}>{cuisine.trim()}</li>
                     ))}
                   </ul>
@@ -67,7 +79,7 @@ export default function BasicInformation({
             ) : (
               <div>
                 <ul>
-                  {displayData.cuisine?.map((cuisine: any) => (
+                  {displayData?.cuisine?.map((cuisine: any) => (
                     <li key={cuisine}>{cuisine.trim()}</li>
                   ))}
                 </ul>
@@ -80,7 +92,7 @@ export default function BasicInformation({
               Price Range
             </label>
             <select
-              value={displayData.priceRange}
+              value={displayData?.priceRange}
               onChange={(e) => handleInputChange("priceRange", e.target.value)}
               disabled={!isEditing}
               className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
@@ -99,7 +111,7 @@ export default function BasicInformation({
             Full Description
           </label>
           <textarea
-            value={displayData.description}
+            value={displayData?.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             placeholder="Describe your restaurant"
             disabled={!isEditing}
