@@ -1,5 +1,5 @@
 import Footer from "@/components/ui/Footer";
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "@/components/molecules/Navbar";
 import React from "react";
 
 export default function About() {

@@ -1,3 +1,5 @@
+import Button from "@/components/atoms/buttons/Button";
+
 export default function CallToAction() {
   return (
     <section className="w-full py-20 flex justify-center">
@@ -10,12 +12,8 @@ export default function CallToAction() {
           experiences in your area. Download our app today and start exploring!
         </p>
         <div className="flex gap-4">
-          <button className="bg-black text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors">
-            Download iOS App
-          </button>
-          <button className="bg-black text-white px-8 py-4 rounded-xl hover:bg-gray-800 transition-colors">
-            Download Android App
-          </button>
+          <Button text="Download iOS App" variant="solid" color="black" size="lg"/>
+          <Button text="Download Android App" variant="solid" color="black" size="lg" />
         </div>
       </div>
     </section>

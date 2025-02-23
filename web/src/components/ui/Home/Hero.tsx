@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";
 import { motion } from "motion/react";
-import axios from "axios";
 
 export default function Hero() {
   return (

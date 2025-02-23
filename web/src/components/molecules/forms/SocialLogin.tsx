@@ -1,5 +1,6 @@
 import React from "react";
 import { doSocialLogin } from "@/app/actions/index";
+import Button from "@/components/atoms/buttons/Button";
 
 interface LoginProp {
   loginType: string;
@@ -8,22 +9,24 @@ interface LoginProp {
 export default function SocialLogin({ loginType }: LoginProp) {
   return (
     <form action={doSocialLogin} className="flex flex-col gap-2 w-full">
-      <button
-        className="text-sm font-bold w-full py-2 px-4 bg-white rounded text-black"
-        type="submit"
+      <Button
+        variant="solid"
+        color="white"
         name="action"
+        type="submit"
         value="google"
-      >
-        {loginType} with Google
-      </button>
-      <button
-        className="text-sm font-bold w-full py-2 px-4 bg-white rounded text-black"
-        type="submit"
+        text={`${loginType} with Google`}
+        className="font-bold"
+      />
+      <Button
+        variant="solid"
+        color="white"
         name="action"
+        type="submit"
         value="github"
-      >
-        {loginType} with GitHub
-      </button>
+        text={`${loginType} with GitHub`}
+        className="font-bold"
+      />
     </form>
   );
 }
