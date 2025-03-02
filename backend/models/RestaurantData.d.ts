@@ -1,12 +1,17 @@
-// models/RestaurantData.d.ts
-declare module "../models/RestaurantData.js" {
-  const RestaurantData: {
-    create: (data: any) => Promise<any>;
-    findById: (id: string) => Promise<any>;
-    find: () => Promise<any[]>;
-    findByIdAndUpdate: (id: string, data: any, options: any) => Promise<any>;
-    findByIdAndDelete: (id: string) => Promise<any>;
-  };
+import { Restaurant } from "@/types/restaurantData";
 
-  export default RestaurantData;
+interface RestaurantModel {
+  create(data: Omit<Restaurant, "_id">): Promise<Restaurant>;
+  findById(id: string): Promise<Restaurant | null>;
+  find(): Promise<Restaurant[]>;
+  findByIdAndUpdate(
+    id: string,
+    data: Partial<Restaurant>,
+    options?: { new?: boolean; runValidators?: boolean }
+  ): Promise<Restaurant | null>;
+  findByIdAndDelete(id: string): Promise<Restaurant | null>;
 }
+
+declare const RestaurantData: RestaurantModel;
+
+export default RestaurantData;

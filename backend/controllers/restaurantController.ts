@@ -1,15 +1,6 @@
 import RestaurantData from "../models/RestaurantData.js";
 import { Request, Response } from "express";
-
-// Helper function to handle errors
-const handleError = (
-  error: any,
-  message: string,
-  status = 500,
-  response: Response
-) => {
-  return response.status(status).json({ error: `${error} ${message}` });
-};
+import { handleError } from "@/utils/errorHandler.js";
 
 // Helper function to validate request ID
 const validateId = (request: Request) => {
@@ -85,7 +76,7 @@ export const getAllRestaurants = async (
 
     response.json(restaurantList);
   } catch (error) {
-    return handleError(error, "Failed to fetch all restaurants");
+    return handleError(error, "Failed to fetch all restaurants", response);
   }
 };
 
@@ -111,7 +102,7 @@ export const updateRestaurantData = async (
 
     return response.json(updatedRestaurant);
   } catch (error) {
-    return handleError(error, "Failed to edit Restaurant Data");
+    return handleError(error, "Failed to edit Restaurant Data", response);
   }
 };
 
@@ -132,6 +123,6 @@ export const deletedRestaurant = async (
 
     return response.json(deletedRestaurant);
   } catch (error) {
-    return handleError(error, "Failed to delete Restaurant Data");
+    return handleError(error, "Failed to delete Restaurant Data", response);
   }
 };
