@@ -2,8 +2,13 @@ import RestaurantData from "../models/RestaurantData.js";
 import { Request, Response } from "express";
 
 // Helper function to handle errors
-const handleError = (error: any, message: string, status = 500) => {
-  return Response.status(status).json({ error: `${error} ${message}` });
+const handleError = (
+  error: any,
+  message: string,
+  status = 500,
+  response: Response
+) => {
+  return response.status(status).json({ error: `${error} ${message}` });
 };
 
 // Helper function to validate request ID
@@ -37,7 +42,7 @@ export const createNewRestaurant = async (
 
     return response.status(201).json(newRestaurant);
   } catch (error) {
-    return handleError(error, "Failed to Create Restaurant Data");
+    return handleError(error, "Failed to Create Restaurant Data", response);
   }
 };
 
@@ -57,7 +62,7 @@ export const getRestaurantById = async (
 
     return response.json(restaurant);
   } catch (error: any) {
-    return handleError(error, error.message);
+    return handleError(error, error.message, response);
   }
 };
 
