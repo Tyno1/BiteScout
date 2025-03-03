@@ -1,4 +1,4 @@
-import { Restaurant } from "@/types/restaurantData";
+import { Restaurant } from "@/src/types/restaurantData";
 
 interface RestaurantModel {
   create(data: Omit<Restaurant, "_id">): Promise<Restaurant>;

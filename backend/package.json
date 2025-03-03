@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --loader ts-node/esm src/index.ts"
   },
   "author": "Anthony Ukutegbe",
   "license": "ISC",
@@ -18,9 +20,11 @@
     "mongoose": "^8.11.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.8",
     "@types/node-fetch": "^2.6.12",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   }
 }
