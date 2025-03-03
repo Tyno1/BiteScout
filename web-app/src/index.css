@@ -1,68 +1,32 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  --font-montserrat: Montserrat, sans-serif;
+  --font-poppins: Poppins, sans-serif;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --color-red-light: oklch(70% 0.208 27.06);
+  --color-red: oklch(56.76% 0.208 27.06);
+  --color-red-dark: oklch(42% 0.208 27.06);
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* Orange */
+  --color-orange-light: oklch(85% 0.179 54.4);
+  --color-orange: oklch(71.94% 0.179 54.4);
+  --color-orange-dark: oklch(57% 0.179 54.4);
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  /* Green */
+  --color-green-light: oklch(76% 0.17 149.21);
+  --color-green: oklch(62.71% 0.17 149.21);
+  --color-green-dark: oklch(48% 0.17 149.21);
+
+  /* Yellow */
+  --color-yellow: oklch(84.01% 0.147 80.45);
+
+  /* Gray */
+  --color-gray-light: oklch(96.12% 0 0);
+  --color-gray: oklch(82.03% 0 0);
+  --color-gray-dark: oklch(68% 0 0);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+html {
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
