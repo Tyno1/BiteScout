@@ -8,6 +8,7 @@ import Image from "next/image";
 import ProfileImg from "@/assets/images/profile.png";
 import "animate.css";
 import { useRouter } from "next/navigation";
+import Button from "../atoms/buttons/Button";
 
 interface NavTheme {
   theme: "dark" | "light";
@@ -25,7 +26,7 @@ const Navbar = ({ theme }: NavTheme) => {
   return (
     <nav
       className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
-        theme === "dark" ? "bg-[#030811] text-white": "bg-white text-black"
+        theme === "dark" ? "bg-[#030811] text-white" : "bg-white text-black"
       }`}
     >
       <Link href="/" className="flex-shrink-0">
@@ -68,23 +69,22 @@ const Navbar = ({ theme }: NavTheme) => {
 
         <li>
           {session && session.user ? (
-            <ul className="auth flex ml-20 items-center">
+            <ul className="auth flex ml-20 items-center gap-2">
               <li>
-                <Link
-                  className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black"
-                  href="/dashboard"
-                >
-                  Dashboard
-                </Link>
+                <Button
+                  onClick={() => router.push("/dashboard")}
+                  variant="plain"
+                  text="Dashboard"
+                  size="sm"
+                />
               </li>
               <li>
-                <button
-                  aria-label="logout"
+                <Button
                   onClick={() => signOut()}
-                  className="px-3 py-2 text-sm font-medium  hover:border-b-2 hover:border-black"
-                >
-                  Logout
-                </button>
+                  text="Logout"
+                  size="sm"
+                  variant="plain"
+                />
               </li>
               <li>
                 <Image
@@ -96,24 +96,22 @@ const Navbar = ({ theme }: NavTheme) => {
               </li>
             </ul>
           ) : (
-            <ul className="flex items-center gap-4 ml-10">
+            <ul className="flex items-center gap-2 ml-10">
               <li>
-                <button
-                  className="px-5 py-3 text-red text-sm rounded-lg border border-red"
-                  type="button"
+                <Button
                   onClick={() => router.push("/login")}
-                >
-                  Log In
-                </button>
+                  text="Log In"
+                  size="sm"
+                  variant="plain"
+                />
               </li>
               <li>
-                <button
-                  className="px-5 py-3 text-red text-sm rounded-lg border border-red"
-                  type="button"
+              <Button
                   onClick={() => router.push("/register")}
-                >
-                  Register
-                </button>
+                  text="Register"
+                  size="sm"
+                  variant="plain"
+                />
               </li>
             </ul>
           )}

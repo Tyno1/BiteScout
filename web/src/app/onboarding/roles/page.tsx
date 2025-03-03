@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/buttons/Button";
+import Button from "@/components/atoms/buttons/Button";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";

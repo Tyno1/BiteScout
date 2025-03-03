@@ -1,8 +1,10 @@
 "use client";
 
 import { doCrednentialLogin } from "@/app/actions";
-import { signIn } from "@/auth";
+import Button from "@/components/atoms/buttons/Button";
+import Input from "@/components/atoms/inputs/Input";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -11,6 +13,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const RegisterForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -60,37 +63,49 @@ const RegisterForm = () => {
       onSubmit={handleSubmit}
     >
       {error && <div className="text-red">{error}</div>}
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
+
+      <Input
+        label="first-name"
         placeholder="John"
         type="text"
         name="first-name"
         id="first-name"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
+
+      <Input
+        label="last-name"
         placeholder="Doe"
         type="text"
         name="last-name"
         id="last-name"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="john@doe.com"
+      <Input
+        label="email"
+        placeholder="Email"
         type="email"
         name="email"
         id="email"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="*******"
+      <Input
+        label="Password"
+        placeholder="Password"
         type="password"
         name="password"
         id="password"
+        fullWidth
+        rightButton={showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+        rightButtonStyle="text-gray-700"
+        rightButtonOnClick={() => setShowPassword(!showPassword)}
       />
-      <button className="text-sm font-bold w-full py-2 px-4 bg-red rounded text-white">
-        Register
-      </button>
+      <Button
+        variant="solid"
+        color="primary"
+        type="submit"
+        text={loading ? "Loading..." : "Register"}
+      />
     </form>
   );
 };

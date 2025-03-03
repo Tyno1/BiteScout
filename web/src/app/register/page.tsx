@@ -3,8 +3,8 @@
 import React from "react";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import SocialLogin from "@/components/forms/SocialLogin";
-import RegisterForm from "@/components/forms/RegisterForm";
+import SocialLogin from "@/components/molecules/forms/SocialLogin";
+import RegisterForm from "@/components/molecules/forms/RegisterForm";
 
 const Page = () => {
   const session = useSession();

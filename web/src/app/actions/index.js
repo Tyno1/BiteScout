@@ -22,7 +22,6 @@ export async function doCrednentialLogin(formData) {
       redirect: false,
     });
   } catch (error) {
-    console.error(error);
     throw new Error(error);
   }
 }

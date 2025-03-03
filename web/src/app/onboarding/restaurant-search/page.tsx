@@ -5,7 +5,7 @@ import { RestaurantList } from "@/types/restaurantData";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CircleCheck } from "lucide-react";
-import Button from "@/components/buttons/Button";
+import Button from "@/components/atoms/buttons/Button";
 import { getAllRestaurants } from "@/state/restaurantData/restaurantDataSlice";
 import { useRouter } from "next/navigation";
 
