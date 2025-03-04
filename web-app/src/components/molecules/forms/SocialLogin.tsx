@@ -1,5 +1,4 @@
 import React from "react";
-import { doSocialLogin } from "@/app/actions/index";
 import Button from "@/components/atoms/buttons/Button";
 
 interface LoginProp {
@@ -8,7 +7,7 @@ interface LoginProp {
 
 export default function SocialLogin({ loginType }: LoginProp) {
   return (
-    <form action={doSocialLogin} className="flex flex-col gap-2 w-full">
+    <form className="flex flex-col gap-2 w-full">
       <Button
         variant="solid"
         color="white"

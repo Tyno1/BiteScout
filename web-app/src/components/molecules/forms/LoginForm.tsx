@@ -1,9 +1,6 @@
-"use client";
 
 import React, { useState } from "react";
 
-import { doCrednentialLogin } from "@/app/actions/index";
-import { useRouter } from "next/navigation";
 import {
   AlertCircle,
   Mail,
@@ -14,12 +11,16 @@ import {
 } from "lucide-react";
 import Input from "@/components/atoms/inputs/Input";
 import Button from "@/components/atoms/buttons/Button";
+import { useNavigate } from "react-router";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
+  const NavTo = (route: string) => {
+    navigate(route);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,14 +30,20 @@ export default function LoginForm() {
     try {
       const formData = new FormData(e.currentTarget);
 
-      const response: any = await doCrednentialLogin(formData);
+      // const response: any = await doCrednentialLogin(formData);
+      const response = {
+        id: "",
+        error: {
+          message: "Invalid credentials",
+        },
+      };
 
       if (!!response?.error) {
         setError(response.error.message);
       } else {
         setLoading(false);
         console.log("Login successful");
-        router.replace("/login/loading");
+        NavTo("/login/loading");
       }
     } catch (error) {
       console.log(error);
