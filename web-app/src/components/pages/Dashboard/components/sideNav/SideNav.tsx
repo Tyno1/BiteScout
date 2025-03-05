@@ -8,7 +8,6 @@ import {
   Settings,
   ChefHat,
   Users,
-  Mic,
   UserCog,
   CookingPot,
   BellDot,
@@ -16,6 +15,7 @@ import {
   House,
   LogOut,
 } from "lucide-react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface NavItemProps {
   icon: React.ReactElement;
@@ -29,14 +29,14 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
   const pathname = location.pathname;
 
   const isActive = path ? pathname === path : false;
-  const doLogout = () => {};
+  const { logout } = useAuth0();
 
   return (
     <li className="w-full">
       <button
         onClick={() =>
           text === "Logout"
-            ? doLogout()
+            ? logout()
             : HandleNav && HandleNav(path ? path : "/")
         }
         className={`

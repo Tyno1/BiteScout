@@ -1,10 +1,8 @@
 import SocialLogin from "@/components/molecules/forms/SocialLogin";
 import LoginForm from "@/components/molecules/forms/LoginForm";
 import { useNavigate } from "react-router";
-import LoginAuth from "@/services/loginAuth";
 
 const Login = () => {
-  // LoginAuth();
 
   const navigate = useNavigate();
   const NavTo = (route: string) => {

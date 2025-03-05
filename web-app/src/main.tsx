@@ -1,5 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Auth0Provider } from "@auth0/auth0-react";
+
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "@/components/pages/home";
@@ -70,17 +72,29 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <div>Customer Insights</div>,
-      }, {
+      },
+      {
         path: "customer-insight",
         element: <div>Customer Insights</div>,
-      }
+      },
     ],
   },
   // Add more routes as needed
 ]);
 
+const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Auth0Provider
+      domain={domain}
+      clientId={clientId}
+      authorizationParams={{
+        redirect_uri: window.location.origin + "/dashboard",
+      }}
+    >
+      <RouterProvider router={router} />
+    </Auth0Provider>
   </StrictMode>
 );

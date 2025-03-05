@@ -12,6 +12,7 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "@tailwindcss/vite": "^4.0.9",
     "axios": "^1.8.1",
     "lucide-react": "^0.477.0",
