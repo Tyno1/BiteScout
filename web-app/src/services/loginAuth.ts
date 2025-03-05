@@ -1,10 +1,10 @@
 const LoginAuth = async () => {
   const domain = import.meta.env.VITE_AUTHO_DOMAIN;
   const audience = import.meta.env.VITE_AUTHO_DOMAIN;
-  const scope = ;
-  const clientId = ;
-  const responseType = ;
-  const redirectUri = ;
+  const scope = import.meta.env.VITE_AUTHO_SCOPE;
+  const clientId = import.meta.env.VITE_AUTHO_CLIENT_ID;
+  const responseType = import.meta.env.VITE_AUTHO_RESPONSE_TYPE;
+  const redirectUri = import.meta.env.VITE_AUTHO_REDIRECT_URL;
 
   // Construct the authorization URL
   const authorizationUrl = new URL(`https://${domain}/authorize`);

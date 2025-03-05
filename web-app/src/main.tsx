@@ -2,12 +2,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "@/components/pages/Home";
-import About from "./components/pages/About";
-import Contact from "./components/pages/Contact";
-import Services from "./components/pages/Services";
-import Login from "./components/pages/Auth/Login";
-import Layout from "./components/pages/Dashboard/layout";
+import Home from "@/components/pages/home";
+import About from "./components/pages/about";
+import Contact from "./components/pages/contact";
+import Services from "./components/pages/services";
+import Login from "./components/pages/auth/Login";
+import Layout from "./components/pages/dashboard/layout";
 
 const router = createBrowserRouter([
   {
@@ -32,9 +32,13 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "dashboard",
+    path: "/dashboard",
     element: <Layout />,
     children: [
+      {
+        path: "/dashboard",
+        element: <div>Dashboard</div>,
+      },
       {
         path: "restaurant-profile",
         element: <div>Restaurant Profile</div>,
@@ -65,6 +69,9 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
+        element: <div>Customer Insights</div>,
+      }, {
+        path: "customer-insight",
         element: <div>Customer Insights</div>,
       }
     ],
