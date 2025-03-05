@@ -1,5 +1,4 @@
-"use client";
-import React, { useEffect, useState } from "react";
+\import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
@@ -25,7 +24,7 @@ export interface formErrorType {
   restaurant: string;
 }
 
-export default function FoodCatalogueManagement(): React.ReactElement {
+const FoodCatalogueManagement = () => {
   const {
     allergenData,
     status: allergenStatus,
@@ -234,9 +233,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           ingredient={ingredient}
           formError={formError}
           FormWarning={FormWarning}
-          closeModal={closeModal} 
+          closeModal={closeModal}
         />
       )}
     </div>
   );
-}
+};
+
+export default FoodCatalogueManagement;

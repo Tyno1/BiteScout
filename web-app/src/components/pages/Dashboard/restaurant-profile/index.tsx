@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,8 +19,7 @@ interface BusinessHours {
   close: string;
   closed: boolean;
 }
-
-export default function RestaurantProfile() {
+const RestaurantProfile = () => {
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData
   );
@@ -212,4 +209,5 @@ export default function RestaurantProfile() {
       </div>
     </main>
   );
-}
+};
+export default RestaurantProfile;

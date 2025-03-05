@@ -1,5 +1,3 @@
-"use client";
-
 import UserModal from "@/components/ui/Dashboard/Modal";
 import React, { useState } from "react";
 

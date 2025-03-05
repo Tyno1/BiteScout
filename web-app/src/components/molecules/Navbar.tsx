@@ -2,8 +2,6 @@ import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { Menu, X } from "lucide-react";
-import "animate.css";
-
 import ProfileImg from "@/assets/images/profile.png";
 import Button from "../atoms/buttons/Button";
 

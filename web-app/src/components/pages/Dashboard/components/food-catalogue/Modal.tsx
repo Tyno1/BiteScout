@@ -1,6 +1,6 @@
 import { Allergen, Course, Cuisine, FoodDataSent } from "@/types/foodCatalogue";
 import React, { ReactNode } from "react";
-import { formErrorType } from "../../food-catalogue/page";
+import { formErrorType } from "../../food-catalogue";
 
 interface FoodCatalogueModalType {
   setIsModalOpen: (isOpen: boolean) => void;

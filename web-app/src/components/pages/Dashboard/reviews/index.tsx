@@ -18,7 +18,7 @@ interface reviewProps {
   resolved: boolean;
   tags: string[];
 }
-export default function Reviews() {
+const Reviews = () => {
   const defaultReview = {
     id: 0,
     user: {
@@ -221,4 +221,6 @@ export default function Reviews() {
       </div>
     </div>
   );
-}
+};
+
+export default Reviews;

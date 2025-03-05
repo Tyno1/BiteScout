@@ -1,4 +1,4 @@
-"use client";
+
 
 import { getFoodCatalogueById } from "@/state/foodCatalogueData/foodCatalogueSlice";
 import { AppDispatch, RootState } from "@/state/store";
@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function page() {
+const Food = () => {
   const { foodData, error, status } = useSelector(
     (state: RootState) => state.foodCatalogue
   );
@@ -102,4 +102,6 @@ export default function page() {
       </div>
     </div>
   );
-}
+};
+
+export default Food;

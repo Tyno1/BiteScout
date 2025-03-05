@@ -1,5 +1,6 @@
 import React from "react";
 
-export default function Analytics() {
+const Analytics =()=> {
   return <div>Analytics</div>;
 }
+export default Analytics;

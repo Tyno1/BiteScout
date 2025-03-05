@@ -1,17 +1,10 @@
-import React from "react";
-// import { useSession } from "next-auth/react";
-// import { redirect, useRouter } from "next/navigation";
 import SocialLogin from "@/components/molecules/forms/SocialLogin";
 import LoginForm from "@/components/molecules/forms/LoginForm";
 import { useNavigate } from "react-router";
+import LoginAuth from "@/services/loginAuth";
 
 const Login = () => {
-  // const session = useSession();
-  // const router = useRouter();
-
-  // if (session?.data?.user) {
-  //   redirect("/login/loading");
-  // }
+  // LoginAuth();
 
   const navigate = useNavigate();
   const NavTo = (route: string) => {
