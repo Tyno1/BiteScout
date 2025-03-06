@@ -10,6 +10,7 @@ import Contact from "./components/pages/contact";
 import Services from "./components/pages/services";
 import Login from "./components/pages/auth/Login";
 import Layout from "./components/pages/dashboard/layout";
+import Dashboard from "./components/pages/dashboard";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <div>Dashboard</div>,
+        element: <Dashboard />,
       },
       {
         path: "restaurant-profile",
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+const audience = import.meta.env.VITE_AUTH0_AUDIENCE;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -92,6 +94,7 @@ createRoot(document.getElementById("root")!).render(
       clientId={clientId}
       authorizationParams={{
         redirect_uri: window.location.origin + "/dashboard",
+        audience: audience,
       }}
     >
       <RouterProvider router={router} />

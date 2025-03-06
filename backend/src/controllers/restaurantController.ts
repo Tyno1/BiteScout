@@ -25,7 +25,6 @@ export const createNewRestaurant = async (
     }
 
     const newRestaurant = await (RestaurantData as any).create(body);
-    console.log(newRestaurant);
 
     if (!newRestaurant) {
       res.status(400).json({ error: "Could not create restaurant" });
