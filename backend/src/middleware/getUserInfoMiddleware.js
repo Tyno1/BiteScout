@@ -17,7 +17,6 @@ const getUserInfoMiddleware = async (req, res, next) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(response);
 
     // Attach the user info to the request object
     req.userInfo = response.data;

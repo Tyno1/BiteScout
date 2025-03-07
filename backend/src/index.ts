@@ -34,7 +34,7 @@ app.use(
   "/api/protected",
   jwtCheck,
   getUserInfoMiddleware,
-  // persistUserMiddleware,
+  persistUserMiddleware,
   (req: any, res) => {
     const { name, email, sub, picture } = req.userInfo;
     console.log(name, email, sub, picture);

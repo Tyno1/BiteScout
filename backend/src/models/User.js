@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       // Add custom validator here
     },
-    imageUrl: String,
+    picture: String,
     address: String,
     emailVerified: {
       type: Boolean,
@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema(
     userType: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserType",
+      required: true,
+    },
+    locale:{
+      type: String,
       required: true,
     },
     lastLogin: {
