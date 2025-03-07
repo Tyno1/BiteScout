@@ -95,6 +95,7 @@ createRoot(document.getElementById("root")!).render(
       authorizationParams={{
         redirect_uri: window.location.origin + "/dashboard",
         audience: audience,
+        scope: "openid profile email offline_access",
       }}
     >
       <RouterProvider router={router} />
