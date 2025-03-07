@@ -1,8 +1,10 @@
-import User from "../models/User";
+import User from "../models/User.js";
+import userType from "../models/UserType.js";
 
 const persistUserMiddleware = async (req, res, next) => {
   try {
     // Check if user info is available in the request
+
     if (!req.userInfo) {
       return next();
     }
@@ -17,13 +19,19 @@ const persistUserMiddleware = async (req, res, next) => {
     // Find the user
     let user = await User.findOne({ auth0Id: auth0Id });
 
+    const lowestPrivilegeType = await userType
+      .findOne()
+      .sort({ level: -1 })
+      .limit(1);
+
     if (user) {
       (user.email = email),
         (user.name = name),
         (user.picture = picture),
         (lastLogin = new Date()),
         (user.emailVerified = email_verified),
-        (user.loocale = locale);
+        (user.loocale = locale),
+        (user.userType = lowestPrivilegeType);
       await user.save();
     } else {
       const user = await User.create({
@@ -33,6 +41,7 @@ const persistUserMiddleware = async (req, res, next) => {
         picture,
         lastLogin: new Date(),
         emailVerified: email_verified,
+        userType: lowestPrivilegeType._id,
         locale,
       });
     }

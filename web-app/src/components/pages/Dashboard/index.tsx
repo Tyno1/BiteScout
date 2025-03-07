@@ -1,11 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const serverApi = import.meta.env.VITE_BACKEND_SERVER;
   const { getAccessTokenSilently } = useAuth0();
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const ApiCall = async () => {

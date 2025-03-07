@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
@@ -50,7 +49,7 @@ const userSchema = new mongoose.Schema(
       ref: "UserType",
       required: true,
     },
-    locale:{
+    locale: {
       type: String,
       required: true,
     },
@@ -72,4 +71,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.User || mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);

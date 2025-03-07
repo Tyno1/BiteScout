@@ -13,16 +13,16 @@ const port = process.env.PORT || 3000;
 const uri = process.env.MONGODB_CONNECTION_STRING || "mongodb://localhost";
 const app = express();
 
-// Connect to MongoDB
-mongoose.connect(uri);
+// // Connect to MongoDB
+// mongoose.connect(uri);
 
-mongoose.connection.on("error", (err) => {
-  console.error("MongoDB connection error:", err);
-});
+// mongoose.connection.on("error", (err) => {
+//   console.error("MongoDB connection error:", err);
+// });
 
-mongoose.connection.once("open", () => {
-  console.log("Connected to MongoDB");
-});
+// mongoose.connection.once("open", () => {
+//   console.log("Connected to MongoDB");
+// });
 
 // Middleware
 app.use(cors());
