@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    Auth0Id: {
+    auth0Id: {
       type: String,
       required: true,
       unique: true,
@@ -51,7 +51,6 @@ const userSchema = new mongoose.Schema(
     },
     locale: {
       type: String,
-      required: true,
     },
     lastLogin: {
       type: Date,
