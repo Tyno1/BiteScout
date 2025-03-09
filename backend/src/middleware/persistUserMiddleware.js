@@ -27,6 +27,12 @@ const persistUserMiddleware = async (req, res, next) => {
       .sort({ level: -1 })
       .limit(1);
 
+    if (!lowestPrivilegeType) {
+      console.error("No lowest privilege type found.");
+      return next(); // Return early if no lowest privilege type is found.
+    }
+
+
     if (user) {
       (user.email = email),
         (user.name = name),

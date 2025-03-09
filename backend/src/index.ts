@@ -2,12 +2,14 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { requiredScopes } from "express-oauth2-jwt-bearer";
+import session from "express-session";
+
 import restaurantRoutes from "./routes/restaurant.js";
+import userTypeRoutes from "./routes/userType.js";
 import jwtCheck from "./middleware/auth.js";
 import getUserInfoMiddleware from "./middleware/getUserInfoMiddleware.js";
 import persistUserMiddleware from "./middleware/persistUserMiddleware.js";
-import { requiredScopes } from "express-oauth2-jwt-bearer";
-import session from "express-session";
 
 dotenv.config();
 const port = process.env.PORT || 3000;
@@ -47,20 +49,20 @@ app.use(
   getUserInfoMiddleware,
   persistUserMiddleware,
   (req: any, res) => {
-    const { name, email, sub, picture } = req.userInfo;
-    console.log(name, email, sub, picture);
+    const { name, email, sub, picture, userType } = req.dbUser;
+    console.log(name, email, sub, picture, userType);
 
     res.json({
-      message: "Hello from Protected Server",
-      user: {
-        name,
-        email,
-        userId: sub,
-      },
+      name,
+      email,
+      userId: sub,
+      picture,
+      userType,
     });
   }
 );
 app.use("/restaurants", requiredScopes("read:bitescout"), restaurantRoutes);
+app.use("/api/user-types", userTypeRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
