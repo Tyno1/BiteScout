@@ -8,7 +8,7 @@ interface CourseState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: CourseState = {
   courseData: [{ _id: "", name: "", description: "" }],
@@ -20,7 +20,7 @@ export const createCourse = createAsyncThunk(
   "course/createCourse",
   async (courseData: Course) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue/course`,
+      `${serverApi}/api/food-catalogue/course`,
       courseData
     );
     return response.data;
@@ -29,7 +29,7 @@ export const createCourse = createAsyncThunk(
 export const getCourse = createAsyncThunk(
   "course/getCourse",
   async () => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/course`);
+    const response = await axios.get(`${serverApi}/api/food-catalogue/course`);
     return response.data;
   }
 );

@@ -45,14 +45,14 @@ app.use(
 
 app.use(
   "/api/protected",
-  jwtCheck,
   getUserInfoMiddleware,
   persistUserMiddleware,
   (req: any, res) => {
-    const { name, email, sub, picture, userType } = req.dbUser;
-    console.log(name, email, sub, picture, userType);
+    const { name, email, sub, picture, userType, _id } = req.dbUser;
+    console.log(name, email, sub, picture, userType, _id);
 
     res.json({
+      _id,
       name,
       email,
       userId: sub,
@@ -61,7 +61,7 @@ app.use(
     });
   }
 );
-app.use("/restaurants", requiredScopes("read:bitescout"), restaurantRoutes);
+app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/user-types", userTypeRoutes);
 
 app.listen(port, () => {

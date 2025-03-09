@@ -8,7 +8,7 @@ interface CuisineState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: CuisineState = {
   cuisineData: [{ _id: "", name: "", description: "" }],
@@ -20,7 +20,7 @@ export const createCuisine = createAsyncThunk(
   "cuisine/createCuisine",
   async (cuisineData: Cuisine) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue/cuisine`,
+      `${serverApi}/api/food-catalogue/cuisine`,
       cuisineData
     );
     return response.data;
@@ -29,7 +29,7 @@ export const createCuisine = createAsyncThunk(
 export const getCuisine = createAsyncThunk(
   "cuisine/getCuisine",
   async () => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/cuisine`);
+    const response = await axios.get(`${serverApi}/api/food-catalogue/cuisine`);
     return response.data;
   }
 );

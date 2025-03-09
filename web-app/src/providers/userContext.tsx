@@ -37,7 +37,6 @@ const UserProvider = ({ children }: UserProviderType) => {
   const { getAccessTokenSilently } = useAuth0();
   const [userData, setUserData] = useState<IUser>(DefaultUser);
   const [isLoading, setIsLoading] = useState(true);
-  const [session, setSession] = useState(null);
   const [error, setError] = useState<any>(null);
   const [userType, setUserType] = useState<IUserType>({
     _id: "",
@@ -50,6 +49,24 @@ const UserProvider = ({ children }: UserProviderType) => {
 
   const AuthUser = async () => {
     setIsLoading(true);
+
+    // Try to load from session storage first
+    const cachedUser = sessionStorage.getItem("user");
+    if (cachedUser) {
+      try {
+        const parsedUser = JSON.parse(cachedUser);
+        setUserData(parsedUser);
+        setIsLoading(false);
+        return; // Exit early if we have cached data
+      } catch (e) {
+        // Invalid JSON in storage, continue to API call
+        sessionStorage.removeItem("user");
+      }
+    }
+    console.log("not stored");
+    
+
+    // If not cached, fetch user data from API
     if (user && isAuthenticated) {
       try {
         const token = await getAccessTokenSilently();
@@ -61,17 +78,17 @@ const UserProvider = ({ children }: UserProviderType) => {
           },
         });
 
-        setUserData(response.data);
         setIsLoading(false);
+        setUserData(response.data);
+        sessionStorage.setItem("user", JSON.stringify(response.data));
       } catch (error) {
         setError(error);
-        setIsLoading(false);
         console.error("Failed to fetch API");
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setIsLoading(false);
-      setUserData(DefaultUser);
-      setSession(null);
     }
   };
 

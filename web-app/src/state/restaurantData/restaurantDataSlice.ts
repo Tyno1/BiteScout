@@ -8,7 +8,7 @@ interface RestaurantState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: RestaurantState = {
   restaurantData: {
@@ -42,10 +42,21 @@ const initialState: RestaurantState = {
 
 export const createRestaurantData = createAsyncThunk(
   "restaurantData/createRestaurantData",
-  async (restaurantData: RestaurantDataState) => {
+  async ({
+    restaurantData,
+    token,
+  }: {
+    restaurantData: RestaurantDataState;
+    token: string;
+  }) => {
     const response = await axios.post(
-      `${API_URL}/api/restaurant`,
-      restaurantData
+      `${serverApi}/api/restaurants`,
+      restaurantData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   }
@@ -53,17 +64,28 @@ export const createRestaurantData = createAsyncThunk(
 
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
-  async (id: string) => {
-    const response = await axios.get(`${API_URL}/api/restaurant?id=${id}`);
+  async ({ id, token }: { id: string; token: string }) => {
+    const response = await axios.get(`${serverApi}/api/restaurants?id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data);
+
     return response.data;
   }
 );
 
 export const getRestaurantDataByOwnerId = createAsyncThunk(
   "restaurantData/getRestaurantDataByUserId",
-  async (id: string) => {
+  async ({ id, token }: { id: string; token: string }) => {
     const response = await axios.get(
-      `${API_URL}/api/restaurant/owner?id=${id}`
+      `${serverApi}/api/restaurants/owner?id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   }
@@ -74,13 +96,20 @@ export const updateRestaurantData = createAsyncThunk(
   async ({
     data,
     id,
+    token,
   }: {
     data: RestaurantDataState;
     id: string | undefined;
+    token: string;
   }) => {
     const response = await axios.put(
-      `${API_URL}/api/restaurant/?id=${id}`,
-      data
+      `${serverApi}/api/restaurants/?id=${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   }

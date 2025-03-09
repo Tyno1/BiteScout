@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { Restaurant } from "@/src/types/restaurantData.js";
 
 // Helper function to validate request ID
-const validateId = (request: Request) => {
-  const id = request.params.id;
+const validateId = (req: Request) => {
+  const { id } = req.params;
   if (!id) {
     throw new Error("No id provided");
   }
@@ -17,7 +17,7 @@ export const createNewRestaurant = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body = await req.body;
+    const body = req.body;
 
     if (!body) {
       res.status(400).json({ error: "Invalid request body" });

@@ -9,7 +9,7 @@ interface FoodCatalogueState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: FoodCatalogueState = {
   foodData: {
@@ -35,7 +35,7 @@ export const createFoodCatalogue = createAsyncThunk(
   "foodCatalogueData/createFoodCatalogue",
   async (FoodCatalogue: FoodDataSent) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue`,
+      `${serverApi}/api/food-catalogue`,
       FoodCatalogue
     );
     console.log(response.data);
@@ -49,7 +49,7 @@ export const getFoodCatalogue = createAsyncThunk(
   "foodCatalogueData/getFoodCatalogue",
   async (restaurantId: string) => {
     const response = await axios.get(
-      `${API_URL}/api/food-catalogue/restaurant/?id=${restaurantId}`
+      `${serverApi}/api/food-catalogue/restaurant/?id=${restaurantId}`
     );
     return response.data;
   }
@@ -59,7 +59,7 @@ export const getFoodCatalogue = createAsyncThunk(
 export const getFoodCatalogueById = createAsyncThunk(
   "foodCatalogueData/getFoodCatalogueById",
   async (id: string) => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/${id}`);
+    const response = await axios.get(`${serverApi}/api/food-catalogue/${id}`);
     return response.data;
   }
 );

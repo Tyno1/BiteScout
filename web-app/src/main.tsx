@@ -14,6 +14,10 @@ import Dashboard from "./components/pages/dashboard";
 import { UserProvider } from "./providers/userContext";
 import Hub from "./components/pages/onboarding/hub";
 import ProtectedRoute from "./protectedRoute/protectedRoute";
+import OnboardingLayout from "./components/pages/onboarding";
+import Roles from "./components/pages/onboarding/roles";
+import RestaurantSearch from "./components/pages/onboarding/restaurantSearch";
+import { ReduxProvider } from "./providers/ReduxProvider";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +48,20 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/onboarding",
+        element: <OnboardingLayout />,
+        children: [
+          {
+            path: "roles",
+            element: <Roles />,
+          },
+          {
+            path: "restaurant-search",
+            element: <RestaurantSearch />,
+          },
+        ],
+      },
       {
         path: "/dashboard",
         element: <Layout />,
@@ -102,18 +120,20 @@ const audience = import.meta.env.VITE_AUTH0_AUDIENCE;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: window.location.origin + "/hub",
-        audience: audience,
-        scope: "openid profile email offline_access",
-      }}
-    >
-      <UserProvider>
-        <RouterProvider router={router} />
-      </UserProvider>
-    </Auth0Provider>
+    <ReduxProvider>
+      <Auth0Provider
+        domain={domain}
+        clientId={clientId}
+        authorizationParams={{
+          redirect_uri: window.location.origin + "/hub",
+          audience: audience,
+          scope: "openid profile email offline_access",
+        }}
+      >
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
+      </Auth0Provider>
+    </ReduxProvider>
   </StrictMode>
 );

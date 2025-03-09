@@ -23,6 +23,10 @@ const Navbar = ({ theme }: NavTheme) => {
     setIsOpen((prev) => !prev);
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+    sessionStorage.removeItem("user");
+  };
   return (
     <nav
       className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
@@ -80,7 +84,7 @@ const Navbar = ({ theme }: NavTheme) => {
               </li>
               <li>
                 <Button
-                  onClick={() => logout()}
+                  onClick={() => handleLogout()}
                   text="Logout"
                   size="sm"
                   variant="plain"
@@ -185,7 +189,7 @@ const Navbar = ({ theme }: NavTheme) => {
                   <button
                     onClick={() => {
                       toggleMenu();
-                      logout();
+                      handleLogout();
                     }}
                     className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white w-full"
                   >

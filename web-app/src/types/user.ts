@@ -1,5 +1,5 @@
-
 export interface IUser {
+  _id?: string;
   auth0Id: string;
   username?: string;
   phone?: string;

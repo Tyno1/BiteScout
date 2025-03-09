@@ -8,7 +8,7 @@ interface AllergenState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: AllergenState = {
   allergenData: [{ _id: "", name: "", description: "" }],
@@ -20,7 +20,7 @@ export const createAllergen = createAsyncThunk(
   "allergen/createAllergen",
   async (allergenData: Allergen) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue/allergens`,
+      `${serverApi}/api/food-catalogue/allergens`,
       allergenData
     );
     return response.data;
@@ -29,7 +29,7 @@ export const createAllergen = createAsyncThunk(
 export const getAllergens = createAsyncThunk(
   "allergen/getAllergen",
   async () => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/allergens`);
+    const response = await axios.get(`${serverApi}/api/food-catalogue/allergens`);
     return response.data;
   }
 );

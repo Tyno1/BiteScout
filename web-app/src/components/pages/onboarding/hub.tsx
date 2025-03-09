@@ -15,20 +15,24 @@ const Hub = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    AuthUser();
+    if (isAuthenticated && user) {
+      AuthUser();
+    }
   }, [getAccessTokenSilently, isAuthenticated, user]);
 
   useEffect(() => {
-    if (!isLoading && !error && isAuthenticated) {
-      navigate("/dashboard", { replace: true });
+    if (!isLoading && !authLoading && !error && !authError && isAuthenticated) {
+      navigate("/onboarding/roles", { replace: true });
     }
-  }, [isLoading, error, navigate]);
+  }, [isLoading, authLoading, authError, error, navigate, isAuthenticated]);
 
-  if (isLoading && authLoading) {
+  if (isLoading || authLoading) {
     return <div>Loading...</div>;
   }
-  if (error && authError) {
-    return <div>Oops... {error.message}</div>;
+  if (error || authError) {
+    console.log(authError);
+
+    return <div>Oops... {error}</div>;
   }
 
   return <div>Redirecting to dashboard</div>;
