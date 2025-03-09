@@ -18,4 +18,5 @@ export interface IUser {
   metadata?: Record<string, any>;
   createdAt?: Date;
   updatedAt?: Date;
+  restaurantCount: number;
 }

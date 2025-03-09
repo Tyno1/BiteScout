@@ -1,6 +1,4 @@
 import { Edit, Save, Upload, X } from "lucide-react";
-import Image from "next/image";
-import React from "react";
 
 export default function Hero({
   image1,
@@ -14,22 +12,16 @@ export default function Hero({
 }: any) {
   return (
     <section
-      className="relative h-[30vh] bg-black text-white flex flex-col items-start justify-center px-14"
+      className="relative h-[30vh] w-full bg-black text-white flex flex-col items-start justify-center px-14"
       aria-label="Restaurant header"
     >
-      <Image
-        alt="Restaurant profile cover"
+      <img
         src={image1}
-        priority
-        fill
-        sizes="100vw"
-        className="object-cover"
-        role="img"
+        alt="hero_image"
+        className="object-cover object-fit w-[100%] h-[100%] absolute"
       />
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        aria-hidden="true"
-      />
+
+      <div className="absolute inset-0 bg-black/[50%]" aria-hidden="true" />
       <div className="z-10 w-full flex items-end justify-between">
         <div>
           <h1 className="text-6xl font-bold">
@@ -47,7 +39,6 @@ export default function Hero({
           </h1>
           <p role="contentinfo">
             {isEditing ? (
-              
               <input
                 type="text"
                 placeholder="Add description here"

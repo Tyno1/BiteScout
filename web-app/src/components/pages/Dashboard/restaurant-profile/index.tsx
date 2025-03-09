@@ -20,6 +20,8 @@ interface BusinessHours {
   closed: boolean;
 }
 const RestaurantProfile = () => {
+  const token = sessionStorage.getItem("token") || "";
+
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData
   );
@@ -44,8 +46,7 @@ const RestaurantProfile = () => {
     { day: "Sunday", open: "10:00", close: "15:00", closed: true },
   ] as BusinessHours[];
 
-  // check why businessHours isnt updating
-  const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
+   const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,7 +56,11 @@ const RestaurantProfile = () => {
   const handleSave = () => {
     if (editableData) {
       dispatch(
-        updateRestaurantData({ data: editableData, id: editableData._id })
+        updateRestaurantData({
+          data: editableData,
+          id: editableData._id,
+          token,
+        })
       );
       setIsEditing(false);
       setEditableData(null);
@@ -130,7 +135,7 @@ const RestaurantProfile = () => {
 
   useEffect(() => {
     if (restaurantData._id) {
-      dispatch(getRestaurantData(restaurantData._id));
+      dispatch(getRestaurantData({ id: restaurantData._id, token }));
     }
   }, [dispatch, restaurantData._id]);
 

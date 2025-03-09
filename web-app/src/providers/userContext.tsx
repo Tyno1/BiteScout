@@ -20,7 +20,7 @@ interface UserProviderType {
 const UserContext = createContext({} as UserContextType);
 
 const UserProvider = ({ children }: UserProviderType) => {
-  const DefaultUser = {
+  const DEFAULT_USER = {
     auth0Id: "",
     name: "",
     email: "",
@@ -32,10 +32,12 @@ const UserProvider = ({ children }: UserProviderType) => {
       foodDietaryPreferences: [],
       cookingStyle: "",
     },
+    metadata: {},
+    restaurantCount: 0,
   };
   const serverApi = import.meta.env.VITE_BACKEND_SERVER;
   const { getAccessTokenSilently } = useAuth0();
-  const [userData, setUserData] = useState<IUser>(DefaultUser);
+  const [userData, setUserData] = useState<IUser>(DEFAULT_USER);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
   const [userType, setUserType] = useState<IUserType>({
@@ -49,6 +51,7 @@ const UserProvider = ({ children }: UserProviderType) => {
 
   const AuthUser = async () => {
     setIsLoading(true);
+    console.log("stored");
 
     // Try to load from session storage first
     const cachedUser = sessionStorage.getItem("user");
@@ -64,12 +67,12 @@ const UserProvider = ({ children }: UserProviderType) => {
       }
     }
     console.log("not stored");
-    
 
     // If not cached, fetch user data from API
     if (user && isAuthenticated) {
       try {
         const token = await getAccessTokenSilently();
+        sessionStorage.setItem("userToken", JSON.stringify(token));
         console.log("Token received:", token.substring(0, 10) + "..."); // Log first part of token
 
         const response = await axios.get(`${serverApi}/api/protected`, {

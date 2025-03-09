@@ -1,22 +1,64 @@
 import { UserContext } from "@/providers/userContext";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useContext } from "react";
-import { Outlet } from "react-router";
+import { useContext, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 const ProtectedRoute = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
+    user,
     isAuthenticated,
-    isLoading: Auth0Loading,
+    isLoading: auth0Loading,
+    error: authError,
     loginWithRedirect,
+    getAccessTokenSilently,
   } = useAuth0();
-  const { isLoading: UserLoading, userType } = useContext(UserContext);
+  const {
+    isLoading: userLoading,
+    error: userError,
+    userType,
+    AuthUser,
+  } = useContext(UserContext);
 
-  if (!isAuthenticated) {
-    loginWithRedirect();
-    return;
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      AuthUser();
+    }
+  }, [ isAuthenticated, user,]);
+
+  useEffect(() => {
+    if (
+      !userLoading &&
+      !auth0Loading &&
+      !userError &&
+      !authError &&
+      isAuthenticated &&
+      location.pathname === "/onboarding" // Only redirect from the base path
+    ) {
+      navigate("/onboarding/roles");
+    }
+  }, [
+    userLoading,
+    auth0Loading,
+    authError,
+    userError,
+    navigate,
+    isAuthenticated,
+    location.pathname,
+  ]);
+
+  if (!isAuthenticated && !auth0Loading) {
+    // Save current path before redirecting to login
+    loginWithRedirect({
+      appState: {
+        returnTo: window.location.pathname + window.location.search,
+      },
+    });
+    return <div>Redirecting to Login</div>
   }
 
-  if (Auth0Loading || UserLoading) {
+  if (auth0Loading || userLoading) {
     return <div>Loading...</div>;
   }
 

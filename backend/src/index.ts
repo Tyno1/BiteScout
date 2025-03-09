@@ -48,8 +48,8 @@ app.use(
   getUserInfoMiddleware,
   persistUserMiddleware,
   (req: any, res) => {
-    const { name, email, sub, picture, userType, _id } = req.dbUser;
-    console.log(name, email, sub, picture, userType, _id);
+    const { name, email, sub, picture, userType, _id, restaurantCount } = req.dbUser;
+    console.log(name, email, sub, picture, userType, _id, restaurantCount);
 
     res.json({
       _id,
@@ -58,6 +58,7 @@ app.use(
       userId: sub,
       picture,
       userType,
+      restaurantCount,
     });
   }
 );

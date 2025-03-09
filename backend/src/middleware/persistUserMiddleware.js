@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import userType from "../models/UserType.js";
+import RestaurantData from "../models/RestaurantData.js";
 
 const persistUserMiddleware = async (req, res, next) => {
   try {
@@ -32,7 +33,6 @@ const persistUserMiddleware = async (req, res, next) => {
       return next(); // Return early if no lowest privilege type is found.
     }
 
-
     if (user) {
       (user.email = email),
         (user.name = name),
@@ -54,6 +54,13 @@ const persistUserMiddleware = async (req, res, next) => {
         locale,
       });
     }
+
+    // Add restaurant Count
+    const restaurantCount = await RestaurantData.find({
+      ownerId: user._id,
+    });
+
+    user.restaurantCount = restaurantCount.length;
 
     // Attach database user to request
     req.dbUser = user;

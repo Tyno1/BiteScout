@@ -26,6 +26,7 @@ const Navbar = ({ theme }: NavTheme) => {
   const handleLogout = async () => {
     await logout();
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("userToken");
   };
   return (
     <nav
@@ -103,7 +104,13 @@ const Navbar = ({ theme }: NavTheme) => {
             <ul className="flex items-center gap-2 ml-10">
               <li>
                 <Button
-                  onClick={() => loginWithRedirect()}
+                  onClick={() =>
+                    loginWithRedirect({
+                      appState: {
+                        returnTo: location.pathname,
+                      },
+                    })
+                  }
                   text="Log In"
                   size="sm"
                   variant="plain"
@@ -204,7 +211,13 @@ const Navbar = ({ theme }: NavTheme) => {
                   <button
                     className="px-4 py-2 bg-red text-white rounded-lg"
                     type="button"
-                    onClick={() => loginWithRedirect()}
+                    onClick={() =>
+                      loginWithRedirect({
+                        appState: {
+                          returnTo: location.pathname,
+                        },
+                      })
+                    }
                   >
                     Log In
                   </button>

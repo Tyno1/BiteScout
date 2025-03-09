@@ -4,7 +4,7 @@ import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice
 import { AppDispatch, RootState } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";
 import { useAuth0 } from "@auth0/auth0-react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -19,7 +19,7 @@ const Roles = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const defaultRestaurantData: RestaurantDataState = {
+  const DEFAULT_RESTAURANT_DATA: RestaurantDataState = {
     name: "",
     logo: "ttt",
     description: "",
@@ -43,7 +43,7 @@ const Roles = () => {
     owner: false,
     ownerId: "",
   };
-  const [restaurantData, setRestaurantData] = useState(defaultRestaurantData);
+  const [restaurantData, setRestaurantData] = useState(DEFAULT_RESTAURANT_DATA);
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -56,8 +56,6 @@ const Roles = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const token = await getAccessTokenSilently();
-
-    console.log(userData);
 
     if (restaurantData.owner && userData?._id) {
       // Ensure all required fields are present
@@ -77,7 +75,7 @@ const Roles = () => {
 
       console.log("Submitting complete restaurant data:", newRestaurantData);
 
-      try {        
+      try {
         const resultAction = await dispatch(
           createRestaurantData({ restaurantData: newRestaurantData, token })
         );
@@ -96,6 +94,18 @@ const Roles = () => {
       navigate("/onboarding/restaurant-search");
     }
   };
+
+  // Check if user has created a restaurant
+  useEffect(() => {
+    if (userData && userData?.restaurantCount > 0) {
+      navigate("/dashboard");
+    }
+  }, [userData.restaurantCount]);
+
+  // If they have restaurants, don't render anything while redirecting
+  if (userData?.restaurantCount > 0) {
+    return <div>redirecting to dashboard</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
