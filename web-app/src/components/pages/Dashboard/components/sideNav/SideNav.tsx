@@ -30,13 +30,18 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
 
   const isActive = path ? pathname === path : false;
   const { logout } = useAuth0();
+  const handleLogout = async () => {
+    await logout();
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("userToken");
+  };
 
   return (
     <li className="w-full">
       <button
         onClick={() =>
           text === "Logout"
-            ? logout()
+            ? handleLogout()
             : HandleNav && HandleNav(path ? path : "/")
         }
         className={`

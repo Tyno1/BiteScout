@@ -4,15 +4,20 @@ import RestaurantData from "../models/RestaurantData.js";
 
 const persistUserMiddleware = async (req, res, next) => {
   try {
-    // Check if user info is available in the request
-    if (!req.userInfo) {
+    // Check if user info is available and has a valid sub property
+    if (!req.userInfo || !req.userInfo.sub) {
+      console.log("Missing user info or sub identifier");
       return next();
     }
 
-    // Get user info from the request
     const { sub, email, name, picture, email_verified, locale } = req.userInfo;
     const auth0Id = sub;
 
+    // Only proceed with user persistence if we have a valid auth0Id
+    if (!auth0Id) {
+      console.log("Invalid auth0Id - cannot persist user");
+      return next();
+    }
     // check if session has been initialized
     if (req.session) {
       req.session.user = { name, email, userId: sub, picture };

@@ -20,7 +20,7 @@ interface BusinessHours {
   closed: boolean;
 }
 const RestaurantProfile = () => {
-  const token = sessionStorage.getItem("token") || "";
+  const token = sessionStorage.getItem("userToken") || "";
 
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData

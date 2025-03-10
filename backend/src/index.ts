@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { requiredScopes } from "express-oauth2-jwt-bearer";
 import session from "express-session";
 
 import restaurantRoutes from "./routes/restaurant.js";
 import userTypeRoutes from "./routes/userType.js";
+import userRoutes from "./routes/user.js";
+
 import jwtCheck from "./middleware/auth.js";
 import getUserInfoMiddleware from "./middleware/getUserInfoMiddleware.js";
 import persistUserMiddleware from "./middleware/persistUserMiddleware.js";
@@ -55,7 +56,7 @@ app.use(
       _id,
       name,
       email,
-      userId: sub,
+      auth0Id: sub,
       picture,
       userType,
       restaurantCount,
@@ -64,6 +65,8 @@ app.use(
 );
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/user-types", userTypeRoutes);
+app.use("/api/users", userRoutes);
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

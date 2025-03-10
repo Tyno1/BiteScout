@@ -25,7 +25,7 @@ const ProtectedRoute = () => {
     if (isAuthenticated && user) {
       AuthUser();
     }
-  }, [ isAuthenticated, user,]);
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (
@@ -36,7 +36,7 @@ const ProtectedRoute = () => {
       isAuthenticated &&
       location.pathname === "/onboarding" // Only redirect from the base path
     ) {
-      navigate("/onboarding/roles");
+      navigate("/onboarding/roles", { replace: true });
     }
   }, [
     userLoading,
@@ -55,7 +55,7 @@ const ProtectedRoute = () => {
         returnTo: window.location.pathname + window.location.search,
       },
     });
-    return <div>Redirecting to Login</div>
+    return <div>Redirecting to Login</div>;
   }
 
   if (auth0Loading || userLoading) {
@@ -69,6 +69,7 @@ const ProtectedRoute = () => {
       </div>
     );
   }
+
 
   return <Outlet />;
 };

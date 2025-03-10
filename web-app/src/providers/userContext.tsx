@@ -11,6 +11,7 @@ interface UserContextType {
   error: any;
   AuthUser: () => Promise<void>;
   userType: IUserType;
+  UpdateUserRestaurantCount: (userId: string) => Promise<void>;
 }
 
 interface UserProviderType {
@@ -119,6 +120,31 @@ const UserProvider = ({ children }: UserProviderType) => {
     }
   };
 
+  const UpdateUserRestaurantCount = async (userId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = await getAccessTokenSilently();
+
+      const response = await axios.put(
+        `${serverApi}/api/users/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      sessionStorage.setItem("user", JSON.stringify(response.data));
+      setUserData(response.data.user);
+    } catch (error) {
+      setError(error);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (userData?.userType) {
       GetUserTypeById();
@@ -127,7 +153,14 @@ const UserProvider = ({ children }: UserProviderType) => {
 
   return (
     <UserContext.Provider
-      value={{ userData, AuthUser, isLoading, error, userType }}
+      value={{
+        userData,
+        AuthUser,
+        isLoading,
+        error,
+        userType,
+        UpdateUserRestaurantCount,
+      }}
     >
       {children}
     </UserContext.Provider>

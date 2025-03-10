@@ -1,7 +1,7 @@
 import { Auth0Provider } from "@auth0/auth0-react";
 import { ReduxProvider } from "./providers/ReduxProvider";
 import { UserProvider } from "./providers/userContext";
-import { Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/pages/home";
 import About from "./components/pages/about";
 import Contact from "./components/pages/contact";
@@ -28,71 +28,121 @@ const App = () => {
     );
   };
 
+  // Create the router configuration
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Home />,
+    },
+    {
+      path: "/about",
+      element: <About />,
+    },
+    {
+      path: "/contact",
+      element: <Contact />,
+    },
+    {
+      path: "/services",
+      element: <Services />,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/hub",
+      element: <Hub />,
+    },
+    // Protected routes
+    {
+      element: <ProtectedRoute />,
+      children: [
+        // Onboarding routes
+        {
+          path: "/onboarding",
+          element: <OnboardingLayout />,
+          children: [
+            {
+              path: "roles",
+              element: <Roles />,
+            },
+            {
+              path: "restaurant-search",
+              element: <RestaurantSearch />,
+            },
+          ],
+        },
+        // Dashboard routes
+        {
+          path: "/dashboard",
+          element: <Layout />,
+          children: [
+            {
+              index: true,
+              element: <Dashboard />,
+            },
+            {
+              path: "restaurant-profile",
+              element: <RestaurantProfile />,
+            },
+            {
+              path: "food-catalogue",
+              element: <div>Food Catalogue</div>,
+            },
+            {
+              path: "user-management",
+              element: <div>User Management</div>,
+            },
+            {
+              path: "notifications",
+              element: <div>Notifications</div>,
+            },
+            {
+              path: "analytics",
+              element: <div>Analytics</div>,
+            },
+            {
+              path: "reviews",
+              element: <div>Reviews</div>,
+            },
+            {
+              path: "ai-audio",
+              element: <div>AI Audio Reviews</div>,
+            },
+            {
+              path: "settings",
+              element: <div>Customer Insights</div>,
+            },
+            {
+              path: "customer-insight",
+              element: <div>Customer Insights</div>,
+            },
+          ],
+        },
+      ],
+    },
+    // 404 route
+    {
+      path: "*",
+      element: <div>404 not Found</div>,
+    },
+  ]);
+
   return (
     <ReduxProvider>
       <Auth0Provider
         domain={domain}
         clientId={clientId}
         authorizationParams={{
-          redirect_uri: window.location.origin,
+          redirect_uri: window.location.origin + "/onboarding/roles",
           audience: audience,
           scope: "openid profile email offline_access",
         }}
         onRedirectCallback={onRedirectCallback}
       >
         <UserProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/hub" element={<Hub />} />
-
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-              {/* Onboarding routes */}
-              <Route path="/onboarding" element={<OnboardingLayout />}>
-                <Route path="roles" element={<Roles />} />
-                <Route
-                  path="restaurant-search"
-                  element={<RestaurantSearch />}
-                />
-              </Route>
-
-              {/* Dashboard routes */}
-              <Route path="/dashboard" element={<Layout />}>
-                <Route index element={<Dashboard />} />
-                <Route
-                  path="restaurant-profile"
-                  element={<RestaurantProfile />}
-                />
-                <Route
-                  path="food-catalogue"
-                  element={<div>Food Catalogue</div>}
-                />
-                <Route
-                  path="user-management"
-                  element={<div>User Management</div>}
-                />
-                <Route
-                  path="notifications"
-                  element={<div>Notifications</div>}
-                />
-                <Route path="analytics" element={<div>Analytics</div>} />
-                <Route path="reviews" element={<div>Reviews</div>} />
-                <Route path="ai-audio" element={<div>AI Audio Reviews</div>} />
-                <Route path="settings" element={<div>Customer Insights</div>} />
-                <Route
-                  path="customer-insight"
-                  element={<div>Customer Insights</div>}
-                />
-              </Route>
-            </Route>
-
-            {/* 404 route */}
-            <Route path="*" element={<div>404 not Found</div>} />
-          </Routes>
+          <RouterProvider router={router} />
         </UserProvider>
       </Auth0Provider>
     </ReduxProvider>

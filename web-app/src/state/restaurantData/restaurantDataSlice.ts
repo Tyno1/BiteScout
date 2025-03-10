@@ -64,7 +64,7 @@ export const createRestaurantData = createAsyncThunk(
 
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
-  async ({ id, token }: { id: string; token: string }) => {
+  async ({ id, token }: { id: string; token: string }) => {    
     const response = await axios.get(`${serverApi}/api/restaurants?id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,

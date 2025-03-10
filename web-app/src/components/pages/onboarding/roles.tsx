@@ -1,23 +1,21 @@
 import Button from "@/components/atoms/buttons/Button";
 import { UserContext } from "@/providers/userContext";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
-import { AppDispatch, RootState } from "@/state/store";
+import { AppDispatch } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";
 import { useAuth0 } from "@auth0/auth0-react";
 import React, { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 
 const Roles = () => {
   const { getAccessTokenSilently } = useAuth0();
-  const { userData } = useContext(UserContext);
-  const {
-    restaurantData: restaurant,
-    error,
-    status,
-  } = useSelector((state: RootState) => state.restaurantData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { userData, UpdateUserRestaurantCount } = useContext(UserContext);
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [message, setMessage] = useState("");
 
   const DEFAULT_RESTAURANT_DATA: RestaurantDataState = {
     name: "",
@@ -44,6 +42,12 @@ const Roles = () => {
     ownerId: "",
   };
   const [restaurantData, setRestaurantData] = useState(DEFAULT_RESTAURANT_DATA);
+  const [apiError, setApiError] = useState("");
+  const [formError, setFormError] = useState({
+    name: "",
+    restaurantCount: "",
+    submission: "",
+  });
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -55,43 +59,104 @@ const Roles = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const token = await getAccessTokenSilently();
+    setIsSubmitting(true);
+    setApiError("");
+    setFormError({
+      name: "",
+      restaurantCount: "",
+      submission: "",
+    });
 
-    if (restaurantData.owner && userData?._id) {
-      // Ensure all required fields are present
-      const businessHours = restaurantData.businessHours.map((hour) => ({
-        day: hour.day || "Monday", // Default value
-        open: hour.open || "09:00", // Default value
-        close: hour.close || "17:00", // Default value
-        closed: hour.closed || false,
-      }));
+    try {
+      if (!userData?._id) {
+        setApiError("User data not found");
+        throw new Error("User data not found");
+      }
 
-      const newRestaurantData: RestaurantDataState = {
-        ...restaurantData,
-        ownerId: userData._id,
-        businessHours: businessHours, // Required with proper structure
-        priceRange: restaurantData.priceRange || "$",
-      };
+      const token = await getAccessTokenSilently();
 
-      console.log("Submitting complete restaurant data:", newRestaurantData);
+      if (restaurantData.owner) {
+        // Validate restaurant owner submission
+        if (!restaurantData.name.trim()) {
+          // Handle empty restaurant name error
+          setFormError({ ...formError, name: "Restaurant name is required" });
+          return;
+        }
+        // Ensure all required fields are present
+        const businessHours = restaurantData.businessHours.map((hour) => ({
+          day: hour.day || "Monday", // Default value
+          open: hour.open || "09:00", // Default value
+          close: hour.close || "17:00", // Default value
+          closed: hour.closed || false,
+        }));
+        // create the new restaurant payload
+        const newRestaurantData: RestaurantDataState = {
+          ...restaurantData,
+          ownerId: userData._id,
+          businessHours: businessHours,
+          priceRange: restaurantData.priceRange || "$",
+        };
 
-      try {
+        setMessage("Submitting restaurant");
+        setIsSubmitting(true);
+
         const resultAction = await dispatch(
           createRestaurantData({ restaurantData: newRestaurantData, token })
         );
-        console.log(resultAction);
 
         if (createRestaurantData.fulfilled.match(resultAction)) {
-          console.log("Restaurant created successfully:", resultAction.payload);
-          navigate("/dashboard");
+          setMessage("Restaurant created successfully!");
+
+          // Update user's restaurant count and handle potential errors
+          try {
+            await UpdateUserRestaurantCount(userData._id);
+            // Only navigate if update was successful
+            setIsSubmitting(false);
+            navigate("/dashboard");
+          } catch (updateError) {
+            console.error(
+              "Failed to update user restaurant count:",
+              updateError
+            );
+            setFormError({
+              ...formError,
+              restaurantCount:
+                "Your restaurant was created but we couldn't update your profile. This will be fixed automatically",
+            });
+          }
         } else {
-          console.error("Failed to create restaurant:", resultAction.error);
+          // Handle API error with user-friendly message
+          const errorMessage =
+            resultAction.error?.message || "Failed to create restaurant";
+          setApiError(errorMessage);
         }
-      } catch (error) {
-        console.error("Error creating restaurant:", error);
+      } else {
+        // Employee logic
+        setMessage("Redirecting to restaurant search...");
+        navigate("/onboarding/restaurant-search");
       }
-    } else {
-      navigate("/onboarding/restaurant-search");
+    } catch (error) {
+      // Better error handling
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      console.error("Form submission error:", errorMessage);
+      setFormError({ ...formError, submission: errorMessage });
+    } finally {
+      // Only clear errors if we're navigating away
+      if (
+        !formError.name &&
+        !formError.restaurantCount &&
+        !formError.submission &&
+        !apiError
+      ) {
+        setFormError({
+          name: "",
+          restaurantCount: "",
+          submission: "",
+        });
+        setApiError("");
+      }
+      setIsSubmitting(false);
     }
   };
 
@@ -174,13 +239,15 @@ const Roles = () => {
                   name="name"
                   onChange={handleInputChange}
                   className={`${
-                    error && restaurantData.name === "" && "border-orange"
+                    formError.name &&
+                    restaurantData.name === "" &&
+                    "border-orange"
                   } w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors `}
                   type="text"
                   id="restaurant-name"
                   placeholder="Enter your restaurant name"
                 />
-                {error && restaurantData.name === "" && (
+                {formError.name && restaurantData.name === "" && (
                   <div className="space-y-2">
                     <p className="text-sm text-orange">
                       You must enter a restaurant name
@@ -190,18 +257,47 @@ const Roles = () => {
               </div>
             )}
 
+            {message && (
+              <div className="space-y-2">
+                <p className="text-sm text-green-500">{message}</p>
+              </div>
+            )}
             {/* Submit Button */}
 
-            <Button
-              variant="solid"
-              type="submit"
-              text={
-                restaurantData.owner
-                  ? `Create Restaurant Profile`
-                  : `Find Your Restaurant`
-              }
-              fullWidth
-            />
+            {restaurantData.owner ? (
+              <Button
+                variant="solid"
+                type="submit"
+                disabled={!restaurantData.name}
+                text={
+                  isSubmitting
+                    ? "Creating your restaurant"
+                    : "Create Restaurant Profile"
+                }
+                fullWidth
+              />
+            ) : (
+              <Button
+                variant="solid"
+                type="submit"
+                text="Find Your Restaurant"
+                fullWidth
+              />
+            )}
+
+            {apiError && (
+              <div className="space-y-2">
+                <p className="text-sm text-red-500">{apiError}</p>
+              </div>
+            )}
+            {formError.submission ||
+              (formError.restaurantCount && (
+                <div className="space-y-2">
+                  <p className="text-sm text-red-500">
+                    {formError.submission || formError.restaurantCount}
+                  </p>
+                </div>
+              ))}
           </div>
         </form>
       </div>
