@@ -1,14 +1,13 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import SideNav from "./components/sideNav/SideNav";
 import { useContext } from "react";
 import { UserContext } from "@/providers/userContext";
 
 const Layout = () => {
   const { userData } = useContext(UserContext);
-  const navigate = useNavigate();
 
   if (userData.restaurantCount < 1) {
-   return window.location.href = "/onboarding/roles"
+    return (window.location.href = "/onboarding/roles");
   }
 
   return (

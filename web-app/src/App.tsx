@@ -15,6 +15,7 @@ import RestaurantSearch from "./components/pages/onboarding/restaurantSearch";
 import Layout from "./components/pages/dashboard/layout";
 import Dashboard from "./components/pages/dashboard";
 import RestaurantProfile from "./components/pages/dashboard/restaurant-profile";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -143,6 +144,7 @@ const App = () => {
       >
         <UserProvider>
           <RouterProvider router={router} />
+          <ToastContainer />
         </UserProvider>
       </Auth0Provider>
     </ReduxProvider>

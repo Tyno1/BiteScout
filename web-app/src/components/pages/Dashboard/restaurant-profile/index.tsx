@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
@@ -12,6 +12,7 @@ import ContactInformation from "../components/restaurant-profile/ContactInformat
 import BusinessHours from "../components/restaurant-profile/BusinessHours";
 import Features from "../components/restaurant-profile/Features";
 import { RestaurantDataState } from "@/types/restaurantData";
+import { UserContext } from "@/providers/userContext";
 
 interface BusinessHours {
   day: string;
@@ -20,8 +21,7 @@ interface BusinessHours {
   closed: boolean;
 }
 const RestaurantProfile = () => {
-  const token = sessionStorage.getItem("userToken") || "";
-
+  const { token } = useContext(UserContext);
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData
   );
@@ -46,7 +46,7 @@ const RestaurantProfile = () => {
     { day: "Sunday", open: "10:00", close: "15:00", closed: true },
   ] as BusinessHours[];
 
-   const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
+  const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -134,10 +134,10 @@ const RestaurantProfile = () => {
   };
 
   useEffect(() => {
-    if (restaurantData._id) {
+    if (restaurantData._id && token) {
       dispatch(getRestaurantData({ id: restaurantData._id, token }));
     }
-  }, [dispatch, restaurantData._id]);
+  }, [dispatch, restaurantData._id, token]);
 
   useEffect(() => {
     if (displayData?.businessHours && displayData.businessHours.length >= 1) {
@@ -153,6 +153,20 @@ const RestaurantProfile = () => {
   }, [displayData]);
 
   if (!displayData) return null;
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin text-4xl text-gray-700">Loading...</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <div className="text-red-500 text-4xl">An error occurred.</div>
+      </div>
+    );
+  }
 
   return (
     <main className="w-full min-h-screen bg-gray-50">

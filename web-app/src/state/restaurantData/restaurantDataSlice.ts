@@ -64,13 +64,12 @@ export const createRestaurantData = createAsyncThunk(
 
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
-  async ({ id, token }: { id: string; token: string }) => {    
-    const response = await axios.get(`${serverApi}/api/restaurants?id=${id}`, {
+  async ({ id, token }: { id: string; token: string }) => {        
+    const response = await axios.get(`${serverApi}/api/restaurants/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data);
 
     return response.data;
   }
@@ -102,8 +101,10 @@ export const updateRestaurantData = createAsyncThunk(
     id: string | undefined;
     token: string;
   }) => {
+    console.log(token);
+    
     const response = await axios.put(
-      `${serverApi}/api/restaurants/?id=${id}`,
+      `${serverApi}/api/restaurants/${id}`,
       data,
       {
         headers: {

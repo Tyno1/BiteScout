@@ -11,7 +11,10 @@ interface UserContextType {
   error: any;
   AuthUser: () => Promise<void>;
   userType: IUserType;
-  UpdateUserRestaurantCount: (userId: string) => Promise<void>;
+  UpdateUserRestaurantCountAndUserTpe: (userId: string) => Promise<void>;
+  token: string;
+  tokenLoading: boolean;
+  tokenError: any;
 }
 
 interface UserProviderType {
@@ -41,6 +44,9 @@ const UserProvider = ({ children }: UserProviderType) => {
   const [userData, setUserData] = useState<IUser>(DEFAULT_USER);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const [tokenError, setTokenError] = useState<any>("");
+  const [token, setToken] = useState("");
   const [userType, setUserType] = useState<IUserType>({
     _id: "",
     name: "",
@@ -120,7 +126,7 @@ const UserProvider = ({ children }: UserProviderType) => {
     }
   };
 
-  const UpdateUserRestaurantCount = async (userId: string) => {
+  const UpdateUserRestaurantCountAndUserTpe = async (userId: string) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -145,6 +151,32 @@ const UserProvider = ({ children }: UserProviderType) => {
     }
   };
 
+  const fetchToken = async () => {
+    if (!isAuthenticated) return;
+
+    setTokenLoading(true);
+    try {
+      const accessToken = await getAccessTokenSilently();
+      setToken(accessToken);
+      setTokenError(null);
+    } catch (error) {
+      console.error("Failed to get token:", error);
+      setTokenError(
+        error instanceof Error ? error : new Error("Unknown error")
+      );
+    } finally {
+      setTokenLoading(false);
+    }
+  };
+
+  // Fetch token when auth state changes
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      fetchToken();
+    }
+  }, [isLoading, isAuthenticated]);
+
+
   useEffect(() => {
     if (userData?.userType) {
       GetUserTypeById();
@@ -159,7 +191,10 @@ const UserProvider = ({ children }: UserProviderType) => {
         isLoading,
         error,
         userType,
-        UpdateUserRestaurantCount,
+        UpdateUserRestaurantCountAndUserTpe,
+        token,
+        tokenLoading,
+        tokenError,
       }}
     >
       {children}

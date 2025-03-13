@@ -1,26 +1,15 @@
-
 import { AppDispatch, RootState } from "@/state/store";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "@/components/atoms/buttons/Button";
-import { getAllRestaurants } from "@/state/restaurantData/restaurantDataSlice";
 import { useNavigate } from "react-router";
 
 const RestaurantSearch = () => {
-  const { allRestaurants, error, status } = useSelector(
-    (state: RootState) => state.restaurantData
-  );
   const dispatch = useDispatch<AppDispatch>();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState<string>();
   const navigate = useNavigate();
-
-  const filteredRestaurants =
-    allRestaurants &&
-    allRestaurants.filter((restaurant: RestaurantList) =>
-      restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -82,7 +71,8 @@ const RestaurantSearch = () => {
               )
             )} */}
             <Button
-              onClick={() => router.replace("/dashboard")}
+              variant="solid"
+              onClick={() => navigate("/dashboard")}
               text="Request Authorization"
               fullWidth
             />

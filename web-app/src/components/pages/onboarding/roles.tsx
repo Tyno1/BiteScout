@@ -3,15 +3,15 @@ import { UserContext } from "@/providers/userContext";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";
-import { useAuth0 } from "@auth0/auth0-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Roles = () => {
-  const { getAccessTokenSilently } = useAuth0();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { userData, UpdateUserRestaurantCount } = useContext(UserContext);
+  const { userData, UpdateUserRestaurantCountAndUserTpe, token } =
+    useContext(UserContext);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const Roles = () => {
     submission: "",
   });
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRestaurantData((prev) => ({
       ...prev,
@@ -68,18 +68,22 @@ const Roles = () => {
     });
 
     try {
-      if (!userData?._id) {
-        setApiError("User data not found");
-        throw new Error("User data not found");
-      }
-
-      const token = await getAccessTokenSilently();
-
       if (restaurantData.owner) {
         // Validate restaurant owner submission
         if (!restaurantData.name.trim()) {
           // Handle empty restaurant name error
-          setFormError({ ...formError, name: "Restaurant name is required" });
+          setFormError((prev) => ({
+            ...prev,
+            name: "Restaurant name is required",
+          }));
+          setRestaurantData((prev) => ({ ...prev, name: "" }));
+          return;
+        }
+        if (!userData?._id) {
+          setApiError(
+            "User profile not found. Please refresh the page or contact support."
+          );
+          setIsSubmitting(false);
           return;
         }
         // Ensure all required fields are present
@@ -97,8 +101,7 @@ const Roles = () => {
           priceRange: restaurantData.priceRange || "$",
         };
 
-        setMessage("Submitting restaurant");
-        setIsSubmitting(true);
+        setMessage("Creating your restaurant profile...");
 
         const resultAction = await dispatch(
           createRestaurantData({ restaurantData: newRestaurantData, token })
@@ -109,8 +112,8 @@ const Roles = () => {
 
           // Update user's restaurant count and handle potential errors
           try {
-            await UpdateUserRestaurantCount(userData._id);
-            // Only navigate if update was successful
+            await UpdateUserRestaurantCountAndUserTpe(userData._id);
+            toast.success("Restaurant created successfully!");
             setIsSubmitting(false);
             navigate("/dashboard");
           } catch (updateError) {
@@ -118,17 +121,30 @@ const Roles = () => {
               "Failed to update user restaurant count:",
               updateError
             );
-            setFormError({
-              ...formError,
-              restaurantCount:
-                "Your restaurant was created but we couldn't update your profile. This will be fixed automatically",
-            });
+            // Show warning
+            toast.warning(
+              "Restaurant created, but profile update incomplete. This will be fixed automatically."
+            );
+            setIsSubmitting(false);
           }
         } else {
-          // Handle API error with user-friendly message
-          const errorMessage =
-            resultAction.error?.message || "Failed to create restaurant";
-          setApiError(errorMessage);
+          // Handle API error with specific message based on error type
+          const errorPayload = resultAction.error?.message || "";
+          let userFriendlyMessage =
+            "Failed to create restaurant. Please try again.";
+
+          if (errorPayload.includes("validation")) {
+            userFriendlyMessage =
+              "Some restaurant information is invalid. Please check all fields.";
+          } else if (errorPayload.includes("duplicate")) {
+            userFriendlyMessage = "A restaurant with this name already exists.";
+          } else if (errorPayload.includes("auth")) {
+            userFriendlyMessage =
+              "Your session has expired. Please log in again.";
+          }
+
+          setApiError(userFriendlyMessage);
+          toast.error(userFriendlyMessage);
         }
       } else {
         // Employee logic
@@ -139,23 +155,10 @@ const Roles = () => {
       // Better error handling
       const errorMessage =
         error instanceof Error ? error.message : "An unexpected error occurred";
-      console.error("Form submission error:", errorMessage);
-      setFormError({ ...formError, submission: errorMessage });
+      console.error("Form submission error:", error);
+      setFormError((prev) => ({ ...prev, submission: errorMessage }));
+      toast.error("Something went wrong. Please try again later.");
     } finally {
-      // Only clear errors if we're navigating away
-      if (
-        !formError.name &&
-        !formError.restaurantCount &&
-        !formError.submission &&
-        !apiError
-      ) {
-        setFormError({
-          name: "",
-          restaurantCount: "",
-          submission: "",
-        });
-        setApiError("");
-      }
       setIsSubmitting(false);
     }
   };
@@ -247,9 +250,9 @@ const Roles = () => {
                   id="restaurant-name"
                   placeholder="Enter your restaurant name"
                 />
-                {formError.name && restaurantData.name === "" && (
+                {formError.name && (
                   <div className="space-y-2">
-                    <p className="text-sm text-orange">
+                    <p className="text-sm text-orange-500">
                       You must enter a restaurant name
                     </p>
                   </div>
