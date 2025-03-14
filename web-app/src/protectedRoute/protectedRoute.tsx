@@ -12,7 +12,6 @@ const ProtectedRoute = () => {
     isLoading: auth0Loading,
     error: authError,
     loginWithRedirect,
-    getAccessTokenSilently,
   } = useAuth0();
   const {
     isLoading: userLoading,
@@ -59,7 +58,11 @@ const ProtectedRoute = () => {
   }
 
   if (auth0Loading || userLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-gray-300 border-t-red rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   if (userType?.level > 4) {
@@ -69,7 +72,6 @@ const ProtectedRoute = () => {
       </div>
     );
   }
-
 
   return <Outlet />;
 };

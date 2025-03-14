@@ -42,7 +42,7 @@ export default function Button({
     "rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const colorStyles = {
-    primary: `hover:bg-red focus:outline-none focus:ring-2 focus:ring-red focus:ring-offset-2 ${
+    primary: `hover:bg-red hover:text-white focus:outline-none focus:ring-2 focus:ring-red focus:ring-offset-2 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"

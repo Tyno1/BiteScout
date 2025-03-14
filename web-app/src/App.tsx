@@ -6,7 +6,6 @@ import Home from "./components/pages/home";
 import About from "./components/pages/about";
 import Contact from "./components/pages/contact";
 import Services from "./components/pages/services";
-import Login from "./components/pages/auth/Login";
 import Hub from "./components/pages/onboarding/hub";
 import ProtectedRoute from "./protectedRoute/protectedRoute";
 import OnboardingLayout from "./components/pages/onboarding";
@@ -46,10 +45,6 @@ const App = () => {
     {
       path: "/services",
       element: <Services />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
     },
     {
       path: "/hub",

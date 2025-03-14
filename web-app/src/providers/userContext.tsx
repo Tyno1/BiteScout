@@ -58,8 +58,6 @@ const UserProvider = ({ children }: UserProviderType) => {
 
   const AuthUser = async () => {
     setIsLoading(true);
-    console.log("stored");
-
     // Try to load from session storage first
     const cachedUser = sessionStorage.getItem("user");
     if (cachedUser) {

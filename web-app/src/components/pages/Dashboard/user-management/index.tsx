@@ -1,5 +1,5 @@
-import UserModal from "@/components/ui/Dashboard/Modal";
-import React, { useState } from "react";
+import UserModal from "../components/sideNav/Modal";
+import { useState } from "react";
 
 interface newUserProps {
   name: string;

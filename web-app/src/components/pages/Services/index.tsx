@@ -1,6 +1,5 @@
 import Navbar from "@/components/molecules/Navbar";
-import React from "react";
-
+ 
 const Services = () => {
   return (
     <div className="flex flex-col">

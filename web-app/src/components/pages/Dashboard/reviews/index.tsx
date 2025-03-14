@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 
 interface reviewProps {
   id: number;
@@ -34,7 +33,7 @@ const Reviews = () => {
     resolved: false,
     tags: [],
   };
-  const [reviews, setReviews] = useState<reviewProps[]>([
+  const [reviews] = useState<reviewProps[]>([
     {
       id: 1,
       user: {
@@ -79,17 +78,12 @@ const Reviews = () => {
     setSelectedReview(review);
   };
 
-  const renderMediaPreview = (media) => {
-    return media.map((item, index) => {
+  const renderMediaPreview = (media: any) => {
+    return media.map((item: any, index: any) => {
       if (item.type === "image") {
         return (
           <div key={index} className="w-24 h-24 relative mr-2">
-            <Image
-              src={item.url}
-              alt={`Review media ${index + 1}`}
-              fill
-              className="object-cover rounded"
-            />
+            <img src={item.url} alt="" />
           </div>
         );
       }

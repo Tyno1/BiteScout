@@ -26,13 +26,10 @@ export const createCuisine = createAsyncThunk(
     return response.data;
   }
 );
-export const getCuisine = createAsyncThunk(
-  "cuisine/getCuisine",
-  async () => {
-    const response = await axios.get(`${serverApi}/api/food-catalogue/cuisine`);
-    return response.data;
-  }
-);
+export const getCuisine = createAsyncThunk("cuisine/getCuisine", async () => {
+  const response = await axios.get(`${serverApi}/api/food-catalogue/cuisine`);
+  return response.data;
+});
 
 const CuisineSlice = createSlice({
   name: "cuisine",
@@ -40,7 +37,7 @@ const CuisineSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createCuisine.pending, (state, action) => {
+      .addCase(createCuisine.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -54,7 +51,7 @@ const CuisineSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
-      .addCase(getCuisine.pending, (state, action) => {
+      .addCase(getCuisine.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

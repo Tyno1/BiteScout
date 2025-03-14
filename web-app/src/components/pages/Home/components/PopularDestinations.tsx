@@ -1,6 +1,5 @@
 import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
-import React from "react";
-
+ 
 const PopularDestinations: React.FC = () => {
   return (
     <section className="w-full py-20 flex justify-center">

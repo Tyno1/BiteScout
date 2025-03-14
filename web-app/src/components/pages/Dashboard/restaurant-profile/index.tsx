@@ -49,7 +49,9 @@ const RestaurantProfile = () => {
   const [businessHours, setBusinessHours] = useState(DEFAULT_BUSINESS_HOURS);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    console.log(event);
+    
+    // const file = event.target.files?.[0];
     // Handle image upload logic here
   };
 

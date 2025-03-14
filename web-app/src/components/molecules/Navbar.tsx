@@ -17,7 +17,7 @@ const Navbar = ({ theme }: NavTheme) => {
     navigate(route);
   };
 
-  const { loginWithRedirect, logout, error, isLoading, user } = useAuth0();
+  const { loginWithRedirect, logout, isLoading, user } = useAuth0();
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);

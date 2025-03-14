@@ -26,13 +26,10 @@ export const createCourse = createAsyncThunk(
     return response.data;
   }
 );
-export const getCourse = createAsyncThunk(
-  "course/getCourse",
-  async () => {
-    const response = await axios.get(`${serverApi}/api/food-catalogue/course`);
-    return response.data;
-  }
-);
+export const getCourse = createAsyncThunk("course/getCourse", async () => {
+  const response = await axios.get(`${serverApi}/api/food-catalogue/course`);
+  return response.data;
+});
 
 const CourseSlice = createSlice({
   name: "course",
@@ -40,7 +37,7 @@ const CourseSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createCourse.pending, (state, action) => {
+      .addCase(createCourse.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -54,7 +51,7 @@ const CourseSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
-      .addCase(getCourse.pending, (state, action) => {
+      .addCase(getCourse.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

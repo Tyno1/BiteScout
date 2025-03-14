@@ -1,5 +1,4 @@
-import React from "react";
-import { TrendingUp, Utensils, Camera, MoveRight } from "lucide-react";
+ import { TrendingUp, Utensils, Camera, MoveRight } from "lucide-react";
 import { Link } from "react-router";
 
 const features = [

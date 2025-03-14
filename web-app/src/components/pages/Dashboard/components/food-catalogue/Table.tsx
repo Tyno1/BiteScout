@@ -1,5 +1,4 @@
 import { FoodDataReceived } from "@/types/foodCatalogue";
-import React from "react";
 
 interface TableProps {
   foodDatas: FoodDataReceived[];

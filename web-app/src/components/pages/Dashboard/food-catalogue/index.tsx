@@ -1,5 +1,4 @@
-\import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
 import { FoodDataSent } from "@/types/foodCatalogue";
@@ -12,6 +11,7 @@ import {
   createFoodCatalogue,
   getFoodCatalogue,
 } from "@/state/foodCatalogueData/foodCatalogueSlice";
+import { useNavigate } from "react-router";
 
 export interface formErrorType {
   name: string;
@@ -25,32 +25,15 @@ export interface formErrorType {
 }
 
 const FoodCatalogueManagement = () => {
-  const {
-    allergenData,
-    status: allergenStatus,
-    error: allergenError,
-  } = useSelector((state: RootState) => state.allergen);
-  const {
-    courseData,
-    status: courseStatus,
-    error: courseError,
-  } = useSelector((state: RootState) => state.course);
-  const {
-    cuisineData,
-    status: cuisineStatus,
-    error: cuisineError,
-  } = useSelector((state: RootState) => state.cuisine);
-  const {
-    restaurantData,
-    status: restaurantStatus,
-    error: restaurantError,
-  } = useSelector((state: RootState) => state.restaurantData);
-  const {
-    foodData,
-    foodDatas,
-    status: foodDataStatus,
-    error: foodDataError,
-  } = useSelector((state: RootState) => state.foodCatalogue);
+  const { allergenData } = useSelector((state: RootState) => state.allergen);
+  const { courseData } = useSelector((state: RootState) => state.course);
+  const { cuisineData } = useSelector((state: RootState) => state.cuisine);
+  const { restaurantData } = useSelector(
+    (state: RootState) => state.restaurantData
+  );
+  const { foodData, foodDatas } = useSelector(
+    (state: RootState) => state.foodCatalogue
+  );
   const dispatch = useDispatch<AppDispatch>();
 
   const currencies = [
@@ -92,11 +75,11 @@ const FoodCatalogueManagement = () => {
     restaurant: "",
   };
 
-  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<formErrorType>(DefaultFormError);
   const [newFood, setNewFood] = useState<FoodDataSent>(DefaultFoodData);
+  const navigate = useNavigate();
 
   // functions for modal
   const handleAddFood = async () => {
@@ -155,7 +138,10 @@ const FoodCatalogueManagement = () => {
       return;
     }
     if (newFood.ingredients.includes(ingredient)) {
-      setFormError("ingredient already included");
+      setFormError((prev) => ({
+        ...prev,
+        ingredients: "ingredient already included",
+      }));
       return;
     }
 
@@ -164,7 +150,7 @@ const FoodCatalogueManagement = () => {
       ingredients: [...prev.ingredients, ingredient],
     }));
     setIngredient("");
-    setFormError("");
+    setFormError(DefaultFormError);
   };
 
   const handleRemoveIngredients = (ingredient: string): void => {
@@ -181,7 +167,7 @@ const FoodCatalogueManagement = () => {
   // functions for table
 
   const handleRowClick = (id: string) => {
-    router.push(`food-catalogue/${id}`);
+    navigate(`food-catalogue/${id}`);
   };
 
   useEffect(() => {

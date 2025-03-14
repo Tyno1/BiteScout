@@ -101,8 +101,6 @@ const Roles = () => {
           priceRange: restaurantData.priceRange || "$",
         };
 
-        setMessage("Creating your restaurant profile...");
-
         const resultAction = await dispatch(
           createRestaurantData({ restaurantData: newRestaurantData, token })
         );
@@ -129,6 +127,8 @@ const Roles = () => {
           }
         } else {
           // Handle API error with specific message based on error type
+          console.log(resultAction.error.message);
+          
           const errorPayload = resultAction.error?.message || "";
           let userFriendlyMessage =
             "Failed to create restaurant. Please try again.";
@@ -136,7 +136,7 @@ const Roles = () => {
           if (errorPayload.includes("validation")) {
             userFriendlyMessage =
               "Some restaurant information is invalid. Please check all fields.";
-          } else if (errorPayload.includes("duplicate")) {
+          } else if (errorPayload.includes("409")) {
             userFriendlyMessage = "A restaurant with this name already exists.";
           } else if (errorPayload.includes("auth")) {
             userFriendlyMessage =

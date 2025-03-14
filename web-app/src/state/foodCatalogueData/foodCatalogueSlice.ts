@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface FoodCatalogueState {
-  foodData: FoodDataReceived;
+  foodData: FoodDataReceived | FoodDataSent;
   foodDatas: FoodDataReceived[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
@@ -70,7 +70,7 @@ const foodCatalogueSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createFoodCatalogue.pending, (state, action) => {
+      .addCase(createFoodCatalogue.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -86,7 +86,7 @@ const foodCatalogueSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-      .addCase(getFoodCatalogue.pending, (state, action) => {
+      .addCase(getFoodCatalogue.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -102,7 +102,7 @@ const foodCatalogueSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-      .addCase(getFoodCatalogueById.pending, (state, action) => {
+      .addCase(getFoodCatalogueById.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

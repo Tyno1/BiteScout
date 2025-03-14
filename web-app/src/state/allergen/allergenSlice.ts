@@ -40,7 +40,7 @@ const AllergenSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createAllergen.pending, (state, action) => {
+      .addCase(createAllergen.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -54,7 +54,7 @@ const AllergenSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
-      .addCase(getAllergens.pending, (state, action) => {
+      .addCase(getAllergens.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

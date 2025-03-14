@@ -1,12 +1,9 @@
-
-
 import { getFoodCatalogueById } from "@/state/foodCatalogueData/foodCatalogueSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router";
 
 const Food = () => {
   const { foodData, error, status } = useSelector(
@@ -44,16 +41,16 @@ const Food = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">{foodData.name}</h1>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      {/* <div className="grid md:grid-cols-2 gap-8">
         <div>
           {foodData.images && foodData.images.length > 0 ? (
-            <Image
-              src={foodData?.images[0] || "/placeholder.svg"}
-              alt={foodData.name}
-              width={500}
-              height={400}
-              className="rounded-lg object-cover w-full h-[400px]"
-            />
+            <div className="w-20 h-20">
+              <img
+                src={foodData?.images[0] || "/placeholder.svg"}
+                alt=""
+                className="object-fit w-full h-full"
+              />
+            </div>
           ) : (
             <div className="bg-gray-200 rounded-lg w-full h-[400px] flex items-center justify-center">
               <span className="text-gray-500">No image available</span>
@@ -99,7 +96,7 @@ const Food = () => {
             </>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
