@@ -5,7 +5,7 @@ import Button from "@/components/atoms/buttons/Button";
 import { getRestaurantsByName } from "@/state/restaurantData/restaurantDataSlice";
 import { UserContext } from "@/providers/userContext";
 import RestaurantCardItem from "./components/card";
-import { toast } from "react-toastify";
+import { createRestaurantAccess } from "@/state/restaurantAccess/restaurantAccessSlice";
 
 const RestaurantSearch = () => {
   const { token, userData } = useContext(UserContext);
@@ -15,12 +15,13 @@ const RestaurantSearch = () => {
   );
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string>("");
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    setFormError("");
     if (e.target.value === "") {
       dispatch({ type: "restaurantData/clearResults" });
     }
@@ -29,9 +30,10 @@ const RestaurantSearch = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setHasSearched(true);
+    setFormError("");
     if (!searchTerm.trim()) {
-      toast.error("Please enter a restaurant name");
-      setSearchTerm("")
+      setFormError("Please enter a restaurant name");
+      setSearchTerm("");
       return;
     }
 
@@ -41,23 +43,26 @@ const RestaurantSearch = () => {
       await dispatch(
         getRestaurantsByName({ name: searchTerm, token })
       ).unwrap();
-      toast.success("Search Completed Successfully");
     } catch (error) {
-      console.log("caught error", error);
-      toast.error("Error searching for restaurants");
+      setFormError("Error searching for restaurants");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRestaurantSelect = (restaurantId: string) => {
-    if (userData._id) {
-      // Send access request to the admin
+  const handleRestaurantSelect = async (restaurantId: string) => {
+    try {
+      if (!userData._id) {
+        setFormError("User ID is required");
+        return;
+      }
+      await dispatch(
+        createRestaurantAccess({ restaurantId, userId: userData._id, token })
+      ).unwrap();
+    } catch (error) {
+      console.log(error);
     }
-    setSelectedRestaurant(restaurantId);
-    console.log(restaurantId);
   };
-  console.log(selectedRestaurant);
 
   useEffect(() => {
     // Clear results when component mounts
@@ -89,16 +94,17 @@ const RestaurantSearch = () => {
               onChange={handleSearchChange}
               className="w-full p-4 border-b-2 border-black rounded outline-none focus:ring-0 focus:border-b-2 focus:border-red transition-colors duration-200"
             />
-
+            {formError && (
+              <p className="text-center text-red-500">{formError}</p>
+            )}
             <Button variant="solid" type="submit" text="Search" fullWidth />
-
+            {error && (
+              <p className="text-center text-red-500">Error: {error}</p>
+            )}
             {status === "loading" && isSubmitting && (
               <p className="text-center text-gray-600">
                 Loading restaurants...
               </p>
-            )}
-            {error && (
-              <p className="text-center text-red-500">Error: {error}</p>
             )}
             {/* handle an empty array result */}
             {hasSearched &&
