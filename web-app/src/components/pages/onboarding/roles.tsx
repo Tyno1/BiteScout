@@ -128,7 +128,7 @@ const Roles = () => {
         } else {
           // Handle API error with specific message based on error type
           console.log(resultAction.error.message);
-          
+
           const errorPayload = resultAction.error?.message || "";
           let userFriendlyMessage =
             "Failed to create restaurant. Please try again.";
