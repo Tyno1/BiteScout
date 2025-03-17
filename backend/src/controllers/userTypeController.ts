@@ -23,3 +23,4 @@ export const getUserTypeById = async (
     return next(error);
   }
 };
+

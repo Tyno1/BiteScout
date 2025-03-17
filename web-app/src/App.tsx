@@ -24,7 +24,7 @@ const App = () => {
     window.history.replaceState(
       {},
       document.title,
-      appState?.returnTo || "/hub"
+      appState?.returnTo || "/onboarding/roles"
     );
   };
 

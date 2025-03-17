@@ -24,6 +24,19 @@ export const createNewRestaurant = async (
       return;
     }
 
+    // Check if a restaurant with the same name already exists
+    const existingRestaurant = await RestaurantData.findOne({
+      name: { $regex: new RegExp(`^${body.name}$`, "i") }, // Case-insensitive exact match
+    });
+
+    if (existingRestaurant) {
+      res.status(409).json({
+        error: "Duplicate Restaurant. Restaurant with this name already exists",
+        existingId: existingRestaurant._id,
+      });
+      return;
+    }
+
     const newRestaurant = await (RestaurantData as any).create(body);
 
     if (!newRestaurant) {
@@ -79,6 +92,31 @@ export const getAllRestaurants = async (
     }));
 
     res.json(restaurantList);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRestaurantsByName = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name } = req.query;
+
+    const searchName = typeof name === "string" ? name : "";
+
+    if (!searchName) {
+      res.status(400).json({ error: "No name provided" });
+      return;
+    }
+
+    const restaurants = await RestaurantData.find({
+      name: new RegExp(searchName, "i"), // Simple contains search
+    });
+
+    res.json(restaurants);
   } catch (error) {
     next(error);
   }

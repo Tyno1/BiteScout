@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import { Schema, model } from 'mongoose';
+import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
 const BusinessHourSchema = new Schema({
   day: {
@@ -40,6 +40,7 @@ const restaurantData = new Schema({
     type: String,
     required: true,
     trim: true,
+    unique: true,
   },
   logo: {
     type: String,
@@ -95,4 +96,5 @@ const restaurantData = new Schema({
   },
 });
 
-export default mongoose.models.RestaurantData || model("RestaurantData", restaurantData);
+export default mongoose.models.RestaurantData ||
+  model("RestaurantData", restaurantData);

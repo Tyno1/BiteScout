@@ -1,6 +1,5 @@
 import { RestaurantDataState } from "@/types/restaurantData";
-import React from "react";
-
+ 
 interface BasicInformation {
   isEditing: boolean;
   newCuisine: string;

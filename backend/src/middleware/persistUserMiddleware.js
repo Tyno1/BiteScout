@@ -11,6 +11,8 @@ const persistUserMiddleware = async (req, res, next) => {
     }
 
     const { sub, email, name, picture, email_verified, locale } = req.userInfo;
+    console.log("sub",sub);
+    
     const auth0Id = sub;
 
     // Only proceed with user persistence if we have a valid auth0Id

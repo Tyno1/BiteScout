@@ -1,7 +1,6 @@
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
-import React from "react";
-
+ 
 export default function Hero({
   image1,
   isEditing,

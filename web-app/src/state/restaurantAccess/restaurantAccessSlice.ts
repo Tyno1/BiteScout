@@ -32,9 +32,11 @@ export const createRestaurantAccess = createAsyncThunk(
     userId: string;
     token: string;
   }) => {
+    console.log(userId, restaurantId);
+
     const response = await axios.post(
       `${serverApi}/api/restaurant-access/${restaurantId}`,
-      userId,
+      { userId: userId },
       {
         headers: { Authorization: `Bearer ${token}` },
       }

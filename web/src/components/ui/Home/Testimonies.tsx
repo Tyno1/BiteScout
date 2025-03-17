@@ -1,5 +1,4 @@
-import React from "react";
-
+ 
 // components/Testimonials.tsx
 export default function Testimonials() {
   return (

@@ -1,5 +1,4 @@
-import React from "react";
-import { doSocialLogin } from "@/app/actions/index";
+ import { doSocialLogin } from "@/app/actions/index";
 import Button from "@/components/atoms/buttons/Button";
 
 interface LoginProp {

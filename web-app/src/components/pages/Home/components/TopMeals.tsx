@@ -90,17 +90,17 @@ const TopMeals: React.FC = () => {
   ];
   return (
     <section className="py-8 bg-gray-50 w-full">
-      <div className="flex flex-col items-center px-2 md:px-20">
+      <div className="flex flex-col items-center px-2 md:px-20 w-full">
         <h2 className="text-4xl md:text-6xl font-bold mb-16 text-center">
           Top-Rated Dishes Near You
         </h2>
 
-        <div className="p-2 mb-4 border rounded-2xl md:rounded-3xl md:w-full w-[60%] flex justify-between overflow-x-auto">
+        <div className="p-2 mb-4 border rounded-2xl md:rounded-3xl md:w-[90%] w-full flex justify-between overflow-x-auto">
           {restaurantType.map((type, index) => (
             <button
               onClick={() => handleTypeChange(type)}
               key={index}
-              className={`px-2 md:px-3 py-2 text-xs md:text-sm font-medium text-medium rounded-xl md:rounded-2xl ${
+              className={`px-3 py-2 text-xs md:text-sm font-medium text-medium rounded-xl md:rounded-2xl ${
                 selectedType === type
                   ? "bg-red text-white transition duration-600 ease-in-out"
                   : "text-gray-700"

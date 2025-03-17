@@ -1,6 +1,5 @@
 import Image from "next/image";
-import React from "react";
-import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
+ import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 
 export default function PopularDestinations() {
   return (

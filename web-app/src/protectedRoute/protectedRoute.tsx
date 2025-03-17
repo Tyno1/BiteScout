@@ -67,7 +67,7 @@ const ProtectedRoute = () => {
 
   if (userType?.level > 4) {
     return (
-      <div className="w-full h-full ">
+      <div className="w-full h-full">
         You are not authorized to access this page.
       </div>
     );
