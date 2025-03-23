@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Star, MapPin, Volume2 } from "lucide-react";
-import Button from "@/components/atoms/buttons/Button";
 
 const TopMeals: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>("Fine Dinning");
@@ -89,9 +88,9 @@ const TopMeals: React.FC = () => {
     "Bar",
   ];
   return (
-    <section className="py-8 bg-gray-50 w-full">
+    <section className="py-10 md:py-20 bg-gray-50 w-full">
       <div className="flex flex-col items-center px-2 md:px-20 w-full">
-        <h2 className="text-4xl md:text-6xl font-bold mb-16 text-center">
+        <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
           Top-Rated Dishes Near You
         </h2>
 

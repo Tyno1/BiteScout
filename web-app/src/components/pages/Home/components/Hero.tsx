@@ -23,7 +23,7 @@ export default function Hero() {
               y: 0,
             }}
             transition={{ duration: 1, type: "spring", bounce: 0.6 }}
-            className="font-black text-6xl md:text-7xl lg:text-8xl mb-4 leading-tight"
+            className="font-black text-5xl md:text-7xl lg:text-8xl mb-4 leading-[1]"
           >
             Taste Your City's
             <br />
@@ -51,7 +51,7 @@ export default function Hero() {
               }}
               transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
               aria-label="explore-local-flavors"
-              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none"
+              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none"
             >
               Explore Local Flavors
             </motion.button>

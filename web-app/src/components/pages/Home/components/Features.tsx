@@ -1,4 +1,4 @@
- import { TrendingUp, Utensils, Camera, MoveRight } from "lucide-react";
+import { TrendingUp, Utensils, Camera, MoveRight } from "lucide-react";
 import { Link } from "react-router";
 
 const features = [
@@ -44,9 +44,11 @@ const features = [
 ];
 const Features: React.FC = () => {
   return (
-    <section className="w-full py-20 flex justify-center bg-gray-50">
+    <section className="w-full py-10 md:py-20 px-4 flex justify-center bg-gray-50">
       <div className="w-[90%] flex flex-col items-center">
-        <h2 className="text-5xl font-bold mb-16">How It Works</h2>
+        <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
+          How It Works
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((feature, index) => (
             <div

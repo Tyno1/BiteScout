@@ -1,10 +1,11 @@
- 
 // components/Testimonials.tsx
 const Testimonials: React.FC = () => {
   return (
-    <section className="w-full py-20 flex justify-center bg-gray-50">
+    <section className="w-full py-20 px-4 flex justify-center bg-gray-50">
       <div className="w-[90%] flex flex-col items-center">
-        <h2 className="text-5xl font-bold mb-16">What Our Users Say</h2>
+        <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
+          What Our Users Say
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {

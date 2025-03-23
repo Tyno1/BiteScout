@@ -2,9 +2,9 @@ import Button from "@/components/atoms/buttons/Button";
 
 export default function CallToAction() {
   return (
-    <section className="w-full py-20 flex justify-center">
+    <section className="w-full py-20 px-4  flex justify-center">
       <div className="w-[90%] flex flex-col items-center text-center">
-        <h2 className="text-5xl font-bold mb-6">
+        <h2 className="text-2xl md:text-6xl font-bold mb-16 text-center">
           Ready to Start Your Food Journey?
         </h2>
         <p className="text-gray-600 mb-8 max-w-2xl">

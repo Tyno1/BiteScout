@@ -15,6 +15,7 @@ import Layout from "./components/pages/dashboard/layout";
 import Dashboard from "./components/pages/dashboard";
 import RestaurantProfile from "./components/pages/dashboard/restaurant-profile";
 import { ToastContainer } from "react-toastify";
+import Notifications from "./components/pages/dashboard/notifications";
 
 const App = () => {
   const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -92,7 +93,7 @@ const App = () => {
             },
             {
               path: "notifications",
-              element: <div>Notifications</div>,
+              element: <Notifications />,
             },
             {
               path: "analytics",

@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from "@/state/store";
 import {
   updateRestaurantData,
   getRestaurantData,
+  getRestaurantDataByOwnerId,
 } from "@/state/restaurantData/restaurantDataSlice";
 import Hero from "../components/restaurant-profile/Hero";
 import BasicInformation from "../components/restaurant-profile/BasicInformation";
@@ -21,7 +22,7 @@ interface BusinessHours {
   closed: boolean;
 }
 const RestaurantProfile = () => {
-  const { token } = useContext(UserContext);
+  const { userData, token } = useContext(UserContext);
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData
   );
@@ -50,7 +51,7 @@ const RestaurantProfile = () => {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event);
-    
+
     // const file = event.target.files?.[0];
     // Handle image upload logic here
   };
@@ -136,8 +137,8 @@ const RestaurantProfile = () => {
   };
 
   useEffect(() => {
-    if (restaurantData._id && token) {
-      dispatch(getRestaurantData({ id: restaurantData._id, token }));
+    if (userData._id && token) {
+      dispatch(getRestaurantDataByOwnerId({ userId: userData._id, token }));
     }
   }, [dispatch, restaurantData._id, token]);
 

@@ -143,14 +143,14 @@ export const getRestaurantsByName = createAsyncThunk<
 
 export const getRestaurantDataByOwnerId = createAsyncThunk<
   RestaurantDataState,
-  { id: string; token: string },
+  { userId: string; token: string },
   { rejectValue: ErrorResponse }
 >(
-  "restaurantData/getRestaurantDataByUserId",
-  async ({ id, token }, { rejectWithValue }) => {
+  "restaurantData/getRestaurantDataByOwnerId",
+  async ({ userId, token }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${serverApi}/api/restaurants/owner?id=${id}`,
+        `${serverApi}/api/restaurants/owner/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
