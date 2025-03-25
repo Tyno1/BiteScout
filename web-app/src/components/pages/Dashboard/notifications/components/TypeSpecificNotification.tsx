@@ -1,3 +1,4 @@
+import Button from "@/components/atoms/buttons/Button";
 import { Notification } from "@/types/notification";
 
 interface AccessNotificationType {
@@ -6,14 +7,21 @@ interface AccessNotificationType {
 export const AccessRequestNotification = ({
   notification,
 }: AccessNotificationType) => (
-  <div className="w-full flex flex-col items-start">
-    <h4 className="text-xs text-green-900 bg-green-300 px-3 py-1 rounded-xl">
-      New Access Request
-    </h4>
-    <p className="my-2">
-      {notification.data.requesterName} requested access to{" "}
-      {notification.data.restaurantName}
-    </p>
+  <div className="flex items-center justify-between">
+    <div className="w-full flex flex-col items-start">
+      <h4 className="text-xs text-green-900 bg-green-300 px-3 py-1 rounded-xl">
+        New Access Request
+      </h4>
+      <p className="my-2">
+        {notification.data.requesterName} requested access to{" "}
+        {notification.data.restaurantName}
+      </p>
+    </div>
+    <div className="flex gap-2">
+      <Button variant="solid" color="success" text="Accept" size="sm" />
+      <Button variant="solid" color="primary" text="Decline" size="sm" />
+
+    </div>
   </div>
 );
 
