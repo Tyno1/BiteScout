@@ -39,15 +39,15 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 ";
 
   const colorStyles = {
-    primary: `hover:bg-red hover:text-white focus:outline-none focus:ring-2 focus:ring-red focus:ring-offset-2 ${
+    primary: `hover:bg-orange-500/20 hover:text-orange-900 hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-900 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "bg-red text-white"
-        : "border border-2 border-red bg-none text-red"
+        ? "border-1 bg-orange-900/80 border-orange-900 text-white"
+        : "border border-1 border-gray-500 bg-transparent text-black"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
       variant === "plain"

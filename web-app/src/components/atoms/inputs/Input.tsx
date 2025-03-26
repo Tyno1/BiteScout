@@ -2,6 +2,8 @@ import { InputHTMLAttributes, ReactNode } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  useLabel?: boolean;
+  outlineType?: "round" | "bottom";
   icon?: ReactNode;
   rightButton?: ReactNode;
   type: string;
@@ -13,6 +15,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
   iconStyle?: string;
   rightButtonStyle?: string;
+  labelStyle?: string;
   inputSize?: "sm" | "md" | "lg";
   rightButtonOnClick?: (e: any) => void;
   errorMessage?: string;
@@ -22,6 +25,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export default function Input({
   label,
+  outlineType,
+  useLabel,
   icon,
   rightButton,
   type,
@@ -32,6 +37,7 @@ export default function Input({
   value,
   placeholder,
   iconStyle,
+  labelStyle,
   rightButtonStyle,
   inputSize = "sm",
   rightButtonOnClick,
@@ -40,7 +46,9 @@ export default function Input({
   id,
   ...props
 }: InputProps) {
-  const BaseStyles = `px-4 py-4 rounded-lg text-black `;
+  const BaseStyles = `px-4 py-4 rounded-lg text-black ${
+    outlineType === "bottom" ? "border-b-1" : "border-1"
+  } border-gray-300 focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-orange-500 focus:border-none`;
   const widthStyle = fullWidth ? "w-full" : "";
 
   const sizeStyle = {
@@ -64,6 +72,15 @@ export default function Input({
             {icon}
           </div>
         )}
+        {useLabel && (
+          <label
+            htmlFor={uniqueId}
+            className={`${labelStyle} block mb-3 font-medium text-gray-700`}
+          >
+            {label}
+          </label>
+        )}
+
         <input
           type={type}
           id={uniqueId}

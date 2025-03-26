@@ -6,6 +6,7 @@ import { getRestaurantsByName } from "@/state/restaurantData/restaurantDataSlice
 import { UserContext } from "@/providers/userContext";
 import RestaurantCardItem from "./components/card";
 import { createRestaurantAccess } from "@/state/restaurantAccess/restaurantAccessSlice";
+import Input from "@/components/atoms/inputs/Input";
 
 const RestaurantSearch = () => {
   const { token, userData } = useContext(UserContext);
@@ -87,12 +88,22 @@ const RestaurantSearch = () => {
           </div>
 
           <div className="space-y-4">
-            <input
+            {/* <input
               type="text"
-              placeholder="Restaurant Name"
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full p-4 border-b-2 border-black rounded outline-none focus:ring-0 focus:border-b-2 focus:border-red transition-colors duration-200"
+            /> */}
+            <Input
+              outlineType="bottom"
+              placeholder="Restaurant Name"
+              type="text"
+              onChange={handleSearchChange}
+              label="restaurant search"
+              id="restaurant-search"
+              value={searchTerm}
+              fullWidth
+              inputSize="md"
             />
             {formError && (
               <p className="text-center text-red-500">{formError}</p>

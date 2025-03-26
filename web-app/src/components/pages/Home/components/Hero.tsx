@@ -51,7 +51,7 @@ export default function Hero() {
               }}
               transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
               aria-label="explore-local-flavors"
-              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none"
+              className="border-2 bg-orange-900/80 border-orange-900 text-white hover:scale-105 focus:outline-none focus:ring-orange-900 focus:ring-2 focus:ring-offset-0 text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform"
             >
               Explore Local Flavors
             </motion.button>
@@ -60,7 +60,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
               aria-label="listen-to-tasty-reviews"
-              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out"
+              className="bg-transparent border-2 border-white hover:bg-orange-900/80 hover:border-orange-900 hover:text-white hover:scale-105 focus:outline-none focus:ring-orange-900 focus:ring-2 focus:ring-offset-0 text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform"
             >
               Listen to Tasty Reviews
             </motion.button>

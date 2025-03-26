@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import ProfileImg from "@/assets/images/profile.png";
 import Button from "../atoms/buttons/Button";
 import { useAuth0 } from "@auth0/auth0-react";
+import NewLink from "../atoms/link/Link";
 
 interface NavTheme {
   theme: "dark" | "light";
@@ -40,36 +41,16 @@ const Navbar = ({ theme }: NavTheme) => {
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center h-full">
         <li>
-          <Link
-            to="/"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Home
-          </Link>
+          <NewLink to="/" text="Home" />
         </li>
         <li>
-          <Link
-            to="/about"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            About
-          </Link>
+          <NewLink to="/about" text="About" />
         </li>
         <li>
-          <Link
-            to="/services"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Services
-          </Link>
+          <NewLink to="/service" text="Services" />
         </li>
         <li>
-          <Link
-            to="/contact"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Contact
-          </Link>
+          <NewLink to="/contact" text="Contact" />
         </li>
 
         <li>

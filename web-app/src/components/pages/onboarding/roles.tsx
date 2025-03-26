@@ -1,4 +1,5 @@
 import Button from "@/components/atoms/buttons/Button";
+import Input from "@/components/atoms/inputs/Input";
 import { UserContext } from "@/providers/userContext";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch } from "@/state/store";
@@ -55,6 +56,7 @@ const Roles = () => {
       ...prev,
       [name]: value,
     }));
+    setFormError((prev) => ({ ...prev, name: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,9 +177,7 @@ const Roles = () => {
     return <div>redirecting to dashboard</div>;
   }
 
-// Add a check to see if the logged in user has restaurant acess
-
-
+  // Add a check to see if the logged in user has restaurant acess
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -189,10 +189,10 @@ const Roles = () => {
           <div className="space-y-8">
             {/* Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl text-gray-900">
+              <h1 className="text-3xl text-black">
                 Welcome <span className="font-bold">{userData.name}</span>
               </h1>
-              <p className="text-gray-500">
+              <p className="text-gray-900">
                 Please tell us about your role and restaurant
               </p>
             </div>
@@ -202,66 +202,44 @@ const Roles = () => {
               <h2 className="text-lg font-semibold text-gray-700">
                 Select your role:
               </h2>
-              <div className="flex gap-3">
-                <button
-                  type="button"
+              <div className="flex gap-3 w-full">
+                <Button
+                  variant="outline"
+                  text="Restaurant Owner"
                   onClick={() =>
                     setRestaurantData((prev) => ({ ...prev, owner: true }))
                   }
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                    restaurantData.owner
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  Restaurant Owner
-                </button>
-                <button
-                  type="button"
+                  fullWidth
+                />
+                <Button
+                  variant="outline"
+                  text="Employee"
                   onClick={() =>
                     setRestaurantData((prev) => ({ ...prev, owner: false }))
                   }
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                    !restaurantData.owner
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  Employee
-                </button>
+                  fullWidth
+                />
               </div>
             </div>
 
             {/* Restaurant Name Input */}
             {restaurantData.owner && (
-              <div className="space-y-3">
-                <label
-                  className="text-lg font-semibold text-gray-700 block"
-                  htmlFor="restaurant-name"
-                >
-                  Restaurant Name
-                </label>
-                <input
-                  value={restaurantData.name}
-                  name="name"
-                  onChange={handleInputChange}
-                  className={`${
-                    formError.name &&
-                    restaurantData.name === "" &&
-                    "border-orange"
-                  } w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors `}
-                  type="text"
-                  id="restaurant-name"
-                  placeholder="Enter your restaurant name"
-                />
-                {formError.name && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-orange-500">
-                      You must enter a restaurant name
-                    </p>
-                  </div>
-                )}
-              </div>
+              <Input
+                label="Restaurant Name"
+                name="name"
+                useLabel
+                value={restaurantData.name}
+                onChange={handleInputChange}
+                id="restaurant-name"
+                placeholder="Enter your restaurant name"
+                type="text"
+                fullWidth
+                labelStyle="text-lg"
+                inputSize="md"
+                errorMessage={
+                  formError.name && "You must enter a restaurant name"
+                }
+              />
             )}
 
             {message && (
