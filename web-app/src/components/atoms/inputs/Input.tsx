@@ -47,7 +47,11 @@ export default function Input({
   ...props
 }: InputProps) {
   const BaseStyles = `px-4 py-4 rounded-lg text-black ${
-    outlineType === "bottom" ? "border-b-1" : "border-1"
+    outlineType === "bottom"
+      ? "border-b-1"
+      : outlineType === "round"
+      ? "border-1"
+      : "border-none"
   } border-gray-300 focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-orange-500 focus:border-none`;
   const widthStyle = fullWidth ? "w-full" : "";
 

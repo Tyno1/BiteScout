@@ -87,7 +87,7 @@ const UserProvider = ({ children }: UserProviderType) => {
         });
 
         setIsLoading(false);
-        setUserData(response.data);
+        setUserData(response?.data);
         sessionStorage.setItem("user", JSON.stringify(response.data));
       } catch (error) {
         setError(error);

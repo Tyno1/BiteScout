@@ -1,4 +1,4 @@
-import UserModal from "../components/sideNav/Modal";
+import UserModal from "../components/general/Modal";
 import { useState } from "react";
 
 interface newUserProps {

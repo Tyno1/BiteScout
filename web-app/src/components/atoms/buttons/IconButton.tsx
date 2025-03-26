@@ -1,7 +1,6 @@
 import React, { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  text?: string;
   icon?: React.ReactNode;
   color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
   size?: "sm" | "md" | "lg";
@@ -19,8 +18,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isExpanded?: boolean;
 }
 
-export default function Button({
-  text,
+export default function IconButton({
   icon,
   color = "primary",
   size = "md",
@@ -44,7 +42,7 @@ export default function Button({
   const colorStyles = {
     primary: `hover:bg-orange-500/20 hover:text-orange-900 hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-900 ${
       variant === "plain"
-        ? "text-white"
+        ? "text-orange-500"
         : variant === "solid"
         ? "border-1 bg-orange-900/80 border-orange-900 text-white"
         : "border border-1 border-gray-500 bg-transparent text-black"
@@ -112,7 +110,7 @@ export default function Button({
       name={name}
       value={value}
       className={combinedClassName}
-      aria-label={ariaLabel || text}
+      aria-label={ariaLabel}
       aria-disabled={disabled}
       aria-pressed={isPressed}
       aria-expanded={isExpanded}
@@ -120,9 +118,7 @@ export default function Button({
       tabIndex={disabled ? -1 : 0}
       {...props}
     >
-      {icon && <span className={`mr-2 ${iconStyle}`}>{icon}</span>}
-
-      {text}
+      {icon}
     </button>
   );
 }

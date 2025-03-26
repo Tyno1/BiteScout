@@ -1,4 +1,4 @@
- import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   Home,
   UtensilsCrossed,
@@ -22,7 +22,9 @@ interface NavItemProps {
   path?: string;
   HandleNav?: (navName: string) => void;
 }
-
+interface SideNavProp {
+  setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
 const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
   const location = useLocation();
   const pathname = location.pathname;
@@ -32,7 +34,6 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
   const handleLogout = async () => {
     await logout();
     sessionStorage.removeItem("user");
-    sessionStorage.removeItem("userToken");
   };
 
   return (
@@ -48,7 +49,11 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
           px-2 py-4 rounded-md 
           cursor-pointer 
           transition-colors w-full
-          ${isActive ? "bg-red text-white" : "hover:bg-gray-100 text-gray-700"}
+          ${
+            isActive
+              ? "bg-orange-900/80 border-2 border-orange-900 text-white"
+              : "hover:bg-orange-100/20 text-gray-700"
+          }
         `}
       >
         <span className="mr-3 w-5 h-5">{icon}</span>
@@ -58,9 +63,8 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
   );
 };
 
-const SideNav = () => {
+const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
   const navigate = useNavigate();
-
   const NavTo = (route: string) => {
     navigate(route);
   };
@@ -68,16 +72,12 @@ const SideNav = () => {
   //   handle navigation
   const HandleNav = (navName: string) => {
     NavTo(navName);
+    setIsMenuOpen && setIsMenuOpen(false);
   };
 
   return (
     <div className="h-[100vh] w-full bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200 flex items-center">
-        <ChefHat className="mr-2 text-red-600" />
-        <h2 className="text-xl font-bold text-gray-800">FoodVibe CRM</h2>
-      </div>
-
-      <nav className="flex-1 p-4 w-full h-full">
+      <nav className="flex-1 p-2 md:p-4 w-full h-full">
         <ul className="w-full h-screen">
           <NavItem
             HandleNav={HandleNav}
