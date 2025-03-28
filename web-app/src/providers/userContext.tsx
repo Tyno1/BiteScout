@@ -77,9 +77,6 @@ const UserProvider = ({ children }: UserProviderType) => {
     if (user && isAuthenticated) {
       try {
         const token = await getAccessTokenSilently();
-        sessionStorage.setItem("userToken", JSON.stringify(token));
-        console.log("Token received:", token.substring(0, 10) + "..."); // Log first part of token
-
         const response = await axios.get(`${serverApi}/api/protected`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -173,7 +170,6 @@ const UserProvider = ({ children }: UserProviderType) => {
       fetchToken();
     }
   }, [isLoading, isAuthenticated]);
-
 
   useEffect(() => {
     if (userData?.userType) {

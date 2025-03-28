@@ -21,7 +21,7 @@ export default function BasicInformation({
 }: BasicInformation) {
   return (
     <section
-      className="bg-white rounded-lg shadow-sm border p-6"
+      className="bg-white rounded-lg border-1 border-gray-100 p-6"
       aria-labelledby="basic-info-heading"
     >
       <div className="mb-4">
@@ -34,7 +34,10 @@ export default function BasicInformation({
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label id="cuisine-label" className="text-sm font-medium">
+            <label
+              id="cuisine-label"
+              className="text-sm font-medium text-black"
+            >
               Cuisine Type
             </label>
             {isEditing ? (
@@ -78,23 +81,30 @@ export default function BasicInformation({
             ) : (
               <div>
                 <ul>
-                  {displayData?.cuisine?.map((cuisine: any) => (
-                    <li key={cuisine}>{cuisine.trim()}</li>
-                  ))}
+                  {displayData?.cuisine && displayData?.cuisine?.length > 0 ? (
+                    displayData?.cuisine?.map((cuisine: any) => (
+                      <li key={cuisine}>{cuisine.trim()}</li>
+                    ))
+                  ) : (
+                    <div className="mt-2 text-sm text-gray-900">No Cuisines to display</div>
+                  )}
                 </ul>
               </div>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label id="price-label" className="text-sm font-medium">
+          <div className="space-y-2 flex flex-col">
+            <label
+              id="price-label"
+              className="text-sm font-medium text-black"
+            >
               Price Range
             </label>
             <select
               value={displayData?.priceRange}
               onChange={(e) => handleInputChange("priceRange", e.target.value)}
               disabled={!isEditing}
-              className="w-full rounded-md border px-3 py-2 bg-white disabled:bg-gray-100"
+              className="w-full rounded-md border-1 border-gray-500 px-3 py-2 bg-white disabled:bg-gray-100/40"
               aria-labelledby="price-label"
             >
               <option value="$">$ (Budget)</option>
@@ -105,8 +115,11 @@ export default function BasicInformation({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label id="description-label" className="text-sm font-medium">
+        <div className="space-y-2 flex flex-col">
+          <label
+            id="description-label"
+            className="text-sm font-medium text-black"
+          >
             Full Description
           </label>
           <textarea
@@ -115,7 +128,7 @@ export default function BasicInformation({
             placeholder="Describe your restaurant"
             disabled={!isEditing}
             rows={4}
-            className="w-full rounded-md border px-3 py-2 disabled:bg-gray-100"
+            className="w-full rounded-md border border-1 border-gray-500 px-3 py-2 disabled:bg-gray-100/40"
             aria-labelledby="description-label"
           />
         </div>

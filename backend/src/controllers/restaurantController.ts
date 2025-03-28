@@ -148,6 +148,32 @@ export const updateRestaurantData = async (
   }
 };
 
+export const getRestaurantByOwnerId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ error: "User Id is required" });
+      return;
+    }
+
+    const restaurant = await RestaurantData.findOne({ ownerId: userId });
+
+    if (!restaurant) {
+      res.status(404).json({ error: "Restaurant not found" });
+      return;
+    }
+
+    res.json(restaurant);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deletedRestaurant = async (
   req: Request<{ id: string }>,
   res: Response,

@@ -12,6 +12,7 @@ import {
   getFoodCatalogue,
 } from "@/state/foodCatalogueData/foodCatalogueSlice";
 import { useNavigate } from "react-router";
+import Button from "@/components/atoms/buttons/Button";
 
 export interface formErrorType {
   name: string;
@@ -189,12 +190,13 @@ const FoodCatalogueManagement = () => {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
-        <button
+
+        <Button
+          variant="solid"
+          text="Add New Item"
           onClick={() => setIsModalOpen(true)}
-          className="bg-black hover:bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Add New Item
-        </button>
+          size="sm"
+        />
       </div>
 
       {/* Food Catalogue Table */}

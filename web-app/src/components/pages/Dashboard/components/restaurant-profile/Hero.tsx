@@ -18,10 +18,10 @@ export default function Hero({
       <img
         src={image1}
         alt="hero_image"
-        className="object-cover object-fit w-[100%] h-[100%] absolute"
+        className="object-cover w-full h-full absolute left-0"
       />
 
-      <div className="absolute inset-0 bg-black/[50%]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-orange-900/70" aria-hidden="true" />
       <div className="z-10 w-full flex items-end justify-between">
         <div>
           <h1 className="text-6xl font-bold">

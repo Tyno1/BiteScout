@@ -19,7 +19,7 @@ export const AccessRequestNotification = ({
     </div>
     <div className="flex gap-2">
       <Button variant="solid" color="success" text="Accept" size="sm" />
-      <Button variant="solid" color="primary" text="Decline" size="sm" />
+      <Button variant="solid" color="danger" text="Decline" size="sm" />
 
     </div>
   </div>

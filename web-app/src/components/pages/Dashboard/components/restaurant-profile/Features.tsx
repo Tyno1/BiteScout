@@ -11,7 +11,7 @@ export default function Features({
 }: any) {
   return (
     <section
-      className="bg-white rounded-lg shadow-sm border p-6"
+      className="bg-white rounded-lg border border-1 border-gray-100 p-6 "
       aria-labelledby="features-heading"
     >
       <div className="mb-4">

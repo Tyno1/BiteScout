@@ -56,18 +56,18 @@ export default function Button({
         ? "bg-yellow text-white"
         : "border border-2 border-yellow bg-none text-yellow"
     }`,
-    danger: `hover:bg-red-700 focus:ring-red-500 ${
+    danger: `hover:bg-red-900 focus:ring-red-900 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "text-white bg-orange"
+        ? "text-white bg-red-500"
         : "border border-2 border-orange bg-none text-orange"
     }`,
-    success: `hover:bg-green-700 focus:ring-green-500 ${
+    success: `hover:bg-green-900 focus:ring-green-500 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "bg-green-600 text-white"
+        ? "bg-green-900 text-white"
         : "border border-2 border-green-600 bg-none text-green-600"
     } `,
     black: `hover:bg-red focus:ring-red ${

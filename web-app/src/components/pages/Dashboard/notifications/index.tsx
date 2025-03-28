@@ -71,9 +71,9 @@ const Notifications = () => {
         <div className="notification-types ">
           <button
             onClick={() => handleNotificationClick(null)}
-            className={`py-2 text-gray-600 px-8 text-sm hover:border-b-1 hover: border-red ${
+            className={`py-2 text-gray-600 px-8 text-sm hover:border-b-1 hover: border-orange-500${
               selectedNotification === null &&
-              "text-red-500 border-b-1 border-red-500"
+              "text-orange-500 border-b-1 border-orange-500"
             }`}
           >
             All
@@ -82,9 +82,9 @@ const Notifications = () => {
             <button
               key={type}
               onClick={() => handleNotificationClick(type)}
-              className={`py-2 text-gray-600 px-8 text-sm hover:border-b-1 hover: border-red ${
+              className={`py-2 text-gray-600 px-8 text-sm hover:border-b-1 hover: border-orange-500${
                 selectedNotification === type &&
-                "text-red-500 border-b-1 border-red-500"
+                "text-orange-500 border-b-1 border-orange-500"
               }`}
             >
               {type}

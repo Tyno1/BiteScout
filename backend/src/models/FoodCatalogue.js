@@ -52,7 +52,6 @@ const foodCatalogue = new Schema({
     ref: "Course",
     required: true,
   },
-
   price: {
     type: PriceSchema,
     required: true,

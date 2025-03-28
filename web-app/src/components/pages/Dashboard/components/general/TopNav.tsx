@@ -18,7 +18,7 @@ const TopNav = ({
   unreadNotifications,
 }: TopNavProps) => {
   return (
-    <div className="sticky top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
+    <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
       {/* Conditionally rendered hamburger Menu */}
       <IconButton
         icon={<Menu />}
@@ -66,7 +66,7 @@ const TopNav = ({
               alt={userName}
               className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
             />
-            <span className="hidden md:inline-block font-medium">
+            <span className="hidden md:inline-block text-sm">
               {userName}
             </span>
             <svg

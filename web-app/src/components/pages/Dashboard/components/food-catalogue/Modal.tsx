@@ -44,7 +44,7 @@ export default function Modal({
     <>
       {/* Modal Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 bg-black/50 z-40"
         onClick={() => setIsModalOpen(false)}
       />
 

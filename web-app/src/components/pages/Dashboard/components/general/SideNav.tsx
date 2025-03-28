@@ -46,17 +46,18 @@ const NavItem = ({ icon, text, path, HandleNav }: NavItemProps) => {
         }
         className={`
           flex items-center 
-          px-2 py-4 rounded-md 
+          px-2 py-3
           cursor-pointer 
           transition-colors w-full
+          focus:outline-none focus:ring-1 focus:ring-orange-500 focus:ring-offset-0
           ${
             isActive
-              ? "bg-orange-900/80 border-2 border-orange-900 text-white"
+              ? "bg-orange-900/80 border-1 border-orange-900 text-white"
               : "hover:bg-orange-100/20 text-gray-700"
           }
         `}
       >
-        <span className="mr-3 w-5 h-5">{icon}</span>
+        <span className="mr-4 w-5 h-5">{icon}</span>
         <span className="text-sm font-medium">{text}</span>
       </button>
     </li>
@@ -77,8 +78,8 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
 
   return (
     <div className="h-[100vh] w-full bg-white border-r border-gray-200 flex flex-col">
-      <nav className="flex-1 p-2 md:p-4 w-full h-full">
-        <ul className="w-full h-screen">
+      <nav className="flex-1 md:p-1 w-full h-full">
+        <ul className="w-full h-screen mt-4">
           <NavItem
             HandleNav={HandleNav}
             icon={<Home />}

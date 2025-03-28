@@ -16,6 +16,13 @@ import Dashboard from "./components/pages/dashboard";
 import RestaurantProfile from "./components/pages/dashboard/restaurant-profile";
 import { ToastContainer } from "react-toastify";
 import Notifications from "./components/pages/dashboard/notifications";
+import FoodCatalogueManagement from "./components/pages/dashboard/food-catalogue";
+import UserManagement from "./components/pages/dashboard/user-management";
+import Analytics from "./components/pages/dashboard/analytics";
+import Reviews from "./components/pages/dashboard/reviews";
+import AiAudio from "./components/pages/dashboard/ai-audio";
+import CustomerInsights from "./components/pages/dashboard/customer-insight";
+import Settings from "./components/pages/dashboard/settings";
 
 const App = () => {
   const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -85,11 +92,11 @@ const App = () => {
             },
             {
               path: "food-catalogue",
-              element: <div>Food Catalogue</div>,
+              element: <FoodCatalogueManagement />,
             },
             {
               path: "user-management",
-              element: <div>User Management</div>,
+              element: <UserManagement />,
             },
             {
               path: "notifications",
@@ -97,23 +104,23 @@ const App = () => {
             },
             {
               path: "analytics",
-              element: <div>Analytics</div>,
+              element: <Analytics />,
             },
             {
               path: "reviews",
-              element: <div>Reviews</div>,
+              element: <Reviews />,
             },
             {
               path: "ai-audio",
-              element: <div>AI Audio Reviews</div>,
+              element: <AiAudio />,
             },
             {
               path: "settings",
-              element: <div>Customer Insights</div>,
+              element: <Settings />,
             },
             {
               path: "customer-insight",
-              element: <div>Customer Insights</div>,
+              element: <CustomerInsights />,
             },
           ],
         },

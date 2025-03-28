@@ -10,6 +10,11 @@ import restaurantRoutes from "./routes/restaurant.js";
 import userTypeRoutes from "./routes/userType.js";
 import userRoutes from "./routes/user.js";
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
+import notificationRoutes from "./routes/notification.js";
+import allergenRoutes from "./routes/alergen.js";
+import foodCatalogueRoutes from "./routes/foodCatalogue.js";
+import cuisineRoutes from "./routes/cuisine.js";
+import courseRoutes from "./routes/course.js";
 
 import jwtCheck from "./middleware/auth.js";
 import getUserInfoMiddleware from "./middleware/getUserInfoMiddleware.js";
@@ -30,15 +35,32 @@ const io = new Server(server, {
   },
 });
 
-// Socket.io connection
+const connectedUsers = new Map();
 
+// Socket.IO connection handling
 io.on("connection", (socket) => {
-  console.log(socket.id);
+  console.log("A user connected:", socket.id);
+
+  // User authentication and storing connection
+  socket.on("authenticate", (userId) => {
+    console.log(`User ${userId} authenticated with socket ${socket.id}`);
+    connectedUsers.set(userId, socket.id);
+  });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    // Remove user from connected users when they disconnect
+    for (const [userId, socketId] of connectedUsers.entries()) {
+      if (socketId === socket.id) {
+        connectedUsers.delete(userId);
+        console.log(`User ${userId} disconnected`);
+        break;
+      }
+    }
   });
 });
+
+app.set("io", io);
+app.set("connectedUsers", connectedUsers);
 
 // Connect to MongoDB
 mongoose.connect(uri);
@@ -73,7 +95,6 @@ app.use(
   (req: any, res) => {
     const { name, email, auth0Id, picture, userType, _id, restaurantCount } =
       req.dbUser;
-    console.log(name, email, auth0Id, picture, userType, _id, restaurantCount);
 
     res.json({
       _id,
@@ -90,7 +111,12 @@ app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/restaurant-access", restaurantAccessRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/food-catalogue", foodCatalogueRoutes);
+app.use("/api/allergens", allergenRoutes);
+app.use("/api/cuisines", cuisineRoutes);
+app.use("/api/courses", courseRoutes);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
