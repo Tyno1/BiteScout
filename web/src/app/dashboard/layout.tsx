@@ -26,7 +26,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
     <div className="flex flex-col h-screen w-screen relative">
       <TopNav
         onMenuClick={handleMenuClick}
-        userName={user?.name}
+        userName={user?.name || ""}
         unreadNotifications={unreadCount}
       />
       {/* mobile view */}
@@ -43,7 +43,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
           <SideNav />
         </div>
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          {children}{" "}
+          {children}
         </div>
       </div>
     </div>

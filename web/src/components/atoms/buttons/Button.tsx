@@ -42,11 +42,11 @@ export default function Button({
     "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 ";
 
   const colorStyles = {
-    primary: `hover:bg-orange-500/20 hover:text-orange-900 hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-900 ${
+    primary: `hover:bg-orange-600/70 hover:text-white hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "border-1 bg-orange-900/80 border-orange-900 text-white"
+        ? "border-1 bg-orange-600/80 border-orange-700 text-white"
         : "border border-1 border-gray-500 bg-transparent text-black"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${

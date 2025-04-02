@@ -90,19 +90,21 @@ export default function TopMeals() {
     "Bar",
   ];
   return (
-    <section className="py-8 bg-gray-50 w-full">
-      <div className="flex flex-col items-center px-20">
-        <h2 className="text-5xl font-bold mb-16">Top-Rated Dishes Near You</h2>
+    <section className="py-10 md:py-20 bg-gray-50 w-full">
+      <div className="flex flex-col items-center px-2 md:px-20 w-full">
+        <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
+          Top-Rated Dishes Near You
+        </h2>
 
-        <div className="p-2 mb-4 border rounded-3xl w-[40vw] flex justify-between">
+        <div className="p-2 mb-4 border rounded-2xl md:rounded-3xl w-full  md:w-[90%] lg:w-[60%] flex justify-between overflow-x-auto">
           {restaurantType.map((type, index) => (
             <button
               onClick={() => handleTypeChange(type)}
               key={index}
-              className={`px-4 py-2 text-sm font-medium text-medium rounded-3xl ${
+              className={`px-3 py-2 text-xs md:text-sm font-medium text-medium rounded-xl md:rounded-2xl ${
                 selectedType === type
-                  ? "bg-red text-white transition duration-600 ease-in-out"
-                  : "text-gray-700"
+                  ? "bg-orange-600 text-white transition duration-600 ease-in-out"
+                  : "text-gray-800"
               }`}
             >
               {type}
@@ -126,15 +128,15 @@ export default function TopMeals() {
                   <div className="flex items-start">
                     <div>
                       <h3 className="font-semibold text-sm">{meal.name}</h3>
-                      <p className="text-xs text-gray-600">{meal.restaurant}</p>
+                      <p className="text-xs text-gray-900">{meal.restaurant}</p>
                     </div>
                   </div>
 
                   <div className="mt-2">
-                    <p className="text-xs italic text-gray-600 line-clamp-2">
+                    <p className="text-xs italic text-gray-900 line-clamp-2">
                       {meal.topReview}
                     </p>
-                    <div className="flex items-center mt-1 text-xs text-gray-500">
+                    <div className="flex items-center mt-1 text-xs text-gray-800">
                       <MapPin className="w-3 h-3 mr-1" />
                       {meal.location}
                     </div>

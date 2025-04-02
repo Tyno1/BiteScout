@@ -1,23 +1,49 @@
 @import "tailwindcss";
 
 @theme {
-  /* Orange */
-  --color-orange-100: oklch(84.92% 0.158303 58.5492);
-  --color-orange-500: oklch(74.92% 0.178303 58.5492);
-  --color-orange-900: oklch(64.92% 0.198303 58.5492);
+  /* orange */
+  --color-orange-50: rgb(255, 247, 237); /* Lightest Orange */
+  --color-orange-100: rgb(255, 237, 213);
+  --color-orange-200: rgb(254, 215, 170);
+  --color-orange-300: rgb(253, 186, 116);
+  --color-orange-400: rgb(251, 146, 60);
+  --color-orange-500: rgb(249, 115, 22);
+  --color-orange-600: rgb(234, 88, 12);
+  --color-orange-700: rgb(194, 65, 12);
+  --color-orange-800: rgb(154, 52, 18);
+  --color-orange-900: rgb(124, 45, 18);
+  --color-orange-950: rgb(67, 20, 7); /* Deepest Orange */
 
   /* Red */
-  --color-red-100: oklch(70% 0.208 27.06);
-  --color-red-500: oklch(56.76% 0.208 27.06);
-  --color-red-900: oklch(42% 0.208 27.06);
+  --color-red-100: rgb(236, 156, 154); /* Light Red */
+  --color-red-200: rgb(229, 135, 132);
+  --color-red-300: rgb(221, 113, 110);
+  --color-red-400: rgb(209, 91, 88);
+  --color-red-500: rgb(179, 69, 66); /* Base Red */
+  --color-red-600: rgb(157, 54, 51);
+  --color-red-700: rgb(135, 39, 37);
+  --color-red-800: rgb(113, 25, 23);
+  --color-red-900: rgb(91, 11, 10); /* Dark Red */
 
   /* Green */
-  --color-success-100: oklch(92.71% 0.05 149.21);
-  --color-success-500: oklch(62.71% 0.17 149.21);
-  --color-success-900: oklch(51.56% 0.146 140.26);
+  --color-success-100: rgb(235, 248, 232); /* Light Green */
+  --color-success-200: rgb(209, 238, 205);
+  --color-success-300: rgb(183, 227, 177);
+  --color-success-400: rgb(158, 217, 150);
+  --color-success-500: rgb(94, 178, 124); /* Base Green */
+  --color-success-600: rgb(77, 159, 107);
+  --color-success-700: rgb(60, 140, 91);
+  --color-success-800: rgb(46, 121, 75);
+  --color-success-900: rgb(33, 102, 60); /* Dark Green */
 
   /* Gray */
-  --color-gray-100: oklch(96.12% 0 0);
-  --color-gray-500: oklch(82.03% 0 0);
-  --color-gray-900: oklch(68% 0 0);
+  --color-gray-100: rgb(246, 246, 246); /* Light Gray */
+  --color-gray-200: rgb(233, 233, 233);
+  --color-gray-300: rgb(220, 220, 220);
+  --color-gray-400: rgb(207, 207, 207);
+  --color-gray-500: rgb(194, 194, 194); /* Base Gray */
+  --color-gray-600: rgb(175, 175, 175);
+  --color-gray-700: rgb(156, 156, 156);
+  --color-gray-800: rgb(137, 137, 137);
+  --color-gray-900: rgb(118, 118, 118); /* Dark Gray */
 }

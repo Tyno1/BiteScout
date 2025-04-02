@@ -1,5 +1,5 @@
 "use client";
- import Image from "next/image";
+import Image from "next/image";
 import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";
 import { motion } from "motion/react";
 
@@ -14,7 +14,7 @@ export default function Hero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black bg-opacity-60" />
+        <div className="absolute inset-0 bg-black/70" />
         <div className="relative flex flex-col items-start z-10 w-full md:w-[70%] md:ml-10 p-4">
           <motion.h1
             initial={{ opacity: 0, y: -50 }}
@@ -23,7 +23,7 @@ export default function Hero() {
               y: 0,
             }}
             transition={{ duration: 1, type: "spring", bounce: 0.6 }}
-            className="font-black text-6xl md:text-7xl lg:text-8xl mb-4 leading-tight"
+            className="font-black text-5xl md:text-7xl lg:text-8xl mb-4 leading-[1]"
           >
             Taste Your City's
             <br />
@@ -36,7 +36,7 @@ export default function Hero() {
               y: 0,
             }}
             transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
-            className="text-lg md:text-lg mb-6 max-w-2xl "
+            className="text-lg md:text-lg mb-6 max-w-2xl"
           >
             Embark on a culinary journey through your neighborhood. Discover
             mouthwatering dishes shared by food enthusiasts and local
@@ -51,7 +51,7 @@ export default function Hero() {
               }}
               transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
               aria-label="explore-local-flavors"
-              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:bg-red focus:border-none"
+              className="border-2 bg-orange-600/70 border-orange-600 text-white hover:scale-105 focus:outline-none focus:ring-orange-900 focus:ring-2 focus:ring-offset-0 text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform"
             >
               Explore Local Flavors
             </motion.button>
@@ -60,7 +60,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 1, ease: "easeInOut" }}
               aria-label="listen-to-tasty-reviews"
-              className="bg-transparent border-2 border-white hover:border-red hover:text-white text-white px-6 py-3 rounded-md transition duration-300 ease-in-out"
+              className="bg-transparent border-2 border-white hover:bg-orange-600/70 hover:border-orange-600 hover:text-white hover:scale-105 focus:outline-none focus:ring-orange-900 focus:ring-2 focus:ring-offset-0 text-white px-3 md:px-6 py-3 rounded-md transition duration-300 ease-in-out transform"
             >
               Listen to Tasty Reviews
             </motion.button>

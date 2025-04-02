@@ -1,4 +1,4 @@
- 
+
 export default function BusinessHours({
     businessHours,
     isEditing,
@@ -6,7 +6,7 @@ export default function BusinessHours({
   }:any) {
   return (
     <section
-      className="bg-white rounded-lg shadow-sm border p-6"
+      className="bg-white rounded-lg border-1 border-gray-100 p-6"
       aria-labelledby="hours-heading"
     >
       <div className="mb-4">
@@ -21,9 +21,10 @@ export default function BusinessHours({
             className="grid grid-cols-4 gap-4 items-center"
             role="row"
           >
-            <span className="font-medium" role="rowheader">
+            <span className="font-medium text-black" role="rowheader">
               {hours.day}
             </span>
+            
             <input
               type="time"
               value={hours.open}
@@ -31,7 +32,7 @@ export default function BusinessHours({
                 handleBusinessHoursChange(index, "open", e.target.value)
               }
               disabled={!isEditing || hours.closed}
-              className="rounded-md border px-3 py-2 disabled:bg-gray-100"
+              className="rounded-md border px-3 py-2 border-1 border-gray-300 text-gray-900 disabled:bg-gray-100/40"
               aria-label={`${hours.day} opening time`}
             />
             <input
@@ -41,7 +42,7 @@ export default function BusinessHours({
                 handleBusinessHoursChange(index, "close", e.target.value)
               }
               disabled={!isEditing || hours.closed}
-              className="rounded-md border px-3 py-2 disabled:bg-gray-100"
+              className="rounded-md border px-3 py-2 border-1 border-gray-300 text-gray-900 disabled:bg-gray-100/40"
               aria-label={`${hours.day} closing time`}
             />
             <div className="flex items-center">
@@ -56,7 +57,7 @@ export default function BusinessHours({
                 aria-label={`${hours.day} closed`}
                 id={`closed-${hours.day}`}
               />
-              <label htmlFor={`closed-${hours.day}`} className="text-sm">
+              <label htmlFor={`closed-${hours.day}`} className="text-sm text-black">
                 Closed
               </label>
             </div>

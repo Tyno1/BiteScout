@@ -19,15 +19,18 @@ const NavItem = ({ icon, text, path, handleNav }: NavItemProps) => {
         onClick={() => handleNav && handleNav(path ? path : "/")}
         className={`
           flex items-center 
-          px-2 py-4 rounded-md 
+          px-2 py-4
           cursor-pointer 
           transition-colors w-full
-          ${isActive ? "bg-red text-white" : "hover:bg-gray-100 text-gray-700"}
+          focus:outline-none focus:ring-1 focus:ring-orange-500 focus:ring-offset-0 focus:ring-rounded-lg
+          ${
+            isActive
+              ? "bg-orange-600 border-1 border-orange-600 text-white rounded-lg"
+              : "hover:bg-orange-500/20 text-gray-900 rounded-lg"
+          }
         `}
       >
-        {React.cloneElement(icon, {
-          className: "mr-3 w-5 h-5",
-        })}
+        <span className="mr-4 w-5 h-5">{icon}</span>
         <span className="text-sm font-medium">{text}</span>
       </button>
     </li>

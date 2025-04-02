@@ -1,5 +1,6 @@
+import IconButton from "@/components/atoms/buttons/IconButton";
 import { Plus, X } from "lucide-react";
- 
+
 export default function Features({
   isEditing,
   newFeature,
@@ -11,7 +12,7 @@ export default function Features({
 }: any) {
   return (
     <section
-      className="bg-white rounded-lg shadow-sm border p-6"
+      className="bg-white rounded-lg border border-1 border-gray-100 p-6 "
       aria-labelledby="features-heading"
     >
       <div className="mb-4">
@@ -34,13 +35,12 @@ export default function Features({
             className="flex-1 rounded-md border px-3 py-2"
             aria-label="New feature name"
           />
-          <button
+          <IconButton
+            variant="solid"
+            icon={<Plus />}
             onClick={addFeature}
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-            aria-label="Add feature"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </button>
+            aria-label="Add Feature"
+          />
         </div>
       )}
       <div
@@ -56,13 +56,13 @@ export default function Features({
           >
             <span>{feature}</span>
             {isEditing && (
-              <button
+              <IconButton
+                variant="solid"
+                size="sm"
+                icon={<X />}
                 onClick={() => removeFeature(feature)}
-                className="hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full"
                 aria-label={`Remove ${feature}`}
-              >
-                <X className="w-4 h-4" aria-hidden="true" />
-              </button>
+              />
             )}
           </div>
         ))}
