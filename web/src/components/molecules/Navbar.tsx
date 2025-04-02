@@ -2,13 +2,13 @@
 
 import React, { useCallback, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileImg from "@/assets/images/profile.png";
 import "animate.css";
 import { useRouter } from "next/navigation";
 import Button from "../atoms/buttons/Button";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 interface NavTheme {
   theme: "dark" | "light";
@@ -16,7 +16,7 @@ interface NavTheme {
 
 const Navbar = ({ theme }: NavTheme) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: session } = useSession();
+  const { user, isLoading, error } = useUser();
   const router = useRouter();
 
   const toggleMenu = useCallback(() => {
@@ -68,7 +68,7 @@ const Navbar = ({ theme }: NavTheme) => {
         </li>
 
         <li>
-          {session && session.user ? (
+          {user ? (
             <ul className="auth flex ml-20 items-center gap-2">
               <li>
                 <Button
@@ -79,12 +79,7 @@ const Navbar = ({ theme }: NavTheme) => {
                 />
               </li>
               <li>
-                <Button
-                  onClick={() => signOut()}
-                  text="Logout"
-                  size="sm"
-                  variant="plain"
-                />
+                <a href="/api/auth/logout">Logout</a>
               </li>
               <li>
                 <Image
@@ -98,20 +93,10 @@ const Navbar = ({ theme }: NavTheme) => {
           ) : (
             <ul className="flex items-center gap-2 ml-10">
               <li>
-                <Button
-                  onClick={() => router.push("/login")}
-                  text="Log In"
-                  size="sm"
-                  variant="plain"
-                />
+                <a href="/api/auth/login">Login</a>
               </li>
               <li>
-              <Button
-                  onClick={() => router.push("/register")}
-                  text="Register"
-                  size="sm"
-                  variant="plain"
-                />
+                <a href="/api/auth/login">Register</a>
               </li>
             </ul>
           )}
@@ -170,7 +155,7 @@ const Navbar = ({ theme }: NavTheme) => {
             </Link>
           </li>
           <li>
-            {session && session.user ? (
+            {user ? (
               <ul className="auth flex flex-col items-start w-[100vw]">
                 <li className="w-full">
                   <Link
@@ -182,35 +167,16 @@ const Navbar = ({ theme }: NavTheme) => {
                   </Link>
                 </li>
                 <li className="w-full">
-                  <button
-                    onClick={() => {
-                      toggleMenu();
-                      signOut();
-                    }}
-                    className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white w-full"
-                  >
-                    Logout
-                  </button>
+                  <a href="/api/auth/logout">Logout</a>
                 </li>
               </ul>
             ) : (
               <ul className="flex items-center gap-4 ml-10">
                 <li>
-                  <button
-                    className="px-4 py-2 bg-red text-white rounded-lg"
-                    type="button"
-                    onClick={() => router.push("/login")}
-                  >
-                    Log In
-                  </button>
+                  <a href="/api/auth/login">Login</a>
                 </li>
                 <li>
-                  <button
-                    className="px-4 py-2 bg-green-800 text-white rounded-lg"
-                    type="button"
-                  >
-                    Register
-                  </button>
+                  <a href="/api/auth/login">Register</a>
                 </li>
               </ul>
             )}
