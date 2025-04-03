@@ -2,26 +2,55 @@
 
 import React, { useCallback, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileImg from "@/assets/images/profile.png";
 import "animate.css";
-import { useRouter } from "next/navigation";
-import Button from "../atoms/buttons/Button";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import MobileNav from "./MobileNav";
 
 interface NavTheme {
   theme: "dark" | "light";
 }
 
+interface MobileLinkProp {
+  path: string;
+  text: string;
+}
+
+interface WebLinkProp extends MobileLinkProp {}
+
 const Navbar = ({ theme }: NavTheme) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: session } = useSession();
-  const router = useRouter();
+  const { user, isLoading, error } = useUser();
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+
+  const MobileLinkItem = ({ path, text }: MobileLinkProp) => {
+    return (
+      <Link
+        href={path}
+        onClick={toggleMenu}
+        className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white"
+      >
+        {text}
+      </Link>
+    );
+  };
+
+  const WebLinkItem = ({ path, text }: WebLinkProp) => {
+    return (
+      <Link
+        href={path}
+        onClick={toggleMenu}
+        className="px-4 py-2 text-sm hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
+      >
+        {text}
+      </Link>
+    );
+  };
 
   return (
     <nav
@@ -35,56 +64,31 @@ const Navbar = ({ theme }: NavTheme) => {
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center">
         <li>
-          <Link
-            href="/"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Home
-          </Link>
+          <WebLinkItem text="Home" path="/" />
         </li>
         <li>
-          <Link
-            href="/about"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            About
-          </Link>
+          <WebLinkItem text="About" path="/about" />
         </li>
         <li>
-          <Link
-            href="/services"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Services
-          </Link>
+          <WebLinkItem text="Services" path="/services" />
         </li>
         <li>
-          <Link
-            href="/contact"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Contact
-          </Link>
+          <WebLinkItem text="Contact" path="/contact" />
         </li>
 
         <li>
-          {session && session.user ? (
+          {user ? (
             <ul className="auth flex ml-20 items-center gap-2">
               <li>
-                <Button
-                  onClick={() => router.push("/dashboard")}
-                  variant="plain"
-                  text="Dashboard"
-                  size="sm"
-                />
+                <WebLinkItem text="Dashboard" path="/dashboard" />
               </li>
               <li>
-                <Button
-                  onClick={() => signOut()}
-                  text="Logout"
-                  size="sm"
-                  variant="plain"
-                />
+                <a
+                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
+                  href="/api/auth/logout"
+                >
+                  Logout
+                </a>
               </li>
               <li>
                 <Image
@@ -98,20 +102,20 @@ const Navbar = ({ theme }: NavTheme) => {
           ) : (
             <ul className="flex items-center gap-2 ml-10">
               <li>
-                <Button
-                  onClick={() => router.push("/login")}
-                  text="Log In"
-                  size="sm"
-                  variant="plain"
-                />
+                <a
+                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
+                  href="/api/auth/login"
+                >
+                  Login
+                </a>
               </li>
               <li>
-              <Button
-                  onClick={() => router.push("/register")}
-                  text="Register"
-                  size="sm"
-                  variant="plain"
-                />
+                <a
+                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
+                  href="/api/auth/login"
+                >
+                  Register
+                </a>
               </li>
             </ul>
           )}
@@ -122,100 +126,18 @@ const Navbar = ({ theme }: NavTheme) => {
         aria-controls="mobile-menu"
         aria-label={isOpen ? "Close menu" : "Open menu"}
         onClick={toggleMenu}
-        className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+        className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* mobile view */}
       {isOpen && (
-        <ul
-          id="mobile-menu"
-          className="md:hidden w-full h-[100vh] space-y-1 sm:px-3 absolute top-20 right-0 bg-white text-black animate__animated animate__slideInLeft"
-        >
-          <li>
-            <Link
-              href="/"
-              onClick={toggleMenu}
-              className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/about"
-              onClick={toggleMenu}
-              className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white "
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/services"
-              onClick={toggleMenu}
-              className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white "
-            >
-              Services
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/contact"
-              onClick={toggleMenu}
-              className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white"
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            {session && session.user ? (
-              <ul className="auth flex flex-col items-start w-[100vw]">
-                <li className="w-full">
-                  <Link
-                    className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white"
-                    href="/dashboard"
-                    onClick={toggleMenu}
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-                <li className="w-full">
-                  <button
-                    onClick={() => {
-                      toggleMenu();
-                      signOut();
-                    }}
-                    className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white w-full"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            ) : (
-              <ul className="flex items-center gap-4 ml-10">
-                <li>
-                  <button
-                    className="px-4 py-2 bg-red text-white rounded-lg"
-                    type="button"
-                    onClick={() => router.push("/login")}
-                  >
-                    Log In
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="px-4 py-2 bg-green-800 text-white rounded-lg"
-                    type="button"
-                  >
-                    Register
-                  </button>
-                </li>
-              </ul>
-            )}
-          </li>
-        </ul>
+        <MobileNav
+          toggleMenu={toggleMenu}
+          user={user}
+          MobileLinkItem={MobileLinkItem}
+        />
       )}
     </nav>
   );

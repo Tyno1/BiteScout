@@ -16,7 +16,6 @@ const Footer: React.FC = () => {
       </div>
       <div className="px-4 lg:px-32 xl:px-48 w-full p-10 flex flex-col md:flex-row md:justify-between gap-10 md:gap-0">
         <div className="w-full md:w-60">
-          <p>University Of South Wales, Pontypridd, Wales, UK.</p>
           <div className="md:mt-40 flex flex-col md:gap-10 text-sm">
             <p>(790) 945-3041</p>
             <p>tynodesignz@gmail.com</p>
