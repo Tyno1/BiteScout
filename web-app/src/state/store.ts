@@ -5,6 +5,8 @@ import courseReducer from "@/state/course/courseSlice";
 import cuisineReducer from "@/state/cuisine/cuisineSlice";
 import allergenReducer from "@/state/allergen/allergenSlice";
 import foodCatalogueReducer from "@/state/foodCatalogueData/foodCatalogueSlice";
+import restaurantAccessReducer from "@/state/restaurantAccess/restaurantAccessSlice";
+import notificationReducer from "@/state/notification/notificationSlice"
 
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import {
@@ -45,10 +47,12 @@ const persistConfig = {
 
 const reducer = combineReducers({
   restaurantData: restaurantDataReducer,
+  restaurantAccess: restaurantAccessReducer,
   course: courseReducer,
   cuisine: cuisineReducer,
   allergen: allergenReducer,
   foodCatalogue: foodCatalogueReducer,
+  notification: notificationReducer,
 });
 const persistedReducer = persistReducer(persistConfig, reducer);
 

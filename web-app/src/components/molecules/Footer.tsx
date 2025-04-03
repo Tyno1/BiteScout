@@ -1,5 +1,4 @@
-import React from "react";
-
+ 
 const Footer: React.FC = () => {
   return (
     <div className="bg-white w-full flex flex-col items-center justify-center py-16 relative">

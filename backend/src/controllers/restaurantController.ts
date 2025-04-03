@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { Restaurant } from "@/src/types/restaurantData.js";
 
 // Helper function to validate request ID
-const validateId = (request: Request) => {
-  const id = request.params.id;
+const validateId = (req: Request) => {
+  const { id } = req.params;
   if (!id) {
     throw new Error("No id provided");
   }
@@ -17,15 +17,27 @@ export const createNewRestaurant = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body = await req.body;
+    const body = req.body;
 
     if (!body) {
       res.status(400).json({ error: "Invalid request body" });
       return;
     }
 
+    // Check if a restaurant with the same name already exists
+    const existingRestaurant = await RestaurantData.findOne({
+      name: { $regex: new RegExp(`^${body.name}$`, "i") }, // Case-insensitive exact match
+    });
+
+    if (existingRestaurant) {
+      res.status(409).json({
+        error: "Duplicate Restaurant. Restaurant with this name already exists",
+        existingId: existingRestaurant._id,
+      });
+      return;
+    }
+
     const newRestaurant = await (RestaurantData as any).create(body);
-    console.log(newRestaurant);
 
     if (!newRestaurant) {
       res.status(400).json({ error: "Could not create restaurant" });
@@ -85,6 +97,31 @@ export const getAllRestaurants = async (
   }
 };
 
+export const getRestaurantsByName = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name } = req.query;
+
+    const searchName = typeof name === "string" ? name : "";
+
+    if (!searchName) {
+      res.status(400).json({ error: "No name provided" });
+      return;
+    }
+
+    const restaurants = await RestaurantData.find({
+      name: new RegExp(searchName, "i"), // Simple contains search
+    });
+
+    res.json(restaurants);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateRestaurantData = async (
   req: Request<{ id: string }, {}, Partial<Restaurant>>,
   res: Response,
@@ -108,6 +145,32 @@ export const updateRestaurantData = async (
     res.json(updatedRestaurant);
   } catch (error) {
     return next(error);
+  }
+};
+
+export const getRestaurantByOwnerId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ error: "User Id is required" });
+      return;
+    }
+
+    const restaurant = await RestaurantData.findOne({ ownerId: userId });
+
+    if (!restaurant) {
+      res.status(404).json({ error: "Restaurant not found" });
+      return;
+    }
+
+    res.json(restaurant);
+  } catch (error) {
+    next(error);
   }
 };
 

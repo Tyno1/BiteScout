@@ -8,7 +8,7 @@ interface CourseState {
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: CourseState = {
   courseData: [{ _id: "", name: "", description: "" }],
@@ -20,19 +20,16 @@ export const createCourse = createAsyncThunk(
   "course/createCourse",
   async (courseData: Course) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue/course`,
+      `${serverApi}/api/food-catalogue/course`,
       courseData
     );
     return response.data;
   }
 );
-export const getCourse = createAsyncThunk(
-  "course/getCourse",
-  async () => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/course`);
-    return response.data;
-  }
-);
+export const getCourse = createAsyncThunk("course/getCourse", async () => {
+  const response = await axios.get(`${serverApi}/api/food-catalogue/course`);
+  return response.data;
+});
 
 const CourseSlice = createSlice({
   name: "course",
@@ -40,7 +37,7 @@ const CourseSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createCourse.pending, (state, action) => {
+      .addCase(createCourse.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -54,7 +51,7 @@ const CourseSlice = createSlice({
         state.error = action.error.message || "An error has occurred";
       })
 
-      .addCase(getCourse.pending, (state, action) => {
+      .addCase(getCourse.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

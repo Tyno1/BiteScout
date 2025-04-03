@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  text: string;
+  text?: string;
   icon?: React.ReactNode;
   color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
   size?: "sm" | "md" | "lg";
@@ -10,7 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
   name?: string;
   value?: string;
-  onClick?: () => void;
+  onClick: () => void;
   className?: string;
   iconStyle?: string;
   variant: "solid" | "outline" | "plain";
@@ -39,15 +39,15 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 ";
 
   const colorStyles = {
-    primary: `hover:bg-red focus:outline-none focus:ring-2 focus:ring-red focus:ring-offset-2 ${
+    primary: `hover:bg-orange-600/70 hover:text-white hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "bg-red text-white"
-        : "border border-2 border-red bg-none text-red"
+        ? "border-1 bg-orange-600/80 border-orange-700 text-white"
+        : "border border-1 border-gray-500 bg-transparent text-black"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
       variant === "plain"
@@ -56,18 +56,18 @@ export default function Button({
         ? "bg-yellow text-white"
         : "border border-2 border-yellow bg-none text-yellow"
     }`,
-    danger: `hover:bg-red-700 focus:ring-red-500 ${
+    danger: `hover:bg-red-900 focus:ring-red-900 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "text-white bg-orange"
+        ? "text-white bg-red-500"
         : "border border-2 border-orange bg-none text-orange"
     }`,
-    success: `hover:bg-green-700 focus:ring-green-500 ${
+    success: `hover:bg-green-900 focus:ring-green-500 ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
-        ? "bg-green-600 text-white"
+        ? "bg-green-900 text-white"
         : "border border-2 border-green-600 bg-none text-green-600"
     } `,
     black: `hover:bg-red focus:ring-red ${

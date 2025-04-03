@@ -2,10 +2,10 @@ import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { Menu, X } from "lucide-react";
-import "animate.css";
-
 import ProfileImg from "@/assets/images/profile.png";
 import Button from "../atoms/buttons/Button";
+import { useAuth0 } from "@auth0/auth0-react";
+import NewLink from "../atoms/link/Link";
 
 interface NavTheme {
   theme: "dark" | "light";
@@ -13,25 +13,22 @@ interface NavTheme {
 
 const Navbar = ({ theme }: NavTheme) => {
   const [isOpen, setIsOpen] = useState(false);
-  // const { data: session } = useSession();
-  // const router = useRouter();
   const navigate = useNavigate();
   const NavTo = (route: string) => {
     navigate(route);
   };
-  const session = {
-    data: {
-      user: {
-        name: "John Doe",
-        profilePic: ProfileImg,
-      },
-    },
-  };
+
+  const { loginWithRedirect, logout, isLoading, user } = useAuth0();
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("userToken");
+  };
   return (
     <nav
       className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
@@ -42,42 +39,22 @@ const Navbar = ({ theme }: NavTheme) => {
         <img src="none" alt="Bite Scout" />
       </Link>
       {/* web view */}
-      <ul className="hidden md:flex ml-10 flex items-center">
+      <ul className="hidden md:flex ml-10 flex items-center h-full">
         <li>
-          <Link
-            to="/"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Home
-          </Link>
+          <NewLink to="/" text="Home" />
         </li>
         <li>
-          <Link
-            to="/about"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            About
-          </Link>
+          <NewLink to="/about" text="About" />
         </li>
         <li>
-          <Link
-            to="/services"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Services
-          </Link>
+          <NewLink to="/service" text="Services" />
         </li>
         <li>
-          <Link
-            to="/contact"
-            className="px-3 py-2 text-sm font-medium hover:border-b-2 hover:border-black focus:border-red"
-          >
-            Contact
-          </Link>
+          <NewLink to="/contact" text="Contact" />
         </li>
 
         <li>
-          {session && session.user ? (
+          {!isLoading && user && (
             <ul className="auth flex ml-20 items-center gap-2">
               <li>
                 <Button
@@ -89,21 +66,32 @@ const Navbar = ({ theme }: NavTheme) => {
               </li>
               <li>
                 <Button
-                  onClick={() => signOut()}
+                  onClick={() => handleLogout()}
                   text="Logout"
                   size="sm"
                   variant="plain"
                 />
               </li>
-              <li>
-                <img src={ProfileImg} alt="" />
+              <li className="h-full w-10 rounded-xl">
+                <img
+                  src={ProfileImg}
+                  alt="profile image"
+                  className="object-center w-full h-full"
+                />
               </li>
             </ul>
-          ) : (
+          )}
+          {!isLoading && !user && (
             <ul className="flex items-center gap-2 ml-10">
               <li>
                 <Button
-                  onClick={() => NavTo("/login")}
+                  onClick={() =>
+                    loginWithRedirect({
+                      appState: {
+                        returnTo: location.pathname,
+                      },
+                    })
+                  }
                   text="Log In"
                   size="sm"
                   variant="plain"
@@ -174,7 +162,7 @@ const Navbar = ({ theme }: NavTheme) => {
             </Link>
           </li>
           <li>
-            {session && session.user ? (
+            {!isLoading && user && (
               <ul className="auth flex flex-col items-start w-[100vw]">
                 <li className="w-full">
                   <Link
@@ -189,7 +177,7 @@ const Navbar = ({ theme }: NavTheme) => {
                   <button
                     onClick={() => {
                       toggleMenu();
-                      signOut();
+                      handleLogout();
                     }}
                     className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white w-full"
                   >
@@ -197,13 +185,20 @@ const Navbar = ({ theme }: NavTheme) => {
                   </button>
                 </li>
               </ul>
-            ) : (
+            )}{" "}
+            {!isLoading && !user && (
               <ul className="flex items-center gap-4 ml-10">
                 <li>
                   <button
                     className="px-4 py-2 bg-red text-white rounded-lg"
                     type="button"
-                    onClick={() => NavTo("/login")}
+                    onClick={() =>
+                      loginWithRedirect({
+                        appState: {
+                          returnTo: location.pathname,
+                        },
+                      })
+                    }
                   >
                     Log In
                   </button>

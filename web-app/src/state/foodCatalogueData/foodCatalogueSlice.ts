@@ -3,13 +3,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface FoodCatalogueState {
-  foodData: FoodDataReceived;
+  foodData: FoodDataReceived | FoodDataSent;
   foodDatas: FoodDataReceived[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const serverApi = import.meta.env.VITE_BACKEND_SERVER;
 
 const initialState: FoodCatalogueState = {
   foodData: {
@@ -35,7 +35,7 @@ export const createFoodCatalogue = createAsyncThunk(
   "foodCatalogueData/createFoodCatalogue",
   async (FoodCatalogue: FoodDataSent) => {
     const response = await axios.post(
-      `${API_URL}/api/food-catalogue`,
+      `${serverApi}/api/food-catalogue`,
       FoodCatalogue
     );
     console.log(response.data);
@@ -49,7 +49,7 @@ export const getFoodCatalogue = createAsyncThunk(
   "foodCatalogueData/getFoodCatalogue",
   async (restaurantId: string) => {
     const response = await axios.get(
-      `${API_URL}/api/food-catalogue/restaurant/?id=${restaurantId}`
+      `${serverApi}/api/food-catalogue/restaurant/?id=${restaurantId}`
     );
     return response.data;
   }
@@ -59,7 +59,7 @@ export const getFoodCatalogue = createAsyncThunk(
 export const getFoodCatalogueById = createAsyncThunk(
   "foodCatalogueData/getFoodCatalogueById",
   async (id: string) => {
-    const response = await axios.get(`${API_URL}/api/food-catalogue/${id}`);
+    const response = await axios.get(`${serverApi}/api/food-catalogue/${id}`);
     return response.data;
   }
 );
@@ -70,7 +70,7 @@ const foodCatalogueSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createFoodCatalogue.pending, (state, action) => {
+      .addCase(createFoodCatalogue.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -86,7 +86,7 @@ const foodCatalogueSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-      .addCase(getFoodCatalogue.pending, (state, action) => {
+      .addCase(getFoodCatalogue.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
@@ -102,7 +102,7 @@ const foodCatalogueSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error has occurred";
       })
-      .addCase(getFoodCatalogueById.pending, (state, action) => {
+      .addCase(getFoodCatalogueById.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })

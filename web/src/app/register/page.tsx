@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useSession } from "next-auth/react";
+ import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
 import SocialLogin from "@/components/molecules/forms/SocialLogin";
 import RegisterForm from "@/components/molecules/forms/RegisterForm";

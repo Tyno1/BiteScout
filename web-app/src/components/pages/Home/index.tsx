@@ -9,7 +9,7 @@ import Footer from "../../molecules/Footer";
 
 const Home = () => {
   return (
-    <div className="max-w-[100vw] min-h-[100vh] flex flex-col items-center">
+    <div className="w-[100vw] min-h-[100vh] flex flex-col items-center">
       <Navbar theme="dark" />
       <Hero />
       <Features />
