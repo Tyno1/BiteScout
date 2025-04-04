@@ -52,7 +52,7 @@ export default function Input({
       : outlineType === "round"
       ? "border-1"
       : "border-none"
-  } border-gray-300 focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-orange-500 focus:border-none`;
+  } border-gray-500 focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-orange-500 focus:border-none`;
   const widthStyle = fullWidth ? "w-full" : "";
 
   const sizeStyle = {
