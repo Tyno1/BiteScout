@@ -1,11 +1,11 @@
-interface BusinessHours {
+type BusinessHours = {
   day: string;
   open: string;
   close: string;
   closed: boolean;
-}
+};
 
-export interface RestaurantDataState {
+export type RestaurantDataState = {
   _id?: string;
   name: string;
   logo: string;
@@ -22,4 +22,4 @@ export interface RestaurantDataState {
   meta: any;
   owner: boolean;
   ownerId?: string;
-}
+};

@@ -3,8 +3,9 @@ import "./globals.css";
 import { Montserrat } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { ReduxProvider } from "@/components/ReduxProvider";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { ReduxProvider } from "@/providers/ReduxProvider";
+import { auth } from "@/auth";
+import Provider from "@/providers/Provider";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -18,15 +19,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <html lang="en" className={montserrat.className}>
       <body>
-        <UserProvider>
+        <Provider session={session}>
           <ReduxProvider>
             <ToastContainer />
             <main className="">{children}</main>
           </ReduxProvider>
-        </UserProvider>
+        </Provider>
       </body>
     </html>
   );

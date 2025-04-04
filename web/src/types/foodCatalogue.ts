@@ -1,39 +1,39 @@
-export interface Allergen {
+export type Allergen = {
   _id?: string;
   name: string;
   description: string;
 }
 
-export interface Course {
+export type Course = {
   _id?: string;
   name: string;
   description: string;
 }
 
-export interface Cuisine {
+export type Cuisine = {
   _id?: string;
   name: string;
   description: string;
 }
 
-interface price {
+type Price = {
   currency: string;
   amount: number;
 }
 
-export interface FoodDataSent {
+export type FoodDataSent = {
   _id?: string;
   name: string;
   ingredients: string[];
   cuisineType: string;
-  course: string
-  price: price;
+  course: string;
+  price: Price;
   allergens: string[];
   images?: string[];
   restaurant: string;
 }
 
-export interface FoodDataReceived {
+export type FoodDataReceived = {
   _id?: string;
   name: string;
   ingredients: string[];
@@ -47,7 +47,7 @@ export interface FoodDataReceived {
     name: string;
     description: string;
   };
-  price: price;
+  price: Price;
   allergens: Allergen[];
   images?: string[];
   restaurant: string;

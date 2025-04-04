@@ -1,3 +1,4 @@
+import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -16,7 +17,14 @@ const NavItem = ({ icon, text, path, handleNav }: NavItemProps) => {
   return (
     <li className="w-full">
       <button
-        onClick={() => handleNav && handleNav(path ? path : "/")}
+        onClick={(e) => {
+          e.preventDefault();
+          if (text === "Logout") {
+            signOut({ callbackUrl: "/" });
+          } else {
+            handleNav && handleNav(path ? path : "/");
+          }
+        }}
         className={`
           flex items-center 
           px-2 py-4

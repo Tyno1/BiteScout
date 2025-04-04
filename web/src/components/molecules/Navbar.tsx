@@ -1,28 +1,39 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-import ProfileImg from "@/assets/images/profile.png";
+import { useRouter } from "next/navigation";
+
+import { Menu, X } from "lucide-react";
+
 import "animate.css";
-import { useUser } from "@auth0/nextjs-auth0/client";
+
+import ProfileImg from "@/assets/images/profile.png";
 import MobileNav from "./MobileNav";
+import Button from "../atoms/buttons/Button";
 
-interface NavTheme {
+type NavTheme = {
   theme: "dark" | "light";
-}
+};
 
-interface MobileLinkProp {
+type MobileLinkProp = {
   path: string;
   text: string;
-}
+};
 
 interface WebLinkProp extends MobileLinkProp {}
 
 const Navbar = ({ theme }: NavTheme) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isLoading, error } = useUser();
+  const router = useRouter();
+
+  const handleRoute = (path: string) => {
+    router.push(path);
+  };
+  const { data: session } = useSession();
+  console.log(session);
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
@@ -77,18 +88,17 @@ const Navbar = ({ theme }: NavTheme) => {
         </li>
 
         <li>
-          {user ? (
+          {session ? (
             <ul className="auth flex ml-20 items-center gap-2">
               <li>
                 <WebLinkItem text="Dashboard" path="/dashboard" />
               </li>
               <li>
-                <a
-                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
-                  href="/api/auth/logout"
-                >
-                  Logout
-                </a>
+                <Button
+                  variant="solid"
+                  text="Logout"
+                  onClick={() => signOut()}
+                />
               </li>
               <li>
                 <Image
@@ -102,20 +112,20 @@ const Navbar = ({ theme }: NavTheme) => {
           ) : (
             <ul className="flex items-center gap-2 ml-10">
               <li>
-                <a
-                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
-                  href="/api/auth/login"
-                >
-                  Login
-                </a>
+                <Button
+                  variant="solid"
+                  size="sm"
+                  text="Login"
+                  onClick={()=> handleRoute('/login')}
+                />
               </li>
               <li>
-                <a
-                  className="px-4 py-2 text-sm  hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
-                  href="/api/auth/login"
-                >
-                  Register
-                </a>
+                <Button
+                  variant="plain"
+                  size="sm"
+                  text="Register"
+                  onClick={() => handleRoute("/register")}
+                />
               </li>
             </ul>
           )}
@@ -135,8 +145,9 @@ const Navbar = ({ theme }: NavTheme) => {
       {isOpen && (
         <MobileNav
           toggleMenu={toggleMenu}
-          user={user}
+          session={session}
           MobileLinkItem={MobileLinkItem}
+          handleRoute={handleRoute}
         />
       )}
     </nav>
