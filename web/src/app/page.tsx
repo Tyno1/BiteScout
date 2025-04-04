@@ -1,10 +1,10 @@
 import Footer from "@/components/ui/Footer";
-import CallToAction from "@/components/ui/Home/CallToAction";
-import Features from "@/components/ui/Home/Features";
-import Hero from "@/components/ui/Home/Hero";
-import PopularDestinations from "@/components/ui/Home/PopularDestinations";
-import Testimonials from "@/components/ui/Home/Testimonies";
-import TopMeals from "@/components/ui/Home/TopMeals";
+import CallToAction from "@/components/ui/home/CallToAction";
+import Features from "@/components/ui/home/Features";
+import Hero from "@/components/ui/home/Hero";
+import PopularDestinations from "@/components/ui/home/PopularDestinations";
+import Testimonials from "@/components/ui/home/Testimonies";
+import TopMeals from "@/components/ui/home/TopMeals";
 import Navbar from "@/components/molecules/Navbar";
 
 export default function Home() {

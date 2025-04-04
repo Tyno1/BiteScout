@@ -17,6 +17,8 @@
     "@tailwindcss/postcss": "^4.1.1",
     "animate.css": "^4.1.1",
     "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "clsx": "^2.1.1",
     "fs": "^0.0.1-security",
     "lucide-react": "^0.452.0",
     "mongodb": "^6.12.0",
