@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/atoms/buttons/Button";
+import Input from "@/components/atoms/inputs/Input";
 import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { RestaurantDataState } from "@/types/restaurantData";
@@ -43,7 +44,15 @@ export default function Onboarding() {
     owner: false,
     ownerId: "",
   };
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [restaurantData, setRestaurantData] = useState(defaultRestaurantData);
+  const [apiError, setApiError] = useState("");
+  const [message, setMessage] = useState("");
+  const [formError, setFormError] = useState({
+    name: "",
+    restaurantCount: "",
+    submission: "",
+  });
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -104,11 +113,11 @@ export default function Onboarding() {
           <div className="space-y-8">
             {/* Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl text-gray-900">
+              <h1 className="text-3xl text-black">
                 Welcome{" "}
                 <span className="font-bold">{session.data?.user.name}</span>
               </h1>
-              <p className="text-gray-500">
+              <p className="text-gray-900">
                 Please tell us about your role and restaurant
               </p>
             </div>
@@ -118,77 +127,88 @@ export default function Onboarding() {
               <h2 className="text-lg font-semibold text-gray-700">
                 Select your role:
               </h2>
-              <div className="flex gap-3">
-                <button
-                  type="button"
+              <div className="flex gap-3 w-full">
+                <Button
+                  variant="outline"
+                  text="Restaurant Owner"
                   onClick={() =>
                     setRestaurantData((prev) => ({ ...prev, owner: true }))
                   }
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                    restaurantData.owner
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  Restaurant Owner
-                </button>
-                <button
-                  type="button"
+                  fullWidth
+                />
+                <Button
+                  variant="outline"
+                  text="Employee"
                   onClick={() =>
                     setRestaurantData((prev) => ({ ...prev, owner: false }))
                   }
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-200 ${
-                    !restaurantData.owner
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  Employee
-                </button>
+                  fullWidth
+                />
               </div>
             </div>
 
             {/* Restaurant Name Input */}
             {restaurantData.owner && (
-              <div className="space-y-3">
-                <label
-                  className="text-lg font-semibold text-gray-700 block"
-                  htmlFor="restaurant-name"
-                >
-                  Restaurant Name
-                </label>
-                <input
-                  value={restaurantData.name}
-                  name="name"
-                  onChange={handleInputChange}
-                  className={`${
-                    error && restaurantData.name === "" && "border-orange"
-                  } w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors `}
-                  type="text"
-                  id="restaurant-name"
-                  placeholder="Enter your restaurant name"
-                />
-                {error && restaurantData.name === "" && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-orange">
-                      You must enter a restaurant name
-                    </p>
-                  </div>
-                )}
-              </div>
+              <Input
+                label="Restaurant Name"
+                name="name"
+                outlineType="round"
+                useLabel
+                value={restaurantData.name}
+                onChange={handleInputChange}
+                id="restaurant-name"
+                placeholder="Enter your restaurant name"
+                type="text"
+                fullWidth
+                labelStyle="text-lg"
+                inputSize="md"
+                errorMessage={
+                  formError.name && "You must enter a restaurant name"
+                }
+              />
             )}
 
+            {message && (
+              <div className="space-y-2">
+                <p className="text-sm text-green-500">{message}</p>
+              </div>
+            )}
             {/* Submit Button */}
 
-            <Button
-              type="submit"
-              text={
-                restaurantData.owner
-                  ? `Create Restaurant Profile`
-                  : `Find Your Restaurant`
-              }
-              fullWidth
-            />
+            {restaurantData.owner ? (
+              <Button
+                variant="solid"
+                type="submit"
+                disabled={!restaurantData.name}
+                text={
+                  isSubmitting
+                    ? "Creating your restaurant"
+                    : "Create Restaurant Profile"
+                }
+                fullWidth
+              />
+            ) : (
+              <Button
+                variant="solid"
+                type="submit"
+                text="Find Your Restaurant"
+                fullWidth
+              />
+            )}
+
+            {apiError && (
+              <div className="space-y-2">
+                <p className="text-sm text-red-500">{apiError}</p>
+              </div>
+            )}
+            {formError.submission ||
+              (formError.restaurantCount && (
+                <div className="space-y-2">
+                  <p className="text-sm text-red-500">
+                    {formError.submission || formError.restaurantCount}
+                  </p>
+                </div>
+              ))}
           </div>
         </form>
       </div>

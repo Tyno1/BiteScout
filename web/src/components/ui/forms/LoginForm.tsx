@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 import { doCrednentialLogin } from "@/app/actions";
 import { useRouter } from "next/navigation";
+import Button from "@/components/atoms/buttons/Button";
 
 const LoginForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
@@ -32,15 +33,14 @@ const LoginForm: React.FC = () => {
       setError("Check your credentials");
     }
   };
-  
 
   return (
     <form
       action="post"
-      className="w-full flex flex-col gap-2"
+      className="w-full flex flex-col items-center gap-2"
       onSubmit={handleSubmit}
     >
-      {error && <div className="text-red">{error}</div>}
+      {error && <div className="text-red-500">{error}</div>}
       <input
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
         placeholder="email"
@@ -55,9 +55,7 @@ const LoginForm: React.FC = () => {
         name="password"
         id="password"
       />
-      <button className="text-sm font-bold w-full py-2 px-4 bg-red rounded text-white">
-        Credential Login
-      </button>
+      <Button fullWidth variant="solid" text="Credential Login" />{" "}
     </form>
   );
 };
