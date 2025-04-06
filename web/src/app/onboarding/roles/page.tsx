@@ -1,60 +1,39 @@
 "use client";
 
-import Button from "@/components/atoms/buttons/Button";
-import Input from "@/components/atoms/inputs/Input";
-import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
-import { AppDispatch, RootState } from "@/state/store";
-import { RestaurantDataState } from "@/types/restaurantData";
+import type React from "react";
+
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
+import { useUpdateUser } from "@/app/hooks/useUpdateUser";
+import type { AppDispatch } from "@/state/store";
+import type { RestaurantDataState } from "@/types/restaurantData";
+import { RoleOnboardingForm } from "../components/roleOnboardingForm";
+import { DEFAULT_RESTAURANT_DATA } from "../constants";
+import type { FormErrorState } from "../components/roleOnboardingForm";
 
 export default function Onboarding() {
-  const {
-    restaurantData: restaurant,
-    error,
-    status,
-  } = useSelector((state: RootState) => state.restaurantData);
   const dispatch = useDispatch<AppDispatch>();
   const session = useSession();
   const router = useRouter();
+  const { updateUser } = useUpdateUser();
 
-  const defaultRestaurantData: RestaurantDataState = {
-    name: "",
-    logo: "ttt",
-    description: "",
-    cuisine: [],
-    priceRange: "",
-    address: "",
-    phone: "",
-    email: "",
-    website: "",
-    businessHours: [
-      {
-        day: "",
-        open: "",
-        close: "",
-        closed: false,
-      },
-    ],
-    features: [],
-    gallery: [],
-    meta: {},
-    owner: false,
-    ownerId: "",
-  };
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState(defaultRestaurantData);
+  const [restaurantData, setRestaurantData] = useState<RestaurantDataState>(
+    DEFAULT_RESTAURANT_DATA
+  );
   const [apiError, setApiError] = useState("");
   const [message, setMessage] = useState("");
-  const [formError, setFormError] = useState({
+  const [formError, setFormError] = useState<FormErrorState>({
     name: "",
     restaurantCount: "",
     submission: "",
   });
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRestaurantData((prev) => ({
       ...prev,
@@ -62,156 +41,149 @@ export default function Onboarding() {
     }));
   };
 
+  const handleRoleSelection = (isOwner: boolean) => {
+    setRestaurantData((prev) => ({ ...prev, owner: isOwner }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    resetErrors();
 
-    if (restaurantData.owner && session?.data?.user?.id) {
-      // Ensure all required fields are present
-      const businessHours = restaurantData.businessHours.map((hour) => ({
-        day: hour.day || "Monday", // Default value
-        open: hour.open || "09:00", // Default value
-        close: hour.close || "17:00", // Default value
-        closed: hour.closed || false,
-      }));
-
-      const newRestaurantData: RestaurantDataState = {
-        ...restaurantData,
-        ownerId: session.data.user.id,
-        businessHours: businessHours, // Required with proper structure
-        priceRange: restaurantData.priceRange || "$",
-      };
-
-      console.log("Submitting complete restaurant data:", newRestaurantData);
-
-      try {
-        const resultAction = await dispatch(
-          createRestaurantData(newRestaurantData)
-        );
-        console.log(resultAction);
-
-        if (createRestaurantData.fulfilled.match(resultAction)) {
-          console.log("Restaurant created successfully:", resultAction.payload);
-          router.push("/dashboard");
-        } else {
-          console.error("Failed to create restaurant:", resultAction.error);
-        }
-      } catch (error) {
-        console.error("Error creating restaurant:", error);
+    try {
+      if (restaurantData.owner) {
+        await handleOwnerSubmission();
+      } else {
+        handleEmployeeSubmission();
       }
-    } else {
-      router.push("/onboarding/restaurant-search");
+    } catch (error) {
+      handleSubmissionError(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const resetErrors = () => {
+    setApiError("");
+    setFormError({
+      name: "",
+      restaurantCount: "",
+      submission: "",
+    });
+  };
+
+  const handleOwnerSubmission = async () => {
+    // Validate restaurant name
+    if (!restaurantData.name.trim()) {
+      setFormError((prev) => ({
+        ...prev,
+        name: "Restaurant name is required",
+      }));
+      setRestaurantData((prev) => ({ ...prev, name: "" }));
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate user session
+    if (!session.data?.user?._id) {
+      setApiError(
+        "User profile not found. Please refresh the page or contact support."
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Prepare restaurant data
+    const preparedData = prepareRestaurantData();
+
+    // Create restaurant
+    const resultAction = await dispatch(createRestaurantData(preparedData));
+
+    if (createRestaurantData.fulfilled.match(resultAction)) {
+      await handleSuccessfulCreation();
+    } else {
+      handleCreationError(resultAction.error);
+    }
+  };
+
+  const prepareRestaurantData = (): RestaurantDataState => {
+    const businessHours = restaurantData.businessHours.map((hour) => ({
+      day: hour.day || "Monday",
+      open: hour.open || "09:00",
+      close: hour.close || "17:00",
+      closed: hour.closed || false,
+    }));
+
+    return {
+      ...restaurantData,
+      ownerId: session?.data?.user?._id || "",
+      businessHours,
+      priceRange: restaurantData.priceRange || "$",
+    };
+  };
+
+  const handleSuccessfulCreation = async () => {
+    setMessage("Restaurant created successfully!");
+
+    try {
+      if (session?.data?.user?._id) {
+        await updateUser(session.data.user._id);
+        router.push("/dashboard");
+      }
+    } catch (updateError) {
+      console.error("Failed to update user restaurant count:", updateError);
+      toast.warning(
+        "Restaurant created, but profile update incomplete. This will be fixed automatically."
+      );
+      router.push("/dashboard");
+    }
+  };
+
+  const handleCreationError = (error: any) => {
+    console.error("Restaurant creation error:", error);
+
+    const errorPayload = error?.message || "";
+    let userFriendlyMessage = "Failed to create restaurant. Please try again.";
+
+    if (errorPayload.includes("validation")) {
+      userFriendlyMessage =
+        "Some restaurant information is invalid. Please check all fields.";
+    } else if (errorPayload.includes("409")) {
+      userFriendlyMessage = "A restaurant with this name already exists.";
+    } else if (errorPayload.includes("auth")) {
+      userFriendlyMessage = "Your session has expired. Please log in again.";
+    }
+
+    setApiError(userFriendlyMessage);
+  };
+
+  const handleEmployeeSubmission = () => {
+    setMessage("Redirecting to restaurant search...");
+    router.push("/onboarding/restaurant-search");
+  };
+
+  const handleSubmissionError = (error: unknown) => {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+    console.error("Form submission error:", error);
+    setFormError((prev: FormErrorState) => ({
+      ...prev,
+      submission: errorMessage,
+    }));
+    toast.error("Something went wrong. Please try again later.");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-xl p-8 md:p-10"
-        >
-          <div className="space-y-8">
-            {/* Header */}
-            <div className="space-y-2">
-              <h1 className="text-3xl text-black">
-                Welcome{" "}
-                <span className="font-bold">{session.data?.user.name}</span>
-              </h1>
-              <p className="text-gray-900">
-                Please tell us about your role and restaurant
-              </p>
-            </div>
-
-            {/* Role Selection */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Select your role:
-              </h2>
-              <div className="flex gap-3 w-full">
-                <Button
-                  variant="outline"
-                  text="Restaurant Owner"
-                  onClick={() =>
-                    setRestaurantData((prev) => ({ ...prev, owner: true }))
-                  }
-                  fullWidth
-                />
-                <Button
-                  variant="outline"
-                  text="Employee"
-                  onClick={() =>
-                    setRestaurantData((prev) => ({ ...prev, owner: false }))
-                  }
-                  fullWidth
-                />
-              </div>
-            </div>
-
-            {/* Restaurant Name Input */}
-            {restaurantData.owner && (
-              <Input
-                label="Restaurant Name"
-                name="name"
-                outlineType="round"
-                useLabel
-                value={restaurantData.name}
-                onChange={handleInputChange}
-                id="restaurant-name"
-                placeholder="Enter your restaurant name"
-                type="text"
-                fullWidth
-                labelStyle="text-lg"
-                inputSize="md"
-                errorMessage={
-                  formError.name && "You must enter a restaurant name"
-                }
-              />
-            )}
-
-            {message && (
-              <div className="space-y-2">
-                <p className="text-sm text-green-500">{message}</p>
-              </div>
-            )}
-            {/* Submit Button */}
-
-            {restaurantData.owner ? (
-              <Button
-                variant="solid"
-                type="submit"
-                disabled={!restaurantData.name}
-                text={
-                  isSubmitting
-                    ? "Creating your restaurant"
-                    : "Create Restaurant Profile"
-                }
-                fullWidth
-              />
-            ) : (
-              <Button
-                variant="solid"
-                type="submit"
-                text="Find Your Restaurant"
-                fullWidth
-              />
-            )}
-
-            {apiError && (
-              <div className="space-y-2">
-                <p className="text-sm text-red-500">{apiError}</p>
-              </div>
-            )}
-            {formError.submission ||
-              (formError.restaurantCount && (
-                <div className="space-y-2">
-                  <p className="text-sm text-red-500">
-                    {formError.submission || formError.restaurantCount}
-                  </p>
-                </div>
-              ))}
-          </div>
-        </form>
-      </div>
-    </div>
+    <RoleOnboardingForm
+      session={session}
+      restaurantData={restaurantData}
+      isSubmitting={isSubmitting}
+      message={message}
+      apiError={apiError}
+      formError={formError}
+      handleInputChange={handleInputChange}
+      handleRoleSelection={handleRoleSelection}
+      handleSubmit={handleSubmit}
+    />
   );
 }

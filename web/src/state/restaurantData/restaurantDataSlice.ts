@@ -44,7 +44,7 @@ export const createRestaurantData = createAsyncThunk(
   "restaurantData/createRestaurantData",
   async (restaurantData: RestaurantDataState) => {
     const response = await axios.post(
-      `${API_URL}/api/restaurant`,
+      `${API_URL}/restaurants`,
       restaurantData
     );
     return response.data;
@@ -54,7 +54,7 @@ export const createRestaurantData = createAsyncThunk(
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
   async (id: string) => {
-    const response = await axios.get(`${API_URL}/api/restaurant?id=${id}`);
+    const response = await axios.get(`${API_URL}/restaurant?id=${id}`);
     return response.data;
   }
 );
@@ -63,7 +63,7 @@ export const getRestaurantDataByOwnerId = createAsyncThunk(
   "restaurantData/getRestaurantDataByUserId",
   async (id: string) => {
     const response = await axios.get(
-      `${API_URL}/api/restaurant/owner?id=${id}`
+      `${API_URL}/restaurant/owner?id=${id}`
     );
     return response.data;
   }
@@ -79,7 +79,7 @@ export const updateRestaurantData = createAsyncThunk(
     id: string | undefined;
   }) => {
     const response = await axios.put(
-      `${API_URL}/api/restaurant/?id=${id}`,
+      `${API_URL}/restaurant/?id=${id}`,
       data
     );
     return response.data;

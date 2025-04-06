@@ -6,6 +6,130 @@ import User from "@/app/api/models/User";
 import dbConnect from "@/utils/db";
 import userType from "@/app/api/models/UserType";
 import restaurantData from "@/app/api/models/RestaurantData";
+import UserType from "@/app/api/models/UserType";
+
+// Provider configurations
+const providers = [
+  Google({
+    clientId: process.env.GOOGLE_CLIENT_ID || "",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    authorization: {
+      params: {
+        prompt: "consent",
+        access_type: "offline",
+        response_type: "code",
+      },
+    },
+  }),
+  Github({
+    clientId: process.env.GITHUB_ID || "",
+    clientSecret: process.env.GITHUB_SECRET || "",
+    authorization: {
+      params: {
+        prompt: "consent",
+        access_type: "offline",
+        response_type: "code",
+      },
+    },
+  }),
+  Credentials({
+    name: "credentials",
+    credentials: {
+      email: { label: "email", type: "text", placeholder: "email@email.com" },
+      password: { label: "password", type: "password" },
+    },
+
+    async authorize(credentials) {
+      if (!credentials?.email || !credentials?.password) {
+        throw new Error("Missing credentials");
+      }
+
+      try {
+        await dbConnect();
+        const queryUser = { email: credentials.email };
+        const user = await User.findOne(queryUser);
+
+        if (!user) {
+          throw new Error("User not found. Please sign up");
+        }
+
+        const isMatch = await user.comparePassword(credentials.password);
+
+        if (!isMatch) {
+          throw new Error("Check your email and password");
+        }
+
+        return {
+          _id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          userType: user.userType,
+        };
+      } catch (error: any) {
+        throw new Error(error.message || "Authentication failed");
+      }
+    },
+  }),
+];
+
+// Helper functions
+async function getDefaultUserType() {
+  await dbConnect();
+  const defaultUserType = await UserType.findOne({ name: "user" });
+
+  if (!defaultUserType) {
+    throw new Error("Default user type not found");
+  }
+
+  return defaultUserType;
+}
+
+async function findOrCreateOAuthUser(profile: any) {
+  await dbConnect();
+
+  const existingUser = await User.findOne({ email: profile?.email });
+
+  if (existingUser) {
+    return {
+      user: existingUser,
+      isNewUser: false,
+    };
+  }
+
+  const defaultUserType = await getDefaultUserType();
+
+  const newUser = await User.create({
+    email: profile?.email,
+    name: profile?.name,
+    image: profile?.image,
+    userType: defaultUserType._id,
+    loginMethod: "oauth",
+  });
+
+  return {
+    user: newUser,
+    isNewUser: true,
+  };
+}
+
+async function getUserTypeDetails(userTypeId: string) {
+  try {
+    await dbConnect();
+    const userTypeDetails = await UserType.findById(userTypeId);
+
+    if (userTypeDetails) {
+      return {
+        name: userTypeDetails.name,
+        level: userTypeDetails.level,
+      };
+    }
+
+    return { name: "user", level: 1 };
+  } catch (error) {
+    console.error("Error fetching user type details:", error);
+    return { name: "user", level: 1 };
+  }
+}
 
 export const {
   handlers: { GET, POST },
@@ -16,109 +140,23 @@ export const {
   session: {
     strategy: "jwt",
   },
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
-    }),
-    Github({
-      clientId: process.env.GITHUB_ID || "",
-      clientSecret: process.env.GITHUB_SECRET || "",
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
-    }),
-    Credentials({
-      name: "credentials",
-      credentials: {
-        email: { label: "email", type: "text", placeholder: "email@email.com" },
-        password: { label: "password", type: "password" },
-      },
-
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
-        }
-
-        try {
-          await dbConnect();
-          const queryUser = { email: credentials.email };
-          const user = await User.findOne(queryUser);
-
-          if (!user) {
-            throw new Error("User not found. Please sign up");
-          }
-
-          const isMatch = await user.comparePassword(credentials.password);
-
-          if (!isMatch) {
-            throw new Error("Check your email and password");
-          }
-
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            userType: user.userType,
-          };
-        } catch (error: any) {
-          throw new Error(error.message || "Authentication failed");
-        }
-      },
-    }),
-  ],
+  providers,
   callbacks: {
     async signIn({ account, profile, user }) {
-      // if login method is oauth
+      // Skip for credential login
       if (!account || account.provider === "credentials") {
         return true;
       }
 
       try {
-        await dbConnect();
-        // get default userType - lowest priviledge
-        const lowestPrivilegeType = await userType.findOne({ name: "user" });
+        const { user: dbUser, isNewUser } = await findOrCreateOAuthUser(
+          profile
+        );
 
-        if (!lowestPrivilegeType) {
-          console.error("Default user type not found");
-          return false;
-        }
-
-        const userExists = await User.findOne({ email: profile?.email });
-
-        if (!userExists) {
-          const newUser = await User.create({
-            email: profile?.email,
-            name: profile?.name,
-            image: profile?.image,
-            userType: lowestPrivilegeType._id,
-            loginMethod: "oauth",
-          });
-
-          // Merge the userType into the user object that's passed to callbacks
-          if (user) {
-            user.userType = lowestPrivilegeType._id;
-          }
-        } else {
-          console.log(
-            "Existing user found with userType:",
-            userExists.userType
-          );
-          // Merge the userType into the user object that's passed to callbacks
-          if (user) {
-            user.userType = userExists.userType;
-          }
+        // Update the user object with database values
+        if (user) {
+          user.userType = dbUser.userType;
+          user._id = dbUser._id;
         }
 
         return true;
@@ -129,10 +167,9 @@ export const {
     },
 
     async jwt({ token, user }) {
-      console.log("user", user);
-
+      // Only update token when user is provided (on sign in)
       if (user) {
-        token.id = user.id;
+        token._id = user._id;
         token.userType = user.userType;
       }
 
@@ -142,31 +179,18 @@ export const {
     async session({ session, token }) {
       try {
         // Add token data to session
-        session.user.id = token.id as string;
+        session.user._id = token._id as string;
 
+        // Get User Type Details
         if (token.userType) {
-          session.user.userType = token.userType as string;
-
-          await dbConnect();
-
-          // Fetch additional user data if needed
-          const userTypeDetails = await userType.findById(token.userType);
-
-          if (userTypeDetails) {
-            session.user.userTypeDetails = {
-              name: userTypeDetails.name,
-              level: userTypeDetails.level,
-            };
-          } else {
-            console.log("No userTypeDetails found for ID:", token.userType);
-            // Set a default or fallback value
-            session.user.userTypeDetails = { name: "user", level: 1 };
-          }
+          session.user.userTypeDetails = await getUserTypeDetails(
+            token.userType as string
+          );
         } else {
           console.log("No userType in token, setting default");
           // Set default values when userType is missing
-          session.user.userType = "default";
-          session.user.userTypeDetails = { name: "user", level: 1 };
+          session.user.userType = "user";
+          session.user.userTypeDetails = { name: "user", level: 3 };
         }
 
         return session;
