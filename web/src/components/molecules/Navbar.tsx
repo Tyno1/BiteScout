@@ -96,6 +96,7 @@ const Navbar = ({ theme }: NavTheme) => {
               <li>
                 <Button
                   variant="solid"
+                  size="sm"
                   text="Logout"
                   onClick={() => signOut()}
                 />

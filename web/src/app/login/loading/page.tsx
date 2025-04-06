@@ -11,7 +11,7 @@ export default function AuthLoader() {
 
   useEffect(() => {
     const handleRestaurantData = async () => {
-      // Check if the user is logged in
+      // Check if the user is logged in, has a resstaurant and is an admin or moderator
       if (
         session?.data?.user?._id &&
         (session?.data?.user?.userTypeDetails?.level as number) <= 2 &&
