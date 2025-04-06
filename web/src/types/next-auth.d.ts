@@ -23,6 +23,7 @@ declare module "next-auth" {
         name: string;
         level: number;
       };
+      restaurantCount?: number; // Add the restaurantCount property
     };
   }
 }
@@ -32,5 +33,6 @@ declare module "next-auth/jwt" {
     _id: string;
     role?: string;
     userType?: string; // Add the userType property
+    restaurantCount?: number; // Add the restaurantCount property
   }
 }

@@ -2,13 +2,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { User } from "next-auth";
+import { useSession } from "next-auth/react";
 
 const BACKEND_API = process.env.NEXT_PUBLIC_API_URL;
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
-  const [data, setData] = useState<User | null>(null);
+  const { data: session, update } = useSession();
 
   const updateUser = async (id: string) => {
     if (!id) {
@@ -20,13 +21,18 @@ export function useUpdateUser() {
     setError(null);
 
     try {
-      console.log("i ran in react");
-      
       const response = await axios.put(`${BACKEND_API}/users/${id}`);
-      setData(response.data);
-      return response.data;
-      console.log("using");
-      
+      const data = response.data;
+
+      // 2. Update the client-side session with new data
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          restaurantCount: data.restaurantCount,
+          userType: data.userType,
+        },
+      });
     } catch (err: any) {
       console.error("Error updating user:", err);
       setError(err.message || "Failed to update user");
@@ -36,5 +42,5 @@ export function useUpdateUser() {
     }
   };
 
-  return { updateUser, isLoading, error, data };
+  return { updateUser, isLoading, error };
 }

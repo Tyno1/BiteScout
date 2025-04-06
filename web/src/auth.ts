@@ -7,6 +7,7 @@ import dbConnect from "@/utils/db";
 import userType from "@/app/api/models/UserType";
 import restaurantData from "@/app/api/models/RestaurantData";
 import UserType from "@/app/api/models/UserType";
+import RestaurantData from "@/app/api/models/RestaurantData";
 
 // Provider configurations
 const providers = [
@@ -166,7 +167,7 @@ export const {
       }
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       // Only update token when user is provided (on sign in)
       if (user) {
         token._id = user._id;
@@ -191,6 +192,15 @@ export const {
           // Set default values when userType is missing
           session.user.userType = "user";
           session.user.userTypeDetails = { name: "user", level: 3 };
+        }
+
+        if (token._id) {
+          await dbConnect();
+          const restaurantCount = await RestaurantData.countDocuments({
+            ownerId: token._id,
+          });
+
+          session.user.restaurantCount = restaurantCount;
         }
 
         return session;

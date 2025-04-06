@@ -22,7 +22,7 @@ export function middleware(req: NextRequest) {
 
     // if in authpage with token present, redirect to onboarding
     if (isAuthPage && authToken) {
-      return NextResponse.redirect(new URL("/onboarding/roles", nextUrl));
+      return NextResponse.redirect(new URL("/login/loading", nextUrl));
     }
 
     //   // If all checks pass, allow the request to proceed
