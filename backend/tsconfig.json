@@ -26,7 +26,7 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/middleware/auth.js", "src/middleware/persistUserInfo.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/middleware/auth.js", "src/middleware/persistUserInfo.js", "src/middleware/authmiddleware.js"],
   "exclude": ["src/node_modules"]
 }
 

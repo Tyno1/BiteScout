@@ -23,7 +23,7 @@ export const UpdateUser = async (
         .json({ message: "User is not a Restaurant Owner" });
     }
 
-    // Find the Admin User Type (level 2) to update userType to Admin
+    // Find the Admin User Type (level 1) to update userType to Admin
     const userType = await UserType.findOne({
       level: 1,
     });
