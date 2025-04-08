@@ -1,4 +1,5 @@
 import { RestaurantDataState } from "@/types/restaurantData";
+import apiClient from "@/utils/authClient";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -43,7 +44,7 @@ const initialState: RestaurantState = {
 export const createRestaurantData = createAsyncThunk(
   "restaurantData/createRestaurantData",
   async (restaurantData: RestaurantDataState) => {
-    const response = await axios.post(
+    const response = await apiClient.post(
       `${API_URL}/restaurants`,
       restaurantData
     );
@@ -54,7 +55,7 @@ export const createRestaurantData = createAsyncThunk(
 export const getRestaurantData = createAsyncThunk(
   "restaurantData/getRestaurantData",
   async (id: string) => {
-    const response = await axios.get(`${API_URL}/restaurant?id=${id}`);
+    const response = await apiClient.get(`${API_URL}/restaurants?id=${id}`);
     return response.data;
   }
 );
@@ -62,9 +63,7 @@ export const getRestaurantData = createAsyncThunk(
 export const getRestaurantDataByOwnerId = createAsyncThunk(
   "restaurantData/getRestaurantDataByUserId",
   async (id: string) => {
-    const response = await axios.get(
-      `${API_URL}/restaurant/owner?id=${id}`
-    );
+    const response = await apiClient.get(`${API_URL}/restaurants/owner/${id}`);
     return response.data;
   }
 );
@@ -78,10 +77,7 @@ export const updateRestaurantData = createAsyncThunk(
     data: RestaurantDataState;
     id: string | undefined;
   }) => {
-    const response = await axios.put(
-      `${API_URL}/restaurant/?id=${id}`,
-      data
-    );
+    const response = await axios.put(`${API_URL}/restaurants/?id=${id}`, data);
     return response.data;
   }
 );

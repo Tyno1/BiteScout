@@ -167,13 +167,17 @@ export const {
       }
     },
 
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, account }) {
       // Only update token when user is provided (on sign in)
       if (user) {
         token._id = user._id;
         token.userType = user.userType;
       }
-
+      if (account && account.access_token) {
+        token.accessToken = account.access_token;
+        console.log(account);
+        
+      }
       return token;
     },
 
@@ -201,6 +205,10 @@ export const {
           });
 
           session.user.restaurantCount = restaurantCount;
+        }
+
+        if (typeof token.accessToken === "string") {
+          session.accessToken = token.accessToken;
         }
 
         return session;

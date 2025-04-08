@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import {
   updateRestaurantData,
-  getRestaurantData,
+  getRestaurantDataByOwnerId,
 } from "@/state/restaurantData/restaurantDataSlice";
 import Hero from "../components/restaurant-profile/Hero";
 import BasicInformation from "../components/restaurant-profile/BasicInformation";
@@ -14,6 +14,7 @@ import ContactInformation from "../components/restaurant-profile/ContactInformat
 import BusinessHours from "../components/restaurant-profile/BusinessHours";
 import Features from "../components/restaurant-profile/Features";
 import { RestaurantDataState } from "@/types/restaurantData";
+import { useSession } from "next-auth/react";
 
 interface BusinessHours {
   day: string;
@@ -23,6 +24,7 @@ interface BusinessHours {
 }
 
 export default function RestaurantProfile() {
+  const session = useSession();
   const { restaurantData, error, status } = useSelector(
     (state: RootState) => state.restaurantData
   );
@@ -132,10 +134,10 @@ export default function RestaurantProfile() {
   };
 
   useEffect(() => {
-    if (restaurantData._id) {
-      dispatch(getRestaurantData(restaurantData._id));
+    if (session?.data?.user._id) {
+      dispatch(getRestaurantDataByOwnerId(session.data?.user?._id));
     }
-  }, [dispatch, restaurantData._id]);
+  }, [dispatch, session.data?.user?._id]);
 
   useEffect(() => {
     if (displayData?.businessHours && displayData.businessHours.length >= 1) {

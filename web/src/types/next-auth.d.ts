@@ -10,6 +10,7 @@ declare module "next-auth" {
     role?: string;
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
+    accessToken?: string; // Add the accessToken property
   }
 
   interface Session {
@@ -25,6 +26,7 @@ declare module "next-auth" {
       };
       restaurantCount?: number; // Add the restaurantCount property
     };
+    accessToken?: string; // Add the accessToken property
   }
 }
 
@@ -34,5 +36,6 @@ declare module "next-auth/jwt" {
     role?: string;
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
+    accessToken?: string; // Add the accessToken property
   }
 }
