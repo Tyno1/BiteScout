@@ -4,10 +4,9 @@ import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import User from "@/app/api/models/User";
 import dbConnect from "@/utils/db";
-import userType from "@/app/api/models/UserType";
-import restaurantData from "@/app/api/models/RestaurantData";
 import UserType from "@/app/api/models/UserType";
 import RestaurantData from "@/app/api/models/RestaurantData";
+
 
 // Provider configurations
 const providers = [
@@ -132,12 +131,7 @@ async function getUserTypeDetails(userTypeId: string) {
   }
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
@@ -175,8 +169,6 @@ export const {
       }
       if (account && account.access_token) {
         token.accessToken = account.access_token;
-        console.log(account);
-        
       }
       return token;
     },
@@ -185,7 +177,7 @@ export const {
       try {
         // Add token data to session
         session.user._id = token._id as string;
-
+        
         // Get User Type Details
         if (token.userType) {
           session.user.userTypeDetails = await getUserTypeDetails(

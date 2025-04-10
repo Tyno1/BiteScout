@@ -1,47 +1,68 @@
 import dbConnect from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/app/api/models/User";
-import userType from "../models/UserType";
-import { MongooseError } from "mongoose";
+import User from "../models/User";
+import UserType from "../models/UserType";
 
-
-export const POST = async (request: NextRequest) => {
-  const { firstName, lastName, email, password } = await request.json();
-  const name = `${firstName} ${lastName}`;
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
     await dbConnect();
-
-    // get default userType - lowest priviledge - highest number
-    const lowestPrivilegeType = await userType
-      .findOne()
-      .sort({ level: -1 })
-      .limit(1);
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
+    const body = await req.json();
+    const { firstName, lastName, email, password } = body;
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "User already exists" },
+        { message: "Missing Credentials" },
         { status: 400 }
       );
     }
-    // Create new user
-    const user = new User({
-      name,
+    const userExixts = await User.findOne({ email });
+
+    if (userExixts) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 400 }
+      );
+    }
+
+    const userType = await UserType.findOne({ name: "user" });
+    if (!userType) {
+      return NextResponse.json(
+        { message: "User type not found" },
+        { status: 400 }
+      );
+    }
+
+    const user = await User.create({
+      name: `${firstName} ${lastName}`,
       email,
       password,
-      userType: lowestPrivilegeType._id,
+      userType: userType._id,
       loginMethod: "credentials",
     });
-    await user.save();
 
-    return NextResponse.json(user);
-  } catch (error : any) {
+    if (!user) {
+      return NextResponse.json(
+        { message: "User creation failed" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: error.message },
       {
-        status: 500,
-      }
+        message: "User created successfully",
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          userType: user.userType,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
     );
   }
-};
+}

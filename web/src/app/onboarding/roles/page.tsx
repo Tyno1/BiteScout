@@ -5,24 +5,22 @@ import type React from "react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { useUpdateUser } from "@/app/hooks/useUpdateUser";
-import type { AppDispatch } from "@/state/store";
-import type { RestaurantDataState } from "@/types/restaurantData";
+import type { RestaurantData } from "@/types/restaurantData";
 import { RoleOnboardingForm } from "../components/roleOnboardingForm";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 import type { FormErrorState } from "../components/roleOnboardingForm";
+import useRestaurantStore from "@/stores/restaurantStore";
 
 export default function Onboarding() {
-  const dispatch = useDispatch<AppDispatch>();
+  const { createRestaurant, isLoading, error } = useRestaurantStore();
   const session = useSession();
   const router = useRouter();
   const { updateUser } = useUpdateUser();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState<RestaurantDataState>(
+  const [restaurantData, setRestaurantData] = useState<RestaurantData>(
     DEFAULT_RESTAURANT_DATA
   );
   const [apiError, setApiError] = useState("");
@@ -97,16 +95,16 @@ export default function Onboarding() {
     const preparedData = prepareRestaurantData();
 
     // Create restaurant
-    const resultAction = await dispatch(createRestaurantData(preparedData));
+    await createRestaurant(preparedData);
 
-    if (createRestaurantData.fulfilled.match(resultAction)) {
+    if (!error && !isLoading) {
       await handleSuccessfulCreation();
     } else {
-      handleCreationError(resultAction.error);
+      handleCreationError(error);
     }
   };
 
-  const prepareRestaurantData = (): RestaurantDataState => {
+  const prepareRestaurantData = (): RestaurantData => {
     const businessHours = restaurantData.businessHours.map((hour) => ({
       day: hour.day || "Monday",
       open: hour.open || "09:00",
@@ -141,20 +139,6 @@ export default function Onboarding() {
 
   const handleCreationError = (error: any) => {
     console.error("Restaurant creation error:", error);
-
-    const errorPayload = error?.message || "";
-    let userFriendlyMessage = "Failed to create restaurant. Please try again.";
-
-    if (errorPayload.includes("validation")) {
-      userFriendlyMessage =
-        "Some restaurant information is invalid. Please check all fields.";
-    } else if (errorPayload.includes("409")) {
-      userFriendlyMessage = "A restaurant with this name already exists.";
-    } else if (errorPayload.includes("auth")) {
-      userFriendlyMessage = "Your session has expired. Please log in again.";
-    }
-
-    setApiError(userFriendlyMessage);
   };
 
   const handleEmployeeSubmission = () => {

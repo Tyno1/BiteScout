@@ -3,18 +3,15 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Table from "../components/food-catalogue/Table";
 import Modal from "../components/food-catalogue/Modal";
-import { FoodDataSent } from "@/types/foodCatalogue";
+import { FoodData } from "@/types/foodCatalogue";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
-import { getAllergens } from "@/state/allergen/allergenSlice";
-import { getCuisine } from "@/state/cuisine/cuisineSlice";
-import { getCourse } from "@/state/course/courseSlice";
-import {
-  createFoodCatalogue,
-  getFoodCatalogue,
-} from "@/state/foodCatalogueData/foodCatalogueSlice";
+import useFoodDataStore from "@/stores/foodDataStore";
+import useAllergenStore from "@/stores/allergenStore";
+import useCuisineStore from "@/stores/cuisineStore";
+import useCourseStore from "@/stores/courseStore";
+import useRestaurantStore from "@/stores/restaurantStore";
 
-export interface formErrorType {
+export type formErrorType = Partial<{
   name: string;
   ingredients: string;
   cuisineType: string;
@@ -23,38 +20,10 @@ export interface formErrorType {
   allergens: string;
   images: string;
   restaurant: string;
-}
+}>;
 
 export default function FoodCatalogueManagement(): React.ReactElement {
-  const {
-    allergenData,
-    status: allergenStatus,
-    error: allergenError,
-  } = useSelector((state: RootState) => state.allergen);
-  const {
-    courseData,
-    status: courseStatus,
-    error: courseError,
-  } = useSelector((state: RootState) => state.course);
-  const {
-    cuisineData,
-    status: cuisineStatus,
-    error: cuisineError,
-  } = useSelector((state: RootState) => state.cuisine);
-  const {
-    restaurantData,
-    status: restaurantStatus,
-    error: restaurantError,
-  } = useSelector((state: RootState) => state.restaurantData);
-  const {
-    foodData,
-    foodDatas,
-    status: foodDataStatus,
-    error: foodDataError,
-  } = useSelector((state: RootState) => state.foodCatalogue);
-  const dispatch = useDispatch<AppDispatch>();
-
-  const currencies = [
+  const CURRENCIES = [
     "GBP",
     "USD",
     "EUR",
@@ -69,20 +38,20 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     "THB",
     "ZAR",
   ];
-  const DefaultFoodData = {
+  const DEFAULT_FOOD_DATA = {
     name: "",
     ingredients: [],
     cuisineType: "",
     course: "",
     price: {
-      currency: currencies[0],
+      currency: CURRENCIES[0],
       amount: 0,
     },
     allergens: [],
     images: [],
     restaurant: "",
   };
-  const DefaultFormError = {
+  const DEFAULT_FORM_ERROR = {
     name: "",
     ingredients: "",
     cuisineType: "",
@@ -93,11 +62,34 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     restaurant: "",
   };
 
+  const { foodDatas, createFoodData, getFoodDatas, error, isLoading } =
+    useFoodDataStore();
+  const { restaurantData } = useRestaurantStore();
+  const {
+    allergens,
+    getAllergens,
+    error: allergenError,
+    isLoading: allergenLoading,
+  } = useAllergenStore();
+
+  const {
+    cuisines,
+    getCuisines,
+    error: cuisineError,
+    isLoading: cuisineLoading,
+  } = useCuisineStore();
+  const {
+    courses,
+    getCourses,
+    error: courseError,
+    isLoading: courseLoading,
+  } = useCourseStore();
+
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
-  const [formError, setFormError] = useState<formErrorType>(DefaultFormError);
-  const [newFood, setNewFood] = useState<FoodDataSent>(DefaultFoodData);
+  const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
+  const [newFood, setNewFood] = useState<FoodData>(DEFAULT_FOOD_DATA);
 
   // functions for modal
   const handleAddFood = async () => {
@@ -126,16 +118,16 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }
 
     // If no errors, proceed with form submission
-    dispatch(createFoodCatalogue(newFood));
+    createFoodData(newFood);
     setIsModalOpen(false);
-    setNewFood(DefaultFoodData);
-    setFormError(DefaultFormError);
+    setNewFood(DEFAULT_FOOD_DATA);
+    setFormError(DEFAULT_FORM_ERROR);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setNewFood(DefaultFoodData);
-    setFormError(DefaultFormError);
+    setNewFood(DEFAULT_FOOD_DATA);
+    setFormError(DEFAULT_FORM_ERROR);
   };
   // create a component for form warning
   const FormWarning = (message: string) => {
@@ -156,7 +148,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       return;
     }
     if (newFood.ingredients.includes(ingredient)) {
-      setFormError("ingredient already included");
+      setFormError({ ingredients: "ingredient already included" });
       return;
     }
 
@@ -165,7 +157,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       ingredients: [...prev.ingredients, ingredient],
     }));
     setIngredient("");
-    setFormError("");
+    setFormError((prev) => ({ ...prev, ingredients: "" }));
   };
 
   const handleRemoveIngredients = (ingredient: string): void => {
@@ -186,17 +178,16 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   };
 
   useEffect(() => {
-    dispatch(getAllergens());
-    dispatch(getCuisine());
-    dispatch(getCourse());
-
+    getCuisines();
+    getCourses();
+    getAllergens();
     // Fetch foods data from the server here and update the foods state accordingly.
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (restaurantData?._id) {
       setNewFood({ ...newFood, restaurant: restaurantData?._id });
-      dispatch(getFoodCatalogue(restaurantData?._id));
+      getFoodDatas(restaurantData?._id);
     }
   }, [dispatch, restaurantData, foodData]);
 
@@ -221,20 +212,20 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           setIsModalOpen={setIsModalOpen}
           setNewFood={setNewFood}
           newFood={newFood}
-          cuisineData={cuisineData}
-          courseData={courseData}
-          allergenData={allergenData}
+          cuisineData={cuisines}
+          courseData={courses}
+          allergenData={allergens}
           handleAddFood={handleAddFood}
           handleImageUpload={handleImageUpload}
           toggleAllergen={toggleAllergen}
-          currencies={currencies}
+          currencies={CURRENCIES}
           handleAddIngredients={handleAddIngredients}
           handleRemoveIngredients={handleRemoveIngredients}
           setIngredient={setIngredient}
           ingredient={ingredient}
           formError={formError}
           FormWarning={FormWarning}
-          closeModal={closeModal} 
+          closeModal={closeModal}
         />
       )}
     </div>

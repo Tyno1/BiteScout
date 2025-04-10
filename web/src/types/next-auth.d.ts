@@ -7,7 +7,6 @@ declare module "next-auth" {
     name?: string | null;
     email?: string | null;
     image?: string | null;
-    role?: string;
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
     accessToken?: string; // Add the accessToken property
@@ -33,7 +32,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     _id: string;
-    role?: string;
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
     accessToken?: string; // Add the accessToken property

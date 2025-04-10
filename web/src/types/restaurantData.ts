@@ -5,7 +5,7 @@ type BusinessHours = {
   closed: boolean;
 };
 
-export type RestaurantDataState = {
+export type RestaurantData = {
   _id?: string;
   name: string;
   logo: string;

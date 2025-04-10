@@ -1,8 +1,8 @@
-import { doCrednentialLogin } from "@/app/actions";
 import Button from "@/components/atoms/buttons/Button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,25 +25,19 @@ const RegisterForm = () => {
         password: formData.get("password"),
       };
 
-      const response: any = await axios.post(
-        `${API_URL}/api/register`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response: any = await axios.post(`${API_URL}/register`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response?.error) {
         setError(response.error.message);
       } else {
         setLoading(false);
         console.log("Registration successful");
-
-        await doCrednentialLogin(formData);
-        router.push("/onboarding/roles");
-        console.log("Login successful");
+        toast.success("Login successful, Kindly Login");
+        router.replace("/login");
       }
     } catch (error) {
       console.log(error);
