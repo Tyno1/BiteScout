@@ -189,7 +189,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       setNewFood({ ...newFood, restaurant: restaurantData?._id });
       getFoodDatas(restaurantData?._id);
     }
-  }, [dispatch, restaurantData, foodData]);
+  }, [restaurantData, foodDatas]);
 
   return (
     <div className="container mx-auto p-4">
