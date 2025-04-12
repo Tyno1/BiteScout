@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
-import Hero from "../components/restaurant-profile/Hero";
-import BasicInformation from "../components/restaurant-profile/BasicInformation";
-import ContactInformation from "../components/restaurant-profile/ContactInformation";
-import BusinessHours from "../components/restaurant-profile/BusinessHours";
-import Features from "../components/restaurant-profile/Features";
+import Hero from "../../../components/ui/dashboard/restaurant-profile/Hero";
+import BasicInformation from "../../../components/ui/dashboard/restaurant-profile/BasicInformation";
+import ContactInformation from "../../../components/ui/dashboard/restaurant-profile/ContactInformation";
+import BusinessHours from "../../../components/ui/dashboard/restaurant-profile/BusinessHours";
+import Features from "../../../components/ui/dashboard/restaurant-profile/Features";
 import { useSession } from "next-auth/react";
 import useRestaurantStore from "@/stores/restaurantStore";
 import { RestaurantData } from "@/types/restaurantData";

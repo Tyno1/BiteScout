@@ -174,6 +174,31 @@ export const getRestaurantByOwnerId = async (
   }
 };
 
+export const getOwnerRestaurants = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ error: "User Id is required" });
+      return;
+    }
+
+    const restaurants = await RestaurantData.find({ ownerId: userId });
+    if (!restaurants || restaurants.length === 0) {
+      res.json([]);
+      return;
+    }
+
+    res.json(restaurants);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deletedRestaurant = async (
   req: Request<{ id: string }>,
   res: Response,

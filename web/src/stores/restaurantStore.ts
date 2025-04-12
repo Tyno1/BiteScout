@@ -9,7 +9,9 @@ type RestaurantStore = {
   error: string | null;
 
   // actions
-  createRestaurant: (data: RestaurantData) => Promise<void>;
+  createRestaurant: (
+    data: RestaurantData
+  ) => Promise<{ success: boolean; error?: string }>;
   getRestaurant: (id: string) => Promise<void>;
   getRestaurantByOwnerId: (ownerId: string) => Promise<void>;
   updateRestaurant: ({
@@ -58,16 +60,21 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await axios.post(`${API_URL}/restaurants`, { data });
+      const response = await axios.post(`${API_URL}/restaurants`, data);
 
       set({
         restaurantData: response.data,
       });
+      return { success: true };
     } catch (error) {
       set({
         isLoading: false,
         error: error instanceof Error ? error?.message : "An error occurred",
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error?.message : "An error occurred",
+      };
     }
   },
 

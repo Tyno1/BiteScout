@@ -14,12 +14,17 @@ export async function doSocialLogin(formData: FormData) {
 }
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }).trim(),
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .trim()
+    .toLowerCase(),
   password: z
     .string()
     .min(4, { message: "Password must be at least 4 characters" })
     .trim(),
 });
+
 export async function doCredentialLogin(prevState: any, formData: FormData) {
   try {
     const result = loginSchema.safeParse(Object.fromEntries(formData));

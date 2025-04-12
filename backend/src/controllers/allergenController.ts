@@ -20,6 +20,33 @@ export const getAllergens = async (
   }
 };
 
+export const getAllergen = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({ error: "Allergen ID is required" });
+      return;
+    }
+
+    const allergen = await Allergen.findById(id);
+
+    if (!allergen) {
+      res.status(404).json({ error: "Allergen not found" });
+      return;
+    }
+
+    res.status(200).json(allergen);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
 export const createAllergens = async (
   req: Request,
   res: Response,

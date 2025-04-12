@@ -1,37 +1,13 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
-import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
-import User from "@/app/api/models/User";
 import dbConnect from "@/utils/db";
 import UserType from "@/app/api/models/UserType";
-import RestaurantData from "@/app/api/models/RestaurantData";
+import axios from "axios";
 
+const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // Provider configurations
 const providers = [
-  Google({
-    clientId: process.env.GOOGLE_CLIENT_ID || "",
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    authorization: {
-      params: {
-        prompt: "consent",
-        access_type: "offline",
-        response_type: "code",
-      },
-    },
-  }),
-  Github({
-    clientId: process.env.GITHUB_ID || "",
-    clientSecret: process.env.GITHUB_SECRET || "",
-    authorization: {
-      params: {
-        prompt: "consent",
-        access_type: "offline",
-        response_type: "code",
-      },
-    },
-  }),
   Credentials({
     name: "credentials",
     credentials: {
@@ -45,26 +21,14 @@ const providers = [
       }
 
       try {
-        await dbConnect();
-        const queryUser = { email: credentials.email };
-        const user = await User.findOne(queryUser);
+        const response = await axios.post(`${BACKEND_SERVER}/auth/login`, {
+          email: credentials.email,
+          password: credentials.password,
+        });
+        console.log(response.headers);
 
-        if (!user) {
-          throw new Error("User not found. Please sign up");
-        }
-
-        const isMatch = await user.comparePassword(credentials.password);
-
-        if (!isMatch) {
-          throw new Error("Check your email and password");
-        }
-
-        return {
-          _id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          userType: user.userType,
-        };
+        const user = response.data.user;
+        return user;
       } catch (error: any) {
         throw new Error(error.message || "Authentication failed");
       }
@@ -72,55 +36,16 @@ const providers = [
   }),
 ];
 
-// Helper functions
-async function getDefaultUserType() {
-  await dbConnect();
-  const defaultUserType = await UserType.findOne({ name: "user" });
-
-  if (!defaultUserType) {
-    throw new Error("Default user type not found");
-  }
-
-  return defaultUserType;
-}
-
-async function findOrCreateOAuthUser(profile: any) {
-  await dbConnect();
-
-  const existingUser = await User.findOne({ email: profile?.email });
-
-  if (existingUser) {
-    return {
-      user: existingUser,
-      isNewUser: false,
-    };
-  }
-
-  const defaultUserType = await getDefaultUserType();
-
-  const newUser = await User.create({
-    email: profile?.email,
-    name: profile?.name,
-    image: profile?.image,
-    userType: defaultUserType._id,
-    loginMethod: "oauth",
-  });
-
-  return {
-    user: newUser,
-    isNewUser: true,
-  };
-}
-
 async function getUserTypeDetails(userTypeId: string) {
   try {
-    await dbConnect();
-    const userTypeDetails = await UserType.findById(userTypeId);
+    const response = await axios.get(
+      `${BACKEND_SERVER}/user-types/${userTypeId}`
+    );
 
-    if (userTypeDetails) {
+    if (response.data) {
       return {
-        name: userTypeDetails.name,
-        level: userTypeDetails.level,
+        name: response.data.name,
+        level: response.data.level,
       };
     }
 
@@ -137,47 +62,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers,
   callbacks: {
-    async signIn({ account, profile, user }) {
-      // Skip for credential login
-      if (!account || account.provider === "credentials") {
-        return true;
-      }
-
-      try {
-        const { user: dbUser, isNewUser } = await findOrCreateOAuthUser(
-          profile
-        );
-
-        // Update the user object with database values
-        if (user) {
-          user.userType = dbUser.userType;
-          user._id = dbUser._id;
-        }
-
-        return true;
-      } catch (error) {
-        console.error("Error in signIn callback:", error);
-        return false;
-      }
-    },
-
     async jwt({ token, user, account }) {
       // Only update token when user is provided (on sign in)
       if (user) {
         token._id = user._id;
         token.userType = user.userType;
-      }
-      if (account && account.access_token) {
-        token.accessToken = account.access_token;
+        token.accessToken = account?.access_token;
       }
       return token;
     },
 
     async session({ session, token }) {
-      try {
+      try {        
         // Add token data to session
         session.user._id = token._id as string;
-        
+
         // Get User Type Details
         if (token.userType) {
           session.user.userTypeDetails = await getUserTypeDetails(
@@ -191,10 +90,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         if (token._id) {
-          await dbConnect();
-          const restaurantCount = await RestaurantData.countDocuments({
-            ownerId: token._id,
-          });
+          const restaurant = await axios.get(
+            `${BACKEND_SERVER}/restaurants/owner-restaurants/${token._id}`
+          );
+
+          const restaurantCount = restaurant.data.length;
 
           session.user.restaurantCount = restaurantCount;
         }

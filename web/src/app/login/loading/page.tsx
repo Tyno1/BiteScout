@@ -1,13 +1,21 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Loader2, UtensilsCrossed } from "lucide-react";
 
 export default function AuthLoader() {
   const session = useSession();
   const router = useRouter();
+
+  useEffect(() => {
+    const refreshSession = async () => {
+      await getSession(); // Triggers re-fetch of session
+    };
+
+    refreshSession();
+  }, []);
 
   useEffect(() => {
     const handleRestaurantData = async () => {

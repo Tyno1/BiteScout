@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -12,6 +12,8 @@ import { RoleOnboardingForm } from "../components/roleOnboardingForm";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 import type { FormErrorState } from "../components/roleOnboardingForm";
 import useRestaurantStore from "@/stores/restaurantStore";
+import { LoaderIcon } from "lucide-react";
+import { Spinner } from "@/components/atoms/loaders/Spinners";
 
 export default function Onboarding() {
   const { createRestaurant, isLoading, error } = useRestaurantStore();
@@ -30,6 +32,7 @@ export default function Onboarding() {
     restaurantCount: "",
     submission: "",
   });
+  const [shouldRender, setShouldRender] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -93,14 +96,15 @@ export default function Onboarding() {
 
     // Prepare restaurant data
     const preparedData = prepareRestaurantData();
+    console.log("Prepared restaurant data:", preparedData);
 
     // Create restaurant
-    await createRestaurant(preparedData);
+    const result = await createRestaurant(preparedData);
 
-    if (!error && !isLoading) {
+    if (result.success) {
       await handleSuccessfulCreation();
     } else {
-      handleCreationError(error);
+      handleCreationError(result.error);
     }
   };
 
@@ -138,7 +142,8 @@ export default function Onboarding() {
   };
 
   const handleCreationError = (error: any) => {
-    console.error("Restaurant creation error:", error);
+    console.log("Restaurant creation error:", error);
+    setApiError(error);
   };
 
   const handleEmployeeSubmission = () => {
@@ -156,6 +161,25 @@ export default function Onboarding() {
     }));
     toast.error("Something went wrong. Please try again later.");
   };
+
+  useEffect(() => {
+    if (
+      session?.data?.user.restaurantCount &&
+      session.data.user.restaurantCount >= 1
+    ) {
+      router.push("/dashboard");
+      setShouldRender(false);
+    } else {
+      setShouldRender(true);
+    }
+  }, [session, router]);
+
+  if (!shouldRender)
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
 
   return (
     <RoleOnboardingForm

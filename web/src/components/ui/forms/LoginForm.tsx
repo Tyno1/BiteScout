@@ -3,16 +3,12 @@
 import React, { useActionState, useState } from "react";
 
 import { doCredentialLogin } from "@/app/actions";
-import { useRouter } from "next/navigation";
 import Button from "@/components/atoms/buttons/Button";
 import { useFormStatus } from "react-dom";
 
 const LoginForm: React.FC = () => {
   const [state, loginAction] = useActionState(doCredentialLogin, undefined);
   const { pending } = useFormStatus();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   return (
     <form

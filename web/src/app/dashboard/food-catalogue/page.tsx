@@ -1,10 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Table from "../components/food-catalogue/Table";
-import Modal from "../components/food-catalogue/Modal";
+import Table from "@/components/ui/dashboard/food-catalogue/Table";
+import Modal from "@/components/ui/dashboard/food-catalogue/Modal";
 import { FoodData } from "@/types/foodCatalogue";
-import { useDispatch, useSelector } from "react-redux";
 import useFoodDataStore from "@/stores/foodDataStore";
 import useAllergenStore from "@/stores/allergenStore";
 import useCuisineStore from "@/stores/cuisineStore";

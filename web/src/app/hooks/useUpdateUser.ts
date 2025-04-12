@@ -1,10 +1,8 @@
-// hooks/useUpdateUser.js
 import { useState } from "react";
 import axios from "axios";
-import { User } from "next-auth";
 import { useSession } from "next-auth/react";
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL;
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);

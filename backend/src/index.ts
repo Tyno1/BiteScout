@@ -6,6 +6,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import authMiddleware from "./middleware/authmiddleware.js";
 
+import authRoutes from "../src/routes/auth.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import userTypeRoutes from "./routes/userType.js";
 import userRoutes from "./routes/user.js";
@@ -74,6 +75,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // app.use(authMiddleware);
 
+app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
