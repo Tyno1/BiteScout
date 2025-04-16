@@ -98,7 +98,7 @@ const Navbar = ({ theme }: NavTheme) => {
                   variant="solid"
                   size="sm"
                   text="Logout"
-                  onClick={() => signOut()}
+                  onClick={async () => await signOut({ callbackUrl: "/" })}
                 />
               </li>
               <li>
@@ -117,7 +117,7 @@ const Navbar = ({ theme }: NavTheme) => {
                   variant="solid"
                   size="sm"
                   text="Login"
-                  onClick={()=> handleRoute('/login')}
+                  onClick={() => handleRoute("/login")}
                 />
               </li>
               <li>

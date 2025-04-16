@@ -1,12 +1,14 @@
-// utils/apiClient.ts
+"use server";
+
 import axios, {
   AxiosInstance,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
 import { getSession } from "next-auth/react";
+import { cookies } from "next/headers";
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL;
+const BACKEND_API = process.env.BACKEND_URL;
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BACKEND_API,
@@ -20,13 +22,19 @@ apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     // Get session from NextAuth
     const session = await getSession();
+    console.log(session);
 
     // If session exists and has a token, add it to the request
     if (session?.user) {
       // Adjust this based on where your token is stored in the session
+
+      const cookieStore = await cookies();
+      const jwtCookie = cookieStore.get("next-auth.session-token")?.value;
+
+      console.log("Raw JWT:", jwtCookie);
+
       const token = session.accessToken;
       console.log(token);
-      
 
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;

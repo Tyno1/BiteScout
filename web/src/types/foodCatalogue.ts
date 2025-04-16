@@ -21,7 +21,7 @@ type Price = {
   amount: number;
 }
 
-export type FoodDataSent = {
+export type FoodData = {
   _id?: string;
   name: string;
   ingredients: string[];

@@ -1,10 +1,9 @@
 // hooks/useUpdateUser.js
 import { useState } from "react";
 import axios from "axios";
-import { User } from "next-auth";
 import { useSession } from "next-auth/react";
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL;
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -23,6 +22,11 @@ export function useUpdateUser() {
     try {
       const response = await axios.put(`${BACKEND_API}/users/${id}`);
       const data = response.data;
+
+      if (!response.data) {
+        setError("No data returned from the server");
+        return;
+      }
 
       // 2. Update the client-side session with new data
       await update({

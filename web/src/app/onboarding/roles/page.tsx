@@ -2,27 +2,26 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { createRestaurantData } from "@/state/restaurantData/restaurantDataSlice";
 import { useUpdateUser } from "@/app/hooks/useUpdateUser";
-import type { AppDispatch } from "@/state/store";
-import type { RestaurantDataState } from "@/types/restaurantData";
+import type { RestaurantData } from "@/types/restaurantData";
 import { RoleOnboardingForm } from "../components/roleOnboardingForm";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 import type { FormErrorState } from "../components/roleOnboardingForm";
+import useRestaurantStore from "@/stores/restaurantStore";
+import { Spinner } from "@/components/atoms/loaders/Spinners";
 
 export default function Onboarding() {
-  const dispatch = useDispatch<AppDispatch>();
+  const { createRestaurant } = useRestaurantStore();
   const session = useSession();
   const router = useRouter();
   const { updateUser } = useUpdateUser();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState<RestaurantDataState>(
+  const [restaurantData, setRestaurantData] = useState<RestaurantData>(
     DEFAULT_RESTAURANT_DATA
   );
   const [apiError, setApiError] = useState("");
@@ -32,6 +31,7 @@ export default function Onboarding() {
     restaurantCount: "",
     submission: "",
   });
+  const [shouldRender, setShouldRender] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -95,18 +95,19 @@ export default function Onboarding() {
 
     // Prepare restaurant data
     const preparedData = prepareRestaurantData();
+    console.log("Prepared restaurant data:", preparedData);
 
     // Create restaurant
-    const resultAction = await dispatch(createRestaurantData(preparedData));
+    const result = await createRestaurant(preparedData);
 
-    if (createRestaurantData.fulfilled.match(resultAction)) {
+    if (result.success) {
       await handleSuccessfulCreation();
     } else {
-      handleCreationError(resultAction.error);
+      handleCreationError(result.error);
     }
   };
 
-  const prepareRestaurantData = (): RestaurantDataState => {
+  const prepareRestaurantData = (): RestaurantData => {
     const businessHours = restaurantData.businessHours.map((hour) => ({
       day: hour.day || "Monday",
       open: hour.open || "09:00",
@@ -140,21 +141,8 @@ export default function Onboarding() {
   };
 
   const handleCreationError = (error: any) => {
-    console.error("Restaurant creation error:", error);
-
-    const errorPayload = error?.message || "";
-    let userFriendlyMessage = "Failed to create restaurant. Please try again.";
-
-    if (errorPayload.includes("validation")) {
-      userFriendlyMessage =
-        "Some restaurant information is invalid. Please check all fields.";
-    } else if (errorPayload.includes("409")) {
-      userFriendlyMessage = "A restaurant with this name already exists.";
-    } else if (errorPayload.includes("auth")) {
-      userFriendlyMessage = "Your session has expired. Please log in again.";
-    }
-
-    setApiError(userFriendlyMessage);
+    console.log("Restaurant creation error:", error);
+    setApiError(error);
   };
 
   const handleEmployeeSubmission = () => {
@@ -172,6 +160,25 @@ export default function Onboarding() {
     }));
     toast.error("Something went wrong. Please try again later.");
   };
+
+  useEffect(() => {
+    if (
+      session?.data?.user?.restaurantCount &&
+      session.data.user?.restaurantCount >= 1
+    ) {
+      router.push("/dashboard");
+      setShouldRender(false);
+    } else {
+      setShouldRender(true);
+    }
+  }, [session, router]);
+
+  if (!shouldRender)
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
 
   return (
     <RoleOnboardingForm

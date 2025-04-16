@@ -4,8 +4,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
+import cookieParser from "cookie-parser";
+
 import authMiddleware from "./middleware/authmiddleware.js";
 
+import authRoutes from "../src/routes/auth.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import userTypeRoutes from "./routes/userType.js";
 import userRoutes from "./routes/user.js";
@@ -69,12 +72,18 @@ mongoose.connection.once("open", () => {
 });
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Your frontend URL
+    credentials: true, // This is key
+  })
+);
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-// app.use(authMiddleware);
+app.use(cookieParser());
 
-app.use("/api/restaurants", restaurantRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/restaurants", authMiddleware, restaurantRoutes);
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/restaurant-access", restaurantAccessRoutes);

@@ -1,14 +1,14 @@
 import Button from "@/components/atoms/buttons/Button";
-import { RestaurantDataState } from "@/types/restaurantData";
+import { RestaurantData } from "@/types/restaurantData";
 
 interface BasicInformation {
   isEditing: boolean;
   newCuisine: string;
   setNewCuisine: (value: string) => void;
-  editableData: RestaurantDataState | null;
-  setEditableData: (value: RestaurantDataState) => void;
-  displayData: RestaurantDataState | null;
-  handleInputChange: (field: keyof RestaurantDataState, value: any) => void;
+  editableData: RestaurantData | null;
+  setEditableData: (value: RestaurantData) => void;
+  displayData: RestaurantData | null;
+  handleInputChange: (field: keyof RestaurantData, value: any) => void;
 }
 
 export default function BasicInformation({

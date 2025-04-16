@@ -3,7 +3,6 @@ import "./globals.css";
 import { Montserrat } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { ReduxProvider } from "@/providers/ReduxProvider";
 import { auth } from "@/auth";
 import Provider from "@/providers/Provider";
 
@@ -24,10 +23,8 @@ export default async function RootLayout({
     <html lang="en" className={montserrat.className}>
       <body>
         <Provider session={session}>
-          <ReduxProvider>
-            <ToastContainer />
-            <main className="">{children}</main>
-          </ReduxProvider>
+          <ToastContainer />
+          <main className="">{children}</main>
         </Provider>
       </body>
     </html>

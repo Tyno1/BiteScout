@@ -2,19 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
-import {
-  updateRestaurantData,
-  getRestaurantDataByOwnerId,
-} from "@/state/restaurantData/restaurantDataSlice";
-import Hero from "../components/restaurant-profile/Hero";
-import BasicInformation from "../components/restaurant-profile/BasicInformation";
-import ContactInformation from "../components/restaurant-profile/ContactInformation";
-import BusinessHours from "../components/restaurant-profile/BusinessHours";
-import Features from "../components/restaurant-profile/Features";
-import { RestaurantDataState } from "@/types/restaurantData";
+import Hero from "../../../components/ui/dashboard/restaurant-profile/Hero";
+import BasicInformation from "../../../components/ui/dashboard/restaurant-profile/BasicInformation";
+import ContactInformation from "../../../components/ui/dashboard/restaurant-profile/ContactInformation";
+import BusinessHours from "../../../components/ui/dashboard/restaurant-profile/BusinessHours";
+import Features from "../../../components/ui/dashboard/restaurant-profile/Features";
 import { useSession } from "next-auth/react";
+import useRestaurantStore from "@/stores/restaurantStore";
+import { RestaurantData } from "@/types/restaurantData";
 
 interface BusinessHours {
   day: string;
@@ -25,14 +20,17 @@ interface BusinessHours {
 
 export default function RestaurantProfile() {
   const session = useSession();
-  const { restaurantData, error, status } = useSelector(
-    (state: RootState) => state.restaurantData
+
+  const restaurantData = useRestaurantStore((state) => state.restaurantData);
+  const getRestaurantDataByOwnerId = useRestaurantStore(
+    (state) => state.getRestaurantByOwnerId
   );
-  const dispatch = useDispatch<AppDispatch>();
+  const updateRestaurantData = useRestaurantStore(
+    (state) => state.updateRestaurant
+  );
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editableData, setEditableData] = useState<RestaurantDataState | null>(
-    null
-  );
+  const [editableData, setEditableData] = useState<RestaurantData | null>(null);
   const [newFeature, setNewFeature] = useState("");
   const [newCuisine, setNewCuisine] = useState<string>("");
 
@@ -58,10 +56,9 @@ export default function RestaurantProfile() {
   };
 
   const handleSave = () => {
-    if (editableData) {
-      dispatch(
-        updateRestaurantData({ data: editableData, id: editableData._id })
-      );
+    if (editableData && editableData._id) {
+      updateRestaurantData({ data: editableData, id: editableData._id });
+
       setIsEditing(false);
       setEditableData(null);
     }
@@ -106,7 +103,7 @@ export default function RestaurantProfile() {
     }
   };
 
-  const handleInputChange = (field: keyof RestaurantDataState, value: any) => {
+  const handleInputChange = (field: keyof RestaurantData, value: any) => {
     if (editableData) {
       setEditableData((prev) => ({
         ...prev!,
@@ -135,16 +132,16 @@ export default function RestaurantProfile() {
 
   useEffect(() => {
     if (session?.data?.user._id) {
-      dispatch(getRestaurantDataByOwnerId(session.data?.user?._id));
+      getRestaurantDataByOwnerId(session.data?.user?._id);
     }
-  }, [dispatch, session.data?.user?._id]);
+  }, [session.data?.user?._id]);
 
   useEffect(() => {
     if (displayData?.businessHours && displayData.businessHours.length >= 1) {
       setBusinessHours(
         DEFAULT_BUSINESS_HOURS.map((defaultHours) => {
           const existingHours = displayData.businessHours.find(
-            (h) => h.day === defaultHours.day
+            (h: any) => h.day === defaultHours.day
           );
           return existingHours || defaultHours;
         })

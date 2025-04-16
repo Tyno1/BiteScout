@@ -1,47 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 
-import { doCrednentialLogin } from "@/app/actions";
-import { useRouter } from "next/navigation";
+import { doCredentialLogin } from "@/app/actions";
 import Button from "@/components/atoms/buttons/Button";
+import { useRouter } from "next/navigation";
 
 const LoginForm: React.FC = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [state, loginAction, isPending] = useActionState(
+    doCredentialLogin,
+    undefined
+  );
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const formData = new FormData(e.currentTarget);
-
-      const response: any = await doCrednentialLogin(formData);
-
-      if (!!response?.error) {
-        setError(response.error.message);
-      } else {
-        setLoading(false);
-        console.log("Login successful");
-        router.replace("/login/loading");
-      }
-    } catch (error) {
-      console.log(error);
-      setError("Check your credentials");
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/login/loading");
     }
-  };
+  }, [state, router]);
 
   return (
     <form
-      action="post"
+      action={loginAction}
       className="w-full flex flex-col items-center gap-2"
-      onSubmit={handleSubmit}
     >
-      {error && <div className="text-red-500">{error}</div>}
+      {state?.errors && state?.errors.email && (
+        <div className="text-red-500">{state.errors.email}</div>
+      )}
+      {state?.errors && state?.errors.password && (
+        <div className="text-red-500 text-sm">{state.errors.password}</div>
+      )}
       <input
+        required
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
         placeholder="email"
         type="email"
@@ -49,13 +39,20 @@ const LoginForm: React.FC = () => {
         id="email"
       />
       <input
+        required
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
         placeholder="password"
         type="password"
         name="password"
         id="password"
       />
-      <Button fullWidth variant="solid" text="Credential Login" />{" "}
+      <Button
+        disabled={isPending}
+        type="submit"
+        fullWidth
+        variant="solid"
+        text="Credential Login"
+      />{" "}
     </form>
   );
 };

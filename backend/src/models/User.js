@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
-    auth0Id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     username: {
       type: String,
       unique: true,
@@ -37,9 +33,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       // Add custom validator here
     },
-    picture: String,
+    imageUrl: String,
     address: String,
-    emailVerified: {
+    password: {
+      type: String,
+      required: true,
+    },
+    isVerified: {
       type: Boolean,
       required: true,
       default: false,
@@ -49,29 +49,21 @@ const userSchema = new mongoose.Schema(
       ref: "UserType",
       required: true,
     },
-    locale: {
-      type: String,
-    },
-    lastLogin: {
-      type: Date,
-      default: Date.now,
-    },
-    preferences: {
-      type: Object,
-      default: {},
-    },
-    metadata: {
-      type: Object,
-      default: {},
-    },
-    restaurantCount:{
-      type: Number,
-      default: 0,
-    }
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
+
+// Password hashing before saving the user
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password") || this.isNew) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+// Method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 export default mongoose.models.User || mongoose.model("User", userSchema);
