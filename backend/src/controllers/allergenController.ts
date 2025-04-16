@@ -46,7 +46,6 @@ export const getAllergen = async (
   }
 };
 
-
 export const createAllergens = async (
   req: Request,
   res: Response,
@@ -94,7 +93,7 @@ export const updateAllergens = async (
       return;
     }
 
-    res.json(updatedAllergen);
+    res.status(200).json(updatedAllergen);
   } catch (error) {
     return next(error);
   }

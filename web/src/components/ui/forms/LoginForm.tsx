@@ -1,20 +1,35 @@
 "use client";
 
-import React, { useActionState, useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 
 import { doCredentialLogin } from "@/app/actions";
 import Button from "@/components/atoms/buttons/Button";
-import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
 const LoginForm: React.FC = () => {
-  const [state, loginAction] = useActionState(doCredentialLogin, undefined);
-  const { pending } = useFormStatus();
+  const [state, loginAction, isPending] = useActionState(
+    doCredentialLogin,
+    undefined
+  );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/login/loading");
+    }
+  }, [state, router]);
 
   return (
     <form
       action={loginAction}
       className="w-full flex flex-col items-center gap-2"
     >
+      {state?.errors && state?.errors.email && (
+        <div className="text-red-500">{state.errors.email}</div>
+      )}
+      {state?.errors && state?.errors.password && (
+        <div className="text-red-500 text-sm">{state.errors.password}</div>
+      )}
       <input
         required
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
@@ -23,9 +38,6 @@ const LoginForm: React.FC = () => {
         name="email"
         id="email"
       />
-      {state?.errors.email && (
-        <div className="text-red-500">{state.errors.email}</div>
-      )}
       <input
         required
         className="text-sm w-full py-4 px-4 bg-white rounded text-black"
@@ -34,11 +46,8 @@ const LoginForm: React.FC = () => {
         name="password"
         id="password"
       />
-      {state?.errors.password && (
-        <div className="text-red-500 text-sm">{state.errors.password}</div>
-      )}
       <Button
-        disabled={pending}
+        disabled={isPending}
         type="submit"
         fullWidth
         variant="solid"

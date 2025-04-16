@@ -1,84 +1,73 @@
-import Button from "@/components/atoms/buttons/Button";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { toast } from "react-toastify";
+"use client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { credentialRegister } from "@/app/actions";
+import Button from "@/components/atoms/buttons/Button";
+import Input from "@/components/atoms/inputs/Input";
+import React, { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [state, formAction] = useActionState(credentialRegister, undefined);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const formData = new FormData(e.currentTarget);
-      const payload = {
-        firstName: formData.get("first-name"),
-        lastName: formData.get("last-name"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-      };
-
-      const response: any = await axios.post(`${API_URL}/register`, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response?.error) {
-        setError(response.error.message);
-      } else {
-        setLoading(false);
-        console.log("Registration successful");
-        toast.success("Login successful, Kindly Login");
-        router.replace("/login");
-      }
-    } catch (error) {
-      console.log(error);
-      setError("Check your credentials");
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/register/success");
     }
-  };
+  }, [state?.success]);
 
   return (
     <form
-      action="post"
+      action={formAction}
       className="w-full flex flex-col items-center gap-2"
-      onSubmit={handleSubmit}
     >
-      {error && <div className="text-red-600 text-sm">{error}</div>}
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
+      {state?.errors?.firstName && (
+        <div className="text-red-600 text-sm">{state.errors.firstName[0]}</div>
+      )}
+      {state?.errors?.lastName && (
+        <div className="text-red-600 text-sm">{state.errors.lastName[0]}</div>
+      )}
+
+      {state?.errors?.email && (
+        <div className="text-red-600 text-sm">{state.errors.email[0]}</div>
+      )}
+
+      {state?.errors?.password && (
+        <div className="text-red-600 text-sm">{state.errors.password[0]}</div>
+      )}
+
+      <Input
+        type="text"
         placeholder="John"
-        type="text"
-        name="first-name"
         id="first-name"
+        name="firstName"
+        label="First Name"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="Doe"
+
+      <Input
         type="text"
-        name="last-name"
+        placeholder="Doe"
         id="last-name"
+        name="lastName"
+        label="Last Name"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="john@doe.com"
+      <Input
         type="email"
-        name="email"
+        placeholder="john@doe.com"
         id="email"
+        name="email"
+        label="Email"
+        fullWidth
       />
-      <input
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="*******"
+      <Input
         type="password"
-        name="password"
+        placeholder="*******"
         id="password"
+        name="password"
+        label="Password"
+        fullWidth
       />
       <Button type="submit" text="Register" fullWidth variant="solid" />
     </form>

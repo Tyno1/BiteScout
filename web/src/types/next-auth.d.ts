@@ -10,6 +10,8 @@ declare module "next-auth" {
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
     accessToken?: string; // Add the accessToken property
+    refreshToken?: string; // Add the refreshToken property
+    expiresIn?: number; // Add the expiresIn property
   }
 
   interface Session {

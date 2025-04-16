@@ -1,40 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import dbConnect from "@/utils/db";
-import UserType from "@/app/api/models/UserType";
 import axios from "axios";
+import refreshAccessToken from "./utils/refreshAccessToken";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-// Provider configurations
-const providers = [
-  Credentials({
-    name: "credentials",
-    credentials: {
-      email: { label: "email", type: "text", placeholder: "email@email.com" },
-      password: { label: "password", type: "password" },
-    },
-
-    async authorize(credentials) {
-      if (!credentials?.email || !credentials?.password) {
-        throw new Error("Missing credentials");
-      }
-
-      try {
-        const response = await axios.post(`${BACKEND_SERVER}/auth/login`, {
-          email: credentials.email,
-          password: credentials.password,
-        });
-        console.log(response.headers);
-
-        const user = response.data.user;
-        return user;
-      } catch (error: any) {
-        throw new Error(error.message || "Authentication failed");
-      }
-    },
-  }),
-];
 
 async function getUserTypeDetails(userTypeId: string) {
   try {
@@ -60,20 +29,66 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  providers,
+  secret: process.env.NEXTAUTH_SECRET,
+  providers: [
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "email", type: "text", placeholder: "email@email.com" },
+        password: { label: "password", type: "password" },
+      },
+
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing credentials");
+        }
+
+        try {
+          const response = await axios.post(`${BACKEND_SERVER}/auth/login`, {
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+          if (response.data && response.data.accessToken) {
+            const { user, accessToken, refreshToken, expiresIn } =
+              response.data;
+
+            return {
+              _id: user._id,
+              name: user.name,
+              email: user.email,
+              accessToken,
+              refreshToken,
+              expiresIn,
+              userType: user.userType,
+            };
+          } else {
+            throw new Error("Invalid credentials");
+          }
+        } catch (error: any) {
+          throw new Error(error.message || "Authentication failed");
+        }
+      },
+    }),
+  ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       // Only update token when user is provided (on sign in)
       if (user) {
         token._id = user._id;
         token.userType = user.userType;
-        token.accessToken = account?.access_token;
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
       }
-      return token;
+      if (Date.now() < (token.expiresIn as number) * 1000) {
+        return token;
+      }
+      // If the token is expired, try to refresh it
+      return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
-      try {        
+      try {
         // Add token data to session
         session.user._id = token._id as string;
 

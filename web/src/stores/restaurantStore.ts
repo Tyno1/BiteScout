@@ -60,7 +60,9 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await axios.post(`${API_URL}/restaurants`, data);
+      const response = await axios.post(`${API_URL}/restaurants`, data, {
+        withCredentials: true,
+      });
 
       set({
         restaurantData: response.data,
@@ -100,7 +102,9 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
       set({ isLoading: true, error: null });
 
       const response = await axios.get(
-        `${API_URL}/restaurants/owner/${ownerId}`
+        `${API_URL}/restaurants/owner/${ownerId}`, {
+          withCredentials: true,
+        }
       );
 
       // remember to handle the case when no restaurant is found

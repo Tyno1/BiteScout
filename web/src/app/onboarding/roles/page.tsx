@@ -12,11 +12,10 @@ import { RoleOnboardingForm } from "../components/roleOnboardingForm";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 import type { FormErrorState } from "../components/roleOnboardingForm";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { LoaderIcon } from "lucide-react";
 import { Spinner } from "@/components/atoms/loaders/Spinners";
 
 export default function Onboarding() {
-  const { createRestaurant, isLoading, error } = useRestaurantStore();
+  const { createRestaurant } = useRestaurantStore();
   const session = useSession();
   const router = useRouter();
   const { updateUser } = useUpdateUser();
@@ -164,8 +163,8 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (
-      session?.data?.user.restaurantCount &&
-      session.data.user.restaurantCount >= 1
+      session?.data?.user?.restaurantCount &&
+      session.data.user?.restaurantCount >= 1
     ) {
       router.push("/dashboard");
       setShouldRender(false);

@@ -3,7 +3,6 @@ import RestaurantData from "../models/RestaurantData.js";
 import User from "../models/User.js";
 import UserType from "../models/UserType.js";
 
-
 export const UpdateUser = async (
   req: Request,
   res: Response,
@@ -51,7 +50,7 @@ export const UpdateUser = async (
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "User updated successfully",
       user,
     });

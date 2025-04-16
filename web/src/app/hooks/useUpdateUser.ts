@@ -1,3 +1,4 @@
+// hooks/useUpdateUser.js
 import { useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -21,6 +22,11 @@ export function useUpdateUser() {
     try {
       const response = await axios.put(`${BACKEND_API}/users/${id}`);
       const data = response.data;
+
+      if (!response.data) {
+        setError("No data returned from the server");
+        return;
+      }
 
       // 2. Update the client-side session with new data
       await update({
