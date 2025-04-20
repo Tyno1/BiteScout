@@ -18,4 +18,5 @@ export interface User {
   restaurantCount: number;
   createdAt: Date;
   updatedAt: Date;
+  refreshToken?: string;
 }
