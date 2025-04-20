@@ -27,6 +27,7 @@ declare module "next-auth" {
       };
       restaurantCount?: number; // Add the restaurantCount property
       accessToken?: string; // Add the accessToken property
+      refreshToken?: string;
     };
     
   }

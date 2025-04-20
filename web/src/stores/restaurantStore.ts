@@ -21,7 +21,7 @@ type RestaurantStore = {
   }: {
     data: RestaurantData;
     id: string;
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; error?: string }>;
   resetRestaurant: () => void;
 };
 
@@ -125,6 +125,8 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
   }) => {
     try {
       set({ isLoading: true, error: null });
+      console.log(id, data);
+
       const response = await apiClient.put(`/restaurants/${id}`, {
         data,
       });
@@ -132,11 +134,17 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
       set({
         restaurantData: response.data,
       });
+
+      return { success: true };
     } catch (error) {
       set({
         isLoading: false,
         error: error instanceof Error ? error?.message : "An error occurred",
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error?.message : "An error occurred",
+      };
     }
   },
 

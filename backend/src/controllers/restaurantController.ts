@@ -1,6 +1,7 @@
 import RestaurantData from "../models/RestaurantData.js";
 import { Request, Response, NextFunction } from "express";
 import { Restaurant } from "@/src/types/restaurantData.js";
+import mongoose from "mongoose";
 
 // Helper function to validate request ID
 const validateId = (req: Request) => {
@@ -123,19 +124,42 @@ export const getRestaurantsByName = async (
 };
 
 export const updateRestaurantData = async (
-  req: Request<{ id: string }, {}, Partial<Restaurant>>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const body: Partial<Restaurant> = await req.body;
+    const body: Partial<Restaurant> = req.body.data || req.body;
+    console.log("Attempting to update restaurant:", { id, body });
 
-    const updatedRestaurant = await (RestaurantData as any).findByIdAndUpdate(
-      id,
-      body,
-      { new: true, runValidators: true }
+    console.log("Body being applied:", JSON.stringify(body, null, 2));
+
+    // First check if document exists
+    const existingRestaurant = await RestaurantData.findById(id);
+    if (!existingRestaurant) {
+      res.status(404).json({ error: "Restaurant not found" });
+      return;
+    }
+
+    console.log(
+      "Before update:",
+      JSON.stringify(existingRestaurant.toObject(), null, 2)
     );
+
+    // Then attempt update
+    const updatedRestaurant = await RestaurantData.findByIdAndUpdate(
+      id,
+      { $set: body }, // Use $set to explicitly set only the fields provided
+      {
+        new: true,
+      }
+    );
+
+    // console.log("updated", updatedRestaurant);
+    console.log("After update:", JSON.stringify(updatedRestaurant.toObject(), null, 2));
+
+
 
     if (!updatedRestaurant) {
       res.status(404).json({ error: "Restaurant data not updated" });
@@ -143,6 +167,7 @@ export const updateRestaurantData = async (
     }
 
     res.json(updatedRestaurant);
+    return;
   } catch (error) {
     return next(error);
   }

@@ -6,7 +6,7 @@ type BusinessHours = {
 };
 
 export type RestaurantData = {
-  _id?: string;
+  _id: string;
   name: string;
   logo: string;
   description: string;

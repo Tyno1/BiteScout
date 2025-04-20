@@ -55,12 +55,25 @@ export default function RestaurantProfile() {
     // Handle image upload logic here
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editableData && editableData._id) {
-      updateRestaurantData({ data: editableData, id: editableData._id });
+      try {
+        const response = await updateRestaurantData({
+          data: editableData,
+          id: editableData._id,
+        });
+
+        if (!response.success) {
+          console.log("error");
+        }
+      } catch (error) {
+        console.log(error);
+      }
 
       setIsEditing(false);
       setEditableData(null);
+    } else {
+      console.log("something");
     }
   };
 

@@ -44,23 +44,12 @@ export const login = async (
 
     console.log(refreshToken, "refresh token");
 
-    // Save the refresh token in the user DB
-
-    const saveRefreshToken = await User.findByIdAndUpdate(user._id, {
-      refreshToken,
-    });
-
-    if (!saveRefreshToken) {
-      res.status(400).json({ message: "Error saving refresh token" });
-      return;
-    }
-
     res.status(200).json({
       message: "Login successful",
       user,
       accessToken,
       refreshToken,
-      expiresIn: 3600,
+      expiresIn: Date.now() + 3600 * 1000, // expiresIn is a timestamp in milliseconds
     });
     return;
   } catch (error: any) {
@@ -132,11 +121,11 @@ export const refresh = async (req: Request, res: Response) => {
       process.env.JWT_REFRESH_SECRET as string
     ) as MyJWTPayload;
 
-    console.log("i am decoded", decoded);
+    console.log("i am decoded x2", decoded);
 
     const user = await User.findById(decoded?.userId);
 
-    if (!user || user.refreshToken !== refreshToken) {
+    if (!user) {
       res.status(403).json({ message: "Invalid refresh token" });
       return;
     }
@@ -144,20 +133,11 @@ export const refresh = async (req: Request, res: Response) => {
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
 
-    const saveRefreshToken = await User.findByIdAndUpdate(user._id, {
-      refreshToken: newRefreshToken,
-    });
-
-    if (!saveRefreshToken) {
-      res.status(400).json({ message: "Error saving refresh token" });
-      return;
-    }
-
     res.status(200).json({
       message: "Refresh token successful",
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
-      expiresIn: 3600,
+      expiresIn: Date.now() + 3600 * 1000, // expiresIn is a timestamp in milliseconds
     });
     return;
   } catch (error) {
