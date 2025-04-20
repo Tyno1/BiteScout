@@ -1,18 +1,19 @@
-
 openapi: "3.0.0"
 info:
-    version: 1.0
+    version: 1.0.0
     title: "BiteScout API"
     description: "API documentation for BiteScout"
 servers:
     - url: http://localhost:3000/api
-
+paths:
+  /auth:
+    description: Authentication Path
+  
 components:
     schemas:
-        User:
+        User: 
           type: object
           required:
             - id
             - name
             - email
-          properties:
