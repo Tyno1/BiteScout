@@ -20,6 +20,8 @@ export default function Onboarding() {
   const router = useRouter();
   const { updateUser } = useUpdateUser();
 
+  console.log("Session data:", session.data);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [restaurantData, setRestaurantData] = useState<RestaurantData>(
     DEFAULT_RESTAURANT_DATA
@@ -106,7 +108,9 @@ export default function Onboarding() {
       handleCreationError(result.error);
     }
   };
-
+  {
+    session?.data?.user?.accessToken;
+  }
   const prepareRestaurantData = (): RestaurantData => {
     const businessHours = restaurantData.businessHours.map((hour) => ({
       day: hour.day || "Monday",

@@ -1,4 +1,5 @@
 import { RestaurantData } from "@/types/restaurantData";
+import apiClient from "@/utils/authClient";
 import axios from "axios";
 import { create } from "zustand";
 
@@ -59,10 +60,7 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
   createRestaurant: async (data: RestaurantData) => {
     try {
       set({ isLoading: true, error: null });
-
-      const response = await axios.post(`${API_URL}/restaurants`, data, {
-        withCredentials: true,
-      });
+      const response = await apiClient.post("/restaurants", data);
 
       set({
         restaurantData: response.data,
@@ -101,11 +99,7 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await axios.get(
-        `${API_URL}/restaurants/owner/${ownerId}`, {
-          withCredentials: true,
-        }
-      );
+      const response = await apiClient.get(`/restaurants/owner/${ownerId}`);
 
       // remember to handle the case when no restaurant is found
       if (response.data.length === 0) {
@@ -131,7 +125,7 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
   }) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await axios.put(`${API_URL}/restaurants/?id=${id}`, {
+      const response = await apiClient.put(`/restaurants/${id}`, {
         data,
       });
 

@@ -1,5 +1,5 @@
 import { FoodDataReceived } from "@/types/foodCatalogue";
- 
+
 interface TableProps {
   foodDatas: FoodDataReceived[];
   handleRowClick: (id: string) => void;
@@ -39,8 +39,7 @@ export default function Table({ foodDatas, handleRowClick }: TableProps) {
             <tr
               onClick={() => food._id && handleRowClick(food._id)}
               key={index}
-              className="hover:bg-gray-50 cursor-pointer
-"
+              className="hover:bg-gray-50 cursor-pointer"
             >
               <td className="px-6 py-4">{food?.name}</td>
               <td className="px-6 py-4">

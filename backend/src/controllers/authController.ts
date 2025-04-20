@@ -42,6 +42,19 @@ export const login = async (
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
+    console.log(refreshToken, "refresh token");
+
+    // Save the refresh token in the user DB
+
+    const saveRefreshToken = await User.findByIdAndUpdate(user._id, {
+      refreshToken,
+    });
+
+    if (!saveRefreshToken) {
+      res.status(400).json({ message: "Error saving refresh token" });
+      return;
+    }
+
     res.status(200).json({
       message: "Login successful",
       user,
@@ -107,7 +120,6 @@ export const register = async (
 
 export const refresh = async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
-  console.log("Refresh token:", refreshToken);
 
   if (!refreshToken) {
     res.status(401).json({ message: "Refresh token not found" });
@@ -120,6 +132,8 @@ export const refresh = async (req: Request, res: Response) => {
       process.env.JWT_REFRESH_SECRET as string
     ) as MyJWTPayload;
 
+    console.log("i am decoded", decoded);
+
     const user = await User.findById(decoded?.userId);
 
     if (!user || user.refreshToken !== refreshToken) {
@@ -130,6 +144,15 @@ export const refresh = async (req: Request, res: Response) => {
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
 
+    const saveRefreshToken = await User.findByIdAndUpdate(user._id, {
+      refreshToken: newRefreshToken,
+    });
+
+    if (!saveRefreshToken) {
+      res.status(400).json({ message: "Error saving refresh token" });
+      return;
+    }
+
     res.status(200).json({
       message: "Refresh token successful",
       accessToken: newAccessToken,
@@ -139,6 +162,8 @@ export const refresh = async (req: Request, res: Response) => {
     return;
   } catch (error) {
     res.status(403).json({ message: "Invalid refresh token" });
+    console.log("SOMETHING WENT WRONG", error);
+
     return;
   }
 };

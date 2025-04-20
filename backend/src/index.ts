@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import cookieParser from "cookie-parser";
 
 import authMiddleware from "./middleware/authmiddleware.js";
 
@@ -80,7 +79,6 @@ app.use(
 );
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", authMiddleware, restaurantRoutes);

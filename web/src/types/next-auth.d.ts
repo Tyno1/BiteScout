@@ -26,8 +26,9 @@ declare module "next-auth" {
         level: number;
       };
       restaurantCount?: number; // Add the restaurantCount property
+      accessToken?: string; // Add the accessToken property
     };
-    accessToken?: string; // Add the accessToken property
+    
   }
 }
 
@@ -37,5 +38,6 @@ declare module "next-auth/jwt" {
     userType?: string; // Add the userType property
     restaurantCount?: number; // Add the restaurantCount property
     accessToken?: string; // Add the accessToken property
+    refreshToken?: string; // Add the refreshToken property
   }
 }

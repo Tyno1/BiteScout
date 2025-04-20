@@ -73,22 +73,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Only update token when user is provided (on sign in)
-      if (user) {
-        token._id = user._id;
-        token.userType = user.userType;
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+      try {
+        // Only update token when user is provided (on sign in)
+        if (user) {
+          token._id = user._id;
+          token.userType = user.userType;
+          token.accessToken = user.accessToken;
+          token.refreshToken = user.refreshToken;
+          token.expiresIn = user.expiresIn; // Set expiration time
+        }
+        if (Date.now() < (token.expiresIn as number) * 1000) {
+          return token;
+        }
+
+        // If the token is expired, try to refresh it
+        return await refreshAccessToken(token);
+      } catch (error) {
+        console.error("Error in JWT callback:", error);
+        return {
+          ...token,
+          error: "RefreshAccessTokenError",
+        };
       }
-      if (Date.now() < (token.expiresIn as number) * 1000) {
-        return token;
-      }
-      // If the token is expired, try to refresh it
-      return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
       try {
+        if (token.accessToken) {
+          session.user.accessToken = token.accessToken as string;
+        }
+
         // Add token data to session
         session.user._id = token._id as string;
 
@@ -106,16 +120,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (token._id) {
           const restaurant = await axios.get(
-            `${BACKEND_SERVER}/restaurants/owner-restaurants/${token._id}`
+            `${BACKEND_SERVER}/restaurants/owner-restaurants/${token._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token.accessToken}`,
+              },
+            }
           );
-
           const restaurantCount = restaurant.data.length;
 
           session.user.restaurantCount = restaurantCount;
-        }
-
-        if (typeof token.accessToken === "string") {
-          session.accessToken = token.accessToken;
         }
 
         return session;
