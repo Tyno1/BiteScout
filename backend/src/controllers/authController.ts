@@ -42,8 +42,6 @@ export const login = async (
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
-    console.log(refreshToken, "refresh token");
-
     res.status(200).json({
       message: "Login successful",
       user,
@@ -76,7 +74,7 @@ export const register = async (
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400).json({ message: "User already exists" });
+      res.status(409).json({ message: "User already exists" });
       return;
     }
 
@@ -95,9 +93,15 @@ export const register = async (
       userType,
     });
 
+    const userWithoutPass = {
+      name: newUser.name,
+      email: newUser.email,
+      userType: newUser.userType
+    };
+
     res.status(201).json({
       message: "User created successfully",
-      user: newUser,
+      user: userWithoutPass,
     });
   } catch (error: any) {
     console.error("Error creating user:", error);
@@ -111,7 +115,7 @@ export const refresh = async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    res.status(401).json({ message: "Refresh token not found" });
+    res.status(400).json({ message: "Refresh token not found" });
     return;
   }
 
@@ -121,12 +125,10 @@ export const refresh = async (req: Request, res: Response) => {
       process.env.JWT_REFRESH_SECRET as string
     ) as MyJWTPayload;
 
-    console.log("i am decoded x2", decoded);
-
     const user = await User.findById(decoded?.userId);
 
     if (!user) {
-      res.status(403).json({ message: "Invalid refresh token" });
+      res.status(400).json({ message: "Invalid refresh token" });
       return;
     }
 
@@ -141,7 +143,7 @@ export const refresh = async (req: Request, res: Response) => {
     });
     return;
   } catch (error) {
-    res.status(403).json({ message: "Invalid refresh token" });
+    res.status(401).json({ message: "Invalid refresh token request" });
     console.log("SOMETHING WENT WRONG", error);
 
     return;
