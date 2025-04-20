@@ -1,5 +1,4 @@
-import Image from "next/image";
-import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
+import PopularDestinationCard from "./PopularDestinationCard";
 
 export default function PopularDestinations() {
   return (
@@ -14,21 +13,7 @@ export default function PopularDestinations() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div key={item} className="relative group cursor-pointer">
-              <div className="relative h-80 w-full rounded-xl overflow-hidden">
-                <Image src={RestImg} objectFit="cover" alt={`image${item}`} />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
-              <div className="absolute bottom-0 p-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">
-                  Restaurant Name {item}
-                </h3>
-                <p className="text-sm opacity-90">
-                  Location • $$$ • Cuisine Type
-                </p>
-              </div>
-            </div>
+            <PopularDestinationCard key={item} item={item} />
           ))}
         </div>
       </div>

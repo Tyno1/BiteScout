@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React, { ReactElement, ReactNode } from "react";
+import Button from "../atoms/buttons/Button";
 
 interface NavProp {
   toggleMenu: () => void;
@@ -10,10 +11,16 @@ interface NavProp {
     path: string;
     text: string;
   }) => React.JSX.Element;
-  user: any;
+  session: any;
+  handleRoute: (path: string) => void;
 }
 
-const MobileNav = ({ toggleMenu, MobileLinkItem, user }: NavProp) => {
+const MobileNav = ({
+  toggleMenu,
+  MobileLinkItem,
+  session,
+  handleRoute,
+}: NavProp) => {
   return (
     <>
       <ul
@@ -34,7 +41,7 @@ const MobileNav = ({ toggleMenu, MobileLinkItem, user }: NavProp) => {
           <MobileLinkItem path="/contact" text="Contact" />
         </li>
         <li>
-          {user ? (
+          {session ? (
             <ul className="auth flex flex-col items-start w-[100vw]">
               <li className="w-full">
                 <MobileLinkItem path="/dashboard" text="Dashboard" />
@@ -46,10 +53,20 @@ const MobileNav = ({ toggleMenu, MobileLinkItem, user }: NavProp) => {
           ) : (
             <ul className="flex flex-col">
               <li>
-                <MobileLinkItem path="/api/auth/login" text="Login" />
+                <Button
+                  text="Login"
+                  variant="solid"
+                  size="sm"
+                  onClick={() => handleRoute("/login")}
+                />{" "}
               </li>
               <li>
-                <MobileLinkItem path="/api/auth/login" text="Register" />
+                <Button
+                  size="sm"
+                  text="Register"
+                  variant="solid"
+                  onClick={() => handleRoute("/register")}
+                />
               </li>
             </ul>
           )}

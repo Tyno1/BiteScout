@@ -106,7 +106,6 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
                 handleNav={handleNav}
                 icon={<LogOut />}
                 text="Logout"
-                path="/api/auth/logout"
               />
             </ul>
           </li>

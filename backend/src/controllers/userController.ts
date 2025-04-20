@@ -23,7 +23,7 @@ export const UpdateUser = async (
         .json({ message: "User is not a Restaurant Owner" });
     }
 
-    // Find the Admin User Type (level 2) to update userType to Admin
+    // Find the Admin User Type (level 1) to update userType to Admin
     const userType = await UserType.findOne({
       level: 1,
     });
@@ -50,7 +50,7 @@ export const UpdateUser = async (
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "User updated successfully",
       user,
     });
@@ -59,5 +59,35 @@ export const UpdateUser = async (
     res
       .status(500)
       .json({ message: "Error updating user", error: error.message });
+  }
+};
+
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      message: "User deleted successfully",
+      user,
+    });
+  } catch (error: any) {
+    console.error("Error deleting user:", error);
+    res
+      .status(500)
+      .json({ message: "Error deleting user", error: error.message });
   }
 };

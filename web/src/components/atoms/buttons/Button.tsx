@@ -1,6 +1,6 @@
-import React, { ButtonHTMLAttributes } from "react";
+import React, { ComponentProps } from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = ComponentProps<"button"> & {
   text?: string;
   icon?: React.ReactNode;
   color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
@@ -10,14 +10,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
   name?: string;
   value?: string;
-  onClick: () => void;
+  onClick?: () => void; // Note: this is required (no question mark)
   className?: string;
   iconStyle?: string;
-  variant: "solid" | "outline" | "plain";
+  variant: "solid" | "outline" | "plain"; // Note: this is required (no question mark)
   ariaLabel?: string;
   isPressed?: boolean;
   isExpanded?: boolean;
-}
+};
 
 export default function Button({
   text,

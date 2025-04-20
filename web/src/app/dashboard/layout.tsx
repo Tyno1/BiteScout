@@ -1,14 +1,14 @@
 "use client";
 
-import SideNav from "@/components/ui/Dashboard/SideNav";
+import SideNav from "@/components/ui/dashboard/SideNav";
 import { ReactNode, useState } from "react";
-import TopNav from "@/components/ui/Dashboard/TopNav";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import TopNav from "@/components/ui/dashboard/TopNav";
+import { useSession } from "next-auth/react";
 // import { useNotifications } from "@/hooks/useNotification";
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const { user } = useUser();
+  const { data: session } = useSession();
   // const { unreadCount } = useNotifications({
   //   userId: userData?._id,
   //   token,
@@ -26,7 +26,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
     <div className="flex flex-col h-screen w-screen relative">
       <TopNav
         onMenuClick={handleMenuClick}
-        userName={user?.name || ""}
+        userName={session?.user?.name || ""}
         unreadNotifications={unreadCount}
       />
       {/* mobile view */}
