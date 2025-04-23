@@ -131,9 +131,6 @@ export const updateRestaurantData = async (
   try {
     const { id } = req.params;
     const body: Partial<Restaurant> = req.body.data || req.body;
-    console.log("Attempting to update restaurant:", { id, body });
-
-    console.log("Body being applied:", JSON.stringify(body, null, 2));
 
     // First check if document exists
     const existingRestaurant = await RestaurantData.findById(id);
@@ -141,11 +138,6 @@ export const updateRestaurantData = async (
       res.status(404).json({ error: "Restaurant not found" });
       return;
     }
-
-    console.log(
-      "Before update:",
-      JSON.stringify(existingRestaurant.toObject(), null, 2)
-    );
 
     // Then attempt update
     const updatedRestaurant = await RestaurantData.findByIdAndUpdate(
@@ -155,11 +147,6 @@ export const updateRestaurantData = async (
         new: true,
       }
     );
-
-    // console.log("updated", updatedRestaurant);
-    console.log("After update:", JSON.stringify(updatedRestaurant.toObject(), null, 2));
-
-
 
     if (!updatedRestaurant) {
       res.status(404).json({ error: "Restaurant data not updated" });
