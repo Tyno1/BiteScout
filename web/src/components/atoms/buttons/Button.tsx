@@ -19,7 +19,7 @@ type ButtonProps = ComponentProps<"button"> & {
   isExpanded?: boolean;
 };
 
-export default function Button({
+export function Button({
   text,
   icon,
   color = "primary",

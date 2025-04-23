@@ -1,22 +1,21 @@
 "use client";
 
-import IconButton from "@/components/atoms/buttons/IconButton";
-import Input from "@/components/atoms/inputs/Input";
+import { IconButton, Input } from "@/components/atoms";
 import { Bell, ChefHat, Menu } from "lucide-react";
 
-interface TopNavProps {
+type TopNavProps = {
   onMenuClick: () => void;
   userName?: string;
   userImage?: string;
   unreadNotifications?: number;
-}
+};
 
-const TopNav = ({
+export function TopNav({
   onMenuClick,
   userName,
   userImage = "/placeholder.svg?height=32&width=32",
   unreadNotifications,
-}: TopNavProps) => {
+}: TopNavProps) {
   return (
     <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
       {/* Conditionally rendered hamburger Menu */}
@@ -37,6 +36,7 @@ const TopNav = ({
         {/* Middle - Search bar */}
         <div className="hidden md:block max-w-md w-full mx-4">
           <Input
+            name="navSearch"
             placeholder="search"
             type="text"
             id="navbar-search"
@@ -66,9 +66,7 @@ const TopNav = ({
               alt={userName}
               className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
             />
-            <span className="hidden md:inline-block text-sm">
-              {userName}
-            </span>
+            <span className="hidden md:inline-block text-sm">{userName}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -88,6 +86,5 @@ const TopNav = ({
       </div>
     </div>
   );
-};
+}
 
-export default TopNav;

@@ -1,6 +1,6 @@
 import React, { ButtonHTMLAttributes } from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: React.ReactNode;
   color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
   size?: "sm" | "md" | "lg";
@@ -16,9 +16,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   ariaLabel?: string;
   isPressed?: boolean;
   isExpanded?: boolean;
-}
+};
 
-export default function IconButton({
+export function IconButton({
   icon,
   color = "primary",
   size = "md",

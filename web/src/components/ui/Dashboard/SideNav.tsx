@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {
   Home,
@@ -5,7 +7,6 @@ import {
   Star,
   AudioLines,
   Settings,
-  ChefHat,
   Users,
   UserCog,
   CookingPot,
@@ -15,7 +16,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import NavItem from "./NavItem";
+import { NavItem } from "@/components/ui/dashboard";
 
 interface SideNavProp {
   setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -102,11 +103,7 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
                 text="Home"
                 path="/"
               />
-              <NavItem
-                handleNav={handleNav}
-                icon={<LogOut />}
-                text="Logout"
-              />
+              <NavItem handleNav={handleNav} icon={<LogOut />} text="Logout" />
             </ul>
           </li>
         </ul>

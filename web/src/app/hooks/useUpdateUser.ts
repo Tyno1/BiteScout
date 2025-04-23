@@ -1,4 +1,3 @@
-// hooks/useUpdateUser.js
 import { useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";

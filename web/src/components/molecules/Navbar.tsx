@@ -5,14 +5,11 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 import { Menu, X } from "lucide-react";
-
 import "animate.css";
-
 import ProfileImg from "@/assets/images/profile.png";
-import MobileNav from "./MobileNav";
-import Button from "../atoms/buttons/Button";
+import { MobileNav } from "./MobileNav";
+import { Button } from "../atoms";
 
 type NavTheme = {
   theme: "dark" | "light";
@@ -25,7 +22,7 @@ type MobileLinkProp = {
 
 interface WebLinkProp extends MobileLinkProp {}
 
-const Navbar = ({ theme }: NavTheme) => {
+export function Navbar({ theme }: NavTheme) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -153,6 +150,4 @@ const Navbar = ({ theme }: NavTheme) => {
       )}
     </nav>
   );
-};
-
-export default Navbar;
+}

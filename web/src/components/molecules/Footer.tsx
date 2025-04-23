@@ -1,7 +1,6 @@
-"use client"
+"use client";
 
- 
-const Footer: React.FC = () => {
+export function Footer() {
   return (
     <div className="bg-white w-full flex flex-col items-center justify-center py-16 relative">
       <div className="news-letter bg-black w-full h-40 p-10 px-4 lg:px-32 xl:px-48 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-20">
@@ -49,6 +48,4 @@ const Footer: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Footer;
+}

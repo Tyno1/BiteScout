@@ -1,13 +1,15 @@
+"use client"
+
 import { useRef } from "react";
 import ReactDOM from "react-dom";
 
-interface ModalProps {
+type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
 
-export default function UserModal({ isOpen, onClose, children }: ModalProps) {
+export function UserModal({ isOpen, onClose, children }: ModalProps) {
   const modalRef = useRef(null);
 
   if (!isOpen) return null;

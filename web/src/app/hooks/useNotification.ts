@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
 import { fetchNotifications } from "@/state/notification/notificationSlice";
 import { initializeSocket, disconnectSocket } from "@/utils/socketService";
 

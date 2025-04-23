@@ -1,7 +1,7 @@
-import IconButton from "@/components/atoms/buttons/IconButton";
+import { IconButton } from "@/components/atoms";
 import { Plus, X } from "lucide-react";
 
-export default function Features({
+export function RestaurantProfileFeatures({
   isEditing,
   newFeature,
   setNewFeature,

@@ -2,8 +2,8 @@
 
 import SideNav from "@/components/ui/dashboard/SideNav";
 import { ReactNode, useState } from "react";
-import TopNav from "@/components/ui/dashboard/TopNav";
 import { useSession } from "next-auth/react";
+import { TopNav } from "@/components/ui";
 // import { useNotifications } from "@/hooks/useNotification";
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {

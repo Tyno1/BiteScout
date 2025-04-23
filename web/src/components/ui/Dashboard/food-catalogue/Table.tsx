@@ -1,11 +1,12 @@
 import { FoodDataReceived } from "@/types/foodCatalogue";
 
-interface TableProps {
+
+type TableProps = {
   foodDatas: FoodDataReceived[];
   handleRowClick: (id: string) => void;
 }
 
-export default function Table({ foodDatas, handleRowClick }: TableProps) {
+export function Table({ foodDatas, handleRowClick }: TableProps) {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full border-collapse">

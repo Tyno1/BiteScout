@@ -1,10 +1,10 @@
-import { useNotifications } from "@/hooks/useNotification";
+import { useNotifications } from "@/app/hooks/useNotification";
 
-interface NotificationBadgeProps {
-  userId?: string;
-}
-const NotificationBadge = ({ userId }: NotificationBadgeProps) => {
-  const { unreadCount } = useNotifications(userId);
+type NotificationBadgeProps = {
+  userId?: string | undefined;
+};
+export function NotificationBadge({ userId }: NotificationBadgeProps) {
+  const { unreadCount } = useNotifications(userId); 
 
   if (unreadCount === 0) return;
 
@@ -13,5 +13,4 @@ const NotificationBadge = ({ userId }: NotificationBadgeProps) => {
       {unreadCount > 99 ? "99+" : unreadCount}
     </div>
   );
-};
-export default NotificationBadge;
+}

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import featuresData, { FeaturesProp } from "./FeaturesData";
+import { featuresData, FeaturesProp } from "./FeaturesData";
 import { MoveRight } from "lucide-react";
 
-export default function Features() {
+export function Features() {
   return (
     <section className="w-full py-10 md:py-20 px-4 flex justify-center bg-gray-50">
       <div className="w-[90%] flex flex-col items-center">

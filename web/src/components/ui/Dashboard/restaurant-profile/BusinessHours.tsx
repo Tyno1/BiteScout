@@ -1,5 +1,5 @@
 
-export default function BusinessHours({
+export function BusinessHours({
     businessHours,
     isEditing,
     handleBusinessHoursChange,

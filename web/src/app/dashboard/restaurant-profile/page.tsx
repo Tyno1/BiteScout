@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
-import Hero from "../../../components/ui/dashboard/restaurant-profile/Hero";
-import BasicInformation from "../../../components/ui/dashboard/restaurant-profile/BasicInformation";
-import ContactInformation from "../../../components/ui/dashboard/restaurant-profile/ContactInformation";
-import BusinessHours from "../../../components/ui/dashboard/restaurant-profile/BusinessHours";
-import Features from "../../../components/ui/dashboard/restaurant-profile/Features";
 import { useSession } from "next-auth/react";
 import useRestaurantStore from "@/stores/restaurantStore";
 import { RestaurantData } from "@/types/restaurantData";
+import {
+  BasicInformation,
+  BusinessHours,
+  ContactInformation,
+  RestaurantProfileFeatures,
+  RestaurantProfileHero,
+} from "@/components/ui";
 
 interface BusinessHours {
   day: string;
@@ -166,8 +168,7 @@ export default function RestaurantProfile() {
 
   return (
     <main className="w-full min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <Hero
+      <RestaurantProfileHero
         image1={image1}
         isEditing={isEditing}
         displayData={displayData}
@@ -179,7 +180,6 @@ export default function RestaurantProfile() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Basic Information */}
         <BasicInformation
           isEditing={isEditing}
           newCuisine={newCuisine}
@@ -190,22 +190,19 @@ export default function RestaurantProfile() {
           handleInputChange={handleInputChange}
         />
 
-        {/* Contact Information */}
         <ContactInformation
           isEditing={isEditing}
           displayData={displayData}
           handleInputChange={handleInputChange}
         />
 
-        {/* Business Hours */}
         <BusinessHours
           businessHours={businessHours}
           isEditing={isEditing}
           handleBusinessHoursChange={handleBusinessHoursChange}
         />
 
-        {/* Features */}
-        <Features
+        <RestaurantProfileFeatures
           isEditing={isEditing}
           newFeature={newFeature}
           setNewFeature={setNewFeature}

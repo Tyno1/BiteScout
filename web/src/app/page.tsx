@@ -1,11 +1,14 @@
-import Footer from "@/components/ui/Footer";
-import CallToAction from "@/components/ui/home/CallToAction";
-import Features from "@/components/ui/home/Features";
-import Hero from "@/components/ui/home/Hero";
-import PopularDestinations from "@/components/ui/home/PopularDestinations";
-import Testimonials from "@/components/ui/home/Testimonies";
-import TopMeals from "@/components/ui/home/TopMeals";
-import Navbar from "@/components/molecules/Navbar";
+"use client"
+
+import { Footer, Navbar } from "@/components/molecules";
+import {
+  CallToAction,
+  Features,
+  Hero,
+  PopularDestinations,
+  Testimonials,
+  TopMeals,
+} from "@/components/ui";
 
 export default function Home() {
   return (

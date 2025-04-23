@@ -8,7 +8,7 @@ export type FeaturesProp = {
   featureType: string;
 };
 
-const featuresData: FeaturesProp[] = [
+export const featuresData: FeaturesProp[] = [
   {
     icon: <Camera className="w-12 h-12 text-orange-600" />,
     title: "Snap & Share",
@@ -49,4 +49,3 @@ const featuresData: FeaturesProp[] = [
     featureType: "Restaurant Admin",
   },
 ];
-export default featuresData;

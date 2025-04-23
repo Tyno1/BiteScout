@@ -1,7 +1,7 @@
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 
-export default function Hero({
+export function RestaurantProfileHero({
   image1,
   isEditing,
   displayData,
