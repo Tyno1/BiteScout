@@ -4,21 +4,22 @@ import SideNav from "@/components/ui/dashboard/SideNav";
 import { ReactNode, useState } from "react";
 import { useSession } from "next-auth/react";
 import { TopNav } from "@/components/ui";
-// import { useNotifications } from "@/hooks/useNotification";
+import { useNotifications } from "../hooks/useNotification";
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const { data: session } = useSession();
-  // const { unreadCount } = useNotifications({
-  //   userId: userData?._id,
-  //   token,
+  // const { unreadCount, notifications } = useNotifications({
+  //   userId: session?.user._id,
   // });
+
+  // console.log(notifications);
 
   const handleMenuClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
-  const unreadCount = 1;
-  // if (userData.restaurantCount < 1) {
+
+  // if (session?.user.restaurantCount && session?.user.restaurantCount < 1) {
   //   return (window.location.href = "/onboarding/roles");
   // }
 
@@ -27,7 +28,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
       <TopNav
         onMenuClick={handleMenuClick}
         userName={session?.user?.name || ""}
-        unreadNotifications={unreadCount}
+        userId={session?.user?._id}
       />
       {/* mobile view */}
       <div

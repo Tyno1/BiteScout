@@ -1,11 +1,9 @@
 "use client";
 
 import type React from "react";
-
 import type { Session } from "next-auth";
-import Button from "@/components/atoms/buttons/Button";
-import Input from "@/components/atoms/inputs/Input";
-import type { RestaurantDataState } from "@/types/restaurantData";
+import type { RestaurantData } from "@/types/restaurantData";
+import { Button, Input } from "@/components/atoms";
 
 export type FormErrorState = {
   name: string;
@@ -15,7 +13,7 @@ export type FormErrorState = {
 
 type RoleOnboardingFormProps = {
   session: { data?: Session | null };
-  restaurantData: RestaurantDataState;
+  restaurantData: RestaurantData;
   isSubmitting: boolean;
   message: string;
   apiError: string;

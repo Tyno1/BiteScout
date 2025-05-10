@@ -1,32 +1,37 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchNotifications } from "@/state/notification/notificationSlice";
 import { initializeSocket, disconnectSocket } from "@/utils/socketService";
+import useNotificationStore from "@/stores/notificationStore";
+import { Notification } from "@/types/notification";
 
-interface useNotificationProps {
+type useNotificationProps = {
   userId: string | undefined;
-  token: string;
-}
-export const useNotifications = ({ userId, token }: useNotificationProps) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { notifications, unreadCount, status } = useSelector(
-    (state: RootState) => state.notification
-  );
+};
+type useNotificationReturn = {
+  notifications: Notification[];
+  unreadCount: number;
+  isLoading: boolean;
+};
+export const useNotifications = ({
+  userId,
+}: useNotificationProps): useNotificationReturn => {
+  const { fetchNotifications, notifications, unreadCount, isLoading, addNotification } =
+    useNotificationStore();
+    
 
   useEffect(() => {
-    if (userId && token) {
+    if (userId) {
       // 1. Initialize socket connection for real-time updates
-      initializeSocket(userId, dispatch);
+      initializeSocket(userId, addNotification);
 
       // 2. Fetch existing notifications from the API
-      dispatch(fetchNotifications({ userId, token }));
+      fetchNotifications(userId);
 
       // Clean up on unmount
       return () => {
         disconnectSocket();
       };
     }
-  }, [userId, token, dispatch]);
+  }, [userId, addNotification, fetchNotifications]);
 
-  return { notifications, unreadCount, status };
+  return { notifications, unreadCount, isLoading };
 };
