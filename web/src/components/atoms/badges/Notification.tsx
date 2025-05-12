@@ -19,7 +19,7 @@ export function NotificationBadge({ userId }: NotificationBadgeProps) {
   }
 
   return (
-    <div className="badge bg-red-500 text-white">
+    <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
       {/* Display "99+" if unreadCount exceeds 99, otherwise show the actual count */}
       {unreadCount > 99 ? "99+" : unreadCount}
     </div>

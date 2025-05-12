@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CircleCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button, Input } from "@/components/atoms";
 import SearchResultCard from "../components/searchResultCard";
 import useRestaurantStore from "@/stores/restaurantStore";
@@ -29,6 +29,8 @@ const RestaurantSearch = () => {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +92,23 @@ const RestaurantSearch = () => {
     fetchRestaurantAccess();
   }, [userId, getRestaurantAccess]);
 
+  // Redirect to dashboard if user has access to any restaurant
+  useEffect(() => {
+    if (restaurantAccessList.length > 0) {
+      const isMatched = restaurantAccessList.find((access) =>
+        restaurantDatas.find(
+          (restaurant) =>
+            restaurant?._id && access.restaurantId === restaurant?._id
+        )
+      );
+      const hasAccess = isMatched?.status === "approved";
+
+      if (hasAccess) {
+        window.location.href = "/dashboard";  
+      }
+    }
+  }, [restaurantAccessList, restaurantDatas]);
+
   // Clear results when component mounts
   useEffect(() => {
     resetRestaurant();
@@ -133,7 +152,6 @@ const RestaurantSearch = () => {
           key={restaurant?._id}
           handleRestaurantSelect={handleRestaurantSelect}
           data={restaurant}
-          userId={userId ?? ""}
           restaurantAccessList={restaurantAccessList}
           isSubmitting={isSubmitting}
         />

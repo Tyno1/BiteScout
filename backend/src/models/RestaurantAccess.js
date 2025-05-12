@@ -20,7 +20,7 @@ const restaurantAccessSchema = new Schema({
     enum: ["pending", "approved", "suspended", "innactive"],
     default: "pending",
   },
-  addedAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },

@@ -2,12 +2,12 @@ import { Button } from "@/components/atoms";
 import { RestaurantAccess } from "@/types/restaurantAccess";
 import { RestaurantData } from "@/types/restaurantData";
 import { CircleCheck, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type CardProp = {
   data: RestaurantData;
   handleRestaurantSelect: (restaurantId: string) => void;
   restaurantAccessList: RestaurantAccess[];
-  userId: string;
   isSubmitting: boolean;
 };
 
@@ -15,20 +15,26 @@ const SearchResultCard = ({
   data,
   handleRestaurantSelect,
   restaurantAccessList,
-  userId,
   isSubmitting,
 }: CardProp) => {
-  // Check if user already has access and its status
-  const restaurantAccess = Array.isArray(restaurantAccessList)
-    ? restaurantAccessList.find((access) => access.restaurantId === data._id)
-    : undefined;    
-    
-    
-  const hasRestaurantAccess =
-    restaurantAccess && restaurantAccess?.userId === userId;
-  const accessStatus = restaurantAccess?.status;
-  const isPending = hasRestaurantAccess && accessStatus === "pending";
-  const isApproved = hasRestaurantAccess && accessStatus === "approved";
+  const [isPending, setIsPending] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+
+  useEffect(() => {
+    const restaurantAccess = Array.isArray(restaurantAccessList)
+      ? restaurantAccessList.find((access) => access.restaurantId === data._id)
+      : undefined;
+
+    const hasAccess = !!restaurantAccess?._id;
+    const accessStatus = restaurantAccess?.status;
+
+    if (hasAccess && accessStatus === "pending") {
+      setIsPending(true);
+    } else if (hasAccess && accessStatus === "approved") {
+      setIsApproved(true);
+    }
+  }, [restaurantAccessList, data._id]);
+
   // Render search button based on access status
   const renderActionButton = () => {
     if (isPending) {

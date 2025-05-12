@@ -1,27 +1,47 @@
 "use client";
 
 import SideNav from "@/components/ui/dashboard/SideNav";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { TopNav } from "@/components/ui";
-import { useNotifications } from "../hooks/useNotification";
+import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
+import { Spinner } from "@/components/atoms";
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const { data: session } = useSession();
-  // const { unreadCount, notifications } = useNotifications({
-  //   userId: session?.user._id,
-  // });
-
-  // console.log(notifications);
+  const { restaurantAccessList } = useRestaurantAccessStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleMenuClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
-  // if (session?.user.restaurantCount && session?.user.restaurantCount < 1) {
-  //   return (window.location.href = "/onboarding/roles");
-  // }
+  // fix this check
+
+  useEffect(() => {
+    const isNotOwner =
+      session?.user?.restaurantCount !== undefined &&
+      session.user.restaurantCount < 1;
+    const isNotAdmin =
+      restaurantAccessList?.length > 0 &&
+      restaurantAccessList.some((access) => access.status !== "approved");
+
+    setIsLoading(true);
+    if (isNotOwner || isNotAdmin) {
+      setIsLoading(false);
+      console.log("not ownwr", isNotOwner);
+      console.log("not admin", isNotAdmin);
+      console.log(restaurantAccessList);
+
+      // window.location.href = "/onboarding/roles";
+    }
+    setIsLoading(false);
+  }, [session?.user.restaurantCount, restaurantAccessList]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="flex flex-col h-screen w-screen relative">

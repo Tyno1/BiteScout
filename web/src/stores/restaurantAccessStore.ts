@@ -21,7 +21,7 @@ type RestaurantAccessState = {
     userId: string
   ) => Promise<{ success: boolean; error?: string } | null>;
 
-  resestAccess: () => void;
+  resetAccess: () => void;
 };
 const DEFAULT_RESTAURANT_ACCESS: RestaurantAccess = {
   _id: "",
@@ -33,7 +33,7 @@ const DEFAULT_RESTAURANT_ACCESS: RestaurantAccess = {
 
 const useRestaurantAccessStore = create<RestaurantAccessState>((set) => ({
   restaurantAccess: DEFAULT_RESTAURANT_ACCESS,
-  restaurantAccessList: [DEFAULT_RESTAURANT_ACCESS],
+  restaurantAccessList: [],
   isLoading: false,
   error: null,
 
@@ -50,9 +50,11 @@ const useRestaurantAccessStore = create<RestaurantAccessState>((set) => ({
         `/restaurant-access/${restaurantId}`,
         { userId }
       );
-
-      if (response.data) {
-        set({ restaurantAccess: response.data });
+      if (response.data) {        
+        set((state) => ({
+          restaurantAccessList: [...state.restaurantAccessList, response.data.restaurantAccess],
+          restaurantAccess: response.data,
+        }));
       }
       return {
         success: true,
@@ -81,7 +83,10 @@ const useRestaurantAccessStore = create<RestaurantAccessState>((set) => ({
       if (response.data) {
         set({ restaurantAccessList: response.data.restaurantAccesses });
       }
-      return { success: true, restaurantAccess: response.data };
+      return {
+        success: true,
+        restaurantAccessList: response.data.restaurantAccesses,
+      };
     } catch (error) {
       set({
         error:
@@ -98,10 +103,10 @@ const useRestaurantAccessStore = create<RestaurantAccessState>((set) => ({
     }
   },
 
-  resestAccess: () =>
+  resetAccess: () =>
     set({
       restaurantAccess: DEFAULT_RESTAURANT_ACCESS,
-      restaurantAccessList: [DEFAULT_RESTAURANT_ACCESS],
+      restaurantAccessList: [],
       error: null,
       isLoading: false,
     }),
