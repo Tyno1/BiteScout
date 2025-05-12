@@ -30,7 +30,11 @@ const RestaurantSearch = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+<<<<<<< HEAD
   console.log("Restaurant Access List:", restaurantAccessList);
+=======
+
+>>>>>>> origin/webhook-notification
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +108,11 @@ const RestaurantSearch = () => {
       const hasAccess = isMatched?.status === "approved";
 
       if (hasAccess) {
+<<<<<<< HEAD
         window.location.href = "/dashboard";
+=======
+        window.location.href = "/dashboard";  
+>>>>>>> origin/webhook-notification
       }
     }
   }, [restaurantAccessList, restaurantDatas]);
