@@ -18,11 +18,6 @@ export function TopNav({
   userImage = "/placeholder.svg?height=32&width=32",
   userId,
 }: TopNavProps) {
-  // Use the hook inside the functional component
-  const { notifications, unreadCount, isLoading } = useNotifications({
-    userId,
-  });
-
   return (
     <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
       {/* Conditionally rendered hamburger Menu */}
@@ -62,12 +57,6 @@ export function TopNav({
           >
             <Bell />
             <NotificationBadge userId={userId} />
-            {/* Display unread count */}
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                {unreadCount}
-              </span>
-            )}
           </button>
 
           {/* User profile */}
