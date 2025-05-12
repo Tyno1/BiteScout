@@ -2,19 +2,21 @@
 
 import { IconButton, Input } from "@/components/atoms";
 import { Bell, ChefHat, Menu } from "lucide-react";
+import { useNotifications } from "@/app/hooks/useNotification"; // Import the hook
+import { NotificationBadge } from "@/components/atoms/badges";
 
 type TopNavProps = {
   onMenuClick: () => void;
+  userId?: string;
   userName?: string;
   userImage?: string;
-  unreadNotifications?: number;
 };
 
 export function TopNav({
   onMenuClick,
   userName,
   userImage = "/placeholder.svg?height=32&width=32",
-  unreadNotifications,
+  userId,
 }: TopNavProps) {
   return (
     <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
@@ -54,9 +56,7 @@ export function TopNav({
             aria-label="Notifications"
           >
             <Bell />
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              {unreadNotifications}
-            </span>
+            <NotificationBadge userId={userId} />
           </button>
 
           {/* User profile */}
@@ -87,4 +87,3 @@ export function TopNav({
     </div>
   );
 }
-
