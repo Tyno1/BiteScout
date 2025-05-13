@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.refreshToken = user.refreshToken;
           token.expiresIn = user.expiresIn; // Set expiration time
         }
-        if (Date.now() < (token.expiresIn as number) * 1000) {
+        if (Date.now() < (token.expiresIn as number)) {          
           return token;
         }
 
@@ -101,6 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         if (token.accessToken) {
           session.user.accessToken = token.accessToken as string;
+          session.user.refreshToken = token.refreshToken as string;
         }
 
         // Add token data to session

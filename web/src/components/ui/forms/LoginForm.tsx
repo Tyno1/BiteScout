@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useActionState, useEffect, useState } from "react";
+import React, { useActionState, useEffect } from "react";
 
 import { doCredentialLogin } from "@/app/actions";
-import Button from "@/components/atoms/buttons/Button";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/atoms";
 
-const LoginForm: React.FC = () => {
+export function LoginForm() {
   const [state, loginAction, isPending] = useActionState(
     doCredentialLogin,
     undefined
@@ -52,9 +52,7 @@ const LoginForm: React.FC = () => {
         fullWidth
         variant="solid"
         text="Credential Login"
-      />{" "}
+      />
     </form>
   );
-};
-
-export default LoginForm;
+}

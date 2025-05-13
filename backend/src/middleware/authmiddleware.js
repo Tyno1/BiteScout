@@ -19,7 +19,9 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.clearCookie("accessToken");
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired." });
+    }
     return res.status(403).json({ error: "Invalid token." });
   }
 };

@@ -26,7 +26,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
 }
 
-export default function Input({
+export function Input({
   label,
   id,
   name,

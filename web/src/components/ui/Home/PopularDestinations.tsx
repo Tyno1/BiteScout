@@ -1,6 +1,6 @@
-import PopularDestinationCard from "./PopularDestinationCard";
+import { PopularDestinationCard } from "./PopularDestinationCard";
 
-export default function PopularDestinations() {
+export function PopularDestinations() {
   return (
     <section className="w-full py-10 md:py-20 px-4 flex justify-center">
       <div className="w-full flex flex-col items-center">

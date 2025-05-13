@@ -5,7 +5,7 @@ import React from "react";
 type DestinationCardType = {
   item: number;
 };
-const PopularDestinationCard = ({ item }: DestinationCardType) => {
+export function PopularDestinationCard({ item }: DestinationCardType) {
   return (
     <>
       <div key={item} className="relative group cursor-pointer">
@@ -21,6 +21,4 @@ const PopularDestinationCard = ({ item }: DestinationCardType) => {
       </div>
     </>
   );
-};
-
-export default PopularDestinationCard;
+}

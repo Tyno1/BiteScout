@@ -2,7 +2,6 @@
 
 import { signIn, signOut } from "@/auth";
 import axios from "axios";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 export type SignInResponse = {

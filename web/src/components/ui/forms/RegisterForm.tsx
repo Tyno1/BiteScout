@@ -1,12 +1,11 @@
 "use client";
 
 import { credentialRegister } from "@/app/actions";
-import Button from "@/components/atoms/buttons/Button";
-import Input from "@/components/atoms/inputs/Input";
 import React, { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Input } from "@/components/atoms";
 
-const RegisterForm = () => {
+export function RegisterForm() {
   const [state, formAction] = useActionState(credentialRegister, undefined);
   const router = useRouter();
 
@@ -72,6 +71,4 @@ const RegisterForm = () => {
       <Button type="submit" text="Register" fullWidth variant="solid" />
     </form>
   );
-};
-
-export default RegisterForm;
+}

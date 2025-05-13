@@ -1,15 +1,17 @@
+"use client"
+
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-interface NavItemProps {
+type NavItemProps = {
   icon: React.ReactElement;
   text: string;
   path?: string;
   handleNav?: (navName: string) => void;
-}
+};
 
-const NavItem = ({ icon, text, path, handleNav }: NavItemProps) => {
+export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
   const pathname = usePathname();
 
   const isActive = path ? pathname === path : false;
@@ -43,6 +45,4 @@ const NavItem = ({ icon, text, path, handleNav }: NavItemProps) => {
       </button>
     </li>
   );
-};
-
-export default NavItem;
+}

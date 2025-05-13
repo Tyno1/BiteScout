@@ -1,8 +1,7 @@
-import Link from "next/link";
-import React, { ReactElement, ReactNode } from "react";
-import Button from "../atoms/buttons/Button";
+import React from "react";
+import { Button } from "../atoms";
 
-interface NavProp {
+type NavProp = {
   toggleMenu: () => void;
   MobileLinkItem: ({
     path,
@@ -13,14 +12,9 @@ interface NavProp {
   }) => React.JSX.Element;
   session: any;
   handleRoute: (path: string) => void;
-}
+};
 
-const MobileNav = ({
-  toggleMenu,
-  MobileLinkItem,
-  session,
-  handleRoute,
-}: NavProp) => {
+export function MobileNav({ MobileLinkItem, session, handleRoute }: NavProp) {
   return (
     <>
       <ul
@@ -74,6 +68,4 @@ const MobileNav = ({
       </ul>
     </>
   );
-};
-
-export default MobileNav;
+}

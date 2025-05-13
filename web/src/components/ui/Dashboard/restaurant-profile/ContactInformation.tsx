@@ -1,6 +1,6 @@
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
  
-export default function ContactInformation({
+export function ContactInformation({
   isEditing,
   displayData,
   handleInputChange,

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Star, MapPin, Volume2 } from "lucide-react";
 
-export default function TopMeals() {
+export function TopMeals() {
   const [selectedType, setSelectedType] = useState<string>("Fine Dinning");
 
   const handleTypeChange = (type: string) => {

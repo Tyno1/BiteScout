@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import LoginForm from "@/components/ui/forms/LoginForm";
+import { LoginForm } from "@/components/ui/forms/LoginForm";
 
 const Page = () => {
   const session = useSession();

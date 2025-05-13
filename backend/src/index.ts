@@ -29,7 +29,7 @@ const io = new Server(server, {
     origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow your client URL
     methods: ["GET", "POST"],
     credentials: true,
-  },
+  }, 
 });
 
 const connectedUsers = new Map();

@@ -1,6 +1,6 @@
-import type { RestaurantDataState } from "@/types/restaurantData"
+import type { RestaurantData } from "@/types/restaurantData"
 
-export const DEFAULT_RESTAURANT_DATA: RestaurantDataState = {
+export const DEFAULT_RESTAURANT_DATA: RestaurantData= {
   name: "",
   logo: "ttt",
   description: "",

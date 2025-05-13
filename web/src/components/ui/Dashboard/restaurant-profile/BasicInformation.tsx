@@ -1,7 +1,7 @@
-import Button from "@/components/atoms/buttons/Button";
+import { Button } from "@/components/atoms";
 import { RestaurantData } from "@/types/restaurantData";
 
-interface BasicInformation {
+type BasicInformation = {
   isEditing: boolean;
   newCuisine: string;
   setNewCuisine: (value: string) => void;
@@ -9,9 +9,9 @@ interface BasicInformation {
   setEditableData: (value: RestaurantData) => void;
   displayData: RestaurantData | null;
   handleInputChange: (field: keyof RestaurantData, value: any) => void;
-}
+};
 
-export default function BasicInformation({
+export function BasicInformation({
   isEditing,
   newCuisine,
   setNewCuisine,

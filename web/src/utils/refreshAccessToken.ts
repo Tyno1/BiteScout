@@ -1,23 +1,24 @@
+
 import axios from "axios";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-async function refreshAccessToken(token: any) {
+async function refreshAccessToken(token: any) {  
   try {    
     const response = await axios.post(`${BACKEND_SERVER}/auth/refresh`, {
-      refreshToken: token.refreshToken,
+      refreshToken: token.refreshToken
     });
 
     const refreshed = response.data;
-
-    if (!refreshed.accessToken) {
+    
+    if (!refreshed.accessToken) {      
       throw new Error("No access token returned");
     }
 
     return {
       ...token,
       accessToken: refreshed.accessToken,
-      expiresIn: Date.now() + refreshed.expiresIn * 1000,
+      expiresIn: refreshed.expiresIn,
       refreshToken: refreshed.refreshToken ?? token.refreshToken, // fallback
     };
   } catch (error) {

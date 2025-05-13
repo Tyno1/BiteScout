@@ -1,6 +1,6 @@
-import Button from "@/components/atoms/buttons/Button";
+import { Button } from "@/components/atoms";
 
-export default function CallToAction() {
+export function CallToAction() {
   return (
     <section className="w-full py-20 flex justify-center">
       <div className="w-[90%] flex flex-col items-center text-center">

@@ -1,11 +1,11 @@
-import { Allergen, Course, Cuisine, FoodDataSent } from "@/types/foodCatalogue";
+import { Allergen, Course, Cuisine, FoodData } from "@/types/foodCatalogue";
 import React, { ReactNode } from "react";
-import { formErrorType } from "../../food-catalogue/page";
+import { formErrorType } from "@/app/dashboard/food-catalogue/page";
 
-interface FoodCatalogueModalType {
+type FoodCatalogueModalType = {
   setIsModalOpen: (isOpen: boolean) => void;
-  setNewFood: React.Dispatch<React.SetStateAction<FoodDataSent>>;
-  newFood: FoodDataSent;
+  setNewFood: React.Dispatch<React.SetStateAction<FoodData>>;
+  newFood: FoodData;
   cuisineData: Cuisine[];
   courseData: Course[];
   allergenData: Allergen[];
@@ -20,8 +20,8 @@ interface FoodCatalogueModalType {
   formError: formErrorType;
   FormWarning: (message: string) => ReactNode;
   closeModal: () => void;
-}
-export default function Modal({
+};
+export function Modal({
   setIsModalOpen,
   setNewFood,
   newFood,

@@ -4,6 +4,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { getSession } from "next-auth/react";
+import refreshAccessToken from "./refreshAccessToken";
 
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -40,12 +41,15 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
+    const session = await getSession();
+
     // Handle 401 Unauthorized errors (token expired)
     if (error.response?.status === 401) {
       // You could trigger a session refresh here if needed
       console.error("Authentication error:", error);
+      await refreshAccessToken(session?.user);
       // Optionally redirect to login
-      window.location.href = "/login";
+      // window.location.href = "/login";
     }
 
     return Promise.reject(error);
