@@ -59,6 +59,12 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
             text="User Management"
             path="/dashboard/user-management"
           />
+            <NavItem
+            handleNav={handleNav}
+            icon={<UserCog />}
+            text="Team Management"
+            path="/dashboard/team-management"
+          />
           <NavItem
             handleNav={handleNav}
             icon={<BellDot />}

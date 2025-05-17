@@ -5,10 +5,12 @@ const restaurantAccessSchema = new Schema({
   userId: {
     type: String,
     required: true,
+    ref: "User",
   },
   restaurantId: {
     type: String,
     required: true,
+    ref: "RestaurantData",
   },
   role: {
     type: String,
