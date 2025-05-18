@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 import { useSession } from "next-auth/react";
 import useRestaurantStore from "@/stores/restaurantStore";
@@ -12,6 +12,8 @@ import {
   RestaurantProfileFeatures,
   RestaurantProfileHero,
 } from "@/components/ui";
+import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
+import { useRouter } from "next/navigation";
 
 interface BusinessHours {
   day: string;
@@ -21,7 +23,8 @@ interface BusinessHours {
 }
 
 export default function RestaurantProfile() {
-  const session = useSession();
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const restaurantData = useRestaurantStore((state) => state.restaurantData);
   const getRestaurantDataByOwnerId = useRestaurantStore(
@@ -30,6 +33,11 @@ export default function RestaurantProfile() {
   const updateRestaurantData = useRestaurantStore(
     (state) => state.updateRestaurant
   );
+  const getRestaurantData = useRestaurantStore(
+    (state) => state.getRestaurantById
+  );
+
+  const { restaurantAccessList } = useRestaurantAccessStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<RestaurantData | null>(null);
@@ -145,11 +153,51 @@ export default function RestaurantProfile() {
     }
   };
 
+  const approvedAccess = useMemo(() => {
+    return restaurantAccessList.filter(({ status }) => status === "approved");
+  }, [restaurantAccessList]);
+
+  console.log("approvedAccess", approvedAccess);
   useEffect(() => {
-    if (session?.data?.user._id) {
-      getRestaurantDataByOwnerId(session.data?.user?._id);
+    if (!session || !session.user) {
+      alert("No user session found. Redirecting to login page.");
+      router.push("/login");
+      return;
     }
-  }, [session.data?.user?._id]);
+
+    const userId = session.user._id ?? "";
+    const accessLevel = session.user.userTypeDetails?.level ?? undefined;
+
+    const fetchRestaurantData = async () => {
+      if (userId && accessLevel !== undefined) {
+        // If user is an owner, fetch restaurant data by owner ID
+        if (accessLevel <= 1) {
+          await getRestaurantDataByOwnerId(userId);
+        } else {
+          // If user is at least USER, check for restaurant where admin has approved access. fetch restaurant data by restaurant ID
+          if (approvedAccess && approvedAccess.length > 0) {
+            const restaurantId = approvedAccess[0]?.restaurantId as string;
+            if (restaurantId) {
+              console.log("restaurantId", restaurantId);
+              await getRestaurantData(restaurantId);
+            }
+          }
+        }
+      } else {
+        // Handle case where user ID is not found
+        alert("No user ID found. Redirecting to login page.");
+        router.push("/login");
+      }
+    };
+    
+    fetchRestaurantData();
+    
+    // Determine user access level and fetch restaurant data accordingly
+  }, [
+    session?.user?._id,
+    session?.user?.userTypeDetails?.level,
+    restaurantAccessList,
+  ]);
 
   useEffect(() => {
     if (displayData?.businessHours && displayData.businessHours.length >= 1) {

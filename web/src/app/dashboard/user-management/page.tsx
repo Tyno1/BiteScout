@@ -1,6 +1,6 @@
 "use client";
 
-import UserModal from "@/components/ui/dashboard/Modal";
+import {UserModal} from "@/components/ui/dashboard/Modal";
 import React, { useState } from "react";
 
 interface newUserProps {

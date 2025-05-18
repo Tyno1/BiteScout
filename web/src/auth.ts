@@ -18,10 +18,10 @@ async function getUserTypeDetails(userTypeId: string) {
       };
     }
 
-    return { name: "user", level: 1 };
+    return { name: "guest", level: 4 };
   } catch (error) {
     console.error("Error fetching user type details:", error);
-    return { name: "user", level: 1 };
+    return { name: "guest", level: 4 };
   }
 }
 
@@ -116,7 +116,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           console.log("No userType in token, setting default");
           // Set default values when userType is missing
           session.user.userType = "user";
-          session.user.userTypeDetails = { name: "user", level: 3 };
+          session.user.userTypeDetails = { name: "guest", level: 4 };
         }
 
         if (token._id) {

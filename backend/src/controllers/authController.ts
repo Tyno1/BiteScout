@@ -79,7 +79,7 @@ export const register = async (
     }
 
     // Get the user type
-    const userType = await UserType.findOne({ name: "user" });
+    const userType = await UserType.findOne({ name: "guest" });
 
     if (!userType) {
       res.status(400).json({ message: "User type not found" });

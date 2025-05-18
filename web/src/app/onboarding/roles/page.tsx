@@ -20,7 +20,6 @@ export default function Onboarding() {
   const router = useRouter();
   const { updateUser } = useUpdateUser();
 
-  console.log("Session data:", session.data);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [restaurantData, setRestaurantData] = useState<RestaurantData>(

@@ -1,83 +1,165 @@
 import { Button } from "@/components/atoms";
-import { RestaurantAccess } from "@/types/restaurantAccess";
+import { AccessStatus, RestaurantAccess } from "@/types/restaurantAccess";
 import { RestaurantData } from "@/types/restaurantData";
-import { CircleCheck, Loader2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type CardProp = {
   data: RestaurantData;
   handleRestaurantSelect: (restaurantId: string) => void;
   restaurantAccessList: RestaurantAccess[];
-  isSubmitting: boolean;
 };
 
 const SearchResultCard = ({
   data,
   handleRestaurantSelect,
   restaurantAccessList,
-  isSubmitting,
 }: CardProp) => {
-  const [isPending, setIsPending] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>("pending");
 
   useEffect(() => {
-    const restaurantAccess = Array.isArray(restaurantAccessList)
-      ? restaurantAccessList.find((access) => access.restaurantId === data._id)
-      : undefined;
-
-    const hasAccess = !!restaurantAccess?._id;
-    const accessStatus = restaurantAccess?.status;
-
-    if (hasAccess && accessStatus === "pending") {
-      setIsPending(true);
-    } else if (hasAccess && accessStatus === "approved") {
-      setIsApproved(true);
+    if (!Array.isArray(restaurantAccessList) || !data?._id) {
+      return;
     }
-  }, [restaurantAccessList, data._id]);
+
+    const restaurantAccess = restaurantAccessList.find(
+      (access) => access.restaurantId === data._id
+    );
+
+    if (!restaurantAccess) {
+      setAccessStatus(null);
+      return;
+    }
+
+    switch (restaurantAccess?.status) {
+      case "approved":
+        setAccessStatus("approved");
+        break;
+      case "pending":
+        setAccessStatus("pending");
+        break;
+      case "suspended":
+        setAccessStatus("suspended");
+        break;
+      case "innactive":
+        setAccessStatus("innactive");
+        break;
+      default:
+        setAccessStatus(null);
+        break;
+    }
+  }, [restaurantAccessList, data?._id]);
 
   // Render search button based on access status
+  const ContactAdmin = () => (
+    <div className="mt-3 p-2 bg-blue-50 rounded-md border border-blue-100 flex items-start gap-1">
+      <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0" />
+      <p className="text-xs text-blue-700">
+        Contact your restaurant admin to activate your access
+      </p>
+    </div>
+  );
+
+  // Render button based on access status
   const renderActionButton = () => {
-    if (isPending) {
-      return (
-        <Button
-          disabled
-          variant="solid"
-          type="button"
-          text="Awaiting approval"
-        />
-      );
-    } else if (isApproved) {
-      return (
-        <Button variant="solid" type="button" text="Approved" disabled>
-          <CircleCheck className="mr-2" />
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          className="ml-auto"
-          onClick={() => data._id && handleRestaurantSelect(data._id)}
-          variant="solid"
-          type="submit"
-          text="Request Access"
-          disabled={isSubmitting}
-        >
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        </Button>
-      );
+    switch (accessStatus) {
+      case "pending":
+        return (
+          <div className="flex flex-col justify-end">
+            <Button
+              disabled
+              variant="solid"
+              type="button"
+              fullWidth
+              text="Access Pending"
+              className="cursor-not-allowed"
+            />
+            <ContactAdmin />
+          </div>
+        );
+
+      case "approved":
+        return (
+          <Button
+            variant="solid"
+            type="button"
+            text="Access Approved"
+            disabled
+            fullWidth
+            className="cursor-not-allowed"
+          />
+        );
+
+      case "suspended":
+        return (
+          <div className="flex flex-col justify-end">
+            <Button
+              disabled
+              variant="solid"
+              type="button"
+              text="Access Suspended"
+              fullWidth
+              className="cursor-not-allowed"
+            />
+            <ContactAdmin />
+          </div>
+        );
+
+      case "innactive":
+        return (
+          <div className="flex flex-col justify-end">
+            <Button
+              disabled
+              className="cursor-not-allowed"
+              variant="solid"
+              type="button"
+              fullWidth
+              text="Access Deactivated"
+            />
+            <ContactAdmin />
+          </div>
+        );
+        case null:
+        return (
+          <Button
+            onClick={() => data._id && handleRestaurantSelect(data._id)}
+            variant="solid"
+            type="button"
+            text="Request Access"
+            fullWidth
+            className="cursor-not-allowed"
+          />
+        );
+
+      // default:
+        return (
+          <div className="flex flex-col justify-end">
+            <Button
+              disabled
+              variant="solid"
+              type="button"
+              fullWidth
+              text="Access Pending"
+              className="bg-yellow-500 hover:bg-yellow-500 cursor-not-allowed"
+            />
+            <ContactAdmin />
+          </div>
+        );
     }
   };
 
   return (
-    <div className="flex gap-2 items-center justify-between p-2 mb-2 w-full">
-      <div className="flex gap-2 items-center">
-        <div className="h-10 w-10 bg-red-500 rounded">
-          <img src={data.logo || undefined} alt={""} />
-        </div>
-        <p>{data.name}</p>
+    <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center">
+      <div className="mb-2 sm:mb-0 w-full sm:w-[45%]">
+        <span className="text-sm font-medium text-gray-700">
+          {data?.name + "trgvehjdq jdbahjdvawjh " || "Restaurant"}
+        </span>
       </div>
-      {renderActionButton()}
+      <div className="mb-2 sm:mb-0 w-full sm:w-[45%]">
+        {renderActionButton()}
+      </div>
     </div>
   );
 };
+
 export default SearchResultCard;

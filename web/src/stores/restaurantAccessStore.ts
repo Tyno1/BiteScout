@@ -9,6 +9,7 @@ type RestaurantAccessState = {
   restaurantAccessList: RestaurantAccess[];
   error: string | null;
   isLoading: boolean;
+
   // actions
   createRestaurantAccess: ({
     userId,
@@ -16,11 +17,47 @@ type RestaurantAccessState = {
   }: {
     userId: string;
     restaurantId: string;
-  }) => Promise<{ success: boolean; error?: string }>;
+  }) => Promise<{
+    success: boolean;
+    restaurantAccess?: RestaurantAccess;
+    error?: string;
+  }>;
 
-  getRestaurantAccess: (
-    userId: string
-  ) => Promise<{ success: boolean; error?: string } | null>;
+  getRestaurantListAccess: (userId: string) => Promise<{
+    success: boolean;
+    restaurantAccessList?: RestaurantAccess[];
+    error?: string;
+  }>;
+
+  getRestaurantAccessListByOwnerId: (ownerId: string) => Promise<{
+    success: boolean;
+    restaurantAccessList?: RestaurantAccess[];
+    error?: string;
+  }>;
+
+  grantAccess: (accessId: string) => Promise<{
+    success: boolean;
+    restaurantAccess?: RestaurantAccess;
+    error?: string;
+  }>;
+
+  deleteAccess: (accessId: string) => Promise<{
+    success: boolean;
+    restaurantAccess?: RestaurantAccess;
+    error?: string;
+  }>;
+
+  suspendAccess: (accessId: string) => Promise<{
+    success: boolean;
+    restaurantAccess?: RestaurantAccess;
+    error?: string;
+  }>;
+
+  updateAccessRole: (accessId: string) => Promise<{
+    success: boolean;
+    restaurantAccess?: RestaurantAccess;
+    error?: string;
+  }>;
 
   resetAccess: () => void;
 };
@@ -83,7 +120,7 @@ const useRestaurantAccessStore = create<RestaurantAccessState>()(
         }
       },
 
-      getRestaurantAccess: async (userId: string) => {
+      getRestaurantListAccess: async (userId: string) => {
         set({ isLoading: true });
         try {
           const response = await apiClient.get(
@@ -113,6 +150,172 @@ const useRestaurantAccessStore = create<RestaurantAccessState>()(
         }
       },
 
+      getRestaurantAccessListByOwnerId: async (ownerId: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await apiClient.get(
+            `/restaurant-access/owner/${ownerId}`
+          );
+          if (response.data) {
+            set({ restaurantAccessList: response.data.restaurantAccesses });
+          }
+          return {
+            success: true,
+            restaurantAccessList: response.data.restaurantAccesses,
+          };
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Error fetching restaurant access",
+          });
+          return {
+            success: false,
+            error:
+              error instanceof Error ? error?.message : "An error occurred",
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      grantAccess: async (accessId: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await apiClient.patch(
+            `/restaurant-access/access/${accessId}/grant`
+          );
+          if (response.data) {
+            set({
+              restaurantAccessList: get().restaurantAccessList.map((item) =>
+                item._id === accessId ? response.data : item
+              ),
+            });
+          }
+          return {
+            success: true,
+            restaurantAccess: response.data,
+          };
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Error granting restaurant access",
+          });
+          return {
+            success: false,
+            error:
+              error instanceof Error ? error?.message : "An error occurred",
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      deleteAccess: async (accessId: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await apiClient.patch(
+            `/restaurant-access/access/${accessId}/delete`
+          );
+          if (response.data) {
+            set({
+              restaurantAccessList: get().restaurantAccessList.filter(
+                (item) => item._id !== accessId
+              ),
+            });
+          }
+          return {
+            success: true,
+            restaurantAccess: response.data,
+          };
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Error deleting restaurant access",
+          });
+          return {
+            success: false,
+            error:
+              error instanceof Error ? error?.message : "An error occurred",
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      updateAccessRole: async (accessId: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await apiClient.patch(
+            `/restaurant-access/access/${accessId}/update`
+          );
+          if (response.data) {
+            set({
+              restaurantAccessList: get().restaurantAccessList.map((item) =>
+                item._id === accessId ? response.data : item
+              ),
+            });
+          }
+          return {
+            success: true,
+            restaurantAccess: response.data,
+          };
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Error updating restaurant access",
+          });
+          return {
+            success: false,
+            error:
+              error instanceof Error ? error?.message : "An error occurred",
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      suspendAccess: async (accessId: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await apiClient.patch(
+            `/restaurant-access/access/${accessId}/suspend`,
+          );
+          console.log(response.data, "response.data");
+
+          if (response.data) {
+            set({
+              restaurantAccessList: get().restaurantAccessList.map((item) =>
+                item._id === accessId ? response.data : item
+              ),
+            });
+          }
+          return {
+            success: true,
+            restaurantAccess: response.data,
+          };
+        } catch (error) {
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : "Error suspending restaurant access",
+          });
+          return {
+            success: false,
+            error:
+              error instanceof Error ? error?.message : "An error occurred",
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       resetAccess: () =>
         set({
           restaurantAccess: DEFAULT_RESTAURANT_ACCESS,
@@ -124,7 +327,7 @@ const useRestaurantAccessStore = create<RestaurantAccessState>()(
     {
       name: "restaurantAccess",
       onRehydrateStorage: () => (state) => {
-        console.log("✅ restaurantAccessStore has been rehydrated", state);
+        console.log("restaurantAccessStore has been rehydrated", state);
       },
     }
   )

@@ -7,11 +7,13 @@ import SearchResultCard from "../components/searchResultCard";
 import useRestaurantStore from "@/stores/restaurantStore";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const RestaurantSearch = () => {
   // Session and store hooks
   const { data: session } = useSession();
   const userId = session?.user?._id;
+  const router = useRouter();
 
   const {
     getRestaurantsByName,
@@ -21,16 +23,18 @@ const RestaurantSearch = () => {
     isLoading: isSearchLoading,
   } = useRestaurantStore();
 
-  const { restaurantAccessList, getRestaurantAccess, createRestaurantAccess } =
-    useRestaurantAccessStore();
+  const {
+    restaurantAccessList,
+    getRestaurantListAccess,
+    createRestaurantAccess,
+    resetAccess,
+  } = useRestaurantAccessStore();
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-
-  console.log("Restaurant Access List:", restaurantAccessList);
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,16 +85,18 @@ const RestaurantSearch = () => {
     }
   };
 
-  // Fetch restaurant access on component mount
+  // Fetch restaurant access on component mount or when a search is performed
   useEffect(() => {
+    resetAccess();
+
     const fetchRestaurantAccess = async () => {
       if (userId) {
-        await getRestaurantAccess(userId);
+        await getRestaurantListAccess(userId);
       }
     };
 
     fetchRestaurantAccess();
-  }, [userId, getRestaurantAccess]);
+  }, [userId, getRestaurantListAccess, isSubmitting]);
 
   // Redirect to dashboard if user has access to any restaurant
   useEffect(() => {
@@ -104,10 +110,10 @@ const RestaurantSearch = () => {
       const hasAccess = isMatched?.status === "approved";
 
       if (hasAccess) {
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       }
     }
-  }, [restaurantAccessList, restaurantDatas]);
+  }, [restaurantAccessList, restaurantDatas, router]);
 
   // Clear results when component mounts
   useEffect(() => {
@@ -153,7 +159,6 @@ const RestaurantSearch = () => {
           handleRestaurantSelect={handleRestaurantSelect}
           data={restaurant}
           restaurantAccessList={restaurantAccessList}
-          isSubmitting={isSubmitting}
         />
       ));
     }
