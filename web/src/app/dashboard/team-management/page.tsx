@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { Trash2, Ban, CheckCircle, User } from "lucide-react";

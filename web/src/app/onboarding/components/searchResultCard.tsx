@@ -72,7 +72,7 @@ const SearchResultCard = ({
               type="button"
               fullWidth
               text="Access Pending"
-              className="bg-yellow-500 hover:bg-yellow-500 cursor-not-allowed"
+              className="cursor-not-allowed"
             />
             <ContactAdmin />
           </div>
@@ -81,13 +81,12 @@ const SearchResultCard = ({
       case "approved":
         return (
           <Button
-            onClick={() => data._id && handleRestaurantSelect(data._id)}
             variant="solid"
             type="button"
             text="Access Approved"
             disabled
             fullWidth
-            className="bg-green-500 hover:bg-green-500 cursor-not-allowed"
+            className="cursor-not-allowed"
           />
         );
 
@@ -100,7 +99,7 @@ const SearchResultCard = ({
               type="button"
               text="Access Suspended"
               fullWidth
-              className="bg-orange-500 hover:bg-orange-500 cursor-not-allowed"
+              className="cursor-not-allowed"
             />
             <ContactAdmin />
           </div>
@@ -111,7 +110,7 @@ const SearchResultCard = ({
           <div className="flex flex-col justify-end">
             <Button
               disabled
-              className="bg-red-500 hover:bg-red-500 cursor-not-allowed"
+              className="cursor-not-allowed"
               variant="solid"
               type="button"
               fullWidth
@@ -119,6 +118,17 @@ const SearchResultCard = ({
             />
             <ContactAdmin />
           </div>
+        );
+        case null:
+        return (
+          <Button
+            onClick={() => data._id && handleRestaurantSelect(data._id)}
+            variant="solid"
+            type="button"
+            text="Request Access"
+            fullWidth
+            className="cursor-not-allowed"
+          />
         );
 
       // default:

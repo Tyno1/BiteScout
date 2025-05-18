@@ -23,7 +23,7 @@ interface BusinessHours {
 }
 
 export default function RestaurantProfile() {
-  const session = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
 
   const restaurantData = useRestaurantStore((state) => state.restaurantData);
@@ -33,7 +33,9 @@ export default function RestaurantProfile() {
   const updateRestaurantData = useRestaurantStore(
     (state) => state.updateRestaurant
   );
-  const getRestaurantData = useRestaurantStore((state) => state.getRestaurant);
+  const getRestaurantData = useRestaurantStore(
+    (state) => state.getRestaurantById
+  );
 
   const { restaurantAccessList } = useRestaurantAccessStore();
 
@@ -155,34 +157,45 @@ export default function RestaurantProfile() {
     return restaurantAccessList.filter(({ status }) => status === "approved");
   }, [restaurantAccessList]);
 
+  console.log("approvedAccess", approvedAccess);
   useEffect(() => {
-    const userId = session?.data?.user?._id ?? "";
-    const userLevel = session?.data?.user?.userTypeDetails?.level ?? undefined;
+    if (!session || !session.user) {
+      alert("No user session found. Redirecting to login page.");
+      router.push("/login");
+      return;
+    }
 
-    // Determine user access level and fetch restaurant data accordingly
-    if (userId) {
-      // If user is an owner, fetch restaurant data by owner ID
-      if (userLevel !== undefined && userLevel <= 1) {
-        getRestaurantDataByOwnerId(userId);
-      } else {
-        // If user is an admin, check for restaurant where admin has approved access. fetch restaurant data by restaurant ID
-        if (approvedAccess && approvedAccess.length > 0) {
-          const restaurantId = approvedAccess[0]?.restaurantId;
-          if (restaurantId) {
-            getRestaurantData(
-              typeof restaurantId === "string" ? restaurantId : ""
-            );
+    const userId = session.user._id ?? "";
+    const accessLevel = session.user.userTypeDetails?.level ?? undefined;
+
+    const fetchRestaurantData = async () => {
+      if (userId && accessLevel !== undefined) {
+        // If user is an owner, fetch restaurant data by owner ID
+        if (accessLevel <= 1) {
+          await getRestaurantDataByOwnerId(userId);
+        } else {
+          // If user is at least USER, check for restaurant where admin has approved access. fetch restaurant data by restaurant ID
+          if (approvedAccess && approvedAccess.length > 0) {
+            const restaurantId = approvedAccess[0]?.restaurantId as string;
+            if (restaurantId) {
+              console.log("restaurantId", restaurantId);
+              await getRestaurantData(restaurantId);
+            }
           }
         }
+      } else {
+        // Handle case where user ID is not found
+        alert("No user ID found. Redirecting to login page.");
+        router.push("/login");
       }
-    } else {
-      // Handle case where user ID is not found
-      alert("No user ID found. Redirecting to login page.");
-      router.push("/login");
-    }
+    };
+    
+    fetchRestaurantData();
+    
+    // Determine user access level and fetch restaurant data accordingly
   }, [
-    session?.data?.user?._id,
-    session?.data?.user?.userTypeDetails?.level,
+    session?.user?._id,
+    session?.user?.userTypeDetails?.level,
     restaurantAccessList,
   ]);
 
