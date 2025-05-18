@@ -1,7 +1,6 @@
 import RestaurantData from "../models/RestaurantData.js";
 import { Request, Response, NextFunction } from "express";
 import { Restaurant } from "@/src/types/restaurantData.js";
-import mongoose from "mongoose";
 
 // Helper function to validate request ID
 const validateId = (req: Request) => {
@@ -60,12 +59,15 @@ export const getRestaurantById = async (
     const id = validateId(req);
 
     // If ID is provided, return single restaurant
-    const restaurant = await (RestaurantData as any).findById(id);
+    const restaurant = await RestaurantData.findById(id);
 
     if (!restaurant) {
       res.status(404).json({ error: "Restaurant not found" });
       return;
     }
+
+    console.log("restaurant", restaurant);
+    
 
     res.json(restaurant);
   } catch (error: any) {

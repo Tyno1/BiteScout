@@ -13,7 +13,7 @@ type RestaurantStore = {
   createRestaurant: (
     data: RestaurantData
   ) => Promise<{ success: boolean; error?: string }>;
-  getRestaurant: (id: string) => Promise<void>;
+  getRestaurantById: (id: string) => Promise<void>;
   getRestaurantByOwnerId: (ownerId: string) => Promise<void>;
   getRestaurantsByName: (
     name: string
@@ -113,11 +113,11 @@ const useRestaurantStore = create<RestaurantStore>((set) => ({
     }
   },
 
-  getRestaurant: async (id: string) => {
+  getRestaurantById: async (id: string) => {
     try {
       set({ isLoading: true, error: null });
 
-      const response = await apiClient.get(`/restaurants?id=${id}`);
+      const response = await apiClient.get(`/restaurants/${id}`);
 
       set({
         restaurantData: response.data,
