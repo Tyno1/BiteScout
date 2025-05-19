@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { useRouter } from "next/navigation";
+import getApprovedAccessList from "@/utils/getApprovedAccessList";
 
 interface BusinessHours {
   day: string;
@@ -153,11 +154,8 @@ export default function RestaurantProfile() {
     }
   };
 
-  const approvedAccess = useMemo(() => {
-    return restaurantAccessList.filter(({ status }) => status === "approved");
-  }, [restaurantAccessList]);
+  const approvedAccess = getApprovedAccessList(restaurantAccessList);
 
-  console.log("approvedAccess", approvedAccess);
   useEffect(() => {
     if (!session || !session.user) {
       alert("No user session found. Redirecting to login page.");
@@ -178,7 +176,6 @@ export default function RestaurantProfile() {
           if (approvedAccess && approvedAccess.length > 0) {
             const restaurantId = approvedAccess[0]?.restaurantId as string;
             if (restaurantId) {
-              console.log("restaurantId", restaurantId);
               await getRestaurantData(restaurantId);
             }
           }
@@ -189,9 +186,9 @@ export default function RestaurantProfile() {
         router.push("/login");
       }
     };
-    
+
     fetchRestaurantData();
-    
+
     // Determine user access level and fetch restaurant data accordingly
   }, [
     session?.user?._id,

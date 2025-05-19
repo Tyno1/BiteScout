@@ -10,11 +10,11 @@ type CardProp = {
   restaurantAccessList: RestaurantAccess[];
 };
 
-const SearchResultCard = ({
+export function SearchResultCard({
   data,
   handleRestaurantSelect,
   restaurantAccessList,
-}: CardProp) => {
+}: CardProp) {
   const [accessStatus, setAccessStatus] = useState<AccessStatus>("pending");
 
   useEffect(() => {
@@ -119,7 +119,7 @@ const SearchResultCard = ({
             <ContactAdmin />
           </div>
         );
-        case null:
+      case null:
         return (
           <Button
             onClick={() => data._id && handleRestaurantSelect(data._id)}
@@ -131,7 +131,7 @@ const SearchResultCard = ({
           />
         );
 
-      // default:
+        // default:
         return (
           <div className="flex flex-col justify-end">
             <Button
@@ -160,6 +160,4 @@ const SearchResultCard = ({
       </div>
     </div>
   );
-};
-
-export default SearchResultCard;
+}

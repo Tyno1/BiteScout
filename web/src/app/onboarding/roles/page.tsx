@@ -8,9 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useUpdateUser } from "@/app/hooks/useUpdateUser";
 import type { RestaurantData } from "@/types/restaurantData";
-import { RoleOnboardingForm } from "../components/roleOnboardingForm";
+import { RoleOnboardingForm, FormErrorState } from "@/components/ui";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
-import type { FormErrorState } from "../components/roleOnboardingForm";
 import useRestaurantStore from "@/stores/restaurantStore";
 import { Spinner } from "@/components/atoms/loaders/Spinners";
 
@@ -19,7 +18,6 @@ export default function Onboarding() {
   const session = useSession();
   const router = useRouter();
   const { updateUser } = useUpdateUser();
-
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [restaurantData, setRestaurantData] = useState<RestaurantData>(

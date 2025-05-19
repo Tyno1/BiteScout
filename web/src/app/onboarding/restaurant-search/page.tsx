@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Button, Input } from "@/components/atoms";
-import SearchResultCard from "../components/searchResultCard";
+import { SearchResultCard } from "@/components/ui";
 import useRestaurantStore from "@/stores/restaurantStore";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { useSession } from "next-auth/react";
