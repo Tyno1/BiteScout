@@ -47,7 +47,7 @@ export function Button({
         ? "text-white"
         : variant === "solid"
         ? "border-1 bg-orange-600/80 border-orange-700 text-white"
-        : "border border-1 border-gray-500 bg-transparent text-black"
+        : "border border-1 border-orange-500 bg-transparent text-orange-600"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
       variant === "plain"
