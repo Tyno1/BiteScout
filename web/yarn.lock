@@ -6935,6 +6935,11 @@ turbo-stream@2.4.0:
   resolved "https://registry.npmjs.org/turbo-stream/-/turbo-stream-2.4.0.tgz"
   integrity sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==
 
+tw-animate-css@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/tw-animate-css/-/tw-animate-css-1.3.0.tgz"
+  integrity sha512-jrJ0XenzS9KVuDThJDvnhalbl4IYiMQ/XvpA0a2FL8KmlK+6CSMviO7ROY/I7z1NnUs5NnDhlM6fXmF40xPxzw==
+
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz"

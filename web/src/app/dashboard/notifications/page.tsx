@@ -62,8 +62,8 @@ export default function Notifications() {
     if (notification.type === "access-request") {
       return (
         <>
-          <Button color="success" variant="solid" size="sm" text="Approve" />
-          <Button color="danger" variant="outline" size="sm" text="Decline" />
+          <Button color="success" variant="plain" size="sm" text="Approve" />
+          <Button color="danger" variant="plain" size="sm" text="Decline" />
         </>
       );
     } else {
@@ -107,7 +107,7 @@ export default function Notifications() {
                 filteredNotifications[selectedType as keyof FilteredNotificationType].map((notification) => (
                   <div
                     key={notification._id}
-                    className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg p-5 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center border-l-4 border-orange-500"
+                    className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg p-5 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center"
                   >
                     <div className="mb-4 md:mb-0">
                       <h2 className="text-lg font-semibold text-gray-800">
