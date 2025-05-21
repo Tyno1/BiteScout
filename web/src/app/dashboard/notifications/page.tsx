@@ -5,6 +5,8 @@ import { Notification } from "@/types";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { Bell, Mail, AlertCircle } from "lucide-react";
+import { NotificationCard } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 type FilteredNotificationType = {
   accessRequest: Notification[];
@@ -14,7 +16,13 @@ type FilteredNotificationType = {
 
 export default function Notifications() {
   const { data: session } = useSession();
-  const { fetchNotifications, notifications } = useNotificationStore();
+  const router = useRouter();
+  const {
+    fetchNotifications,
+    notifications,
+    markAllNotificationsAsRead,
+    markNotificationAsRead,
+  } = useNotificationStore();
   const [selectedType, setSelectedType] = useState("accessRequest");
 
   const filteredNotifications = useMemo<FilteredNotificationType>(() => {
@@ -37,17 +45,11 @@ export default function Notifications() {
     return groupedNotifications;
   }, [notifications]);
 
-  useEffect(() => {
-    if (session?.user?._id) {
-      fetchNotifications(session.user._id);
-    }
-  }, [session?.user?._id, fetchNotifications]);
-
   // Map notification types to their icons
   const notificationIcons = {
     accessRequest: <Bell className="w-5 h-5" />,
     message: <Mail className="w-5 h-5" />,
-    system: <AlertCircle className="w-5 h-5" />
+    system: <AlertCircle className="w-5 h-5" />,
   };
 
   // Format the type name for display
@@ -61,22 +63,79 @@ export default function Notifications() {
   const renderActionButtons = (notification: Notification) => {
     if (notification.type === "access-request") {
       return (
-        <>
-          <Button color="success" variant="plain" size="sm" text="Approve" />
-          <Button color="danger" variant="plain" size="sm" text="Decline" />
-        </>
+        <div className="flex space-x-2 items-center">
+          <Button
+            color="black"
+            variant="outline"
+            size="sm"
+            text="Manage Request"
+            onClick={() => router.push("/dashboard/team-management")}
+          />{" "}
+          <Button
+            color="primary"
+            variant="outline"
+            size="sm"
+            text="Mark as Read"
+            onClick={() =>
+              notification._id && handleMarkAsRead(notification?._id)
+            }
+          />
+        </div>
       );
     } else {
-      return <Button color="primary" variant="outline" size="sm" text="Mark as Read" />;
+      return (
+        <Button
+          color="primary"
+          variant="outline"
+          size="sm"
+          text="Mark as Read"
+        />
+      );
     }
   };
+  const readNotification = (notifications: Notification[]) => {
+    const filter = notifications.filter((notification) => !notification.read);
+    return filter.length;
+  };
+
+  const handlemarkAllAsRead = () => {
+    if (notifications.length > 0 && session?.user?._id) {
+      markAllNotificationsAsRead(session.user._id);
+    }
+  };
+  const handleMarkAsRead = (notificationId: string) => {
+    const markarkAsRead = async () => {
+      if (session?.user?._id) {
+        await markNotificationAsRead(notificationId, session.user._id);
+        await fetchNotifications(session.user._id);
+      }
+    };
+    markarkAsRead();
+  };
+
+  useEffect(() => {
+    if (session?.user?._id) {
+      fetchNotifications(session.user._id);
+    }
+  }, [session?.user?._id, fetchNotifications]);
 
   return (
     <main className="w-full min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Notifications</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold mb-6">Notifications</h1>
+          <Button
+            color="primary"
+            variant="solid"
+            size="sm"
+            text="Mark All as Read"
+            onClick={handlemarkAllAsRead}
+          />
+        </div>
+
         {filteredNotifications && (
           <>
+            {/* notification header */}
             <div className="flex flex-col md:flex-row justify-between mb-6 w-full md:w-[70%]">
               {Object.entries(filteredNotifications).map(
                 ([type, notification]) => (
@@ -90,52 +149,48 @@ export default function Notifications() {
                     } py-3 px-4 text-sm mb-2 transition-all duration-200 ease-in-out relative`}
                   >
                     <span className="mr-2">
-                      {notificationIcons[type as keyof typeof notificationIcons]}
+                      {
+                        notificationIcons[
+                          type as keyof typeof notificationIcons
+                        ]
+                      }
                     </span>
                     {formatTypeName(type)}
-                    {notification.length > 0 && (
+                    {readNotification(notification) > 0 && (
                       <span className="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {notification.length}
+                        {readNotification(notification)}
                       </span>
                     )}
                   </button>
                 )
               )}
             </div>
+            {/* notification list */}
             <div className="mt-4">
-              {filteredNotifications[selectedType as keyof FilteredNotificationType]?.length > 0 ? (
-                filteredNotifications[selectedType as keyof FilteredNotificationType].map((notification) => (
-                  <div
+              {filteredNotifications[
+                selectedType as keyof FilteredNotificationType
+              ]?.length > 0 ? (
+                filteredNotifications[
+                  selectedType as keyof FilteredNotificationType
+                ].map((notification) => (
+                  <NotificationCard
                     key={notification._id}
-                    className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg p-5 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center"
-                  >
-                    <div className="mb-4 md:mb-0">
-                      <h2 className="text-lg font-semibold text-gray-800">
-                        {notification.data.requesterName || "Notification"}
-                      </h2>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {notification.type === "access-request" 
-                          ? `is requesting access to ${notification.data.restaurantName}`
-                          : notification?.data?.message || "New notification"}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">
-                        {new Date(notification.createdAt).toLocaleString(undefined, {
-                          dateStyle: 'medium',
-                          timeStyle: 'short'
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2 w-full md:w-auto">
-                      {renderActionButtons(notification)}
-                    </div>
-                  </div>
+                    notification={notification}
+                    renderActionButtons={renderActionButtons}
+                  />
                 ))
               ) : (
                 <div className="bg-white p-8 rounded-lg shadow-sm text-center">
                   <div className="flex justify-center mb-4">
-                    {notificationIcons[selectedType as keyof typeof notificationIcons]}
+                    {
+                      notificationIcons[
+                        selectedType as keyof typeof notificationIcons
+                      ]
+                    }
                   </div>
-                  <h3 className="text-lg font-medium text-gray-700">No {formatTypeName(selectedType)} Notifications</h3>
+                  <h3 className="text-lg font-medium text-gray-700">
+                    No {formatTypeName(selectedType)} Notifications
+                  </h3>
                   <p className="text-gray-500 mt-2">You're all caught up!</p>
                 </div>
               )}

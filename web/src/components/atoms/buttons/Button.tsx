@@ -75,7 +75,7 @@ export function Button({
         ? "text-black"
         : variant === "solid"
         ? "bg-black text-white"
-        : "border border-2 border-black bg-none text-black"
+        : "border border-2 border-black bg-none text-black hover:text-white"
     } `,
     white: `hover:bg-gray-400 focus:ring-white ${
       variant === "plain"

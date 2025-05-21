@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { TopNav, SideNav  } from "@/components/ui";
+import { TopNav, SideNav } from "@/components/ui";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { Spinner } from "@/components/atoms";
 
@@ -80,11 +80,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="flex flex-col h-screen w-screen relative">
-      <TopNav
-        onMenuClick={handleMenuClick}
-        userName={session?.user?.name || ""}
-        userId={session?.user?._id}
-      />
+      {session?.user && (
+        <TopNav onMenuClick={handleMenuClick} user={session.user} />
+      )}
 
       {/* Mobile navigation overlay */}
       {isMenuOpen && (
