@@ -1,29 +1,36 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getCurrentSession } from "./app/actions/getSessionAction";
+import { jwtDecode } from "jwt-decode";
 
-export function middleware(req: NextRequest) {
+// function getRoleFromToken(sessionToken) {}
+
+export async function middleware(request: NextRequest) {
   try {
-    const { nextUrl } = req;
-    const authToken =
-      req.cookies.get("authjs.session-token")?.value ||
-      req.cookies.get("__Secure-next-auth.session-token")?.value;
+    const { nextUrl } = request;
+    const session = await getCurrentSession();
+    console.log(session);
 
-    // Define protected paths
-    const isProtectedRoute = nextUrl.pathname.startsWith("/dashboard");
+    const token = jwtDecode(session?.user?.accessToken ?? "");
+    console.log("token",token);
+    
 
-    if (isProtectedRoute && !authToken) {
-      return NextResponse.redirect(new URL("/login", nextUrl));
-    }
+    // // Define protected paths
+    // const isProtectedRoute = nextUrl.pathname.startsWith("/dashboard");
 
-    // Auth pages (login, register)
-    const isAuthPage =
-      nextUrl.pathname === "/login" || nextUrl.pathname === "/register";
+    // if (isProtectedRoute && !authToken) {
+    //   return NextResponse.redirect(new URL("/login", nextUrl));
+    // }
 
-    // if in authpage with token present, redirect to onboarding
-    if (isAuthPage && authToken) {
-      return NextResponse.redirect(new URL("/login/loading", nextUrl));
-    }
+    // // Auth pages (login, register)
+    // const isAuthPage =
+    //   nextUrl.pathname === "/login" || nextUrl.pathname === "/register";
+
+    // // if in authpage with token present, redirect to onboarding
+    // if (isAuthPage && authToken) {
+    //   return NextResponse.redirect(new URL("/login/loading", nextUrl));
+    // }
 
     //   // If all checks pass, allow the request to proceed
     return NextResponse.next();
@@ -35,5 +42,14 @@ export function middleware(req: NextRequest) {
 
 // Define the matcher - this tells Next.js which paths to run the middleware on
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };
