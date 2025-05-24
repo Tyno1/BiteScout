@@ -5,10 +5,10 @@ import refreshAccessToken from "./utils/refreshAccessToken";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-async function getUserTypeDetails(userTypeId: string) {
+async function getUserTypeDetails(userType: string) {
   try {
     const response = await axios.get(
-      `${BACKEND_SERVER}/user-types/${userTypeId}`
+      `${BACKEND_SERVER}/user-types/${userType}`
     );
 
     if (response.data) {
@@ -115,7 +115,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } else {
           console.log("No userType in token, setting default");
           // Set default values when userType is missing
-          session.user.userType = "user";
+          session.user.userType = "guest";
           session.user.userTypeDetails = { name: "guest", level: 4 };
         }
 
