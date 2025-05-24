@@ -39,47 +39,47 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 ";
+    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer";
 
   const colorStyles = {
-    primary: `hover:bg-orange-600/70 hover:text-white hover:border-orange-500 focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 ${
+    primary: `hover:bg-primary/99 hover:text-white hover:border-primary focus:ring-primary focus:bg-primary/20 focus:border-none focus:text-primary ${
       variant === "plain"
-        ? "text-white"
+        ? "text-primary"
         : variant === "solid"
         ? "border-1 bg-orange-600/80 border-orange-700 text-white"
-        : "border border-1 border-gray-500 bg-transparent text-black"
+        : "border border-1 border-orange-500 bg-transparent text-orange-600"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
       variant === "plain"
-        ? "text-white"
+        ? "text-secondary"
         : variant === "solid"
         ? "bg-yellow text-white"
         : "border border-2 border-yellow bg-none text-yellow"
     }`,
-    danger: `hover:bg-red-900 focus:ring-red-900 ${
+    danger: `hover:bg-destructive focus:ring-destructive ${
       variant === "plain"
-        ? "text-white"
+        ? "text-destructive hover:text-white"
         : variant === "solid"
-        ? "text-white bg-red-500"
-        : "border border-2 border-orange bg-none text-orange"
+        ? "text-white bg-destructive"
+        : "border border-2 border-destructive bg-none text-destructive hover:text-white"
     }`,
-    success: `hover:bg-green-900 focus:ring-green-500 ${
+    success: `hover:bg-success focus:ring-success ${
       variant === "plain"
-        ? "text-white"
+        ? "text-success hover:text-white"
         : variant === "solid"
-        ? "bg-green-900 text-white"
-        : "border border-2 border-green-600 bg-none text-green-600"
+        ? "bg-success text-white"
+        : "border border-2 border-success bg-none text-success"
     } `,
-    black: `hover:bg-red focus:ring-red ${
-      variant === "plain"
-        ? "text-white"
-        : variant === "solid"
-        ? "bg-black text-white"
-        : "border border-2 border-black bg-none text-black"
-    } `,
-    white: `hover:bg-gray-400 focus:ring-red ${
+    black: `hover:bg-black focus:ring-black ${
       variant === "plain"
         ? "text-black"
+        : variant === "solid"
+        ? "bg-black text-white"
+        : "border border-2 border-black bg-none text-black hover:text-white"
+    } `,
+    white: `hover:bg-gray-400 focus:ring-white ${
+      variant === "plain"
+        ? "text-white"
         : variant === "solid"
         ? "bg-white text-black"
         : "border border-2 border-white bg-none text-white"
