@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.refreshToken = user.refreshToken;
           token.expiresIn = user.expiresIn; // Set expiration time
         }
-        if (Date.now() < (token.expiresIn as number)) {          
+        if (Date.now() < (token.expiresIn as number)) {
           return token;
         }
 
@@ -103,17 +103,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           session.user.accessToken = token.accessToken as string;
           session.user.refreshToken = token.refreshToken as string;
         }
-
         // Add token data to session
         session.user._id = token._id as string;
 
-        // Get User Type Details
+        // assign userType and Get User Type Details
         if (token.userType) {
+          session.user.userType = token.userType as string;
           session.user.userTypeDetails = await getUserTypeDetails(
             token.userType as string
           );
         } else {
-          console.log("No userType in token, setting default");
           // Set default values when userType is missing
           session.user.userType = "guest";
           session.user.userTypeDetails = { name: "guest", level: 4 };
