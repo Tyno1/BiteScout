@@ -45,8 +45,8 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     userType: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "UserType",
+      type: string,
+      enum: ["guest", "user", "admin", "moderator", "root"],
       required: true,
     },
   },
