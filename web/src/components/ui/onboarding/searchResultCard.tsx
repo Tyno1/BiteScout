@@ -130,21 +130,6 @@ export function SearchResultCard({
             className="cursor-not-allowed"
           />
         );
-
-        // default:
-        return (
-          <div className="flex flex-col justify-end">
-            <Button
-              disabled
-              variant="solid"
-              type="button"
-              fullWidth
-              text="Access Pending"
-              className="bg-yellow-500 hover:bg-yellow-500 cursor-not-allowed"
-            />
-            <ContactAdmin />
-          </div>
-        );
     }
   };
 
@@ -152,7 +137,7 @@ export function SearchResultCard({
     <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center">
       <div className="mb-2 sm:mb-0 w-full sm:w-[45%]">
         <span className="text-sm font-medium text-gray-700">
-          {data?.name + "trgvehjdq jdbahjdvawjh " || "Restaurant"}
+          {data?.name || "Restaurant"}
         </span>
       </div>
       <div className="mb-2 sm:mb-0 w-full sm:w-[45%]">

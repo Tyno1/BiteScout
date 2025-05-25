@@ -10,10 +10,10 @@ export async function middleware(request: NextRequest) {
   try {
     const { nextUrl } = request;
     const session = await getCurrentSession();
-    console.log(session);
+    // console.log(session);
 
     const token = jwtDecode(session?.user?.accessToken ?? "");
-    console.log("token",token);
+    // console.log("token",token);
     
 
     // // Define protected paths

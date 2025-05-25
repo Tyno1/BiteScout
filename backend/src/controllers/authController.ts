@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/User.js";
-import UserType from "../models/UserType.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -78,25 +77,18 @@ export const register = async (
       return;
     }
 
-    // Get the user type
-    const userType = await UserType.findOne({ name: "guest" });
-
-    if (!userType) {
-      res.status(400).json({ message: "User type not found" });
-      return;
-    }
     // Create a new user
     const newUser = await User.create({
       name: `${firstName} ${lastName}`,
       email,
       password,
-      userType,
+      userType: "guest",
     });
 
     const userWithoutPass = {
       name: newUser.name,
       email: newUser.email,
-      userType: newUser.userType
+      userType: newUser.userType,
     };
 
     res.status(201).json({
