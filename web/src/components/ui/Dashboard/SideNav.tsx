@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import {
@@ -16,13 +16,13 @@ import {
   LogOut,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { NavItem } from "@/components/ui/dashboard";
+import { NavItem } from "@/components/ui";
 
 interface SideNavProp {
   setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
+export function SideNav({ setIsMenuOpen }: SideNavProp) {
   const router = useRouter();
 
   //   handle navigation
@@ -59,7 +59,7 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
             text="User Management"
             path="/dashboard/user-management"
           />
-            <NavItem
+          <NavItem
             handleNav={handleNav}
             icon={<UserCog />}
             text="Team Management"
@@ -116,6 +116,4 @@ const SideNav = ({ setIsMenuOpen }: SideNavProp) => {
       </nav>
     </div>
   );
-};
-
-export default SideNav;
+}

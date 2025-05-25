@@ -30,13 +30,12 @@ export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
         className={`
           flex items-center 
           px-2 py-4
-          cursor-pointer 
           transition-colors w-full
-          focus:outline-none focus:ring-1 focus:ring-orange-500 focus:ring-offset-0 focus:ring-rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:ring-rounded-lg
           ${
             isActive
-              ? "bg-orange-600 border-1 border-orange-600 text-white rounded-lg"
-              : "hover:bg-orange-500/20 text-gray-900 rounded-lg"
+              ? "bg-primary border-1 border-primary text-white rounded-lg"
+              : "hover:bg-primary/20 text-gray-900 rounded-lg"
           }
         `}
       >

@@ -3,6 +3,11 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
+if (!BACKEND_API) {
+  throw new Error(
+    "NEXT_PUBLIC_BACKEND_URL is not defined in the environment variables"
+  );
+}
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -15,19 +20,25 @@ export function useUpdateUser() {
       return;
     }
 
+    if (!session) {
+      setError("User session is not available");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
       const response = await axios.put(`${BACKEND_API}/users/${id}`);
-      const data = response.data;
 
       if (!response.data) {
         setError("No data returned from the server");
         return;
       }
+      const data = response.data;
 
       // 2. Update the client-side session with new data
+
       await update({
         ...session,
         user: {

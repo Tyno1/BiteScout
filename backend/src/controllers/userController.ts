@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import RestaurantData from "../models/RestaurantData.js";
 import User from "../models/User.js";
-import UserType from "../models/UserType.js";
 
 export const UpdateUser = async (
   req: Request,
@@ -23,20 +22,10 @@ export const UpdateUser = async (
         .json({ message: "User is not a Restaurant Owner" });
     }
 
-    // Find the Admin User Type (level 1) to update userType to Admin
-    const userType = await UserType.findOne({
-      level: 1,
-    });
-
-    // if Admin user type is not found
-    if (!userType) {
-      return res.status(404).json({ message: "Admin User Type not found" });
-    }
-
-    // Assign the gotten data to updated Data object
+    // Assign admin status to the user
     const updatedData = {
       restaurantCount: restaurant.length,
-      userType: userType._id,
+      userType: "admin" as const,
     };
 
     // Update the user's restaurant count and userType to Admin
@@ -51,7 +40,7 @@ export const UpdateUser = async (
     }
 
     return res.status(200).json({
-      message: "User updated successfully",
+      message: "User promoted to Admin successfully",
       user,
     });
   } catch (error: any) {

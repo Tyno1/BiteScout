@@ -3,7 +3,6 @@ import RestaurantAccess from "../models/RestaurantAccess.js";
 import RestaurantData from "../models/RestaurantData.js";
 import User from "../models/User.js";
 import { createAndSendNotification } from "../services/notificationService.js";
-import UserTypeModel from "../models/UserType.js";
 
 export enum UserType {
   Guest = "guest",
@@ -132,20 +131,9 @@ const updateUserUsertype = async (
   userId: string,
   res: Response
 ) => {
-  const userTypeRecord = await UserTypeModel.findOne({
-    name: usertype.toLowerCase(),
-  });
-
-  if (!userTypeRecord) {
-    return {
-      error: "User type not found during access request process",
-      status: 404,
-    };
-  }
-
   const user = await User.findByIdAndUpdate(
     userId,
-    { userType: userTypeRecord._id },
+    { userType: usertype.toLowerCase() },
     { new: true }
   );
 
@@ -299,7 +287,7 @@ export const GrantAccess = async (
     }
     try {
       const updatedUser = await updateUserUsertype(
-        UserType.User,
+        UserType.Moderator,
         accessRecord.userId.toString(),
         res
       );
@@ -394,7 +382,7 @@ export const DeleteAccess = async (
   res: Response,
   next: NextFunction
 ) => {
- try {
+  try {
     const { accessId } = req.params;
 
     if (!accessId) {

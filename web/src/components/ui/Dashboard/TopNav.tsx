@@ -2,22 +2,15 @@
 
 import { IconButton, Input } from "@/components/atoms";
 import { Bell, ChefHat, Menu } from "lucide-react";
-import { useNotifications } from "@/app/hooks/useNotification"; // Import the hook
 import { NotificationBadge } from "@/components/atoms/badges";
+import { User } from "@/types";
 
 type TopNavProps = {
   onMenuClick: () => void;
-  userId?: string;
-  userName?: string;
-  userImage?: string;
+  user: User;
 };
 
-export function TopNav({
-  onMenuClick,
-  userName,
-  userImage = "/placeholder.svg?height=32&width=32",
-  userId,
-}: TopNavProps) {
+export function TopNav({ onMenuClick, user }: TopNavProps) {
   return (
     <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
       {/* Conditionally rendered hamburger Menu */}
@@ -56,17 +49,28 @@ export function TopNav({
             aria-label="Notifications"
           >
             <Bell />
-            <NotificationBadge userId={userId} />
+            <NotificationBadge userId={user?._id} />
           </button>
 
           {/* User profile */}
           <div className="flex items-center gap-2 cursor-pointer">
             <img
-              src={userImage || "/placeholder.svg"}
-              alt={userName}
+              src={user?.image || "/placeholder.svg"}
+              alt={user?.name || "User"}
               className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
             />
-            <span className="hidden md:inline-block text-sm">{userName}</span>
+            <div className="hidden md:flex flex-col items-start">
+              <span className="hidden md:inline-block text-sm">
+                {user?.name}
+              </span>
+              
+               <span className="hidden md:inline-block text-xs text-primary font-bold rounded-full">
+              {user?.restaurantCount && user.restaurantCount >= 1
+                ? "Owner"
+                : "User"}
+            </span>
+            </div>
+           
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"

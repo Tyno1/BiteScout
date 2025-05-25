@@ -6,7 +6,6 @@ import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { Trash2, Ban, CheckCircle, User } from "lucide-react";
 import { AccessStatus } from "@/types";
 
-
 export default function TeamManagement() {
   const { data: session } = useSession();
   const {
@@ -29,6 +28,7 @@ export default function TeamManagement() {
       fetchRestaurantAccessList();
     }
 
+    // Reset access only when the component unmounts
     return () => {
       resetAccess();
     };
@@ -36,7 +36,6 @@ export default function TeamManagement() {
     session?.user?._id,
     session?.user?.restaurantCount,
     getRestaurantAccessListByOwnerId,
-    resetAccess,
   ]);
 
   const handleStatusChange = async (accessId: string, status: AccessStatus) => {
@@ -126,7 +125,7 @@ export default function TeamManagement() {
                 No team members yet
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                Team access will appear here once users are granted access.
+                Team access will appear here once users have requested access.
               </p>
             </div>
           ) : (
@@ -142,7 +141,9 @@ export default function TeamManagement() {
                     <li key={access?._id} className="px-6 py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                          <h2 className="text-lg font-semibold">{user?.name}</h2>
+                          <h2 className="text-lg font-semibold">
+                            {user?.name}
+                          </h2>
                           <p className="text-sm text-gray-500">{user?.email}</p>
                           <div className="flex items-center space-x-2 mt-1">
                             {getStatusBadge(access?.status)}

@@ -3,4 +3,5 @@ export * from "./food-catalogue";
 export * from "./Modal";
 export * from "./NavItem";
 export * from "./TopNav";
+export * from "./notification"
 export * from "./SideNav";

@@ -1,54 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
 @import "tailwindcss";
+@import "tw-animate-css";
 
-@theme {
-  /* orange */
-  --color-orange-50: rgb(255, 247, 237); /* Lightest Orange */
-  --color-orange-100: rgb(255, 237, 213);
-  --color-orange-200: rgb(254, 215, 170);
-  --color-orange-300: rgb(253, 186, 116);
-  --color-orange-400: rgb(251, 146, 60);
-  --color-orange-500: rgb(249, 115, 22);
-  --color-orange-600: rgb(234, 88, 12);
-  --color-orange-700: rgb(194, 65, 12);
-  --color-orange-800: rgb(154, 52, 18);
-  --color-orange-900: rgb(124, 45, 18);
-  --color-orange-950: rgb(67, 20, 7); /* Deepest Orange */
+@custom-variant dark (&:is(.dark *));
 
-  /* Red */
-  --color-red-100: rgb(236, 156, 154); /* Light Red */
-  --color-red-200: rgb(229, 135, 132);
-  --color-red-300: rgb(221, 113, 110);
-  --color-red-400: rgb(209, 91, 88);
-  --color-red-500: rgb(179, 69, 66); /* Base Red */
-  --color-red-600: rgb(157, 54, 51);
-  --color-red-700: rgb(135, 39, 37);
-  --color-red-800: rgb(113, 25, 23);
-  --color-red-900: rgb(91, 11, 10); /* Dark Red */
-
-  /* Green */
-  --color-success-100: rgb(235, 248, 232); /* Light Green */
-  --color-success-200: rgb(209, 238, 205);
-  --color-success-300: rgb(183, 227, 177);
-  --color-success-400: rgb(158, 217, 150);
-  --color-success-500: rgb(94, 178, 124); /* Base Green */
-  --color-success-600: rgb(77, 159, 107);
-  --color-success-700: rgb(60, 140, 91);
-  --color-success-800: rgb(46, 121, 75);
-  --color-success-900: rgb(33, 102, 60); /* Dark Green */
-
-  /* Gray */
-  --color-gray-100: rgb(246, 246, 246); /* Light Gray */
-  --color-gray-200: rgb(233, 233, 233);
-  --color-gray-300: rgb(220, 220, 220);
-  --color-gray-400: rgb(207, 207, 207);
-  --color-gray-500: rgb(194, 194, 194); /* Base Gray */
-  --color-gray-600: rgb(175, 175, 175);
-  --color-gray-700: rgb(156, 156, 156);
-  --color-gray-800: rgb(137, 137, 137);
-  --color-gray-900: rgb(118, 118, 118); /* Dark Gray */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
 }
 
-a,
-button {
-  cursor: pointer;
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--color-orange-500);
+  --primary-foreground: var(--color-orange-50);
+  --secondary: var(--color-orange-400);
+  --secondary-foreground: var(--color-orange-100);
+  --muted: var(--color-orange-200);
+  --muted-foreground: var(--color-orange-600);
+  --accent: var(--color-orange-300);
+  --accent-foreground: var(--color-orange-50);
+  --destructive: var(--color-orange-700);
+  --border: var(--color-orange-800);
+  --input: var(--color-orange-900);
+  --ring: var(--color-orange-600);
+  --chart-1: var(--color-orange-300);
+  --chart-2: var(--color-orange-400);
+  --chart-3: var(--color-orange-500);
+  --chart-4: var(--color-orange-600);
+  --chart-5: var(--color-orange-700);
+  --sidebar: var(--color-orange-800);
+  --sidebar-foreground: var(--color-orange-50);
+  --sidebar-primary: var(--color-orange-500);
+  --sidebar-primary-foreground: var(--color-orange-50);
+  --sidebar-accent: var(--color-orange-400);
+  --sidebar-accent-foreground: var(--color-orange-50);
+  --sidebar-border: var(--color-orange-900);
+  --sidebar-ring: var(--color-orange-600);
+  --success: var(--color-green-500);
+  --success-foreground: var(--color-green-50);
+}
+
+.dark {
+  --background: var(--color-orange-900);
+  --foreground: var(--color-orange-50);
+  --card: var(--color-orange-800);
+  --card-foreground: var(--color-orange-100);
+  --popover: var(--color-orange-800);
+  --popover-foreground: var(--color-orange-100);
+  --primary: var(--color-orange-600);
+  --primary-foreground: var(--color-orange-50);
+  --secondary: var(--color-orange-500);
+  --secondary-foreground: var(--color-orange-50);
+  --muted: var(--color-orange-700);
+  --muted-foreground: var(--color-orange-200);
+  --accent: var(--color-orange-400);
+  --accent-foreground: var(--color-orange-50);
+  --destructive: var(--color-orange-800);
+  --border: var(--color-orange-900);
+  --input: var(--color-orange-900);
+  --ring: var(--color-orange-600);
+  --chart-1: var(--color-orange-300);
+  --chart-2: var(--color-orange-400);
+  --chart-3: var(--color-orange-500);
+  --chart-4: var(--color-orange-600);
+  --chart-5: var(--color-orange-700);
+  --sidebar: var(--color-orange-800);
+  --sidebar-foreground: var(--color-orange-50);
+  --sidebar-primary: var(--color-orange-600);
+  --sidebar-primary-foreground: var(--color-orange-50);
+  --sidebar-accent: var(--color-orange-500);
+  --sidebar-accent-foreground: var(--color-orange-50);
+  --sidebar-border: var(--color-orange-900);
+  --sidebar-ring: var(--color-orange-600);
+}
+
+@layer base {
+  html {
+    font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, sans-serif;
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  button {
+    cursor: pointer;
+  }
 }

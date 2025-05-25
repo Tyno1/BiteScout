@@ -13,14 +13,14 @@ const Page = () => {
   }
 
   return (
-    <div className="bg-black w-[100vw] h-[100vh] flex items-center justify-center">
-      <div className="text-white w-[40%] min-h-[50%] flex flex-col items-center gap-6">
+    <div className="bg-foreground w-[100vw] h-[100vh] flex items-center justify-center">
+      <div className="text-background w-[40%] min-h-[50%] flex flex-col items-center gap-6">
         <h1 className="font-bold text-2xl">Register</h1>
         <RegisterForm />
         <div className="flex flex-col gap-2">
           <p className="text-sm">Already have an account?</p>
           <button
-            className="text-orange-600"
+            className="text-primary"
             onClick={() => router.push("/login")}
           >
             Login
