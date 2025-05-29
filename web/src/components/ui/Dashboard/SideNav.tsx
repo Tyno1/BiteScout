@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { NavItem } from "@/components/ui";
+import { AccessManager } from "../general";
 
 interface SideNavProp {
   setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,12 +60,17 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             text="User Management"
             path="/dashboard/user-management"
           />
-          <NavItem
-            handleNav={handleNav}
-            icon={<UserCog />}
-            text="Team Management"
-            path="/dashboard/team-management"
-          />
+
+          <AccessManager roles={["root"]}>
+            <NavItem
+              handleNav={handleNav}
+              icon={<UserCog />}
+              text="Team Management"
+              path="/dashboard/team-management"
+            />
+          </AccessManager>
+
+
           <NavItem
             handleNav={handleNav}
             icon={<BellDot />}
