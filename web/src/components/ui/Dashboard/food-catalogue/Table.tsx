@@ -138,89 +138,69 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <TableFilter
-        columnFilters={columnFilters}
-        setColumnFilters={setColumnFilters}
-        filterName={filterName}
-        setFilterName={setFilterName}
-        column={column}
-      />
-      <table
-        className={`w-${table.getTotalSize()} border-collapse overflow-y-auto `}
-      >
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => {
-            return (
-              <tr
-                className="border-gray-200 border-1 bg-gray-100 "
-                key={headerGroup.id}
+   <div className="bg-white rounded-lg shadow overflow-hidden">
+  <TableFilter
+    columnFilters={columnFilters}
+    setColumnFilters={setColumnFilters}
+    filterName={filterName}
+    setFilterName={setFilterName}
+    column={column}
+  />
+
+  <div className="max-h-[60vh] overflow-y-auto">
+    <table className="w-full table-fixed border-collapse">
+      <thead className="bg-gray-100 sticky top-0 z-10">
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <th
+                key={header.id}
+                className="px-4 py-2 text-left text-sm font-semibold text-gray-700"
               >
-                {headerGroup.headers.map((header) => (
-                  <th
-                    className={`w-${header.getSize()} text-gray-700 px-4 py-2 text-left text-sm font-semibold`}
-                    key={header.id}
-                    colSpan={header.colSpan}
-                  >
-                    <div className="flex items-center gap-1">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getCanSort() && (
-                        <button
-                          className="ml-1"
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          <ArrowDownUp size={17} />
-                        </button>
-                      )}
-                      {header.column.getIsSorted() === "asc" ? (
-                        <ArrowUpNarrowWide
-                          className="text-primary/40"
-                          size={17}
-                        />
-                      ) : header.column.getIsSorted() === "desc" ? (
-                        <ArrowDownWideNarrow
-                          className="text-primary/40"
-                          size={17}
-                        />
-                      ) : null}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            );
-          })}
-        </thead>
-        <tbody className="divide-y divide-gray-200 ">
-          {table.getRowModel().rows.map((row) => {
-            return (
-              <tr
-                key={row.id}
-                className="hover:bg-gray-100 cursor-pointer "
-                onClick={() =>
-                  row.original._id && handleRowClick(row.original._id)
-                }
-              >
-                {row.getVisibleCells().map((cell) => {
-                  return (
-                    <td
-                      key={cell.id}
-                      className={`p-4 w-${cell.column.getSize()} text-gray-700 text-sm`}
+                <div className="flex items-center gap-1">
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.column.getCanSort() && (
+                    <button
+                      className="ml-1"
+                      onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                      <ArrowDownUp size={17} />
+                    </button>
+                  )}
+                  {header.column.getIsSorted() === "asc" ? (
+                    <ArrowUpNarrowWide className="text-primary/40" size={17} />
+                  ) : header.column.getIsSorted() === "desc" ? (
+                    <ArrowDownWideNarrow className="text-primary/40" size={17} />
+                  ) : null}
+                </div>
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+
+      <tbody className="divide-y divide-gray-200">
+        {table.getRowModel().rows.map((row) => (
+          <tr
+            key={row.id}
+            className="hover:bg-gray-100 cursor-pointer"
+            onClick={() => row.original._id && handleRowClick(row.original._id)}
+          >
+            {row.getVisibleCells().map((cell) => (
+              <td
+                key={cell.id}
+                className="p-4 text-sm text-gray-700"
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
   );
 }

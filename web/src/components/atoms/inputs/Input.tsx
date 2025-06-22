@@ -12,7 +12,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   type: string;
   required?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  value?: string;
+  value?: string | number;
   inputClassName?: string;
   placeholder?: string;
   fullWidth?: boolean;
@@ -22,7 +22,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   labelStyle?: string;
   inputSize?: "sm" | "md" | "lg";
   rightButtonOnClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  errorMessage?: string;
+  errorMessage?: string | ReactNode;
   helperText?: string;
   labelRow?: boolean; 
 }

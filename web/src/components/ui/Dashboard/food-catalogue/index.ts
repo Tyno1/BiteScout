@@ -1,2 +1,2 @@
-export * from "./Modal";
+export * from "./AddNewFood";
 export * from "./Table"

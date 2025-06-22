@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FoodData } from "@/types/foodCatalogue";
@@ -7,9 +8,10 @@ import useAllergenStore from "@/stores/allergenStore";
 import useCuisineStore from "@/stores/cuisineStore";
 import useCourseStore from "@/stores/courseStore";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { Modal, Table } from "@/components/ui";
+import { AddNewFood, Table } from "@/components/ui";
+import { Modal } from "@/components/organisms";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
-import { Button, Input } from "@/components/atoms";
+import { Button } from "@/components/atoms";
 
 export type formErrorType = Partial<{
   name: string;
@@ -85,7 +87,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     isLoading: courseLoading,
   } = useCourseStore();
 
-  const { restaurantAccessList } = useRestaurantAccessStore();
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -207,7 +208,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           onClick={() => setIsModalOpen(true)}
         />
       </div>
-   
 
       {/* Food Catalogue Table */}
       {isLoading && <div>Loading...</div>}
@@ -220,23 +220,28 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       {isModalOpen && (
         <Modal
           setIsModalOpen={setIsModalOpen}
-          setNewFood={setNewFood}
-          newFood={newFood}
-          cuisineData={cuisines}
-          courseData={courses}
-          allergenData={allergens}
-          handleAddFood={handleAddFood}
-          handleImageUpload={handleImageUpload}
-          toggleAllergen={toggleAllergen}
-          currencies={CURRENCIES}
-          handleAddIngredients={handleAddIngredients}
-          handleRemoveIngredients={handleRemoveIngredients}
-          setIngredient={setIngredient}
-          ingredient={ingredient}
-          formError={formError}
-          FormWarning={FormWarning}
+          modalTitle="Add New Food Item"
+          modalActionText="Add Food"
+          modalActionOnClick={handleAddFood}
           closeModal={closeModal}
-        />
+        >
+          <AddNewFood
+            setNewFood={setNewFood}
+            newFood={newFood}
+            cuisineData={cuisines}
+            courseData={courses}
+            allergenData={allergens}
+            handleImageUpload={handleImageUpload}
+            toggleAllergen={toggleAllergen}
+            currencies={CURRENCIES}
+            handleAddIngredients={handleAddIngredients}
+            handleRemoveIngredients={handleRemoveIngredients}
+            setIngredient={setIngredient}
+            ingredient={ingredient}
+            formError={formError}
+            FormWarning={FormWarning}
+          />
+        </Modal>
       )}
     </div>
   );

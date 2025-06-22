@@ -1,5 +1,6 @@
 import { SelectHTMLAttributes, ReactNode, ChangeEvent } from "react";
 import clsx from "clsx";
+import { ArrowDown, ChevronDown } from "lucide-react";
 
 interface Option {
   value: string;
@@ -8,6 +9,7 @@ interface Option {
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
+  classname?: string;
   name: string;
   id?: string;
   useLabel?: boolean;
@@ -26,7 +28,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   labelStyle?: string;
   inputSize?: "sm" | "md" | "lg";
   rightButtonOnClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  errorMessage?: string;
+  errorMessage?: string | ReactNode;
   helperText?: string;
   labelRow?: boolean;
   options: Option[];
@@ -35,6 +37,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export function Select({
   label,
   id,
+  className,
   name,
   useLabel = false,
   outlineType,
@@ -76,18 +79,23 @@ export function Select({
     theme === "dark"
       ? "bg-black text-white"
       : theme === "transparent"
-      ? "bg-transparent text-gray-700"
-      : "bg-white text-black";
+        ? "bg-transparent text-gray-700"
+        : "bg-white text-black";
 
   const paddingLeft = icon ? "pl-10" : "";
   const paddingRight = rightButton ? "pr-12" : "";
 
   return (
-    <div className={`${fullWidth ? "w-full" : ""} ${labelRow ? "flex flex-row gap-4 items-center mb-3" : ""}`}>
+    <div
+      className={`${fullWidth ? "w-full" : ""} ${labelRow ? "flex flex-row gap-4 items-center mb-3" : ""}  ${className}`}
+    >
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx(`block ${!labelRow && "mb-2"} font-medium text-gray-700`, labelStyle)}
+          className={clsx(
+            `block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+            labelStyle
+          )}
         >
           {label}
         </label>
@@ -133,6 +141,8 @@ export function Select({
             </option>
           ))}
         </select>
+
+        <ChevronDown size={16} className="absolute right-2 top-4" />
 
         {rightButton && (
           <button
