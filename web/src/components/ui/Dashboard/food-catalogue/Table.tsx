@@ -1,63 +1,224 @@
-import { FoodDataReceived } from "@/types/foodCatalogue";
-
+import { IconButton } from "@/components/atoms";
+import { Allergen, DetailedFoodData } from "@/types/foodCatalogue";
+import {
+  getCoreRowModel,
+  useReactTable,
+  flexRender,
+  getFilteredRowModel,
+  getSortedRowModel,
+} from "@tanstack/react-table";
+import {
+  ArrowDownUp,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
+  Pen,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+import { TableFilter } from "./TableFilter";
+import { ColumnDef } from "@tanstack/react-table";
 
 type TableProps = {
-  foodDatas: FoodDataReceived[];
+  foodDatas: DetailedFoodData[];
   handleRowClick: (id: string) => void;
-}
+};
+export type ColumnType = ColumnDef<DetailedFoodData>;
+
+const column: ColumnType[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+    id: "name",
+    cell: (props) => <p>{props.getValue<string>()}</p>,
+  },
+  {
+    accessorKey: "ingredients",
+    header: "Ingredients",
+    id: "ingredients",
+    enableSorting: false,
+
+    cell: (props) => (
+      <p className="line-clamp-2">{props.getValue<any>().join(", ")}</p>
+    ),
+  },
+  {
+    accessorKey: "cuisineType.name",
+    header: "Cuisine",
+    id: "cuisine",
+    cell: (props) => <p>{props.getValue<string>()}</p>,
+  },
+  {
+    accessorKey: "course.name",
+    header: "Course",
+    id: "course",
+    cell: (props) => <p>{props.getValue<string>()}</p>,
+  },
+  {
+    accessorKey: "price",
+    header: "Price",
+    id: "price",
+    accessorFn: (row) => `${row.price.currency}${row.price.amount}`,
+    cell: (props) => <p>{props.getValue<string>()}</p>,
+  },
+  {
+    accessorKey: "allergens",
+    header: "Allergens",
+    enableSorting: false,
+
+    id: "allergens",
+    cell: (props) => (
+      <p className="line-clamp-2">
+        {props
+          .getValue<any>()
+          .map((val: Allergen) => val.name)
+          .join(", ")}
+      </p>
+    ),
+  },
+  {
+    accessorKey: "images.length",
+    header: "Images Count",
+    id: "images",
+    enableSorting: false,
+    cell: (props) => <p>{props.getValue<string>()}</p>,
+  },
+  {
+    accessorKey: "_id",
+    header: "",
+    enableSorting: false,
+    cell: (props) => (
+      <div className="flex justify-end space-x-2">
+        <IconButton
+          variant="plain"
+          icon={<Pen size={20} />}
+          size="sm"
+          onClick={() => props.row.original._id && props.row.original._id}
+        />
+        <IconButton
+          color="danger"
+          variant="plain"
+          size="sm"
+          icon={<Trash2 size={20} />}
+          onClick={() => props.row.original._id && props.row.original._id}
+        />
+      </div>
+    ),
+  },
+];
 
 export function Table({ foodDatas, handleRowClick }: TableProps) {
+  const [data, setData] = useState<DetailedFoodData[]>(foodDatas);
+  const [columnFilters, setColumnFilters] = useState<[]>([]);
+  const [filterName, setFilterName] = useState<string>("name");
+
+  const table = useReactTable({
+    data: data,
+    columns: column,
+    state: {
+      columnFilters: columnFilters,
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      updateData: (rowIndex: any, columnId: any, value: any) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex],
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+    },
+  });
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      <table className="w-full border-collapse">
+      <TableFilter
+        columnFilters={columnFilters}
+        setColumnFilters={setColumnFilters}
+        filterName={filterName}
+        setFilterName={setFilterName}
+        column={column}
+      />
+      <table
+        className={`w-${table.getTotalSize()} border-collapse overflow-y-auto `}
+      >
         <thead>
-          <tr className="bg-gray-50">
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Name
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Ingredients
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Cuisine
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Course
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Price
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Allergens
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
-              Images
-            </th>
-          </tr>
+          {table.getHeaderGroups().map((headerGroup) => {
+            return (
+              <tr
+                className="border-gray-200 border-1 bg-gray-100 "
+                key={headerGroup.id}
+              >
+                {headerGroup.headers.map((header) => (
+                  <th
+                    className={`w-${header.getSize()} text-gray-700 px-4 py-2 text-left text-sm font-semibold`}
+                    key={header.id}
+                    colSpan={header.colSpan}
+                  >
+                    <div className="flex items-center gap-1">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {header.column.getCanSort() && (
+                        <button
+                          className="ml-1"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <ArrowDownUp size={17} />
+                        </button>
+                      )}
+                      {header.column.getIsSorted() === "asc" ? (
+                        <ArrowUpNarrowWide
+                          className="text-primary/40"
+                          size={17}
+                        />
+                      ) : header.column.getIsSorted() === "desc" ? (
+                        <ArrowDownWideNarrow
+                          className="text-primary/40"
+                          size={17}
+                        />
+                      ) : null}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            );
+          })}
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {foodDatas?.map((food: FoodDataReceived, index: number) => (
-            <tr
-              onClick={() => food._id && handleRowClick(food._id)}
-              key={index}
-              className="hover:bg-gray-50 cursor-pointer"
-            >
-              <td className="px-6 py-4">{food?.name}</td>
-              <td className="px-6 py-4">
-                {food?.ingredients?.map((i: string) => i).join(", ")}
-              </td>
-              <td className="px-6 py-4">{food?.cuisineType?.name}</td>
-              <td className="px-6 py-4">{food?.course?.name}</td>
-              <td className="px-6 py-4">
-                {food?.price?.currency}
-                {food?.price?.amount}
-              </td>
-              <td className="px-6 py-4">
-                {food.allergens.map((a: any) => a.name).join(", ")}
-              </td>
-              <td className="px-6 py-4">{food?.images?.length} images</td>
-            </tr>
-          ))}
+        <tbody className="divide-y divide-gray-200 ">
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <tr
+                key={row.id}
+                className="hover:bg-gray-100 cursor-pointer "
+                onClick={() =>
+                  row.original._id && handleRowClick(row.original._id)
+                }
+              >
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <td
+                      key={cell.id}
+                      className={`p-4 w-${cell.column.getSize()} text-gray-700 text-sm`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

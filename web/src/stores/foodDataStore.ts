@@ -1,4 +1,4 @@
-import { FoodData } from "@/types/foodCatalogue";
+import { DetailedFoodData, FoodData } from "@/types/foodCatalogue";
 import axios from "axios";
 import { create } from "zustand";
 
@@ -6,11 +6,15 @@ type FoodDataStore = {
   // State
   foodData: FoodData;
   foodDatas: FoodData[];
+  DetailedFoodDatas?: DetailedFoodData[];
+  DetailedFoodData?: DetailedFoodData;
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  createFoodData: (FoodData: FoodData) => Promise<void>;
+  createFoodData: (
+    FoodData: FoodData
+  ) => Promise<{ success: boolean; error: string | null }>;
   getFoodDatas: (restaurantId: string) => Promise<void>;
   getFoodDataById: ({
     foodId,
@@ -53,7 +57,7 @@ const DEFAULT_FOOD_DATA = {
   images: [],
   restaurant: "",
 };
-const useFoodDataStore = create<FoodDataStore>((set) => ({
+const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   foodData: DEFAULT_FOOD_DATA,
   foodDatas: [DEFAULT_FOOD_DATA],
   isLoading: false,
@@ -64,16 +68,23 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
       set({ error: null, isLoading: true });
 
       const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
-
+      const newFood = response.data;
       set((state) => ({
-        FoodDatas: [...state.foodDatas, response.data],
-        isLoading: false,
+        DetailedFoodDatas: get().DetailedFoodDatas
+          ? [...get().DetailedFoodDatas!, newFood]
+          : [newFood],
       }));
+      return { success: true, error: null };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "An error has occurred",
+      };
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -85,7 +96,7 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
         `${API_URL}/food-catalogue/restaurant/${restaurantId}`
       );
 
-      set({ foodDatas: response.data, isLoading: false });
+      set({ DetailedFoodDatas: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -107,7 +118,7 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
         `${API_URL}/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
       );
 
-      set({ foodData: response.data, isLoading: false });
+      set({ DetailedFoodData: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -133,7 +144,7 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
         foodData
       );
 
-      set({ foodData: response.data, isLoading: false });
+      set({ DetailedFoodData: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -157,7 +168,9 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
       );
 
       set((state) => ({
-        foodDatas: state.foodDatas.filter((food) => food._id !== foodId),
+        DetailedFoodDatas: state.DetailedFoodDatas?.filter(
+          (food) => food._id !== foodId
+        ),
         isLoading: false,
       }));
     } catch (error) {
@@ -169,7 +182,12 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
   },
 
   resetFoodDatas: () =>
-    set({ foodDatas: [DEFAULT_FOOD_DATA], error: null, isLoading: false }),
+    set({
+      foodDatas: [DEFAULT_FOOD_DATA],
+      DetailedFoodDatas: [],
+      error: null,
+      isLoading: false,
+    }),
 }));
 
 export default useFoodDataStore;

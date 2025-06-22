@@ -1,7 +1,12 @@
-import { InputHTMLAttributes, ReactNode, ChangeEvent } from "react";
+import { SelectHTMLAttributes, ReactNode, ChangeEvent } from "react";
 import clsx from "clsx";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   name: string;
   id?: string;
@@ -9,11 +14,10 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   outlineType?: "round" | "bottom" | "none";
   icon?: ReactNode;
   rightButton?: ReactNode;
-  type: string;
   required?: boolean;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
   value?: string;
-  inputClassName?: string;
+  selectClassName?: string;
   placeholder?: string;
   fullWidth?: boolean;
   iconStyle?: string;
@@ -24,10 +28,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   rightButtonOnClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   errorMessage?: string;
   helperText?: string;
-  labelRow?: boolean; 
+  labelRow?: boolean;
+  options: Option[];
 }
 
-export function Input({
+export function Select({
   label,
   id,
   name,
@@ -36,10 +41,9 @@ export function Input({
   icon,
   theme = "light",
   rightButton,
-  type,
   fullWidth = false,
   required = false,
-  inputClassName,
+  selectClassName,
   onChange,
   value,
   placeholder,
@@ -51,9 +55,10 @@ export function Input({
   errorMessage,
   helperText,
   labelRow = false,
+  options,
   ...props
-}: InputProps) {
-  const uniqueId = id || `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
+}: SelectProps) {
+  const uniqueId = id || `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   const sizeMap = {
     sm: "text-sm px-2 py-3",
@@ -67,7 +72,7 @@ export function Input({
     none: "border-none",
   };
 
-  const inputTheme =
+  const themeStyles =
     theme === "dark"
       ? "bg-black text-white"
       : theme === "transparent"
@@ -82,7 +87,7 @@ export function Input({
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx(`block ${!labelRow && "mb-3" } font-medium text-gray-700`, labelStyle)}
+          className={clsx(`block ${!labelRow && "mb-2"} font-medium text-gray-700`, labelStyle)}
         >
           {label}
         </label>
@@ -100,28 +105,34 @@ export function Input({
           </div>
         )}
 
-        <input
+        <select
           id={uniqueId}
           name={name}
-          type={type}
-          placeholder={placeholder}
           required={required}
           onChange={onChange}
           value={value}
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
           className={clsx(
-            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 rounded-lg",
-            inputTheme,
+            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 appearance-none",
+            themeStyles,
             outlineMap[outlineType ?? "none"],
             sizeMap[inputSize],
             paddingLeft,
             paddingRight,
+            "rounded-lg",
             errorMessage && "border-red-500",
-            inputClassName
+            selectClassName
           )}
           {...props}
-        />
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
 
         {rightButton && (
           <button

@@ -6,16 +6,15 @@ const nextConfig = {
     ],
   },
   webpack: (config) => {
-    config.resolve.fallback = { 
+    config.resolve.fallback = {
       crypto: false,
       assert: false,
       fs: false,
       net: false,
-      tls: false
+      tls: false,
     };
     return config;
-  }
-
+  },
 };
 
 export default nextConfig;

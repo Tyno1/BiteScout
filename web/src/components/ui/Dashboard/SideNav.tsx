@@ -61,7 +61,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             path="/dashboard/user-management"
           />
 
-          <AccessManager roles={["root"]}>
+          <AccessManager roles={["root", "admin"]}>
             <NavItem
               handleNav={handleNav}
               icon={<UserCog />}
@@ -69,7 +69,6 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
               path="/dashboard/team-management"
             />
           </AccessManager>
-
 
           <NavItem
             handleNav={handleNav}
