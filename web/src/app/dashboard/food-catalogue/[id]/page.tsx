@@ -1,102 +1,143 @@
 "use client";
 
-import { useApprovedAccess } from "@/app/hooks/useApprovedAccess";
-import useFoodDataStore from "@/stores/foodDataStore";
-import { Loader2 } from "lucide-react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
-export default function page() {
-  const { DetailedFoodData, error, getFoodDataById, isLoading } = useFoodDataStore();
-  const { restaurantId } = useApprovedAccess();
+import useFoodDataStore from "@/stores/foodDataStore";
+import useRestaurantStore from "@/stores/restaurantStore";
+import { CapitalizeFirstCharacter } from "@/utils/typography";
+
+export default function FoodDetailPage() {
+  const { DetailedFoodData, error, getFoodDataById, isLoading } =
+    useFoodDataStore();
+  const { restaurantData } = useRestaurantStore();
   const params = useParams<{ id: string }>();
   const id = params.id;
 
   useEffect(() => {
-    if (id) {
-      if (restaurantId) {
-        getFoodDataById({ foodId: id, restaurantId });
-      }
+    if (id && restaurantData?._id) {
+      getFoodDataById({ foodId: id, restaurantId: restaurantData._id });
     }
-  }, [id, restaurantId]);
-  console.log(DetailedFoodData);
+  }, [id, restaurantData?._id]);
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-semibold mb-6">Error loading data</h1>
-        <p>{error}</p>
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-semibold text-red-600 mb-2">
+          Failed to load food
+        </h1>
+        <p className="text-base text-gray-600">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{DetailedFoodData?.name}</h1>
+    <div className="max-w-6xl mx-auto px-6 py-10">
+      {/* Page Title */}
+      <div className="mb-8">
+        <p>Food Name:</p>
+        <h1 className="text-6xl font-bold text-primary">
+          {CapitalizeFirstCharacter(DetailedFoodData?.name || "")}
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          ID: {DetailedFoodData?._id}
+        </p>
+      </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-10 items-start">
+        {/* Left – Image */}
         <div>
-          {DetailedFoodData?.images && DetailedFoodData?.images.length > 0 ? (
-            <Image
-              src={DetailedFoodData?.images[0] || "/placeholder.svg"}
-              alt={DetailedFoodData?.name}
-              width={500}
-              height={400}
-              className="rounded-lg object-cover w-full h-[400px]"
-            />
+          {/* create component to display and navigate images and open each on on click */}
+          {DetailedFoodData?.images && DetailedFoodData?.images?.length > 0 ? (
+            <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden border shadow-sm">
+              <Image
+                src={DetailedFoodData.images[0]}
+                alt={DetailedFoodData.name}
+                fill
+                className="object-cover"
+              />
+            </div>
           ) : (
-            <div className="bg-gray-200 rounded-lg w-full h-[400px] flex items-center justify-center">
-              <span className="text-gray-500">No image available</span>
+            <div className="aspect-[3/4] bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-lg border shadow-inner">
+              No image available
             </div>
           )}
         </div>
 
-        <div>
-          <p className="text-xl font-semibold mb-2">
-            {DetailedFoodData?.price.amount.toLocaleString("en-GB", {
-              style: "currency",
-              currency: DetailedFoodData?.price.currency,
-            })}
-          </p>
+        {/* Right – Details */}
+        <div className="space-y-8">
+          {/* Price */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700 mb-1">Price</h2>
+            <p className="text-2xl font-bold text-primary">
+              {DetailedFoodData?.price.amount.toLocaleString("en-GB", {
+                style: "currency",
+                currency: DetailedFoodData?.price.currency,
+              })}
+            </p>
+          </div>
 
-          <h2 className="text-2xl font-semibold mb-2">Ingredients</h2>
-          <ul className="list-disc list-inside mb-4">
-            {DetailedFoodData?.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
+          {/* Ingredients */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700 mb-2">
+              Ingredients
+            </h2>
+            <ul className="list-disc list-inside text-base text-gray-800">
+              {DetailedFoodData?.ingredients.map((ing, i) => (
+                <li key={i}>{ing}</li>
+              ))}
+            </ul>
+          </div>
 
-          <h2 className="text-2xl font-semibold mb-2">Cuisine Type</h2>
-          <p className="mb-1">{DetailedFoodData?.cuisineType.name}</p>
-          <p className="text-sm text-gray-600 mb-4">
-            {DetailedFoodData?.cuisineType.description}
-          </p>
+          {/* Cuisine and Course */}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-1">
+                Cuisine
+              </h3>
+              <p className="text-base font-medium text-gray-900">
+                {DetailedFoodData?.cuisineType.name}
+              </p>
+              <p className="text-sm text-gray-500">
+                {DetailedFoodData?.cuisineType.description}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-1">
+                Course
+              </h3>
+              <p className="text-base font-medium text-gray-900">
+                {DetailedFoodData?.course.name}
+              </p>
+              <p className="text-sm text-gray-500">
+                {DetailedFoodData?.course.description}
+              </p>
+            </div>
+          </div>
 
-          <h2 className="text-2xl font-semibold mb-2">Course</h2>
-          <p className="mb-1">{DetailedFoodData?.course.name}</p>
-          <p className="text-sm text-gray-600 mb-4">
-            {DetailedFoodData?.course.description}
-          </p>
-
+          {/* Allergens */}
           {DetailedFoodData?.allergens &&
-            DetailedFoodData?.allergens.length > 0 && (
-              <>
-                <h2 className="text-2xl font-semibold mb-2">Allergens</h2>
-                <ul className="list-disc list-inside">
-                  {DetailedFoodData?.allergens.map((allergen, index) => (
-                    <li key={index}>{allergen.name}</li>
+            DetailedFoodData?.allergens?.length > 0 && (
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                  Allergens
+                </h2>
+                <ul className="list-disc list-inside text-base text-gray-800">
+                  {DetailedFoodData.allergens.map((al, i) => (
+                    <li key={i}>{al.name}</li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
         </div>
       </div>

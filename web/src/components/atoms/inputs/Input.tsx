@@ -111,7 +111,7 @@ export function Input({
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
           className={clsx(
-            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 rounded-lg",
+            'w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 rounded-lg',
             inputTheme,
             outlineMap[outlineType ?? "none"],
             sizeMap[inputSize],

@@ -22,7 +22,7 @@ type FoodDataStore = {
   }: {
     foodId: string;
     restaurantId: string;
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; error: string | null }>;
   updateFoodData: ({
     foodId,
     restaurantId,
@@ -117,13 +117,20 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
       const response = await axios.get(
         `${API_URL}/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
       );
+      console.log(response.data);
+      
 
       set({ DetailedFoodData: response.data, isLoading: false });
+      return { success: true, error: null };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
         isLoading: false,
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "An error has occurred",
+      };
     }
   },
 

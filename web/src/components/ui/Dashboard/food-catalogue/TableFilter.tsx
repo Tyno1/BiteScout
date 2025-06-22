@@ -39,8 +39,9 @@ export const TableFilter = ({
       <div className="flex gap-2 items-center w-full">
         <Input
           label="Filter"
-          name="Filter"
+          name="filter"
           type="text"
+          outlineType="round"
           placeholder="filter text here"
           fullWidth
           value={name}
