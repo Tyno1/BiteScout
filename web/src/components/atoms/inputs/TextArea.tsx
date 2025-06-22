@@ -1,19 +1,18 @@
-import { InputHTMLAttributes, ReactNode, ChangeEvent } from "react";
+import { TextareaHTMLAttributes, ReactNode, ChangeEvent } from "react";
 import clsx from "clsx";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   name: string;
   id?: string;
   useLabel?: boolean;
-  outlineType?: "round" | "bottom" | "none";
+  outlineType?: "round" | "bottom"| "none"
   icon?: ReactNode;
   rightButton?: ReactNode;
-  type: string;
   required?: boolean;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   value?: string;
-  inputClassName?: string;
+  textareaClassName?: string;
   placeholder?: string;
   fullWidth?: boolean;
   iconStyle?: string;
@@ -24,10 +23,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   rightButtonOnClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   errorMessage?: string;
   helperText?: string;
-  labelRow?: boolean; 
+  labelRow?: boolean;
+  rows?: number;
 }
 
-export function Input({
+export function Textarea({
   label,
   id,
   name,
@@ -36,10 +36,9 @@ export function Input({
   icon,
   theme = "light",
   rightButton,
-  type,
   fullWidth = false,
   required = false,
-  inputClassName,
+  textareaClassName,
   onChange,
   value,
   placeholder,
@@ -51,9 +50,10 @@ export function Input({
   errorMessage,
   helperText,
   labelRow = false,
+  rows = 4,
   ...props
-}: InputProps) {
-  const uniqueId = id || `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
+}: TextareaProps) {
+  const uniqueId = id || `textarea-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   const sizeMap = {
     sm: "text-sm px-2 py-3",
@@ -67,7 +67,7 @@ export function Input({
     none: "border-none",
   };
 
-  const inputTheme =
+  const themeStyles =
     theme === "dark"
       ? "bg-black text-white"
       : theme === "transparent"
@@ -82,7 +82,7 @@ export function Input({
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx(`block ${!labelRow && "mb-3" } font-medium text-gray-700`, labelStyle)}
+          className={clsx(`block ${!labelRow && "mb-3"} font-medium text-gray-700`, labelStyle)}
         >
           {label}
         </label>
@@ -92,7 +92,7 @@ export function Input({
         {icon && (
           <div
             className={clsx(
-              "absolute top-1/2 left-3 transform -translate-y-1/2",
+              "absolute top-4 left-3 transform",
               iconStyle
             )}
           >
@@ -100,26 +100,27 @@ export function Input({
           </div>
         )}
 
-        <input
+        <textarea
           id={uniqueId}
           name={name}
-          type={type}
-          placeholder={placeholder}
           required={required}
           onChange={onChange}
           value={value}
+          placeholder={placeholder}
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
           className={clsx(
-            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 rounded-lg",
-            inputTheme,
+            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 resize-none",
+            themeStyles,
             outlineMap[outlineType ?? "none"],
             sizeMap[inputSize],
             paddingLeft,
             paddingRight,
+            "rounded-lg",
             errorMessage && "border-red-500",
-            inputClassName
+            textareaClassName
           )}
+          rows={rows}
           {...props}
         />
 
@@ -128,7 +129,7 @@ export function Input({
             type="button"
             onClick={rightButtonOnClick}
             className={clsx(
-              "absolute top-1/2 right-3 transform -translate-y-1/2",
+              "absolute top-4 right-3",
               rightButtonStyle
             )}
             aria-label={`Action button for ${label}`}

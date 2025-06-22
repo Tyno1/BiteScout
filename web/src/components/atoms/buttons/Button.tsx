@@ -2,7 +2,9 @@ import React, { ComponentProps } from "react";
 
 type ButtonProps = ComponentProps<"button"> & {
   text?: string;
-  icon?: React.ReactNode;
+  IconAfter?: React.ReactNode;
+  IconBefore?: React.ReactNode;
+
   color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
@@ -21,7 +23,8 @@ type ButtonProps = ComponentProps<"button"> & {
 
 export function Button({
   text,
-  icon,
+  IconAfter,
+  IconBefore,
   color = "primary",
   size = "md",
   disabled = false,
@@ -39,15 +42,15 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer";
+    "rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer flex items-center justify-center gap-2";
 
   const colorStyles = {
     primary: `hover:bg-primary/99 hover:text-white hover:border-primary focus:ring-primary focus:bg-primary/20 focus:border-none focus:text-primary ${
       variant === "plain"
         ? "text-primary"
         : variant === "solid"
-        ? "border-1 bg-orange-600/80 border-orange-700 text-white"
-        : "border border-1 border-orange-500 bg-transparent text-orange-600"
+        ? "border-1 bg-primary border-primary/70 text-white"
+        : "border border-1 border-primary bg-transparent text-primary"
     }`,
     secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
       variant === "plain"
@@ -120,9 +123,9 @@ export function Button({
       tabIndex={disabled ? -1 : 0}
       {...props}
     >
-      {icon && <span className={`mr-2 ${iconStyle}`}>{icon}</span>}
-
+      {IconBefore && <span className={`${iconStyle}`}>{IconBefore}</span>}
       {text}
+      {IconAfter && <span className={` ${iconStyle}`}>{IconAfter}</span>}
     </button>
   );
 }

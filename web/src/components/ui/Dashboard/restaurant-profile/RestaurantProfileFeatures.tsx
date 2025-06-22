@@ -1,4 +1,4 @@
-import { IconButton } from "@/components/atoms";
+import { IconButton, Input } from "@/components/atoms";
 import { Plus, X } from "lucide-react";
 
 export function RestaurantProfileFeatures({
@@ -22,19 +22,22 @@ export function RestaurantProfileFeatures({
       </div>
       {isEditing && (
         <div
-          className="flex gap-2 mb-4"
+          className="flex gap-2 mb-4 items-center"
           role="form"
           aria-label="Add new feature"
         >
-          <input
+          <Input
+            fullWidth
+            outlineType={isEditing && "round"}
             type="text"
+            onKeyDown={handleKeyPress}
+            name="New feature name"
+            label="New feature name"
             value={newFeature}
             onChange={(e) => setNewFeature(e.target.value)}
-            onKeyDown={handleKeyPress}
             placeholder="Add a feature (e.g., Outdoor Seating, WiFi)"
-            className="flex-1 rounded-md border px-3 py-2"
-            aria-label="New feature name"
           />
+
           <IconButton
             variant="solid"
             icon={<Plus />}
@@ -57,9 +60,9 @@ export function RestaurantProfileFeatures({
             <span>{feature}</span>
             {isEditing && (
               <IconButton
-                variant="solid"
-                size="sm"
-                icon={<X />}
+                variant="plain"
+                size="xs"
+                icon={<X size={15} />}
                 onClick={() => removeFeature(feature)}
                 aria-label={`Remove ${feature}`}
               />

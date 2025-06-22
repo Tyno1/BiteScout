@@ -1,36 +1,57 @@
 // middleware.ts
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { getCurrentSession } from "./app/actions/getSessionAction";
-import { jwtDecode } from "jwt-decode";
-
-// function getRoleFromToken(sessionToken) {}
+import { Permissions } from "./app/permissions";
+import { getMatchingRoute } from "./utils/getMatchingRoute";
+import { getRoleFromToken } from "./utils/getRoleFromSession";
 
 export async function middleware(request: NextRequest) {
   try {
     const { nextUrl } = request;
+    const pathname = nextUrl.pathname;
     const session = await getCurrentSession();
-    // console.log(session);
 
-    const token = jwtDecode(session?.user?.accessToken ?? "");
-    // console.log("token",token);
-    
+    if (
+      pathname.startsWith("/api/") ||
+      pathname.startsWith("/_next/") ||
+      pathname === "/favicon.ico" ||
+      pathname.startsWith("/static/") ||
+      pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/)
+    ) {
+      return NextResponse.next();
+    } // get user role from token
 
-    // // Define protected paths
-    // const isProtectedRoute = nextUrl.pathname.startsWith("/dashboard");
+    const publicPaths = [
+      "/",
+      "/login",
+      "/register",
+      "register/success",
+      "/login/loading",
+      "/about",
+      "services",
+      "/contact",
+    ];
+    // Check if the request is for a public path and skip
+    if (publicPaths.includes(pathname)) return NextResponse.next();
 
-    // if (isProtectedRoute && !authToken) {
-    //   return NextResponse.redirect(new URL("/login", nextUrl));
-    // }
+    // check if user is authenticated
+    if (!session?.user) {
+      return NextResponse.redirect(new URL("/login", nextUrl));
+    }
 
-    // // Auth pages (login, register)
-    // const isAuthPage =
-    //   nextUrl.pathname === "/login" || nextUrl.pathname === "/register";
+    const role = getRoleFromToken(session?.user?.accessToken ?? "");
+    const matchingRoute = getMatchingRoute(pathname);
 
-    // // if in authpage with token present, redirect to onboarding
-    // if (isAuthPage && authToken) {
-    //   return NextResponse.redirect(new URL("/login/loading", nextUrl));
-    // }
+    if (!matchingRoute) return NextResponse.next();
+
+    const allowedRoles = Permissions[matchingRoute];
+
+    if (allowedRoles && !allowedRoles.includes(role)) {
+      const nextUrl = request.nextUrl.clone();
+      nextUrl.pathname = "/dashboard/unauthorized";
+      return NextResponse.rewrite(nextUrl);
+    }
 
     //   // If all checks pass, allow the request to proceed
     return NextResponse.next();

@@ -16,7 +16,7 @@ export type Cuisine = {
   description: string;
 }
 
-type Price = {
+export type Price = {
   currency: string;
   amount: number;
 }
@@ -33,22 +33,13 @@ export type FoodData = {
   restaurant: string;
 }
 
-export type FoodDataReceived = {
-  _id?: string;
-  name: string;
-  ingredients: string[];
-  cuisineType: {
-    _id?: string;
-    name: string;
-    description: string;
-  };
-  course: {
-    _id?: string;
-    name: string;
-    description: string;
-  };
-  price: Price;
+
+export type DetailedFoodData = Omit<
+  FoodData,
+  "cuisineType" | "course" | "allergens"
+> & {
+  cuisineType: Cuisine;
+  course: Course;
   allergens: Allergen[];
-  images?: string[];
-  restaurant: string;
-}
+};
+
