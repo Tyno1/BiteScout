@@ -14,6 +14,7 @@ import courseRoutes from "./routes/course.js";
 import cuisineRoutes from "./routes/cuisine.js";
 import foodCatalogueRoutes from "./routes/foodCatalogue.js";
 import notificationRoutes from "./routes/notification.js";
+import postRoutes from "./routes/post.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
 import userRoutes from "./routes/user.js";
@@ -179,6 +180,7 @@ app.use("/api/food-catalogue", foodCatalogueRoutes);
 app.use("/api/allergens", allergenRoutes);
 app.use("/api/cuisines", cuisineRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/posts", authMiddleware, postRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
