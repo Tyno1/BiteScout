@@ -22,6 +22,16 @@ export type RegisterFormState = {
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Enhanced password validation with better security
+const passwordSchema = z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters" })
+  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+  .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+  .regex(/[0-9]/, { message: "Password must contain at least one number" })
+  .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character" })
+  .trim();
+
 const loginSchema = z.object({
   email: z
     .string()
@@ -30,7 +40,7 @@ const loginSchema = z.object({
     .toLowerCase(),
   password: z
     .string()
-    .min(4, { message: "Password must be at least 4 characters" })
+    .min(1, { message: "Password is required" })
     .trim(),
 });
 
@@ -42,13 +52,10 @@ const registerSchema = z.object({
     .email({ message: "Invalid email address" })
     .trim()
     .toLowerCase(),
-  password: z
-    .string()
-    .min(4, { message: "Password must be at least 4 characters" })
-    .trim(),
+  password: passwordSchema,
 });
 
-export async function doCredentialLogin(prevState: any, formData: FormData) {
+export async function doCredentialLogin(prevState: unknown, formData: FormData) {
   try {
     const result = loginSchema.safeParse(Object.fromEntries(formData));
 
@@ -84,17 +91,17 @@ export async function doCredentialLogin(prevState: any, formData: FormData) {
         },
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
     return {
       success: false,
-      systemError: error.message || "An unexpected error occurred",
+      systemError: error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }
 
 export async function credentialRegister(
-  prevState: any,
+  prevState: unknown,
   formData: FormData
 ): Promise<RegisterFormState> {
   try {
@@ -137,10 +144,10 @@ export async function credentialRegister(
       systemError:
         "Unexpected error occurred during registration. Please try again.",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      systemError: error.message || "An unexpected error occurred",
+      systemError: error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

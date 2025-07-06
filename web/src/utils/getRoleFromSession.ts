@@ -1,5 +1,5 @@
-import { AccessRoles } from "@/types";
-import { jwtDecode, type JwtPayload } from "jwt-decode";
+import type { AccessRoles } from "@/types";
+import { type JwtPayload, jwtDecode } from "jwt-decode";
 
 type CustomJwtPayload = JwtPayload & {
   userType: AccessRoles;
