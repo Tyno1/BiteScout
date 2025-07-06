@@ -211,7 +211,7 @@ export default function RestaurantProfile() {
   useEffect(() => {
     if (!session?.user?._id || !userRole) return;
     if (userRole !== "root" && userRole !== "admin") return;
-    if (restaurantData) return; // Don't refetch if we have data
+    // if (restaurantData) return; // Don't refetch if we have data
 
     const userId = session.user._id;
     getRestaurantByOwnerId(userId);

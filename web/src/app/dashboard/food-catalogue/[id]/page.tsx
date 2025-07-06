@@ -45,7 +45,6 @@ export default function FoodDetailPage() {
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Page Title */}
       <div className="mb-8">
-        <p>Food Name:</p>
         <h1 className="text-6xl font-bold text-primary">
           {CapitalizeFirstCharacter(DetailedFoodData?.name || "")}
         </h1>

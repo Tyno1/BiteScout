@@ -1,7 +1,8 @@
 import { Allergen, Course, Cuisine, FoodData } from "@/types/foodCatalogue";
 import React, { ReactNode } from "react";
 import { formErrorType } from "@/app/dashboard/food-catalogue/page";
-import { Button, Input, Select } from "@/components/atoms";
+import { Button, IconButton, Input, Select } from "@/components/atoms";
+import { X } from "lucide-react";
 
 type FoodCatalogueModalType = {
   setNewFood: React.Dispatch<React.SetStateAction<FoodData>>;
@@ -88,15 +89,17 @@ export function AddNewFood({
             {newFood.ingredients.map((ingredient: string, index: number) => (
               <div
                 key={index}
-                className="flex gap-2 text-sm bg-black text-white rounded px-2 py-1"
+                className="flex items-center gap-2 text-sm bg-black rounded-xl px-2 py-1"
               >
-                <span>{ingredient}</span>
-                <button
+                <span className="text-white ">{ingredient}</span>
+
+                <IconButton
+                  icon={<X size={16} />}
+                  size="xs"
+                  variant="plain"
+                  color="primary"
                   onClick={() => handleRemoveIngredients(ingredient)}
-                  className=" hover:text-gray-700"
-                >
-                  X
-                </button>
+                />
               </div>
             ))}
           </div>
