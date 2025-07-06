@@ -38,10 +38,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       maxlength: 200,
     },
-    address: String,
-    hometown: String,
-    currentCity: String,
-    country: String,
     dietaryPreferences: {
       type: [String], // e.g., ['vegan', 'gluten-free']
       default: [],
@@ -58,6 +54,7 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       city: String,
+      country: String,
       geo: {
         type: {
           type: String,
