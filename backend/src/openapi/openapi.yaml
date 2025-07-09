@@ -4,12 +4,13 @@ info:
   title: "BiteScout API"
   description: "API documentation for BiteScout"
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:5001
 paths:
-  /auth/register:
-    summary: Register a user
-    description: Creates a  new user account with Provided credentials
+  /api/auth/register:
+   
     post:
+      summary: Register a new user
+      description: Register a new user with the provided details
       requestBody:
         required: true
         content:
@@ -102,10 +103,10 @@ paths:
                   value:
                     message: Error creating user
                     error: Database conection failed
-  /auth/login:
+  /api/auth/login:
     summary: Authenticate a user
-    description: Authenticate a user and return accesss and refresh token
-    get:
+    description: Authenticate a user and return access and refresh token
+    post:  # Changed from get to post
       requestBody:
         required: true
         content:
@@ -136,7 +137,6 @@ paths:
                     type: string
                     example: Login successful
                   user:
-                    type: object
                     $ref: "#/components/schemas/User"
                   accessToken:
                     type: string
@@ -159,33 +159,14 @@ paths:
                   message:
                     type: string
                     example: Missing required fields
-              examples:
-                missingFields:
-                  summary: Missing required fields
-                  value:
-                    message: Missing required fields
-                userNotFound:
-                  summary: User not found
-                  value:
-                    message: User not found
-                invalidCredentials:
-                  summary: Invalid credentials
-                  value:
-                    message: Invalid credentials
         500:
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                LoginError:
-                  summary: Error Logging in
-                  value:
-                    message: Error Logging In
-                    Error: Database connection failed
-  /auth/refresh:
-    summary: Refresh authenticatio token
+  /api/auth/refresh:
+    summary: Refresh authentication token
     description: Refreshes the authentication token with the provided refresh token
     post:
       requestBody:
@@ -252,6 +233,356 @@ paths:
                   message:
                     type: string
                     example: Invalid Refresh Token Request
+  /api/user/{userId}:
+    summary: Update a user
+    put:
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/restaurants:
+    post:
+      summary: Create a new restaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Restaurant"
+      responses:
+        201:
+          description: Restaurant created
+    get:
+      summary: Get all restaurants
+      responses:
+        200:
+          description: List of restaurants
+  /api/restaurants/owner/{userId}:
+    get:
+      summary: Get restaurant by owner ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Restaurant for owner
+  /api/restaurants/owner-restaurants/{userId}:
+    get:
+      summary: Get all restaurants for an owner
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of restaurants for owner
+  /api/restaurants/search:
+    get:
+      summary: Search restaurants by name
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of matching restaurants
+  /api/restaurants/{id}:
+    get:
+      summary: Get restaurant by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Restaurant details
+    put:
+      summary: Update restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Restaurant"
+      responses:
+        200:
+          description: Restaurant updated
+    delete:
+      summary: Delete restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Restaurant deleted
+  /api/food-catalogue/restaurant/{restaurantId}/catalogue/{foodId}:
+    get:
+      summary: Get food catalogue item by ID
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: foodId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Food catalogue item
+    put:
+      summary: Update food catalogue item
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: foodId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodCatalogue"
+      responses:
+        200:
+          description: Food catalogue item updated
+    delete:
+      summary: Delete food catalogue item
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: foodId
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Food catalogue item deleted
+  /api/food-catalogue/restaurant/{restaurantId}:
+    get:
+      summary: Get all food catalogue items for a restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of food catalogue items
+  /api/food-catalogue:
+    post:
+      summary: Create a new food catalogue item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodCatalogue"
+      responses:
+        201:
+          description: Food catalogue item created
+  /api/notifications/{userId}:
+    get:
+      summary: Get notifications for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of notifications
+  /api/notifications/{userId}/{notificationId}/read:
+    patch:
+      summary: Mark a notification as read
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: notificationId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Notification marked as read
+  /api/notifications/{userId}/read-all:
+    patch:
+      summary: Mark all notifications as read
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: All notifications marked as read
+  /api/restaurant-access/{restaurantId}:
+    post:
+      summary: Request access to a restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+      responses:
+        201:
+          description: Access request created
+  /api/restaurant-access/user/{userId}:
+    get:
+      summary: Get restaurant access by user ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of restaurant access for user
+  /api/restaurant-access/owner/{ownerId}:
+    get:
+      summary: Get restaurant access by owner ID
+      parameters:
+        - in: path
+          name: ownerId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of restaurant access for owner
+  /api/restaurant-access/access/{accessId}/grant:
+    patch:
+      summary: Grant restaurant access
+      parameters:
+        - in: path
+          name: accessId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Access granted
+  /api/restaurant-access/access/{accessId}/suspend:
+    patch:
+      summary: Suspend restaurant access
+      parameters:
+        - in: path
+          name: accessId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Access suspended
+  /api/restaurant-access/access/{accessId}/delete:
+    patch:
+      summary: Delete restaurant access
+      parameters:
+        - in: path
+          name: accessId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Access deleted
+  /api/restaurant-access/access/{accessId}/update:
+    patch:
+      summary: Update restaurant access role
+      parameters:
+        - in: path
+          name: accessId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+      responses:
+        200:
+          description: Access role updated
 
 components:
   schemas:
