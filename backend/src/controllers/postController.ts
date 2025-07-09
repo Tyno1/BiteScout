@@ -38,14 +38,15 @@ export const createPost = async (
 			return;
 		}
 
-		// Populate user, restaurant, cuisine, course, allergen, and foodCatalogue data
+		// Populate user, restaurant, cuisine, course, allergen, foodCatalogue, and media data
 		await newPost.populate([
 			{ path: "userId", select: "name username imageUrl" },
 			{ path: "location.restaurantId", select: "name" },
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" }
+			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" }
 		]);
 
 		res.status(201).json(newPost);
@@ -69,6 +70,7 @@ export const getPostById = async (
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
 			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" },
 			{ path: "likes", select: "name username imageUrl" }
 		]);
 
@@ -117,7 +119,8 @@ export const getAllPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" }
+				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
 			.skip(skip)
@@ -158,7 +161,8 @@ export const getUserPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" }
+				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
 			.skip(skip)
@@ -199,7 +203,8 @@ export const getRestaurantPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" }
+				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
 			.skip(skip)
@@ -255,7 +260,8 @@ export const updatePost = async (
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" }
+			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" }
 		]);
 
 		if (!updatedPost) {
@@ -337,6 +343,8 @@ export const likePost = async (
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
+			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" },
 			{ path: "likes", select: "name username imageUrl" }
 		]);
 
@@ -380,7 +388,9 @@ export const searchPosts = async (
 				{ path: "location.restaurantId", select: "name" },
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
-				{ path: "allergens", select: "name" }
+				{ path: "allergens", select: "name" },
+				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
 			.skip(skip)

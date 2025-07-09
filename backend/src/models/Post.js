@@ -1,17 +1,5 @@
 import mongoose from "mongoose";
 
-const mediaSchema = new mongoose.Schema({
-	type: {
-		type: String,
-		enum: ["image", "video"],
-		required: true,
-	},
-	url: {
-		type: String,
-		required: true,
-	},
-});
-
 const priceSchema = new mongoose.Schema({
 	amount: {
 		type: Number,
@@ -65,14 +53,13 @@ const postSchema = new mongoose.Schema(
 			ref: "User",
 			required: true,
 		},
-		media: {
-			type: [mediaSchema],
-			required: true,
-			validate: {
-				validator: (media) => media && media.length > 0,
-				message: "At least one media item is required",
+		media: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Media",
+				required: true,
 			},
-		},
+		],
 		foodName: {
 			type: String,
 			required: true,
@@ -82,10 +69,6 @@ const postSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "FoodCatalogue",
 			required: false,
-		},
-		foodCatalogue: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "FoodCatalogue",
 		},
 		price: {
 			type: priceSchema,

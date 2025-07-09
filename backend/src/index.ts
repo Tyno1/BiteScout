@@ -13,10 +13,12 @@ import allergenRoutes from "./routes/alergen.js";
 import courseRoutes from "./routes/course.js";
 import cuisineRoutes from "./routes/cuisine.js";
 import foodCatalogueRoutes from "./routes/foodCatalogue.js";
+import mediaRoutes from "./routes/media.js";
 import notificationRoutes from "./routes/notification.js";
 import postRoutes from "./routes/post.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
+import reviewRoutes from "./routes/review.js";
 import userRoutes from "./routes/user.js";
 import userTypeRoutes from "./routes/userType.js";
 
@@ -181,6 +183,8 @@ app.use("/api/allergens", allergenRoutes);
 app.use("/api/cuisines", cuisineRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/posts", authMiddleware, postRoutes);
+app.use("/api/media", authMiddleware, mediaRoutes);
+app.use("/api/reviews", authMiddleware, reviewRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

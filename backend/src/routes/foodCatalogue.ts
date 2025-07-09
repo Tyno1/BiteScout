@@ -8,6 +8,6 @@ router.get("/restaurant/:restaurantId/catalogue/:foodId", controller.getFoodCata
 router.get("/restaurant/:restaurantId", controller.getFoodCatalogueByRestaurantId);
 router.post("/", controller.createFoodCatalogue);
 router.put("/restaurant/:restaurantId/catalogue/:foodId", controller.updateFoodCatalogue);
-router.delete("restaurant/:restaurantId/catalogue/:foodId", controller.deleteFoodCatalogue);
+router.delete("/restaurant/:restaurantId/catalogue/:foodId", controller.deleteFoodCatalogue);
 
 export default router;
