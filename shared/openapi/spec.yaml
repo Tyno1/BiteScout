@@ -280,11 +280,21 @@ paths:
       responses:
         201:
           description: Restaurant created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
     get:
       summary: Get all restaurants
       responses:
         200:
           description: List of restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
   /api/restaurants/owner/{userId}:
     get:
       summary: Get restaurant by owner ID
@@ -297,6 +307,10 @@ paths:
       responses:
         200:
           description: Restaurant for owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
   /api/restaurants/owner-restaurants/{userId}:
     get:
       summary: Get all restaurants for an owner
@@ -309,6 +323,12 @@ paths:
       responses:
         200:
           description: List of restaurants for owner
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
   /api/restaurants/search:
     get:
       summary: Search restaurants by name
@@ -321,6 +341,12 @@ paths:
       responses:
         200:
           description: List of matching restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
   /api/restaurants/{id}:
     get:
       summary: Get restaurant by ID
@@ -333,6 +359,10 @@ paths:
       responses:
         200:
           description: Restaurant details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
     put:
       summary: Update restaurant
       parameters:
@@ -350,6 +380,10 @@ paths:
       responses:
         200:
           description: Restaurant updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
     delete:
       summary: Delete restaurant
       parameters:
@@ -378,6 +412,10 @@ paths:
       responses:
         200:
           description: Food catalogue item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodCatalogue"
     put:
       summary: Update food catalogue item
       parameters:
@@ -400,6 +438,10 @@ paths:
       responses:
         200:
           description: Food catalogue item updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodCatalogue"
     delete:
       summary: Delete food catalogue item
       parameters:
@@ -428,6 +470,12 @@ paths:
       responses:
         200:
           description: List of food catalogue items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FoodCatalogue"
   /api/food-catalogue:
     post:
       summary: Create a new food catalogue item
@@ -440,6 +488,10 @@ paths:
       responses:
         201:
           description: Food catalogue item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodCatalogue"
   /api/notifications/{userId}:
     get:
       summary: Get notifications for a user
@@ -452,6 +504,12 @@ paths:
       responses:
         200:
           description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
   /api/notifications/{userId}/{notificationId}/read:
     patch:
       summary: Mark a notification as read
@@ -469,6 +527,10 @@ paths:
       responses:
         200:
           description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
   /api/notifications/{userId}/read-all:
     patch:
       summary: Mark all notifications as read
@@ -481,6 +543,17 @@ paths:
       responses:
         200:
           description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "All notifications marked as read"
+                  updatedCount:
+                    type: integer
+                    example: 5
   /api/restaurant-access/{restaurantId}:
     post:
       summary: Request access to a restaurant
@@ -502,6 +575,10 @@ paths:
       responses:
         201:
           description: Access request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/user/{userId}:
     get:
       summary: Get restaurant access by user ID
@@ -514,6 +591,12 @@ paths:
       responses:
         200:
           description: List of restaurant access for user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/owner/{ownerId}:
     get:
       summary: Get restaurant access by owner ID
@@ -526,6 +609,12 @@ paths:
       responses:
         200:
           description: List of restaurant access for owner
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/grant:
     patch:
       summary: Grant restaurant access
@@ -538,6 +627,10 @@ paths:
       responses:
         200:
           description: Access granted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/suspend:
     patch:
       summary: Suspend restaurant access
@@ -550,6 +643,10 @@ paths:
       responses:
         200:
           description: Access suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/delete:
     patch:
       summary: Delete restaurant access
@@ -562,6 +659,10 @@ paths:
       responses:
         200:
           description: Access deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/update:
     patch:
       summary: Update restaurant access role
@@ -583,6 +684,10 @@ paths:
       responses:
         200:
           description: Access role updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantAccess"
 
 components:
   schemas:
@@ -865,3 +970,123 @@ components:
           type: string
           description: "ID of the restaurant offering the food item"
           example: "restaurant12345"
+
+    Notification:
+      type: object
+      required:
+        - id
+        - userId
+        - type
+        - message
+      properties:
+        id:
+          type: string
+          description: "Unique identifier for the notification"
+          example: "notif_12345"
+        userId:
+          type: string
+          description: "ID of the user who owns this notification"
+          example: "user_12345"
+        type:
+          type: string
+          enum:
+            - "access_request"
+            - "access_granted"
+            - "access_denied"
+            - "access_suspended"
+            - "restaurant_update"
+            - "system"
+          description: "Type of notification"
+          example: "access_request"
+        title:
+          type: string
+          description: "Notification title"
+          example: "Access Request"
+        message:
+          type: string
+          description: "Notification message"
+          example: "Your access request for Restaurant ABC has been approved"
+        isRead:
+          type: boolean
+          default: false
+          description: "Whether the notification has been read"
+          example: false
+        metadata:
+          type: object
+          additionalProperties: true
+          description: "Additional data related to the notification"
+          example:
+            restaurantId: "rest_12345"
+            restaurantName: "Restaurant ABC"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the notification was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the notification was last updated"
+          example: "2025-04-20T15:30:00Z"
+
+    RestaurantAccess:
+      type: object
+      required:
+        - id
+        - userId
+        - restaurantId
+        - status
+      properties:
+        id:
+          type: string
+          description: "Unique identifier for the access record"
+          example: "access_12345"
+        userId:
+          type: string
+          description: "ID of the user requesting access"
+          example: "user_12345"
+        restaurantId:
+          type: string
+          description: "ID of the restaurant"
+          example: "rest_12345"
+        status:
+          type: string
+          enum:
+            - "pending"
+            - "granted"
+            - "denied"
+            - "suspended"
+          description: "Current status of the access request"
+          example: "pending"
+        role:
+          type: string
+          enum:
+            - "viewer"
+            - "editor"
+            - "admin"
+            - "owner"
+          description: "Role assigned to the user"
+          example: "viewer"
+        requestedAt:
+          type: string
+          format: date-time
+          description: "When the access was requested"
+          example: "2025-04-20T15:30:00Z"
+        grantedAt:
+          type: string
+          format: date-time
+          description: "When the access was granted (if applicable)"
+          example: "2025-04-20T16:00:00Z"
+        grantedBy:
+          type: string
+          description: "ID of the user who granted access"
+          example: "owner_12345"
+        expiresAt:
+          type: string
+          format: date-time
+          description: "When the access expires (if applicable)"
+          example: "2025-12-31T23:59:59Z"
+        notes:
+          type: string
+          description: "Additional notes about the access"
+          example: "Temporary access for project collaboration"
