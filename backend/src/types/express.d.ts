@@ -1,15 +1,15 @@
-import { Request } from 'express';
+import type { Request } from "express";
 
 declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        email: string;
-        userType: string;
-        iat: number;
-        exp: number;
-      };
-    }
-  }
-} 
+	namespace Express {
+		interface Request {
+			user?: {
+				id: string;
+				email: string;
+				userType: string;
+				iat: number;
+				exp: number;
+			};
+		}
+	}
+}
