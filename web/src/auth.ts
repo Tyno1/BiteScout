@@ -72,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       try {
         // Only update token when user is provided (on sign in)
         if (user) {
@@ -84,6 +84,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
         if (Date.now() < (token.expiresIn as number)) {
           return token;
+        }
+
+        if (trigger === "update" && session) {
+          token.restaurantCount = session.restaurantCount;
+          token.userType = session.userType;
         }
 
         // If the token is expired, try to refresh it

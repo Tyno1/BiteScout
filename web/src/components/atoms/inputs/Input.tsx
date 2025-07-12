@@ -6,13 +6,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   id?: string;
   useLabel?: boolean;
-  outlineType?: "round" | "bottom";
+  outlineType?: "round" | "bottom" | "none";
   icon?: ReactNode;
   rightButton?: ReactNode;
   type: string;
   required?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  value?: string;
+  value?: string | number;
   inputClassName?: string;
   placeholder?: string;
   fullWidth?: boolean;
@@ -22,8 +22,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   labelStyle?: string;
   inputSize?: "sm" | "md" | "lg";
   rightButtonOnClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  errorMessage?: string;
+  errorMessage?: string | ReactNode;
   helperText?: string;
+  labelRow?: boolean; 
 }
 
 export function Input({
@@ -49,13 +50,14 @@ export function Input({
   rightButtonOnClick,
   errorMessage,
   helperText,
+  labelRow = false,
   ...props
 }: InputProps) {
   const uniqueId = id || `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   const sizeMap = {
-    sm: "text-sm px-4 py-4",
-    md: "text-base px-5 py-4",
+    sm: "text-sm px-2 py-3",
+    md: "text-base px-4 py-4",
     lg: "text-lg px-6 py-5",
   };
 
@@ -72,15 +74,15 @@ export function Input({
       ? "bg-transparent text-gray-700"
       : "bg-white text-black";
 
-  const paddingLeft = icon ? "pl-12" : "";
+  const paddingLeft = icon ? "pl-10" : "";
   const paddingRight = rightButton ? "pr-12" : "";
 
   return (
-    <div className={fullWidth ? "w-full" : ""}>
+    <div className={`${fullWidth ? "w-full" : ""} ${labelRow ? "flex flex-row gap-4 items-center mb-3" : ""}`}>
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx("block mb-3 font-medium text-gray-700", labelStyle)}
+          className={clsx(`block ${!labelRow && "mb-3" } font-medium text-gray-700`, labelStyle)}
         >
           {label}
         </label>
@@ -109,7 +111,7 @@ export function Input({
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
           className={clsx(
-            "w-full focus:outline-none focus:ring-1 focus:ring-orange-400 rounded-lg",
+            'w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 rounded-lg',
             inputTheme,
             outlineMap[outlineType ?? "none"],
             sizeMap[inputSize],

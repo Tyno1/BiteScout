@@ -56,10 +56,12 @@ const foodCatalogue = new Schema({
     type: PriceSchema,
     required: true,
   },
-  images: {
-    type: [String],
-    required: true,
-  },
+  media: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Media",
+    },
+  ],
   restaurant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "restaurantData",

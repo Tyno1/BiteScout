@@ -1,3 +1,4 @@
+import { Input } from "@/components/atoms";
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 
@@ -24,33 +25,40 @@ export function RestaurantProfileHero({
         className="absolute inset-0"
       />
 
-      <div className="absolute inset-0 bg-orange-700/70" aria-hidden="true" />
+      <div className="absolute inset-0 bg-foreground/80" aria-hidden="true" />
       <div className="z-10 w-full flex items-end justify-between">
         <div>
           <h1 className="text-6xl font-bold">
             {isEditing ? (
-              <input
+              <Input
+                fullWidth
+                outlineType={isEditing ? "round" : "none"}
                 type="text"
+                name="restaurant-name"
+                label="Restaurant Name"
+                disabled={!isEditing}
                 value={displayData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                className="w-full text-6xl font-bold bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded"
-                aria-label="Restaurant name"
+                placeholder="Add Restaurant Name here"
+                className="text-6xl font-bold bg-transparent"
               />
             ) : (
               displayData.name
             )}
           </h1>
-          <p role="contentinfo">
+          <p className="text-white" role="contentinfo">
             {isEditing ? (
-              <input
+              <Input
+                outlineType={isEditing ? "round" : "none"}
                 type="text"
-                placeholder="Add description here"
+                name="restaurant-description"
+                label="Restaurant description"
+                disabled={!isEditing}
                 value={displayData.description}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-1 focus:ring-white rounded "
-                aria-label="Restaurant description"
+                placeholder="Add description here"
               />
             ) : (
               displayData.description
@@ -62,14 +70,14 @@ export function RestaurantProfileHero({
             <>
               <button
                 onClick={handleSave}
-                className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+                className="inline-flex items-center justify-center px-4 py-2 border-2  border-white rounded text-white hover:bg-white hover:text-black transition-colors"
                 aria-label="Save changes"
               >
                 <Save className="w-4 h-4" />
               </button>
               <button
                 onClick={handleCancel}
-                className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+                className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
                 aria-label="Cancel editing"
               >
                 <X className="w-4 h-4" />
@@ -78,7 +86,7 @@ export function RestaurantProfileHero({
           ) : (
             <button
               onClick={handleEdit}
-              className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+              className="inline-flex items-center justify-center px-4 py-2 border-2 border-white rounded text-white hover:bg-white hover:text-black transition-colors"
               aria-label="Edit profile"
             >
               <Edit className="w-4 h-4" />
@@ -86,7 +94,7 @@ export function RestaurantProfileHero({
           )}
           <label className="cursor-pointer">
             <button
-              className="inline-flex items-center justify-center px-4 py-2 border-2 rounded text-white hover:bg-white hover:text-black transition-colors"
+              className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
               aria-label="Upload new cover image"
             >
               <Upload className="w-4 h-4" />

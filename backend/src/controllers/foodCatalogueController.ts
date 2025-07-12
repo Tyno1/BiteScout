@@ -8,14 +8,14 @@ export const getFoodCatalogueById = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { foodId } = req.params;
 
-    if (!id) {
+    if (!foodId) {
       res.status(400).json({ error: "Missing Food Catalogue Id" });
       return;
     }
 
-    const result = await FoodCatalogue.findById(id)
+    const result = await FoodCatalogue.findById(foodId)
       .populate("course")
       .populate("cuisineType")
       .populate("allergens");

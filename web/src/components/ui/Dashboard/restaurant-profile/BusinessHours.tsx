@@ -1,9 +1,10 @@
+import { Input } from "@/components/atoms";
 
 export function BusinessHours({
-    businessHours,
-    isEditing,
-    handleBusinessHoursChange,
-  }:any) {
+  businessHours,
+  isEditing,
+  handleBusinessHoursChange,
+}: any) {
   return (
     <section
       className="bg-white rounded-lg border-1 border-gray-100 p-6"
@@ -24,27 +25,31 @@ export function BusinessHours({
             <span className="font-medium text-black" role="rowheader">
               {hours.day}
             </span>
-            
-            <input
+
+            <Input
+              outlineType={isEditing && "round"}
               type="time"
+              name={`${hours.day} opening time`}
+              label={`${hours.day} opening time`}
+              disabled={!isEditing || hours.closed}
               value={hours.open}
               onChange={(e) =>
                 handleBusinessHoursChange(index, "open", e.target.value)
               }
-              disabled={!isEditing || hours.closed}
-              className="rounded-md border px-3 py-2 border-1 border-gray-300 text-gray-900 disabled:bg-gray-100/40"
-              aria-label={`${hours.day} opening time`}
             />
-            <input
+
+            <Input
+              outlineType={isEditing && "round"}
               type="time"
+              name={`${hours.day} closing time`}
+              label={`${hours.day} closing time`}
+              disabled={!isEditing || hours.closed}
               value={hours.close}
               onChange={(e) =>
                 handleBusinessHoursChange(index, "close", e.target.value)
               }
-              disabled={!isEditing || hours.closed}
-              className="rounded-md border px-3 py-2 border-1 border-gray-300 text-gray-900 disabled:bg-gray-100/40"
-              aria-label={`${hours.day} closing time`}
             />
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -57,7 +62,10 @@ export function BusinessHours({
                 aria-label={`${hours.day} closed`}
                 id={`closed-${hours.day}`}
               />
-              <label htmlFor={`closed-${hours.day}`} className="text-sm text-black">
+              <label
+                htmlFor={`closed-${hours.day}`}
+                className="text-sm text-black"
+              >
                 Closed
               </label>
             </div>

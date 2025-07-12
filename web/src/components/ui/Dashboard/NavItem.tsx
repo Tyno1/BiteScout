@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -14,7 +14,8 @@ type NavItemProps = {
 export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
   const pathname = usePathname();
 
-  const isActive = path ? pathname === path : false;
+  const isActive = path
+    ? path !== "/dashboard" ? pathname === path || pathname.startsWith(`${path}/`) : pathname === path : false;
 
   return (
     <li className="w-full">

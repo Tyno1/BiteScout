@@ -1,0 +1,27 @@
+// Main Types Index - All organized API types
+
+// Generated OpenAPI types
+export type { paths, components } from './generated';
+
+// Organized API types by category
+export * from './auth';
+export * from './user';
+export * from './restaurant';
+export * from './access';
+export * from './notifications';
+
+// Common types
+export * from './common';
+
+// API schemas (avoid conflicts by not re-exporting)
+export type { 
+  User, 
+  Restaurant, 
+  FoodCatalogue, 
+  Price, 
+  BusinessHour,
+  Allergen,
+  Course,
+  Cuisine,
+  ErrorResponse
+} from './api/schemas'; 
