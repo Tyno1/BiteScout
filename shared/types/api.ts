@@ -675,6 +675,11 @@ export interface components {
       error?: string;
     };
     User: {
+      /**
+       * @description Unique identifier for the user
+       * @example 507f1f77bcf86cd799439011
+       */
+      _id?: string;
       /** @example anthony_ukutegbe */
       username?: string;
       /** @example +2347012345678 */

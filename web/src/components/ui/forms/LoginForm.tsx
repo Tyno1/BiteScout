@@ -3,8 +3,8 @@
 import React, { useActionState, useEffect } from "react";
 
 import { doCredentialLogin } from "@/app/actions";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
   const [state, loginAction, isPending] = useActionState(
@@ -24,10 +24,10 @@ export function LoginForm() {
       action={loginAction}
       className="w-full flex flex-col items-center gap-2"
     >
-      {state?.errors && state?.errors.email && (
+      {state?.errors?.email && (
         <div className="text-red-500">{state.errors.email}</div>
       )}
-      {state?.errors && state?.errors.password && (
+      {state?.errors?.password && (
         <div className="text-red-500 text-sm">{state.errors.password}</div>
       )}
       <input

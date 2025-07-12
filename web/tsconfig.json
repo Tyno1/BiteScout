@@ -21,7 +21,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/images/*": ["./public/images/*"],
-      "@/icons/*": ["./public/icons/*"]
+      "@/icons/*": ["./public/icons/*"],
+      "@shared/*": ["../shared/*"],
+      "@shared/types/*": ["../shared/types/*"]
     },
   },
   "include": [

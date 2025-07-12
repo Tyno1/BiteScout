@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 
 import authMiddleware from "./middleware/authmiddleware.js";
-import errorHandler from "./middleware/errorHandler.js";
+import errorHandler from "./middleware/errorHandler";
 
 import authRoutes from "../src/routes/auth.js";
 import allergenRoutes from "./routes/alergen.js";

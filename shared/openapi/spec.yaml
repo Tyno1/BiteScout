@@ -706,6 +706,10 @@ components:
     User:
       type: object
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the user"
+          example: "507f1f77bcf86cd799439011"
         username:
           type: string
           example: anthony_ukutegbe
