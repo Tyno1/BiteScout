@@ -69,17 +69,10 @@ export function BasicInformation({
                     outlineType="round"
                     name="cuisine-type"
                     label=""
-                    options={cuisines
-                      .filter(
-                        (
-                          cuisine
-                        ): cuisine is Cuisine & { _id: string; name: string } =>
-                          Boolean(cuisine._id && cuisine.name)
-                      )
-                      .map((cuisine) => ({
-                        value: cuisine._id,
-                        label: cuisine.name,
-                      }))}
+                    options={cuisines.map((cuisine) => ({
+                      value: cuisine._id ?? "",
+                      label: cuisine.name,
+                    }))}
                     value={selectedCuisine}
                     onChange={(e) => setSelectedCuisine(e.target.value)}
                     placeholder={
