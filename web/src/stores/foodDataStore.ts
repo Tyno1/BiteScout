@@ -43,10 +43,11 @@ type FoodDataStore = {
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const DEFAULT_FOOD_DATA: FoodCatalogue = {
+  _id: "",
   name: "",
   ingredients: [],
-  cuisineType: {name: "", description: ""},
-  course: {name: "", description: ""},
+  cuisineType: {_id: "", name: "", description: ""},
+  course: {_id: "", name: "", description: ""},
   price: {
     currency: "GBP" as Currency,
     amount: 0,
@@ -57,7 +58,7 @@ const DEFAULT_FOOD_DATA: FoodCatalogue = {
 };
 const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   foodData: DEFAULT_FOOD_DATA,
-  foodDatas: [DEFAULT_FOOD_DATA],
+  foodDatas: [],
   isLoading: false,
   error: null,
 
@@ -188,7 +189,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
 
   resetFoodDatas: () =>
     set({
-      foodDatas: [DEFAULT_FOOD_DATA],
+      foodDatas: [],
       error: null,
       isLoading: false,
     }),

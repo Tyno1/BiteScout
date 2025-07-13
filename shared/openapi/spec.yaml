@@ -308,15 +308,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Restaurant"
-  /api/restaurants/search:
+  /api/restaurants/search/{name}:
     get:
       summary: Search restaurants by name
       parameters:
-        - in: query
+        - in: path
           name: name
-          required: false
+          required: true
+          description: Restaurant name to search for
           schema:
             type: string
+            example: "Pizza"
       responses:
         200:
           description: List of matching restaurants
@@ -326,6 +328,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Restaurant"
+        400:
+          description: Restaurant name is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/restaurants/{id}:
     get:
       summary: Get restaurant by ID
@@ -557,7 +565,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authorization request sent successfully"
+                  restaurantAccess:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/user/{userId}:
     get:
       summary: Get restaurant access by user ID
@@ -573,9 +587,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  restaurantAccesses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/owner/{ownerId}:
     get:
       summary: Get restaurant access by owner ID
@@ -591,9 +608,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  restaurantAccesses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/grant:
     patch:
       summary: Grant restaurant access
@@ -609,7 +629,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access granted successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/suspend:
     patch:
       summary: Suspend restaurant access
@@ -625,7 +651,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access Suspended Successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/delete:
     patch:
       summary: Delete restaurant access
@@ -641,7 +673,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access deleted successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/update:
     patch:
       summary: Update restaurant access role
@@ -666,7 +704,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Role updated successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/user-types:
     get:
       summary: Get all user types
@@ -2397,12 +2441,12 @@ components:
     RestaurantAccess:
       type: object
       required:
-        - id
+        - _id
         - userId
         - restaurantId
         - status
       properties:
-        id:
+        _id:
           type: string
           description: "Unique identifier for the access record"
           example: "access_12345"
@@ -2418,20 +2462,21 @@ components:
           type: string
           enum:
             - "pending"
-            - "granted"
-            - "denied"
+            - "approved"
             - "suspended"
+            - "innactive"
           description: "Current status of the access request"
           example: "pending"
         role:
           type: string
           enum:
-            - "viewer"
-            - "editor"
+            - "guest"
+            - "user"
+            - "moderator"
             - "admin"
-            - "owner"
-          description: "Role assigned to the user"
-          example: "viewer"
+            - "root"
+          description: "Role assigned to the user (references UserType.name)"
+          example: "user"
         requestedAt:
           type: string
           format: date-time
@@ -2455,6 +2500,16 @@ components:
           type: string
           description: "Additional notes about the access"
           example: "Temporary access for project collaboration"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the access record was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the access record was last updated"
+          example: "2025-04-20T15:30:00Z"
 
     UserType:
       type: object

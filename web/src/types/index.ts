@@ -1,6 +1,4 @@
-export * from "./foodCatalogue"
-export * from "./restaurantData"
-export * from "./restaurantAccess"
+
 export * from "./user"
 export * from "./notification"
 export * from "./roles"

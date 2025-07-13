@@ -284,12 +284,13 @@ export interface paths {
       };
     };
   };
-  "/api/restaurants/search": {
+  "/api/restaurants/search/{name}": {
     /** Search restaurants by name */
     get: {
       parameters: {
-        query?: {
-          name?: string;
+        path: {
+          /** @description Restaurant name to search for */
+          name: string;
         };
       };
       responses: {
@@ -297,6 +298,12 @@ export interface paths {
         200: {
           content: {
             "application/json": components["schemas"]["Restaurant"][];
+          };
+        };
+        /** @description Restaurant name is required */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
           };
         };
       };
@@ -526,7 +533,11 @@ export interface paths {
         /** @description Access request created */
         201: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"];
+            "application/json": {
+              /** @example Authorization request sent successfully */
+              message?: string;
+              restaurantAccess?: components["schemas"]["RestaurantAccess"];
+            };
           };
         };
       };
@@ -544,7 +555,9 @@ export interface paths {
         /** @description List of restaurant access for user */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"][];
+            "application/json": {
+              restaurantAccesses?: components["schemas"]["RestaurantAccess"][];
+            };
           };
         };
       };
@@ -562,7 +575,9 @@ export interface paths {
         /** @description List of restaurant access for owner */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"][];
+            "application/json": {
+              restaurantAccesses?: components["schemas"]["RestaurantAccess"][];
+            };
           };
         };
       };
@@ -580,7 +595,11 @@ export interface paths {
         /** @description Access granted */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"];
+            "application/json": {
+              /** @example Access granted successfully */
+              message?: string;
+              accessRecord?: components["schemas"]["RestaurantAccess"];
+            };
           };
         };
       };
@@ -598,7 +617,11 @@ export interface paths {
         /** @description Access suspended */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"];
+            "application/json": {
+              /** @example Access Suspended Successfully */
+              message?: string;
+              accessRecord?: components["schemas"]["RestaurantAccess"];
+            };
           };
         };
       };
@@ -616,7 +639,11 @@ export interface paths {
         /** @description Access deleted */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"];
+            "application/json": {
+              /** @example Access deleted successfully */
+              message?: string;
+              accessRecord?: components["schemas"]["RestaurantAccess"];
+            };
           };
         };
       };
@@ -641,7 +668,11 @@ export interface paths {
         /** @description Access role updated */
         200: {
           content: {
-            "application/json": components["schemas"]["RestaurantAccess"];
+            "application/json": {
+              /** @example Role updated successfully */
+              message?: string;
+              accessRecord?: components["schemas"]["RestaurantAccess"];
+            };
           };
         };
       };
@@ -2126,7 +2157,7 @@ export interface components {
        * @description Unique identifier for the access record
        * @example access_12345
        */
-      id: string;
+      _id: string;
       /**
        * @description ID of the user requesting access
        * @example user_12345
@@ -2142,13 +2173,13 @@ export interface components {
        * @example pending
        * @enum {string}
        */
-      status: "pending" | "granted" | "denied" | "suspended";
+      status: "pending" | "approved" | "suspended" | "innactive";
       /**
-       * @description Role assigned to the user
-       * @example viewer
+       * @description Role assigned to the user (references UserType.name)
+       * @example user
        * @enum {string}
        */
-      role?: "viewer" | "editor" | "admin" | "owner";
+      role?: "guest" | "user" | "moderator" | "admin" | "root";
       /**
        * Format: date-time
        * @description When the access was requested
@@ -2177,6 +2208,18 @@ export interface components {
        * @example Temporary access for project collaboration
        */
       notes?: string;
+      /**
+       * Format: date-time
+       * @description When the access record was created
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description When the access record was last updated
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
     };
     UserType: {
       /**

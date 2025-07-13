@@ -97,12 +97,12 @@ export default function Onboarding() {
 		console.log("Prepared restaurant data:", preparedData);
 
 		// Create restaurant
-		const result = await createRestaurant(preparedData);
-
-		if (result.success) {
+		try {
+			const result = await createRestaurant(preparedData);
 			await handleSuccessfulCreation();
-		} else {
-			handleCreationError(result.error);
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : "An error occurred";
+			handleCreationError(errorMessage);
 		}
 	};
 	session?.data?.user?.accessToken;

@@ -16,7 +16,9 @@ import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import FoodCatalogue from "../models/FoodCatalogue.js";
 
 type GetFoodCatalogueItemApiResponse = GetFoodCatalogueItemResponse | ApiError;
-type GetAllFoodCatalogueItemsApiResponse = GetAllFoodCatalogueItemsResponse | ApiError;
+type GetAllFoodCatalogueItemsApiResponse =
+  | GetAllFoodCatalogueItemsResponse
+  | ApiError;
 type CreateFoodCatalogueApiResponse = CreateFoodCatalogueResponse | ApiError;
 type UpdateFoodCatalogueApiResponse = UpdateFoodCatalogueResponse | ApiError;
 type DeleteFoodCatalogueApiResponse = DeleteFoodCatalogueResponse | ApiError;
@@ -101,13 +103,11 @@ export const createFoodCatalogue = async (
     const body = req.body;
 
     if (!body) {
-      return next(
-        createError(ErrorCodes.BAD_REQUEST, "Invalid request body")
-      );
+      return next(createError(ErrorCodes.BAD_REQUEST, "Invalid request body"));
     }
 
     const newFoodItem = await FoodCatalogue.create(body);
-    
+
     if (!newFoodItem) {
       return next(
         createError(ErrorCodes.BAD_REQUEST, "Failed to create food item")
@@ -122,7 +122,10 @@ export const createFoodCatalogue = async (
 
     if (!populatedFoodItem) {
       return next(
-        createError(ErrorCodes.INTERNAL_SERVER_ERROR, "Failed to retrieve the created food item")
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "Failed to retrieve the created food item"
+        )
       );
     }
 
@@ -133,7 +136,11 @@ export const createFoodCatalogue = async (
 };
 
 export const updateFoodCatalogue = async (
-  req: Request<{ foodId: string; restaurantId: string }, unknown, UpdateFoodCatalogueRequest>,
+  req: Request<
+    { foodId: string; restaurantId: string },
+    unknown,
+    UpdateFoodCatalogueRequest
+  >,
   res: Response<UpdateFoodCatalogueApiResponse>,
   next: NextFunction
 ) => {
@@ -154,20 +161,24 @@ export const updateFoodCatalogue = async (
     }
 
     if (!body) {
-      return next(
-        createError(ErrorCodes.BAD_REQUEST, "Invalid request body")
-      );
+      return next(createError(ErrorCodes.BAD_REQUEST, "Invalid request body"));
     }
 
-    const updatedFoodItem = await FoodCatalogue.findByIdAndUpdate(foodId, body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedFoodItem = await FoodCatalogue.findByIdAndUpdate(
+      foodId,
+      body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .populate("course")
+      .populate("cuisineType")
+      .populate("allergens")
+      .populate("images");
 
     if (!updatedFoodItem) {
-      return next(
-        createError(ErrorCodes.NOT_FOUND, "Food item not found")
-      );
+      return next(createError(ErrorCodes.NOT_FOUND, "Food item not found"));
     }
 
     res.status(200).json(updatedFoodItem);
@@ -199,9 +210,7 @@ export const deleteFoodCatalogue = async (
     const deletedFoodItem = await FoodCatalogue.findByIdAndDelete(foodId);
 
     if (!deletedFoodItem) {
-      return next(
-        createError(ErrorCodes.NOT_FOUND, "Food item not found")
-      );
+      return next(createError(ErrorCodes.NOT_FOUND, "Food item not found"));
     }
 
     res.status(204).send();

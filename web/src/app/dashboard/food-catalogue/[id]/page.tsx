@@ -2,10 +2,10 @@
 
 import useFoodDataStore from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { getMediaAlt, getMediaUrl } from "@/types/media";
+import { getMediaAlt, getMediaUrl } from "@/utils/mediaUtils";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 // Utility function to capitalize first character
 const CapitalizeFirstCharacter = (str: string): string => {
@@ -18,22 +18,22 @@ export default function FoodDetailPage() {
   const { foodData, getFoodDataById, isLoading, error } = useFoodDataStore();
   const { restaurantData } = useRestaurantStore();
 
-  useEffect(() => {
-    const fetchFoodData = async () => {
-      if (foodId && restaurantId) {
-        try {
-          await getFoodDataById({
-            foodId: foodId as string,
-            restaurantId: restaurantId as string,
-          });
-        } catch (error) {
-          console.error("Error fetching food data:", error);
-        }
+  const fetchFoodData = useCallback(async () => {
+    if (foodId && restaurantId) {
+      try {
+        await getFoodDataById({
+          foodId: foodId as string,
+          restaurantId: restaurantId as string,
+        });
+      } catch (error) {
+        console.error("Error fetching food data:", error);
       }
-    };
-
-    fetchFoodData();
+    }
   }, [foodId, restaurantId, getFoodDataById]);
+
+  useEffect(() => {
+    fetchFoodData();
+  }, [fetchFoodData]);
 
   if (isLoading) {
     return (
@@ -49,7 +49,9 @@ export default function FoodDetailPage() {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Error loading food data</h1>
+          <h1 className="text-2xl font-bold text-red-600">
+            Error loading food data
+          </h1>
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
@@ -63,9 +65,7 @@ export default function FoodDetailPage() {
         <h1 className="text-6xl font-bold text-primary">
           {CapitalizeFirstCharacter(foodData?.name || "")}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          ID: {foodData?._id}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">ID: {foodData?._id}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-10 items-start">

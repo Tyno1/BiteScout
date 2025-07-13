@@ -9,7 +9,7 @@ import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
 import useCuisineStore from "@/stores/cuisineStore";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { getMediaUrl } from "@/types/media";
+import { getMediaUrl } from "@/utils/mediaUtils";
 import type {
   BusinessHour,
   Cuisine,
@@ -98,15 +98,10 @@ export default function RestaurantProfile() {
       return;
     }
     try {
-      const response = await updateRestaurant({
+      await updateRestaurant({
         data: editableData,
         id: editableData._id,
       });
-
-      if (!response.success) {
-        console.error("Failed to update restaurant:", response);
-        return;
-      }
 
       setIsEditing(false);
       setEditableData(null);

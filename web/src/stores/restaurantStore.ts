@@ -1,5 +1,22 @@
+import { handleApiError } from "@/utils/apiErrorHandler";
 import apiClient from "@/utils/authClient";
 import type { Restaurant } from "@shared/types/api/schemas";
+import type { ApiError } from "@shared/types/common/errors.js";
+import type {
+	CreateRestaurantRequest,
+	CreateRestaurantResponse,
+	RestaurantDetailGetResponse,
+	RestaurantDetailPutRequest,
+	RestaurantDetailPutResponse,
+} from "@shared/types/restaurant";
+import type {
+	GetOwnerRestaurantsResponse,
+	GetRestaurantByOwnerResponse,
+} from "@shared/types/restaurant/get";
+import type {
+	SearchRestaurantsRequest,
+	SearchRestaurantsResponse,
+} from "@shared/types/restaurant/search";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -12,20 +29,20 @@ type RestaurantStore = {
 
 	// actions
 	createRestaurant: (
-		data: Restaurant,
-	) => Promise<{ success: boolean; error?: string }>;
-	getRestaurantById: (id: string) => Promise<void>;
-	getRestaurantByOwnerId: (ownerId: string) => Promise<void>;
+		data: CreateRestaurantRequest,
+	) => Promise<CreateRestaurantResponse>;
+	getRestaurantById: (id: string) => Promise<RestaurantDetailGetResponse>;
+	getRestaurantByOwnerId: (ownerId: string) => Promise<GetRestaurantByOwnerResponse>;
 	getRestaurantsByName: (
 		name: string,
-	) => Promise<{ success: boolean; error?: string }>;
+	) => Promise<SearchRestaurantsResponse>;
 	updateRestaurant: ({
 		data,
 		id,
 	}: {
-		data: Restaurant;
+		data: RestaurantDetailPutRequest;
 		id: string;
-	}) => Promise<{ success: boolean; error?: string }>;
+	}) => Promise<RestaurantDetailPutResponse>;
 	resetRestaurant: () => void;
 };
 
@@ -63,25 +80,19 @@ const useRestaurantStore = create<RestaurantStore>()(
 			isLoading: false,
 			error: null,
 
-			createRestaurant: async (data: Restaurant) => {
+			createRestaurant: async (data: CreateRestaurantRequest) => {
 				try {
 					set({ isLoading: true, error: null });
-					const response = await apiClient.post("/restaurants", data);
+					const response = await apiClient.post<CreateRestaurantResponse>("/restaurants", data);
 
 					set({
 						restaurantData: response.data,
 					});
-					return { success: true };
+					return response.data;
 				} catch (error) {
-					set({
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					});
-					return {
-						success: false,
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					};
+					const errorMessage = handleApiError(error);
+					set({ error: errorMessage });
+					throw error;
 				} finally {
 					set({ isLoading: false });
 				}
@@ -91,30 +102,22 @@ const useRestaurantStore = create<RestaurantStore>()(
 				try {
 					set({ isLoading: true, error: null });
 
-					const response = await apiClient.get(
-						`/restaurants/search?name=${name}`,
+					const response = await apiClient.get<SearchRestaurantsResponse>(
+						`/restaurants/search/${name}`,
 					);
 
 					if (response.data.length === 0) {
 						set({ restaurantData: DEFAULT_RESTAURANT_DATA });
 					}
 
-					console.log(response.data);
-
 					set({
 						restaurantDatas: response.data,
 					});
-					return { success: true };
+					return response.data;
 				} catch (error) {
-					set({
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					});
-					return {
-						success: false,
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					};
+					const errorMessage = handleApiError(error);
+					set({ error: errorMessage });
+					throw error;
 				} finally {
 					set({ isLoading: false });
 				}
@@ -124,16 +127,16 @@ const useRestaurantStore = create<RestaurantStore>()(
 				try {
 					set({ isLoading: true, error: null });
 
-					const response = await apiClient.get(`/restaurants/${id}`);
+					const response = await apiClient.get<RestaurantDetailGetResponse>(`/restaurants/${id}`);
 
 					set({
 						restaurantData: response.data,
 					});
+					return response.data;
 				} catch (error) {
-					set({
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					});
+					const errorMessage = handleApiError(error);
+					set({ error: errorMessage });
+					throw error;
 				} finally {
 					set({ isLoading: false });
 				}
@@ -143,20 +146,16 @@ const useRestaurantStore = create<RestaurantStore>()(
 				try {
 					set({ isLoading: true, error: null });
 
-					const response = await apiClient.get(`/restaurants/owner/${ownerId}`);
-
-					if (response.data.length === 0) {
-						set({ restaurantData: DEFAULT_RESTAURANT_DATA });
-					}
+					const response = await apiClient.get<GetRestaurantByOwnerResponse>(`/restaurants/owner/${ownerId}`);
 
 					set({
 						restaurantData: response.data,
 					});
+					return response.data;
 				} catch (error) {
-					set({
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					});
+					const errorMessage = handleApiError(error);
+					set({ error: errorMessage });
+					throw error;
 				} finally {
 					set({ isLoading: false });
 				}
@@ -166,32 +165,23 @@ const useRestaurantStore = create<RestaurantStore>()(
 				data,
 				id,
 			}: {
-				data: Restaurant;
+				data: RestaurantDetailPutRequest;
 				id: string;
 			}) => {
 				try {
 					set({ isLoading: true, error: null });
-					console.log(id, data);
 
-					const response = await apiClient.put(`/restaurants/${id}`, {
-						data,
-					});
+					const response = await apiClient.put<RestaurantDetailPutResponse>(`/restaurants/${id}`, data);
 
 					set({
 						restaurantData: response.data,
 					});
 
-					return { success: true };
+					return response.data;
 				} catch (error) {
-					set({
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					});
-					return {
-						success: false,
-						error:
-							error instanceof Error ? error?.message : "An error occurred",
-					};
+					const errorMessage = handleApiError(error);
+					set({ error: errorMessage });
+					throw error;
 				} finally {
 					set({ isLoading: false });
 				}

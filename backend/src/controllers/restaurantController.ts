@@ -1,246 +1,294 @@
+import type { ApiError } from "@shared/types/common/errors.js";
+import type {
+  CreateRestaurantRequest,
+	CreateRestaurantResponse,
+	RestaurantDetailDeleteRequest,
+	RestaurantDetailDeleteResponse,
+	RestaurantDetailGetRequest,
+	RestaurantDetailGetResponse,
+	RestaurantDetailPutRequest,
+	RestaurantDetailPutResponse,
+	RestaurantListGetRequest,
+	RestaurantListGetResponse,
+} from "@shared/types/restaurant";
+import type {
+	GetOwnerRestaurantsRequest,
+	GetOwnerRestaurantsResponse,
+	GetRestaurantByOwnerRequest,
+	GetRestaurantByOwnerResponse,
+} from "@shared/types/restaurant/get";
+import type {
+	SearchRestaurantsRequest,
+	SearchRestaurantsResponse,
+} from "@shared/types/restaurant/search";
 import type { NextFunction, Request, Response } from "express";
+import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import RestaurantData from "../models/RestaurantData.js";
-import type { Restaurant } from "../types/restaurantData.js";
 
-// Helper function to validate request ID
-const validateId = (req: Request) => {
-  const { id } = req.params;
-  if (!id) {
-    throw new Error("No id provided");
-  }
-  return id;
-};
+// Combined response types for each endpoint
+type RestaurantListGetApiResponse = RestaurantListGetResponse | ApiError;
+type CreateRestaurantApiResponse = CreateRestaurantResponse | ApiError;
+type RestaurantDetailGetApiResponse = RestaurantDetailGetResponse | ApiError;
+type RestaurantDetailPutApiResponse = RestaurantDetailPutResponse | ApiError;
+type RestaurantDetailDeleteApiResponse = RestaurantDetailDeleteResponse | ApiError;
+type SearchRestaurantsApiResponse = SearchRestaurantsResponse | ApiError;
+type GetRestaurantByOwnerApiResponse = GetRestaurantByOwnerResponse | ApiError;
+type GetOwnerRestaurantsApiResponse = GetOwnerRestaurantsResponse | ApiError;
 
+/**
+ * Creates a new restaurant.
+ */
 export const createNewRestaurant = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<unknown, unknown, CreateRestaurantRequest>,
+	res: Response<CreateRestaurantApiResponse>,
+	next: NextFunction,
 ): Promise<void> => {
-  try {
-    const body = req.body;
+	try {
+		const body = req.body;
 
-    if (!body) {
-      res.status(400).json({ error: "Invalid request body" });
-      return;
-    }
+		if (!body || !body.name) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "Invalid request body or missing name"));
+		}
 
-    // Check if a restaurant with the same name already exists
-    const existingRestaurant = await RestaurantData.findOne({
-      name: { $regex: new RegExp(`^${body.name}$`, "i") }, // Case-insensitive exact match
-    });
+		// Check if a restaurant with the same name already exists
+		const existingRestaurant = await RestaurantData.findOne({
+			name: { $regex: new RegExp(`^${body.name}$`, "i") }, // Case-insensitive exact match
+		});
 
-    if (existingRestaurant) {
-      res.status(409).json({
-        error: "Duplicate Restaurant. Restaurant with this name already exists",
-        existingId: existingRestaurant._id,
-      });
-      return;
-    }
+		if (existingRestaurant) {
+			return next(
+				createError(
+					ErrorCodes.CONFLICT,
+					"Duplicate Restaurant. Restaurant with this name already exists",
+				),
+			);
+		}
 
-    const newRestaurant = await RestaurantData.create(body);
+		const newRestaurant = await RestaurantData.create(body);
 
-    if (!newRestaurant) {
-      res.status(400).json({ error: "Could not create restaurant" });
-      return;
-    }
+		if (!newRestaurant) {
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Could not create restaurant"),
+			);
+		}
 
-    res.status(201).json(newRestaurant);
-  } catch (error) {
-    return next(error);
-  }
+		res.status(201).json(newRestaurant);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Gets a restaurant by its ID.
+ */
 export const getRestaurantById = async (
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction
+	req: Request<RestaurantDetailGetRequest>,
+	res: Response<RestaurantDetailGetApiResponse>,
+	next: NextFunction,
 ) => {
-  try {
-    const id = validateId(req);
+	try {
+		const { id } = req.params;
 
-    // If ID is provided, return single restaurant
-    const restaurant = await RestaurantData.findById(id)
-      .populate("logo")
-      .populate("gallery")
-      .populate("cuisine");
+		if (!id) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required"));
+		}
 
-    if (!restaurant) {
-      res.status(404).json({ error: "Restaurant not found" });
-      return;
-    }
+		const restaurant = await RestaurantData.findById(id)
+			.populate("logo")
+			.populate("gallery")
+			.populate("cuisine");
 
-    console.log("restaurant", restaurant);
+		if (!restaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
 
-    res.json(restaurant);
-  } catch (error) {
-    return next(error);
-  }
+		res.json(restaurant);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Gets all restaurants.
+ */
 export const getAllRestaurants = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<RestaurantListGetRequest>,
+	res: Response<RestaurantListGetApiResponse>,
+	next: NextFunction,
 ): Promise<void> => {
-  try {
-    const allRestaurants = await RestaurantData.find()
-      .populate("logo")
-      .populate("gallery")
-      .populate("cuisine");
+	try {
+		const allRestaurants = await RestaurantData.find()
+			.populate("logo")
+			.populate("gallery")
+			.populate("cuisine");
 
-    if (!allRestaurants || allRestaurants.length === 0) {
-      res.status(404).json({ error: "No restaurants found" });
-      return;
-    }
+		if (!allRestaurants || allRestaurants.length === 0) {
+			return next(createError(ErrorCodes.NOT_FOUND, "No restaurants found"));
+		}
 
-    const restaurantList = allRestaurants.map((restaurant: Restaurant) => ({
-      _id: restaurant._id,
-      name: restaurant.name,
-      ownerId: restaurant.ownerId,
-    }));
+		const restaurantList = allRestaurants.map((restaurant) => ({
+			_id: restaurant._id,
+			name: restaurant.name,
+			ownerId: restaurant.ownerId,
+		}));
 
-    res.json(restaurantList);
-  } catch (error) {
-    next(error);
-  }
+		res.json(restaurantList);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Searches restaurants by name.
+ */
 export const getRestaurantsByName = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<SearchRestaurantsRequest>,
+	res: Response<SearchRestaurantsApiResponse>,
+	next: NextFunction,
 ) => {
-  try {
-    const { name } = req.query;
+	try {
+		const { name } = req.params;
 
-    const searchName = typeof name === "string" ? name : "";
+		const searchName = typeof name === "string" ? name : "";
 
-    if (!searchName) {
-      res.status(400).json({ error: "No name provided" });
-      return;
-    }
+		if (!searchName) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "No name provided"));
+		}
 
-    const restaurants = await RestaurantData.find({
-      name: new RegExp(searchName, "i"), // Simple contains search
-    });
+		const restaurants = await RestaurantData.find({
+			name: new RegExp(searchName, "i"), // Simple contains search
+		});
 
-    res.json(restaurants);
-  } catch (error) {
-    next(error);
-  }
+		res.json(restaurants);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Updates restaurant data.
+ */
 export const updateRestaurantData = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<RestaurantDetailGetRequest, unknown, RestaurantDetailPutRequest>,
+	res: Response<RestaurantDetailPutApiResponse>,
+	next: NextFunction,
 ): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const body: Partial<Restaurant> = req.body.data || req.body;
+	try {
+		const { id } = req.params;
+		const body = req.body;
 
-    // First check if document exists
-    const existingRestaurant = await RestaurantData.findById(id);
-    if (!existingRestaurant) {
-      res.status(404).json({ error: "Restaurant not found" });
-      return;
-    }
+		if (!id) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required"));
+		}
 
-    // Then attempt update
-    const updatedRestaurant = await RestaurantData.findByIdAndUpdate(
-      id,
-      { $set: body }, // Use $set to explicitly set only the fields provided
-      {
-        new: true,
-      }
-    )
-      .populate("logo")
-      .populate("gallery")
-      .populate("cuisine");
+		// First check if document exists
+		const existingRestaurant = await RestaurantData.findById(id);
+		if (!existingRestaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
 
-    if (!updatedRestaurant) {
-      res.status(404).json({ error: "Restaurant data not updated" });
-      return;
-    }
+		// Then attempt update
+		const updatedRestaurant = await RestaurantData.findByIdAndUpdate(
+			id,
+			{ $set: body }, // Use $set to explicitly set only the fields provided
+			{
+				new: true,
+			},
+		)
+			.populate("logo")
+			.populate("gallery")
+			.populate("cuisine");
 
-    res.json(updatedRestaurant);
-    return;
-  } catch (error) {
-    return next(error);
-  }
+		if (!updatedRestaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant data not updated"));
+		}
+
+		res.json(updatedRestaurant);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Gets a restaurant by owner ID.
+ */
 export const getRestaurantByOwnerId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<GetRestaurantByOwnerRequest>,
+	res: Response<GetRestaurantByOwnerApiResponse>,
+	next: NextFunction,
 ) => {
-  try {
-    const { userId } = req.params;
+	try {
+		const { userId } = req.params;
 
-    if (!userId) {
-      res.status(401).json({ error: "User Id is required" });
-      return;
-    }
+		if (!userId) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "User ID is required"));
+		}
 
-    const restaurant = await RestaurantData.findOne({ ownerId: userId })
-      .populate("logo")
-      .populate("gallery")
-      .populate("cuisine");
+		const restaurant = await RestaurantData.findOne({ ownerId: userId })
+			.populate("logo")
+			.populate("gallery")
+			.populate("cuisine");
 
-    if (!restaurant) {
-      res.status(404).json({ error: "Restaurant not found" });
-      return;
-    }
+		if (!restaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
 
-    res.json(restaurant);
-  } catch (error) {
-    next(error);
-  }
+		res.json(restaurant);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Gets all restaurants for an owner.
+ */
 export const getOwnerRestaurants = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+	req: Request<GetOwnerRestaurantsRequest>,
+	res: Response<GetOwnerRestaurantsApiResponse>,
+	next: NextFunction,
 ) => {
-  try {
-    const { userId } = req.params;
+	try {
+		const { userId } = req.params;
 
-    if (!userId) {
-      res.status(401).json({ error: "User Id is required" });
-      return;
-    }
+		if (!userId) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "User ID is required"));
+		}
 
-    const restaurants = await RestaurantData.find({ ownerId: userId });
-    if (!restaurants || restaurants.length === 0) {
-      res.json([]);
-      return;
-    }
+		const restaurants = await RestaurantData.find({ ownerId: userId });
+		if (!restaurants || restaurants.length === 0) {
+			res.json([]);
+			return;
+		}
 
-    res.json(restaurants);
-  } catch (error) {
-    next(error);
-  }
+		res.json(restaurants);
+	} catch (error) {
+		return next(error);
+	}
 };
 
+/**
+ * Deletes a restaurant.
+ */
 export const deletedRestaurant = async (
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction
+	req: Request<RestaurantDetailDeleteRequest>,
+	res: Response<RestaurantDetailDeleteApiResponse>,
+	next: NextFunction,
 ) => {
-  try {
-    const id = validateId(req);
+	try {
+		const { id } = req.params;
 
-    const deletedRestaurant = await RestaurantData.findByIdAndDelete(id);
+		if (!id) {
+			return next(createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required"));
+		}
 
-    if (!deletedRestaurant) {
-      res.status(404).json({ error: "Restaurant data not found" });
-      return;
-    }
+		const deletedRestaurant = await RestaurantData.findByIdAndDelete(id);
 
-    res.json(deletedRestaurant);
-  } catch (error) {
-    return next(error);
-  }
+		if (!deletedRestaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
+
+		res.status(204).send();
+	} catch (error) {
+		return next(error);
+	}
 };
