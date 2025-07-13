@@ -1,9 +1,9 @@
-import type { LoginRequest, LoginResponse } from "@shared/types/auth/login.js";
-import type { RefreshTokenRequest, RefreshTokenResponse } from "@shared/types/auth/refresh.js";
+import type { LoginPostRequest, LoginPostResponse } from "@shared/types/auth/login";
+import type { RefreshPostRequest, RefreshPostResponse } from "@shared/types/auth/refresh";
 import type {
-	RegisterRequest,
-	RegisterResponse,
-} from "@shared/types/auth/register.js";
+  RegisterPostRequest,
+  RegisterPostResponse,
+} from "@shared/types/auth/register";
 import type { ApiError } from "@shared/types/common/errors.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -15,12 +15,12 @@ import {
 import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import User from "../models/User.js";
 
-type LoginApiResponse = LoginResponse | ApiError;
-type RegisterApiResponse = RegisterResponse | ApiError;
-type RefreshApiResponse = RefreshTokenResponse | ApiError;
+type LoginApiResponse = LoginPostResponse | ApiError;
+type RegisterApiResponse = RegisterPostResponse | ApiError;
+type RefreshApiResponse = RefreshPostResponse | ApiError;
 
 export const login = async (
-	req: Request<LoginRequest>,
+	req: Request<Record<string, never>, unknown, LoginPostRequest>,
 	res: Response<LoginApiResponse>,
 	next: NextFunction,
 ) => {
@@ -65,7 +65,7 @@ export const login = async (
 };
 
 export const register = async (
-	req: Request<RegisterRequest>,
+	req: Request<Record<string, never>, unknown, RegisterPostRequest>,
 	res: Response<RegisterApiResponse>,
 	next: NextFunction,
 ) => {
@@ -110,7 +110,7 @@ export const register = async (
 };
 
 export const refresh = async (
-	req: Request<RefreshTokenRequest>,
+	req: Request<Record<string, never>, unknown, RefreshPostRequest>,
 	res: Response<RefreshApiResponse>,
 	next: NextFunction,
 ) => {

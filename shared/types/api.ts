@@ -127,10 +127,7 @@ export interface paths {
         /** @description Missing required field or invalid credentials */
         400: {
           content: {
-            "application/json": {
-              /** @example Missing required fields */
-              message?: string;
-            };
+            "application/json": components["schemas"]["ErrorResponse"];
           };
         };
         /** @description Internal Server Error */
@@ -175,19 +172,13 @@ export interface paths {
         /** @description Refresh token not found or Invalid Token */
         400: {
           content: {
-            "application/json": {
-              /** @example Refresh token not found */
-              message?: string;
-            };
+            "application/json": components["schemas"]["ErrorResponse"];
           };
         };
         /** @description Internal Server error */
         401: {
           content: {
-            "application/json": {
-              /** @example Invalid Refresh Token Request */
-              message?: string;
-            };
+            "application/json": components["schemas"]["ErrorResponse"];
           };
         };
       };
@@ -656,6 +647,609 @@ export interface paths {
       };
     };
   };
+  "/api/user-types": {
+    /** Get all user types */
+    get: {
+      responses: {
+        /** @description List of user types */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserType"][];
+          };
+        };
+      };
+    };
+  };
+  "/api/user-types/{userType}": {
+    /**
+     * Get user type by name
+     * @description Retrieve a specific user type by its name
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description The name of the user type to retrieve */
+          userType: "guest" | "user" | "admin" | "moderator" | "root";
+        };
+      };
+      responses: {
+        /** @description User type retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserType"];
+          };
+        };
+        /** @description User type not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example User Type not found */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/allergens": {
+    /**
+     * Get all allergens
+     * @description Retrieve all available allergens
+     */
+    get: {
+      responses: {
+        /** @description List of allergens */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Allergen"][];
+          };
+        };
+      };
+    };
+    /**
+     * Create a new allergen
+     * @description Create a new allergen with the provided details
+     */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Allergen"];
+        };
+      };
+      responses: {
+        /** @description Allergen created successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Allergen"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/allergens/{id}": {
+    /**
+     * Get allergen by ID
+     * @description Retrieve a specific allergen by its ID
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description The ID of the allergen to retrieve */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Allergen retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Allergen"];
+          };
+        };
+        /** @description Allergen ID is required */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Allergen not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Update allergen
+     * @description Update an existing allergen
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description The ID of the allergen to update */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Allergen"];
+        };
+      };
+      responses: {
+        /** @description Allergen updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Allergen"];
+          };
+        };
+        /** @description Invalid input (missing ID or body) */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Allergen not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Delete allergen
+     * @description Delete an allergen by its ID
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description The ID of the allergen to delete */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Allergen deleted successfully */
+        200: {
+          content: {
+            "application/json": {
+              /** @example Allergen deleted successfully */
+              message?: string;
+              data?: {
+                /** @example 507f1f77bcf86cd799439013 */
+                id?: string;
+              };
+            };
+          };
+        };
+        /** @description Allergen ID is required */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Allergen not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/courses": {
+    /**
+     * Get all courses
+     * @description Retrieve all available courses
+     */
+    get: {
+      responses: {
+        /** @description List of courses */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Course"][];
+          };
+        };
+      };
+    };
+    /**
+     * Create a new course
+     * @description Create a new course with the provided details
+     */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Course"];
+        };
+      };
+      responses: {
+        /** @description Course created successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Course"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Invalid request body */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/courses/{id}": {
+    /**
+     * Get course by ID
+     * @description Retrieve a specific course by its ID
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description The ID of the course to retrieve */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Course retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Course"];
+          };
+        };
+        /** @description Course ID is required */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Course ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Course not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Course not found */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Update course
+     * @description Update an existing course
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description The ID of the course to update */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Course"];
+        };
+      };
+      responses: {
+        /** @description Course updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Course"];
+          };
+        };
+        /** @description Invalid input (missing ID or body) */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Course ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Course not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Course not found */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Delete course
+     * @description Delete a course by its ID
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description The ID of the course to delete */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Course deleted successfully */
+        200: {
+          content: {
+            "application/json": {
+              /** @example Course deleted successfully */
+              message?: string;
+            };
+          };
+        };
+        /** @description Course ID is required */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Course ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Course not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Course not found */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/cuisines": {
+    /**
+     * Get all cuisines
+     * @description Retrieve all available cuisines
+     */
+    get: {
+      responses: {
+        /** @description List of cuisines */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Cuisine"][];
+          };
+        };
+      };
+    };
+    /**
+     * Create a new cuisine
+     * @description Create a new cuisine with the provided details
+     */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Cuisine"];
+        };
+      };
+      responses: {
+        /** @description Cuisine created successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Cuisine"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Invalid request body */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/cuisines/{id}": {
+    /**
+     * Get cuisine by ID
+     * @description Retrieve a specific cuisine by its ID
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description The ID of the cuisine to retrieve */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Cuisine retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Cuisine"];
+          };
+        };
+        /** @description Cuisine ID is required */
+        400: {
+          content: {
+            "application/json": {
+              /** @example ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Cuisine not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Cuisine type not found */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Update cuisine
+     * @description Update an existing cuisine
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description The ID of the cuisine to update */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Cuisine"];
+        };
+      };
+      responses: {
+        /** @description Cuisine updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Cuisine"];
+          };
+        };
+        /** @description Invalid input (missing ID or body) */
+        400: {
+          content: {
+            "application/json": {
+              /** @example Cuisine ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Cuisine not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Cuisine type not found */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Delete cuisine
+     * @description Delete a cuisine by its ID
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description The ID of the cuisine to delete */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Cuisine deleted successfully */
+        200: {
+          content: {
+            "application/json": {
+              /** @example Cuisine type deleted successfully */
+              message?: string;
+            };
+          };
+        };
+        /** @description Cuisine ID is required */
+        400: {
+          content: {
+            "application/json": {
+              /** @example ID is required */
+              error?: string;
+            };
+          };
+        };
+        /** @description Cuisine not found */
+        404: {
+          content: {
+            "application/json": {
+              /** @example Cuisine type not found */
+              error?: string;
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Internal server error */
+              error?: string;
+            };
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -708,8 +1302,7 @@ export interface components {
       password: string;
       /** @example false */
       isVerified?: boolean;
-      /** @example userTypeId */
-      userType: string;
+      userType: components["schemas"]["UserType"];
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -722,22 +1315,67 @@ export interface components {
       updatedAt?: string;
     };
     Allergen: {
+      /**
+       * @description Unique identifier for the allergen
+       * @example 507f1f77bcf86cd799439013
+       */
+      _id?: string;
       /** @example egg */
-      name?: string;
+      name: string;
       /** @example allergic reaction to eggs and food that has egg content */
-      description?: string;
+      description: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
     };
     Course: {
+      /**
+       * @description Unique identifier for the course
+       * @example 507f1f77bcf86cd799439014
+       */
+      _id?: string;
       /** @example main */
-      name?: string;
+      name: string;
       /** @example Main course in a meal */
-      description?: string;
+      description: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
     };
     Cuisine: {
+      /**
+       * @description Unique identifier for the cuisine
+       * @example 507f1f77bcf86cd799439015
+       */
+      _id?: string;
       /** @example Nigerian */
-      name?: string;
+      name: string;
       /** @example A Type of meal based on region of origin */
-      description?: string;
+      description: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
     };
     BusinessHour: {
       /** @enum {string} */
@@ -970,6 +1608,29 @@ export interface components {
        * @example Temporary access for project collaboration
        */
       notes?: string;
+    };
+    UserType: {
+      /**
+       * @description Unique identifier for the user type
+       * @example 507f1f77bcf86cd799439012
+       */
+      _id?: string;
+      /**
+       * @description Name of the user type
+       * @example user
+       * @enum {string}
+       */
+      name: "guest" | "user" | "admin" | "moderator" | "root";
+      /**
+       * @description Access level (1=lowest, 5=highest)
+       * @example 2
+       */
+      level: number;
+      /**
+       * @description Description of the user type
+       * @example an ordinary user with restaurant access
+       */
+      description: string;
     };
   };
   responses: never;

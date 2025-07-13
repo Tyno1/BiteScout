@@ -3,7 +3,7 @@
 import React, { useActionState, useEffect } from "react";
 
 import { doCredentialLogin } from "@/app/actions";
-import { Button } from "@/components/atoms";
+import { Button, Input } from "@/components/atoms";
 import { useRouter } from "next/navigation";
 
 export function LoginForm() {
@@ -24,28 +24,31 @@ export function LoginForm() {
       action={loginAction}
       className="w-full flex flex-col items-center gap-2"
     >
-      {state?.errors?.email && (
-        <div className="text-red-500">{state.errors.email}</div>
-      )}
-      {state?.errors?.password && (
-        <div className="text-red-500 text-sm">{state.errors.password}</div>
-      )}
-      <input
+     
+
+      <Input
         required
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="email"
+        inputSize="md"
         type="email"
-        name="email"
+        placeholder="Email"
         id="email"
+        name="email"
+        label="Email"
+        fullWidth
+        errorMessage={state?.errors?.email?.[0]}
       />
-      <input
-        required
-        className="text-sm w-full py-4 px-4 bg-white rounded text-black"
-        placeholder="password"
+
+      <Input
+        inputSize="md"
         type="password"
-        name="password"
+        placeholder="Password"
         id="password"
+        name="password"
+        label="password"
+        fullWidth
+        errorMessage={state?.errors?.password?.[0]}
       />
+
       <Button
         disabled={isPending}
         type="submit"

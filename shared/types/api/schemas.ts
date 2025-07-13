@@ -1,5 +1,5 @@
 // API Schema Types - Extracted from generated OpenAPI types
-import type { components } from '../generated';
+import type { components } from '../api';
 
 // Core Schemas
 export type User = components['schemas']['User'];
@@ -12,6 +12,7 @@ export type BusinessHour = components['schemas']['BusinessHour'];
 export type Allergen = components['schemas']['Allergen'];
 export type Course = components['schemas']['Course'];
 export type Cuisine = components['schemas']['Cuisine'];
+export type UserType = components['schemas']['UserType'];
 
 // Notification and Access Schemas
 export type Notification = components['schemas']['Notification'];

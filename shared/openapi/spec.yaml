@@ -154,11 +154,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Missing required fields
+                $ref: "#/components/schemas/ErrorResponse"
         500:
           description: Internal Server Error
           content:
@@ -209,30 +205,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Refresh token not found
-              examples:
-                missingToken:
-                  summary: Missing token
-                  value:
-                    message: Refresh token not found
-                invalidToken:
-                  summary: Invalid refresh token
-                  value:
-                    message: Invalid refresh token
+                $ref: "#/components/schemas/ErrorResponse"
         401:
           description: Internal Server error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid Refresh Token Request
+                $ref: "#/components/schemas/ErrorResponse"
   /api/user/{userId}:
     summary: Update a user
     put:
@@ -688,6 +667,594 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RestaurantAccess"
+  /api/user-types:
+    get:
+      summary: Get all user types
+      responses:
+        200:
+          description: List of user types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserType"
+
+  /api/user-types/{userType}:
+    get:
+      summary: Get user type by name
+      description: Retrieve a specific user type by its name
+      parameters:
+        - in: path
+          name: userType
+          required: true
+          description: The name of the user type to retrieve
+          schema:
+            type: string
+            enum: ["guest", "user", "admin", "moderator", "root"]
+            example: "user"
+      responses:
+        200:
+          description: User type retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserType"
+        404:
+          description: User type not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User Type not found"
+
+  /api/allergens:
+    get:
+      summary: Get all allergens
+      description: Retrieve all available allergens
+      responses:
+        200:
+          description: List of allergens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Allergen"
+    post:
+      summary: Create a new allergen
+      description: Create a new allergen with the provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Allergen"
+      responses:
+        201:
+          description: Allergen created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Allergen"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/allergens/{id}:
+    get:
+      summary: Get allergen by ID
+      description: Retrieve a specific allergen by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the allergen to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Allergen retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Allergen"
+        400:
+          description: Allergen ID is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Allergen not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update allergen
+      description: Update an existing allergen
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the allergen to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Allergen"
+      responses:
+        200:
+          description: Allergen updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Allergen"
+        400:
+          description: Invalid input (missing ID or body)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Allergen not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete allergen
+      description: Delete an allergen by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the allergen to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Allergen deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Allergen deleted successfully"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "507f1f77bcf86cd799439013"
+        400:
+          description: Allergen ID is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Allergen not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/courses:
+    get:
+      summary: Get all courses
+      description: Retrieve all available courses
+      responses:
+        200:
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+    post:
+      summary: Create a new course
+      description: Create a new course with the provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Course"
+      responses:
+        201:
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid request body"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /api/courses/{id}:
+    get:
+      summary: Get course by ID
+      description: Retrieve a specific course by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the course to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Course retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Course ID is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course ID is required"
+        404:
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course not found"
+    put:
+      summary: Update course
+      description: Update an existing course
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the course to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Course"
+      responses:
+        200:
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid input (missing ID or body)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course ID is required"
+        404:
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+    delete:
+      summary: Delete course
+      description: Delete a course by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the course to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Course deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Course deleted successfully"
+        400:
+          description: Course ID is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course ID is required"
+        404:
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Course not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /api/cuisines:
+    get:
+      summary: Get all cuisines
+      description: Retrieve all available cuisines
+      responses:
+        200:
+          description: List of cuisines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cuisine"
+    post:
+      summary: Create a new cuisine
+      description: Create a new cuisine with the provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Cuisine"
+      responses:
+        201:
+          description: Cuisine created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cuisine"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid request body"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /api/cuisines/{id}:
+    get:
+      summary: Get cuisine by ID
+      description: Retrieve a specific cuisine by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the cuisine to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Cuisine retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cuisine"
+        400:
+          description: Cuisine ID is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "ID is required"
+        404:
+          description: Cuisine not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cuisine type not found"
+    put:
+      summary: Update cuisine
+      description: Update an existing cuisine
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the cuisine to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Cuisine"
+      responses:
+        200:
+          description: Cuisine updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cuisine"
+        400:
+          description: Invalid input (missing ID or body)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cuisine ID is required"
+        404:
+          description: Cuisine not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cuisine type not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+    delete:
+      summary: Delete cuisine
+      description: Delete a cuisine by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the cuisine to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Cuisine deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cuisine type deleted successfully"
+        400:
+          description: Cuisine ID is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "ID is required"
+        404:
+          description: Cuisine not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cuisine type not found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
 
 components:
   schemas:
@@ -746,8 +1313,7 @@ components:
           type: boolean
           example: false
         userType:
-          type: string
-          example: userTypeId
+          $ref: "#/components/schemas/UserType"
         createdAt:
           type: string
           format: date-time
@@ -764,30 +1330,75 @@ components:
     Allergen:
       type: object
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the allergen"
+          example: "507f1f77bcf86cd799439013"
         name:
           type: string
           example: egg
         description:
           type: string
           example: allergic reaction to eggs and food that has egg content
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+      required:
+        - name
+        - description
     Course:
       type: object
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the course"
+          example: "507f1f77bcf86cd799439014"
         name:
           type: string
           example: main
         description:
           type: string
           example: Main course in a meal
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+      required:
+        - name
+        - description
     Cuisine:
       type: object
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the cuisine"
+          example: "507f1f77bcf86cd799439015"
         name:
           type: string
           example: Nigerian
         description:
           type: string
           example: A Type of meal based on region of origin
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+      required:
+        - name
+        - description
     BusinessHour:
       type: object
       properties:
@@ -1094,3 +1705,30 @@ components:
           type: string
           description: "Additional notes about the access"
           example: "Temporary access for project collaboration"
+
+    UserType:
+      type: object
+      required:
+        - name
+        - level
+        - description
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the user type"
+          example: "507f1f77bcf86cd799439012"
+        name:
+          type: string
+          enum: ["guest", "user", "admin", "moderator", "root"]
+          description: "Name of the user type"
+          example: "user"
+        level:
+          type: number
+          minimum: 1
+          maximum: 5
+          description: "Access level (1=lowest, 5=highest)"
+          example: 2
+        description:
+          type: string
+          description: "Description of the user type"
+          example: "an ordinary user with restaurant access"

@@ -1,4 +1,5 @@
-import type { LoginRequest, LoginResponse } from "@shared/types/auth/login";
+import type { UserType } from "@shared/types/api/schemas";
+import type { LoginPostRequest, LoginPostResponse } from "@shared/types/auth/login";
 import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import NextAuth from "next-auth";
@@ -7,7 +8,7 @@ import refreshAccessToken from "./utils/refreshAccessToken";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-async function getUserTypeDetails(userType: string) {
+async function getUserTypeDetails(userType: UserType["name"]) {
   try {
     const response = await axios.get(
       `${BACKEND_SERVER}/user-types/${userType}`
@@ -20,9 +21,22 @@ async function getUserTypeDetails(userType: string) {
       };
     }
 
+    console.warn(`UserType details not found for: ${userType}, using guest defaults`);
     return { name: "guest", level: 4 };
   } catch (error) {
-    console.error("Error fetching user type details:", error);
+    // Log detailed error information for debugging
+    if (axios.isAxiosError(error)) {
+      console.error(`Error fetching user type details for ${userType}:`, {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+    } else {
+      console.error(`Unexpected error fetching user type details for ${userType}:`, error);
+    }
+    
+    // Return guest defaults as fallback
     return { name: "guest", level: 4 };
   }
 }
@@ -46,12 +60,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         try {
-          const response = await axios.post<LoginResponse>(
+          const response = await axios.post<LoginPostResponse>(
             `${BACKEND_SERVER}/auth/login`,
             {
               email: credentials.email,
               password: credentials.password,
-            } as LoginRequest
+            } as LoginPostRequest
           );
 
           if (response.data?.accessToken) {

@@ -1,2 +1,2 @@
-// User Types - Organized by endpoint/concern
-export * from './update'; 
+// User Types - All user-related request, response, and error types
+export * from './profile'; 
