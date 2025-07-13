@@ -1,3 +1,4 @@
+/// <reference path="../types/express.d.ts" />
 import type { NextFunction, Request, Response } from "express";
 import Post from "../models/Post.js";
 

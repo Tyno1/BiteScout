@@ -56,7 +56,7 @@ const foodCatalogue = new Schema({
     type: PriceSchema,
     required: true,
   },
-  media: [
+  images: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Media",

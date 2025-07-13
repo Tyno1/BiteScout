@@ -1,80 +1,78 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import image1 from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
-import { useSession } from "next-auth/react";
-import useRestaurantStore from "@/stores/restaurantStore";
-import { RestaurantData } from "@/types/restaurantData";
-import {
-  BasicInformation,
-  BusinessHours,
-  ContactInformation,
-  RestaurantProfileFeatures,
-  RestaurantProfileHero,
-} from "@/components/ui";
-import { useRouter } from "next/navigation";
-import { useRole } from "@/app/hooks/useRole";
 import { useApprovedAccess } from "@/app/hooks/useApprovedAccess";
+import { useRole } from "@/app/hooks/useRole";
+import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/BasicInformation";
+import { BusinessHours } from "@/components/ui/dashboard/restaurant-profile/BusinessHours";
+import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile/ContactInformation";
+import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
+import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
+import useCuisineStore from "@/stores/cuisineStore";
+import useRestaurantStore from "@/stores/restaurantStore";
+import { getMediaUrl } from "@/types/media";
+import type {
+  BusinessHour,
+  Cuisine,
+  Restaurant,
+  RestaurantFeature,
+} from "@shared/types/api/schemas";
+import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-type BusinessHoursType = {
-  day: string;
-  open: string;
-  close: string;
-  closed: boolean;
-};
-
-const DEFAULT_BUSINESS_HOURS: BusinessHoursType[] = [
+const DEFAULT_BUSINESS_HOURS: BusinessHour[] = [
   { day: "Monday", open: "09:00", close: "17:00", closed: false },
   { day: "Tuesday", open: "09:00", close: "17:00", closed: false },
   { day: "Wednesday", open: "09:00", close: "17:00", closed: false },
   { day: "Thursday", open: "09:00", close: "17:00", closed: false },
   { day: "Friday", open: "09:00", close: "17:00", closed: false },
-  { day: "Saturday", open: "10:00", close: "15:00", closed: false },
-  { day: "Sunday", open: "10:00", close: "15:00", closed: true },
+  { day: "Saturday", open: "09:00", close: "17:00", closed: false },
+  { day: "Sunday", open: "09:00", close: "17:00", closed: false },
 ];
 
 export default function RestaurantProfile() {
-  const router = useRouter();
+  const { data: session } = useSession();
+  const { userRole, isLoading: roleLoading } = useRole();
   const {
     hasAccess,
-    isLoading: accessLoading,
     restaurantId,
+    isLoading: accessLoading,
   } = useApprovedAccess();
-  const { userRole, isLoading: roleLoading } = useRole();
-  const { data: session } = useSession();
-
   const {
-    getRestaurantByOwnerId,
-    updateRestaurant,
-    getRestaurantById,
     restaurantData,
     isLoading: restaurantLoading,
+    getRestaurantByOwnerId,
+    getRestaurantById,
+    updateRestaurant,
   } = useRestaurantStore();
+  const { cuisines, getCuisines } = useCuisineStore();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editableData, setEditableData] = useState<RestaurantData | null>(null);
-  const [newFeature, setNewFeature] = useState("");
-  const [newCuisine, setNewCuisine] = useState<string>("");
-  const [businessHours, setBusinessHours] = useState<BusinessHoursType[]>(
+  const [editableData, setEditableData] = useState<Restaurant | null>(null);
+  const [businessHours, setBusinessHours] = useState<BusinessHour[]>(
     DEFAULT_BUSINESS_HOURS
   );
+  const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
 
-  // Use editableData when in edit mode, otherwise use restaurantData
-  const displayData = isEditing ? editableData : restaurantData;
+  // Get the display data (either editable or current)
+  const displayData = editableData || restaurantData;
 
-  // Memoize business hours to prevent unnecessary recalculations
+  // Get the hero image from restaurant media
+  const heroImage = getMediaUrl(
+    restaurantData?.logo || restaurantData?.gallery,
+    "/api/placeholder/1200/800"
+  );
+
+  // Merge business hours from restaurant data with defaults
   const mergedBusinessHours = useMemo(() => {
-    if (!displayData?.businessHours || displayData.businessHours.length === 0) {
-      return DEFAULT_BUSINESS_HOURS;
-    }
-
-    return DEFAULT_BUSINESS_HOURS.map((defaultHours) => {
-      const existingHours = displayData.businessHours.find(
-        (h: any) => h.day === defaultHours.day
-      );
-      return existingHours || defaultHours;
-    });
-  }, [displayData?.businessHours]);
+    return restaurantData?.businessHours?.length
+      ? restaurantData.businessHours.map((hour: BusinessHour) => ({
+          day: hour.day,
+          open: hour.open,
+          close: hour.close,
+          closed: hour.closed,
+        }))
+      : DEFAULT_BUSINESS_HOURS;
+  }, [restaurantData?.businessHours]);
 
   // Update business hours when displayData changes
   useEffect(() => {
@@ -132,51 +130,51 @@ export default function RestaurantProfile() {
     setEditableData(null);
   }, []);
 
-  const addFeature = useCallback(() => {
-    const trimmedFeature = newFeature.trim();
-    if (!trimmedFeature) return;
-
+  const addFeature = useCallback((feature: RestaurantFeature) => {
     setEditableData((prev) => {
-      if (!prev || prev.features.includes(trimmedFeature)) return prev;
+      if (!prev) return prev;
+      const currentFeatures = prev.features || [];
+      if (currentFeatures.includes(feature)) return prev;
       return {
         ...prev,
-        features: [...prev.features, trimmedFeature],
+        features: [...currentFeatures, feature],
       };
     });
-    setNewFeature("");
-  }, [newFeature]); // Only depend on newFeature
+  }, []);
 
-  const removeFeature = useCallback((feature: string) => {
+
+  const addCuisine = useCallback((cuisine: Cuisine) => {
+    setEditableData((prev) => {
+      if (!prev) return prev;
+
+      const currentCuisines = prev.cuisine || [];
+      const cuisineExists = currentCuisines.some((c) =>
+        typeof c === "string" ? c === cuisine._id : c._id === cuisine._id
+      );
+
+      if (cuisineExists) return prev;
+
+      return {
+        ...prev,
+        cuisine: [...(prev.cuisine || []), cuisine],
+      };
+    });
+  }, []);
+
+  const removeCuisine = useCallback((cuisine: Cuisine) => {
     setEditableData((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        features: prev.features.filter((f) => f !== feature),
+        cuisine: prev.cuisine?.filter((c) => c !== cuisine),
       };
     });
   }, []); // No dependencies needed
 
-  const removeCuisine = useCallback((cuisine: string) => {
-    setEditableData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        cuisine: prev.cuisine.filter((c) => c !== cuisine),
-      };
-    });
-  }, []); // No dependencies needed
-
-  const handleKeyPress = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        addFeature();
-      }
-    },
-    [addFeature]
-  );
+  console.log(restaurantData);
 
   const handleInputChange = useCallback(
-    (field: keyof RestaurantData, value: any) => {
+    (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => {
       setEditableData((prev) => {
         if (!prev) return prev;
         return {
@@ -189,23 +187,31 @@ export default function RestaurantProfile() {
   );
 
   const handleBusinessHoursChange = useCallback(
-    (index: number, field: keyof BusinessHoursType, value: any) => {
+    (
+      index: number,
+      field: keyof BusinessHour,
+      value: BusinessHour[keyof BusinessHour]
+    ) => {
       setEditableData((prev) => {
         if (!prev?.businessHours) return prev;
 
-        const newHours = [...prev.businessHours];
-        newHours[index] = {
-          ...newHours[index],
+        const oldHours = [...prev.businessHours];
+        oldHours[index] = {
+          ...oldHours[index],
           [field]: value,
         };
         return {
           ...prev,
-          businessHours: newHours,
+          businessHours: oldHours,
         };
       });
     },
     []
   );
+
+  useEffect(() => {
+    getCuisines();
+  }, [getCuisines]);
 
   // Effect for admin/root users
   useEffect(() => {
@@ -215,7 +221,7 @@ export default function RestaurantProfile() {
 
     const userId = session.user._id;
     getRestaurantByOwnerId(userId);
-  }, [session?.user?._id, userRole]);
+  }, [session?.user?._id, userRole, getRestaurantByOwnerId]);
 
   // Effect for regular users with access
   useEffect(() => {
@@ -225,7 +231,15 @@ export default function RestaurantProfile() {
     if (restaurantData) return; // Don't refetch if we have data
 
     getRestaurantById(restaurantId);
-  }, [session?.user?._id, hasAccess, restaurantId]);
+  }, [
+    session?.user?._id,
+    hasAccess,
+    restaurantId,
+    accessLoading,
+    restaurantData,
+    getRestaurantById,
+    userRole,
+  ]);
 
   // Loading state
   if (restaurantLoading || accessLoading || roleLoading) {
@@ -264,7 +278,7 @@ export default function RestaurantProfile() {
   return (
     <main className="w-full min-h-screen bg-gray-50">
       <RestaurantProfileHero
-        image1={image1}
+        image1={heroImage}
         isEditing={isEditing}
         displayData={displayData}
         handleInputChange={handleInputChange}
@@ -278,8 +292,8 @@ export default function RestaurantProfile() {
         <BasicInformation
           removeCuisine={removeCuisine}
           isEditing={isEditing}
-          newCuisine={newCuisine}
-          setNewCuisine={setNewCuisine}
+          addCuisine={addCuisine}
+          cuisines={cuisines}
           editableData={editableData}
           setEditableData={setEditableData}
           displayData={displayData}
@@ -293,7 +307,11 @@ export default function RestaurantProfile() {
         />
 
         <BusinessHours
-          businessHours={businessHours}
+          businessHours={
+            isEditing
+              ? editableData?.businessHours || businessHours
+              : businessHours
+          }
           isEditing={isEditing}
           handleBusinessHoursChange={handleBusinessHoursChange}
         />
@@ -302,14 +320,13 @@ export default function RestaurantProfile() {
           isEditing={isEditing}
           newFeature={newFeature}
           setNewFeature={setNewFeature}
-          handleKeyPress={handleKeyPress}
           addFeature={addFeature}
-          removeFeature={removeFeature}
           displayData={displayData}
+          handleInputChange={handleInputChange}
         />
 
         {/* Status Messages for Screen Readers */}
-        <div className="sr-only" role="status" aria-live="polite">
+        <div className="sr-only" aria-live="polite">
           {isEditing
             ? "You are in edit mode. Make your changes and click the save button to save them."
             : "View mode. Click the edit button to make changes."}

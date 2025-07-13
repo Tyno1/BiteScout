@@ -1256,6 +1256,513 @@ paths:
                     type: string
                     example: "Internal server error"
 
+  /api/media:
+    post:
+      summary: Create new media
+      description: Upload and create a new media item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+                - type
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the media file"
+                  example: "https://example.com/images/restaurant-photo.jpg"
+                type:
+                  type: string
+                  enum:
+                    - "image"
+                    - "video"
+                    - "audio"
+                  description: "Type of media file"
+                  example: "image"
+                title:
+                  type: string
+                  description: "Title or caption for the media"
+                  example: "Restaurant Interior"
+                description:
+                  type: string
+                  description: "Description of the media content"
+                  example: "Beautiful interior view of the restaurant"
+                associatedWith:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "post"
+                        - "dish"
+                        - "restaurant"
+                      description: "Type of content this media is associated with"
+                      example: "post"
+                    id:
+                      type: string
+                      description: "ID of the associated content"
+                      example: "507f1f77bcf86cd799439016"
+                  description: "Information about what this media is associated with"
+                fileSize:
+                  type: number
+                  description: "Size of the media file in bytes"
+                  example: 2048576
+                mimeType:
+                  type: string
+                  description: "MIME type of the media file"
+                  example: "image/jpeg"
+                dimensions:
+                  type: object
+                  properties:
+                    width:
+                      type: number
+                      description: "Width of the media in pixels"
+                      example: 1920
+                    height:
+                      type: number
+                      description: "Height of the media in pixels"
+                      example: 1080
+                  description: "Dimensions of the media (for images/videos)"
+      responses:
+        201:
+          description: Media created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/{id}:
+    get:
+      summary: Get media by ID
+      description: Retrieve a specific media item by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update media
+      description: Update an existing media item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: "Title or caption for the media"
+                  example: "Updated Restaurant Interior"
+                description:
+                  type: string
+                  description: "Description of the media content"
+                  example: "Updated description of the restaurant interior"
+                associatedWith:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "post"
+                        - "dish"
+                        - "restaurant"
+                      description: "Type of content this media is associated with"
+                      example: "post"
+                    id:
+                      type: string
+                      description: "ID of the associated content"
+                      example: "507f1f77bcf86cd799439016"
+                  description: "Information about what this media is associated with"
+      responses:
+        200:
+          description: Media updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to update this media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete media
+      description: Delete a media item by its ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Media deleted successfully"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to delete this media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/associated/{type}/{id}:
+    get:
+      summary: Get media by associated item
+      description: Retrieve media items associated with a specific content type and ID
+      parameters:
+        - in: path
+          name: type
+          required: true
+          description: Type of content (post, dish, restaurant)
+          schema:
+            type: string
+            enum:
+              - "post"
+              - "dish"
+              - "restaurant"
+        - in: path
+          name: id
+          required: true
+          description: ID of the associated content
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid type or missing ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/user/{userId}:
+    get:
+      summary: Get user's media
+      description: Retrieve media items uploaded by a specific user with pagination
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        200:
+          description: User's media retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      totalMedia:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/{id}/verify:
+    post:
+      summary: Verify media
+      description: Verify or unverify a media item (admin/moderator only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to verify
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - verified
+              properties:
+                verified:
+                  type: boolean
+                  description: "Whether to verify or unverify the media"
+                  example: true
+      responses:
+        200:
+          description: Media verification status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  media:
+                    $ref: "#/components/schemas/Media"
+                  message:
+                    type: string
+                    example: "Media verified successfully"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to verify media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/verified:
+    get:
+      summary: Get verified media
+      description: Retrieve verified media items with optional filtering and pagination
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: type
+          required: false
+          description: Filter by media type (post, dish)
+          schema:
+            type: string
+            enum:
+              - "post"
+              - "dish"
+      responses:
+        200:
+          description: Verified media retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      totalMedia:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     ErrorResponse:
@@ -1430,23 +1937,30 @@ components:
         - ownerId
         - name
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the restaurant"
+          example: "507f1f77bcf86cd799439011"
         ownerId:
           type: string
           description: "Unique identifier for the restaurant owner"
+        owner:
+          type: boolean
+          default: false
+          description: "Whether the current user is the owner of this restaurant"
         name:
           type: string
           description: "Name of the restaurant"
         logo:
-          type: string
-          format: uri
-          description: "URL to the restaurant's logo image"
+          $ref: "#/components/schemas/Media"
+          description: "Restaurant logo media"
         description:
           type: string
           description: "Brief description of the restaurant"
         cuisine:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Cuisine"
           description: "List of cuisines offered by the restaurant"
         priceRange:
           type: string
@@ -1481,20 +1995,168 @@ components:
           items:
             type: string
             enum:
+              # Seating & Dining
               - "Outdoor seating"
-              - "Dining area"
+              - "Indoor dining"
+              - "Private dining rooms"
+              - "Bar seating"
+              - "Counter seating"
+              - "Rooftop dining"
+              - "Garden dining"
+              - "Waterfront dining"
+              - "Street-side dining"
+              - "Patio dining"
+              
+              # Service Types
               - "Take-out"
               - "Delivery"
+              - "Drive-through"
+              - "Curbside pickup"
               - "Catering"
-              - "Wifi"
-              - "Parking"
+              - "Private events"
+              - "Corporate events"
+              - "Wedding catering"
+              - "Party catering"
+              - "Food trucks"
+              
+              # Technology & Convenience
+              - "Free WiFi"
+              - "Mobile ordering"
+              - "Online reservations"
+              - "Contactless payment"
+              - "Digital menus"
+              - "QR code menus"
+              - "Self-service kiosks"
+              - "Table service"
+              - "Counter service"
+              - "Buffet service"
+              
+              # Accessibility
+              - "Wheelchair accessible"
+              - "Accessible parking"
+              - "Accessible restrooms"
+              - "Braille menus"
+              - "Service animal friendly"
+              - "Elevator access"
+              - "Ramp access"
+              
+              # Entertainment & Atmosphere
+              - "Live music"
+              - "Sports on TV"
+              - "Background music"
+              - "Dance floor"
+              - "Karaoke"
+              - "Trivia nights"
+              - "Comedy nights"
+              - "Wine tastings"
+              - "Cooking classes"
+              - "Chef's table"
+              
+              # Parking & Transportation
+              - "Free parking"
+              - "Valet parking"
+              - "Street parking"
+              - "Parking garage"
+              - "Bike parking"
+              - "Near public transit"
+              - "Uber/Lyft friendly"
+              
+              # Family & Kids
+              - "Kid-friendly"
+              - "High chairs"
+              - "Kids menu"
+              - "Play area"
+              - "Changing tables"
+              - "Family restrooms"
+              - "Birthday parties"
+              
+              # Dietary Accommodations
+              - "Vegetarian options"
+              - "Vegan options"
+              - "Gluten-free options"
+              - "Halal options"
+              - "Kosher options"
+              - "Dairy-free options"
+              - "Nut-free options"
+              - "Low-sodium options"
+              - "Organic ingredients"
+              - "Local ingredients"
+              
+              # Beverages & Bar
+              - "Full bar"
+              - "Wine list"
+              - "Craft beer"
+              - "Cocktails"
+              - "Happy hour"
+              - "BYOB"
+              - "Coffee service"
+              - "Tea service"
+              - "Juice bar"
+              - "Smoothies"
+              
+              # Special Services
+              - "Gift cards"
+              - "Loyalty program"
+              - "Rewards program"
+              - "Group discounts"
+              - "Student discounts"
+              - "Senior discounts"
+              - "Military discounts"
+              - "Corporate accounts"
+              - "Catering delivery"
+              - "Event planning"
+              
+              # Health & Safety
+              - "Contactless delivery"
+              - "Sanitized surfaces"
+              - "Staff wearing masks"
+              - "Temperature checks"
+              - "Social distancing"
+              - "Air purification"
+              - "UV sanitization"
+              - "Health inspections"
+              - "Food safety certified"
+              - "Allergen information"
+              
+              # Payment & Financial
+              - "Credit cards accepted"
+              - "Cash only"
+              - "Digital payments"
+              - "Split bills"
+              - "Gratuity included"
+              - "Tipping accepted"
+              - "Corporate billing"
+              - "Invoice available"
+              
+              # Hours & Availability
+              - "24/7 service"
+              - "Late night dining"
+              - "Breakfast service"
+              - "Lunch service"
+              - "Dinner service"
+              - "Brunch service"
+              - "Holiday hours"
+              - "Seasonal hours"
+              - "Reservations required"
+              - "Walk-ins welcome"
+              
+              # Special Occasions
+              - "Romantic dining"
+              - "Anniversary specials"
+              - "Birthday celebrations"
+              - "Date night"
+              - "Business meetings"
+              - "Networking events"
+              - "Graduation parties"
+              - "Holiday parties"
+              - "Corporate lunches"
+              - "Team building"
           description: "List of features available at the restaurant"
         gallery:
           type: array
           items:
-            type: string
-            format: uri
-          description: "URLs to images in the restaurant's gallery"
+            $ref: "#/components/schemas/Media"
+          description: "Gallery media items for the restaurant"
         meta:
           type: object
           additionalProperties: true
@@ -1579,12 +2241,8 @@ components:
         images:
           type: array
           items:
-            type: string
-            format: uri
-          description: "List of image URLs for the food item"
-          example:
-            - "https://example.com/images/spaghetti-bolognese-1.jpg"
-            - "https://example.com/images/spaghetti-bolognese-2.jpg"
+            $ref: "#/components/schemas/Media"
+          description: "Media items for the food item"
         restaurant:
           type: string
           description: "ID of the restaurant offering the food item"
@@ -1646,6 +2304,94 @@ components:
           type: string
           format: date-time
           description: "When the notification was last updated"
+          example: "2025-04-20T15:30:00Z"
+
+    Media:
+      type: object
+      required:
+        - url
+        - type
+        - uploadedBy
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the media"
+          example: "507f1f77bcf86cd799439017"
+        url:
+          type: string
+          format: uri
+          description: "URL to the media file"
+          example: "https://example.com/images/restaurant-photo.jpg"
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+          description: "Type of media file"
+          example: "image"
+        title:
+          type: string
+          description: "Title or caption for the media"
+          example: "Restaurant Interior"
+        description:
+          type: string
+          description: "Description of the media content"
+          example: "Beautiful interior view of the restaurant"
+        uploadedBy:
+          type: string
+          description: "ID of the user who uploaded the media"
+          example: "507f1f77bcf86cd799439011"
+        associatedWith:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - "post"
+                - "dish"
+                - "restaurant"
+              description: "Type of content this media is associated with"
+              example: "post"
+            id:
+              type: string
+              description: "ID of the associated content"
+              example: "507f1f77bcf86cd799439016"
+          description: "Information about what this media is associated with"
+        verified:
+          type: boolean
+          default: false
+          description: "Whether the media has been verified by moderators"
+          example: false
+        fileSize:
+          type: number
+          description: "Size of the media file in bytes"
+          example: 2048576
+        mimeType:
+          type: string
+          description: "MIME type of the media file"
+          example: "image/jpeg"
+        dimensions:
+          type: object
+          properties:
+            width:
+              type: number
+              description: "Width of the media in pixels"
+              example: 1920
+            height:
+              type: number
+              description: "Height of the media in pixels"
+              example: 1080
+          description: "Dimensions of the media (for images/videos)"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the media was uploaded"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the media was last updated"
           example: "2025-04-20T15:30:00Z"
 
     RestaurantAccess:

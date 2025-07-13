@@ -1250,6 +1250,487 @@ export interface paths {
       };
     };
   };
+  "/api/media": {
+    /**
+     * Create new media
+     * @description Upload and create a new media item
+     */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * Format: uri
+             * @description URL to the media file
+             * @example https://example.com/images/restaurant-photo.jpg
+             */
+            url: string;
+            /**
+             * @description Type of media file
+             * @example image
+             * @enum {string}
+             */
+            type: "image" | "video" | "audio";
+            /**
+             * @description Title or caption for the media
+             * @example Restaurant Interior
+             */
+            title?: string;
+            /**
+             * @description Description of the media content
+             * @example Beautiful interior view of the restaurant
+             */
+            description?: string;
+            /** @description Information about what this media is associated with */
+            associatedWith?: {
+              /**
+               * @description Type of content this media is associated with
+               * @example post
+               * @enum {string}
+               */
+              type?: "post" | "dish" | "restaurant";
+              /**
+               * @description ID of the associated content
+               * @example 507f1f77bcf86cd799439016
+               */
+              id?: string;
+            };
+            /**
+             * @description Size of the media file in bytes
+             * @example 2048576
+             */
+            fileSize?: number;
+            /**
+             * @description MIME type of the media file
+             * @example image/jpeg
+             */
+            mimeType?: string;
+            /** @description Dimensions of the media (for images/videos) */
+            dimensions?: {
+              /**
+               * @description Width of the media in pixels
+               * @example 1920
+               */
+              width?: number;
+              /**
+               * @description Height of the media in pixels
+               * @example 1080
+               */
+              height?: number;
+            };
+          };
+        };
+      };
+      responses: {
+        /** @description Media created successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Media"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/{id}": {
+    /**
+     * Get media by ID
+     * @description Retrieve a specific media item by its ID
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description The ID of the media to retrieve */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Media retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Media"];
+          };
+        };
+        /** @description Media not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Update media
+     * @description Update an existing media item
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description The ID of the media to update */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description Title or caption for the media
+             * @example Updated Restaurant Interior
+             */
+            title?: string;
+            /**
+             * @description Description of the media content
+             * @example Updated description of the restaurant interior
+             */
+            description?: string;
+            /** @description Information about what this media is associated with */
+            associatedWith?: {
+              /**
+               * @description Type of content this media is associated with
+               * @example post
+               * @enum {string}
+               */
+              type?: "post" | "dish" | "restaurant";
+              /**
+               * @description ID of the associated content
+               * @example 507f1f77bcf86cd799439016
+               */
+              id?: string;
+            };
+          };
+        };
+      };
+      responses: {
+        /** @description Media updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Media"];
+          };
+        };
+        /** @description Invalid input */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to update this media */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Media not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Delete media
+     * @description Delete a media item by its ID
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description The ID of the media to delete */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Media deleted successfully */
+        200: {
+          content: {
+            "application/json": {
+              /** @example Media deleted successfully */
+              message?: string;
+            };
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to delete this media */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Media not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/associated/{type}/{id}": {
+    /**
+     * Get media by associated item
+     * @description Retrieve media items associated with a specific content type and ID
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description Type of content (post, dish, restaurant) */
+          type: "post" | "dish" | "restaurant";
+          /** @description ID of the associated content */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Media items retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Media"][];
+          };
+        };
+        /** @description Invalid type or missing ID */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/user/{userId}": {
+    /**
+     * Get user's media
+     * @description Retrieve media items uploaded by a specific user with pagination
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of items per page */
+          limit?: number;
+        };
+        path: {
+          /** @description ID of the user */
+          userId: string;
+        };
+      };
+      responses: {
+        /** @description User's media retrieved successfully */
+        200: {
+          content: {
+            "application/json": {
+              media?: components["schemas"]["Media"][];
+              pagination?: {
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                currentPage?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 5
+                 */
+                totalPages?: number;
+                /**
+                 * @description Total number of media items
+                 * @example 50
+                 */
+                totalMedia?: number;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/{id}/verify": {
+    /**
+     * Verify media
+     * @description Verify or unverify a media item (admin/moderator only)
+     */
+    post: {
+      parameters: {
+        path: {
+          /** @description The ID of the media to verify */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description Whether to verify or unverify the media
+             * @example true
+             */
+            verified: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Media verification status updated successfully */
+        200: {
+          content: {
+            "application/json": {
+              media?: components["schemas"]["Media"];
+              /** @example Media verified successfully */
+              message?: string;
+            };
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to verify media */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Media not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/verified": {
+    /**
+     * Get verified media
+     * @description Retrieve verified media items with optional filtering and pagination
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of items per page */
+          limit?: number;
+          /** @description Filter by media type (post, dish) */
+          type?: "post" | "dish";
+        };
+      };
+      responses: {
+        /** @description Verified media retrieved successfully */
+        200: {
+          content: {
+            "application/json": {
+              media?: components["schemas"]["Media"][];
+              pagination?: {
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                currentPage?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 5
+                 */
+                totalPages?: number;
+                /**
+                 * @description Total number of media items
+                 * @example 50
+                 */
+                totalMedia?: number;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -1391,19 +1872,26 @@ export interface components {
       closed?: boolean;
     };
     Restaurant: {
+      /**
+       * @description Unique identifier for the restaurant
+       * @example 507f1f77bcf86cd799439011
+       */
+      _id?: string;
       /** @description Unique identifier for the restaurant owner */
       ownerId: string;
+      /**
+       * @description Whether the current user is the owner of this restaurant
+       * @default false
+       */
+      owner?: boolean;
       /** @description Name of the restaurant */
       name: string;
-      /**
-       * Format: uri
-       * @description URL to the restaurant's logo image
-       */
-      logo?: string;
+      /** @description Restaurant logo media */
+      logo?: components["schemas"]["Media"];
       /** @description Brief description of the restaurant */
       description?: string;
       /** @description List of cuisines offered by the restaurant */
-      cuisine?: string[];
+      cuisine?: components["schemas"]["Cuisine"][];
       /**
        * @description Price range of the restaurant
        * @enum {string}
@@ -1426,9 +1914,9 @@ export interface components {
       /** @description Operating hours for each day of the week */
       businessHours?: components["schemas"]["BusinessHour"][];
       /** @description List of features available at the restaurant */
-      features?: ("Outdoor seating" | "Dining area" | "Take-out" | "Delivery" | "Catering" | "Wifi" | "Parking")[];
-      /** @description URLs to images in the restaurant's gallery */
-      gallery?: string[];
+      features?: ("Outdoor seating" | "Indoor dining" | "Private dining rooms" | "Bar seating" | "Counter seating" | "Rooftop dining" | "Garden dining" | "Waterfront dining" | "Street-side dining" | "Patio dining" | "Take-out" | "Delivery" | "Drive-through" | "Curbside pickup" | "Catering" | "Private events" | "Corporate events" | "Wedding catering" | "Party catering" | "Food trucks" | "Free WiFi" | "Mobile ordering" | "Online reservations" | "Contactless payment" | "Digital menus" | "QR code menus" | "Self-service kiosks" | "Table service" | "Counter service" | "Buffet service" | "Wheelchair accessible" | "Accessible parking" | "Accessible restrooms" | "Braille menus" | "Service animal friendly" | "Elevator access" | "Ramp access" | "Live music" | "Sports on TV" | "Background music" | "Dance floor" | "Karaoke" | "Trivia nights" | "Comedy nights" | "Wine tastings" | "Cooking classes" | "Chef's table" | "Free parking" | "Valet parking" | "Street parking" | "Parking garage" | "Bike parking" | "Near public transit" | "Uber/Lyft friendly" | "Kid-friendly" | "High chairs" | "Kids menu" | "Play area" | "Changing tables" | "Family restrooms" | "Birthday parties" | "Vegetarian options" | "Vegan options" | "Gluten-free options" | "Halal options" | "Kosher options" | "Dairy-free options" | "Nut-free options" | "Low-sodium options" | "Organic ingredients" | "Local ingredients" | "Full bar" | "Wine list" | "Craft beer" | "Cocktails" | "Happy hour" | "BYOB" | "Coffee service" | "Tea service" | "Juice bar" | "Smoothies" | "Gift cards" | "Loyalty program" | "Rewards program" | "Group discounts" | "Student discounts" | "Senior discounts" | "Military discounts" | "Corporate accounts" | "Catering delivery" | "Event planning" | "Contactless delivery" | "Sanitized surfaces" | "Staff wearing masks" | "Temperature checks" | "Social distancing" | "Air purification" | "UV sanitization" | "Health inspections" | "Food safety certified" | "Allergen information" | "Credit cards accepted" | "Cash only" | "Digital payments" | "Split bills" | "Gratuity included" | "Tipping accepted" | "Corporate billing" | "Invoice available" | "24/7 service" | "Late night dining" | "Breakfast service" | "Lunch service" | "Dinner service" | "Brunch service" | "Holiday hours" | "Seasonal hours" | "Reservations required" | "Walk-ins welcome" | "Romantic dining" | "Anniversary specials" | "Birthday celebrations" | "Date night" | "Business meetings" | "Networking events" | "Graduation parties" | "Holiday parties" | "Corporate lunches" | "Team building")[];
+      /** @description Gallery media items for the restaurant */
+      gallery?: components["schemas"]["Media"][];
       /** @description Additional metadata associated with the restaurant */
       meta?: {
         [key: string]: unknown;
@@ -1480,14 +1968,8 @@ export interface components {
       course: components["schemas"]["Course"];
       /** @description Price details for the food item */
       price: components["schemas"]["Price"];
-      /**
-       * @description List of image URLs for the food item
-       * @example [
-       *   "https://example.com/images/spaghetti-bolognese-1.jpg",
-       *   "https://example.com/images/spaghetti-bolognese-2.jpg"
-       * ]
-       */
-      images: string[];
+      /** @description Media items for the food item */
+      images: components["schemas"]["Media"][];
       /**
        * @description ID of the restaurant offering the food item
        * @example restaurant12345
@@ -1546,6 +2028,95 @@ export interface components {
       /**
        * Format: date-time
        * @description When the notification was last updated
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    Media: {
+      /**
+       * @description Unique identifier for the media
+       * @example 507f1f77bcf86cd799439017
+       */
+      _id?: string;
+      /**
+       * Format: uri
+       * @description URL to the media file
+       * @example https://example.com/images/restaurant-photo.jpg
+       */
+      url: string;
+      /**
+       * @description Type of media file
+       * @example image
+       * @enum {string}
+       */
+      type: "image" | "video" | "audio";
+      /**
+       * @description Title or caption for the media
+       * @example Restaurant Interior
+       */
+      title?: string;
+      /**
+       * @description Description of the media content
+       * @example Beautiful interior view of the restaurant
+       */
+      description?: string;
+      /**
+       * @description ID of the user who uploaded the media
+       * @example 507f1f77bcf86cd799439011
+       */
+      uploadedBy: string;
+      /** @description Information about what this media is associated with */
+      associatedWith?: {
+        /**
+         * @description Type of content this media is associated with
+         * @example post
+         * @enum {string}
+         */
+        type?: "post" | "dish" | "restaurant";
+        /**
+         * @description ID of the associated content
+         * @example 507f1f77bcf86cd799439016
+         */
+        id?: string;
+      };
+      /**
+       * @description Whether the media has been verified by moderators
+       * @default false
+       * @example false
+       */
+      verified?: boolean;
+      /**
+       * @description Size of the media file in bytes
+       * @example 2048576
+       */
+      fileSize?: number;
+      /**
+       * @description MIME type of the media file
+       * @example image/jpeg
+       */
+      mimeType?: string;
+      /** @description Dimensions of the media (for images/videos) */
+      dimensions?: {
+        /**
+         * @description Width of the media in pixels
+         * @example 1920
+         */
+        width?: number;
+        /**
+         * @description Height of the media in pixels
+         * @example 1080
+         */
+        height?: number;
+      };
+      /**
+       * Format: date-time
+       * @description When the media was uploaded
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description When the media was last updated
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;

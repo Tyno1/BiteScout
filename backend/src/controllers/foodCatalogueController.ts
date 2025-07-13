@@ -1,94 +1,129 @@
-import { Request, Response, NextFunction } from "express";
+import type { ApiError } from "@shared/types/common/errors.js";
+import type {
+  CreateFoodCatalogueRequest,
+  CreateFoodCatalogueResponse,
+  DeleteFoodCatalogueRequest,
+  DeleteFoodCatalogueResponse,
+  GetAllFoodCatalogueItemsRequest,
+  GetAllFoodCatalogueItemsResponse,
+  GetFoodCatalogueItemRequest,
+  GetFoodCatalogueItemResponse,
+  UpdateFoodCatalogueRequest,
+  UpdateFoodCatalogueResponse,
+} from "@shared/types/restaurant/food-catalogue";
+import type { NextFunction, Request, Response } from "express";
+import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import FoodCatalogue from "../models/FoodCatalogue.js";
 
-// get food catalogue by id
+type GetFoodCatalogueItemApiResponse = GetFoodCatalogueItemResponse | ApiError;
+type GetAllFoodCatalogueItemsApiResponse = GetAllFoodCatalogueItemsResponse | ApiError;
+type CreateFoodCatalogueApiResponse = CreateFoodCatalogueResponse | ApiError;
+type UpdateFoodCatalogueApiResponse = UpdateFoodCatalogueResponse | ApiError;
+type DeleteFoodCatalogueApiResponse = DeleteFoodCatalogueResponse | ApiError;
+
+// Get food catalogue by id
 export const getFoodCatalogueById = async (
-  req: Request,
-  res: Response,
+  req: Request<GetFoodCatalogueItemRequest>,
+  res: Response<GetFoodCatalogueItemApiResponse>,
   next: NextFunction
 ) => {
   try {
-    const { foodId } = req.params;
+    const { foodId, restaurantId } = req.params;
 
     if (!foodId) {
-      res.status(400).json({ error: "Missing Food Catalogue Id" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Food Catalogue ID is required")
+      );
+    }
+
+    if (!restaurantId) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required")
+      );
     }
 
     const result = await FoodCatalogue.findById(foodId)
       .populate("course")
       .populate("cuisineType")
-      .populate("allergens");
+      .populate("allergens")
+      .populate("images");
 
     if (!result) {
-      res.status(400).json({ error: "Food Catalogue not found" });
-      return;
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "Food Catalogue not found")
+      );
     }
+
     res.status(200).json(result);
-    return;
   } catch (error) {
     return next(error);
   }
 };
 
 export const getFoodCatalogueByRestaurantId = async (
-  req: Request,
-  res: Response,
+  req: Request<GetAllFoodCatalogueItemsRequest>,
+  res: Response<GetAllFoodCatalogueItemsApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { restaurantId } = req.params;
 
     if (!restaurantId) {
-      res.status(400).json({ error: "Missing Restaurant Id" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required")
+      );
     }
 
     const result = await FoodCatalogue.find({ restaurant: restaurantId })
       .populate("course")
       .populate("cuisineType")
-      .populate("allergens");
+      .populate("allergens")
+      .populate("images");
 
-    if (!result) {
-      res.status(400).json({ error: "Food Catalogue not found" });
-      return;
+    if (!result || result.length === 0) {
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "No food catalogue items found")
+      );
     }
+
     res.status(200).json(result);
-    return;
   } catch (error) {
     return next(error);
   }
 };
 
 export const createFoodCatalogue = async (
-  req: Request,
-  res: Response,
+  req: Request<Record<string, never>, unknown, CreateFoodCatalogueRequest>,
+  res: Response<CreateFoodCatalogueApiResponse>,
   next: NextFunction
 ) => {
   try {
     const body = req.body;
 
     if (!body) {
-      res.status(400).json({ error: "Invalid request body" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Invalid request body")
+      );
     }
 
     const newFoodItem = await FoodCatalogue.create(body);
+    
     if (!newFoodItem) {
-      res.status(400).json({ error: "Failed to create food item" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Failed to create food item")
+      );
     }
 
     const populatedFoodItem = await FoodCatalogue.findById(newFoodItem._id)
       .populate("course")
       .populate("cuisineType")
-      .populate("allergens");
+      .populate("allergens")
+      .populate("images");
 
     if (!populatedFoodItem) {
-      res
-        .status(500)
-        .json({ error: "Failed to retrieve the created food item" });
-      return;
+      return next(
+        createError(ErrorCodes.INTERNAL_SERVER_ERROR, "Failed to retrieve the created food item")
+      );
     }
 
     res.status(201).json(populatedFoodItem);
@@ -98,62 +133,78 @@ export const createFoodCatalogue = async (
 };
 
 export const updateFoodCatalogue = async (
-  req: Request,
-  res: Response,
+  req: Request<{ foodId: string; restaurantId: string }, unknown, UpdateFoodCatalogueRequest>,
+  res: Response<UpdateFoodCatalogueApiResponse>,
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { foodId, restaurantId } = req.params;
     const body = req.body;
 
-    if (!id) {
-      res.status(400).json({ error: "Missing Food Catalogue Id" });
-      return;
-    }
-    if (!body) {
-      res.status(400).json({ error: "Invalid request body" });
-      return;
+    if (!foodId) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Food Catalogue ID is required")
+      );
     }
 
-    const updatedFoodItem = await FoodCatalogue.findByIdAndUpdate(id, body, {
+    if (!restaurantId) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required")
+      );
+    }
+
+    if (!body) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Invalid request body")
+      );
+    }
+
+    const updatedFoodItem = await FoodCatalogue.findByIdAndUpdate(foodId, body, {
       new: true,
       runValidators: true,
     });
 
     if (!updatedFoodItem) {
-      res.status(404).json({ error: "Food item not found" });
-      return;
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "Food item not found")
+      );
     }
 
     res.status(200).json(updatedFoodItem);
-    return;
   } catch (error) {
     return next(error);
   }
 };
 
 export const deleteFoodCatalogue = async (
-  req: Request,
-  res: Response,
+  req: Request<DeleteFoodCatalogueRequest>,
+  res: Response<DeleteFoodCatalogueApiResponse>,
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { foodId, restaurantId } = req.params;
 
-    if (!id) {
-      res.status(400).json({ error: "Missing Food Catalogue Id" });
-      return;
+    if (!foodId) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Food Catalogue ID is required")
+      );
     }
 
-    const deletedFoodItem = await FoodCatalogue.findByIdAndDelete(id);
+    if (!restaurantId) {
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Restaurant ID is required")
+      );
+    }
+
+    const deletedFoodItem = await FoodCatalogue.findByIdAndDelete(foodId);
 
     if (!deletedFoodItem) {
-      res.status(404).json({ error: "Food item not found" });
-      return;
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "Food item not found")
+      );
     }
 
-    res.status(200).json({ message: "Food item deleted successfully" });
-    return;
+    res.status(204).send();
   } catch (error) {
     return next(error);
   }

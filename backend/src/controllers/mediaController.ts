@@ -1,42 +1,70 @@
+import type { 
+	ApiError,
+	CreateMediaRequest,
+	CreateMediaResponse,
+	DeleteMediaRequest,
+	DeleteMediaResponse,
+	GetMediaByAssociatedRequest,
+	GetMediaByAssociatedResponse,
+	GetMediaRequest,
+	GetMediaResponse,
+	GetUserMediaRequest,
+	GetUserMediaResponse,
+	GetVerifiedMediaRequest,
+	GetVerifiedMediaResponse,
+	Media as MediaType,
+	UpdateMediaRequest,
+	UpdateMediaResponse,
+	VerifyMediaRequest,
+	VerifyMediaResponse
+} from "@shared/types";
 /// <reference path="../types/express.d.ts" />
 import type { NextFunction, Request, Response } from "express";
+import { createError } from "../middleware/errorHandler.js";
 import Media from "../models/Media.js";
+
+// Combined response types for each endpoint
+type CreateMediaApiResponse = CreateMediaResponse | ApiError;
+type GetMediaApiResponse = GetMediaResponse | ApiError;
+type UpdateMediaApiResponse = UpdateMediaResponse | ApiError;
+type DeleteMediaApiResponse = DeleteMediaResponse | ApiError;
+type GetMediaByAssociatedApiResponse = GetMediaByAssociatedResponse | ApiError;
+type GetUserMediaApiResponse = GetUserMediaResponse | ApiError;
+type VerifyMediaApiResponse = VerifyMediaResponse | ApiError;
+type GetVerifiedMediaApiResponse = GetVerifiedMediaResponse | ApiError;
 
 // Helper function to validate request ID
 const validateId = (req: Request) => {
 	const { id } = req.params;
 	if (!id) {
-		throw new Error("No id provided");
+		throw createError(400, "No id provided");
 	}
 	return id;
 };
 
 export const createMedia = async (
-	req: Request,
-	res: Response,
+	req: Request<Record<string, never>, CreateMediaApiResponse, CreateMediaRequest>,
+	res: Response<CreateMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const body = req.body;
 
 		if (!body) {
-			res.status(400).json({ error: "Invalid request body" });
-			return;
+			throw createError(400, "Invalid request body");
 		}
 
 		// Add uploadedBy from authenticated user
-		body.uploadedBy = req.user?.id;
+		const mediaData = { ...body, uploadedBy: req.user?.id };
 
-		if (!body.uploadedBy) {
-			res.status(401).json({ error: "User not authenticated" });
-			return;
+		if (!mediaData.uploadedBy) {
+			throw createError(401, "User not authenticated");
 		}
 
-		const newMedia = await Media.create(body);
+		const newMedia = await Media.create(mediaData);
 
 		if (!newMedia) {
-			res.status(400).json({ error: "Could not create media" });
-			return;
+			throw createError(400, "Could not create media");
 		}
 
 		// Populate uploadedBy user data
@@ -51,8 +79,8 @@ export const createMedia = async (
 };
 
 export const getMediaById = async (
-	req: Request<{ id: string }>,
-	res: Response,
+	req: Request<GetMediaRequest, GetMediaApiResponse>,
+	res: Response<GetMediaApiResponse>,
 	next: NextFunction,
 ) => {
 	try {
@@ -63,8 +91,7 @@ export const getMediaById = async (
 		]);
 
 		if (!media) {
-			res.status(404).json({ error: "Media not found" });
-			return;
+			throw createError(404, "Media not found");
 		}
 
 		res.json(media);
@@ -74,21 +101,19 @@ export const getMediaById = async (
 };
 
 export const getMediaByAssociatedItem = async (
-	req: Request,
-	res: Response,
+	req: Request<GetMediaByAssociatedRequest, GetMediaByAssociatedApiResponse>,
+	res: Response<GetMediaByAssociatedApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const { type, id } = req.params;
 
 		if (!type || !id) {
-			res.status(400).json({ error: "Type and ID are required" });
-			return;
+			throw createError(400, "Type and ID are required");
 		}
 
 		if (!["post", "dish"].includes(type)) {
-			res.status(400).json({ error: "Invalid type. Must be 'post' or 'dish'" });
-			return;
+			throw createError(400, "Invalid type. Must be 'post' or 'dish'");
 		}
 
 		const media = await Media.find({
@@ -103,13 +128,13 @@ export const getMediaByAssociatedItem = async (
 };
 
 export const getUserMedia = async (
-	req: Request,
-	res: Response,
+	req: Request<{ userId: string }, GetUserMediaApiResponse, Record<string, never>, { page?: string; limit?: string }>,
+	res: Response<GetUserMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const { userId } = req.params;
-		const { page = 1, limit = 10 } = req.query;
+		const { page = "1", limit = "10" } = req.query;
 
 		const skip = (Number(page) - 1) * Number(limit);
 
@@ -137,8 +162,8 @@ export const getUserMedia = async (
 };
 
 export const updateMedia = async (
-	req: Request,
-	res: Response,
+	req: Request<{ id: string }, UpdateMediaApiResponse, UpdateMediaRequest>,
+	res: Response<UpdateMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -148,13 +173,11 @@ export const updateMedia = async (
 		// Check if media exists and user owns it
 		const existingMedia = await Media.findById(id);
 		if (!existingMedia) {
-			res.status(404).json({ error: "Media not found" });
-			return;
+			throw createError(404, "Media not found");
 		}
 
 		if (existingMedia.uploadedBy.toString() !== req.user?.id) {
-			res.status(403).json({ error: "Not authorized to update this media" });
-			return;
+			throw createError(403, "Not authorized to update this media");
 		}
 
 		const updatedMedia = await Media.findByIdAndUpdate(
@@ -164,8 +187,7 @@ export const updateMedia = async (
 		).populate([{ path: "uploadedBy", select: "name username imageUrl" }]);
 
 		if (!updatedMedia) {
-			res.status(404).json({ error: "Media could not be updated" });
-			return;
+			throw createError(404, "Media could not be updated");
 		}
 
 		res.json(updatedMedia);
@@ -175,8 +197,8 @@ export const updateMedia = async (
 };
 
 export const deleteMedia = async (
-	req: Request<{ id: string }>,
-	res: Response,
+	req: Request<DeleteMediaRequest, DeleteMediaApiResponse>,
+	res: Response<DeleteMediaApiResponse>,
 	next: NextFunction,
 ) => {
 	try {
@@ -185,13 +207,11 @@ export const deleteMedia = async (
 		// Check if media exists and user owns it
 		const existingMedia = await Media.findById(id);
 		if (!existingMedia) {
-			res.status(404).json({ error: "Media not found" });
-			return;
+			throw createError(404, "Media not found");
 		}
 
 		if (existingMedia.uploadedBy.toString() !== req.user?.id) {
-			res.status(403).json({ error: "Not authorized to delete this media" });
-			return;
+			throw createError(403, "Not authorized to delete this media");
 		}
 
 		await Media.findByIdAndDelete(id);
@@ -205,8 +225,8 @@ export const deleteMedia = async (
 };
 
 export const verifyMedia = async (
-	req: Request,
-	res: Response,
+	req: Request<{ id: string }, VerifyMediaApiResponse, VerifyMediaRequest>,
+	res: Response<VerifyMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -215,14 +235,12 @@ export const verifyMedia = async (
 
 		// Only admins/moderators can verify media
 		if (req.user?.userType !== "admin" && req.user?.userType !== "moderator") {
-			res.status(403).json({ error: "Not authorized to verify media" });
-			return;
+			throw createError(403, "Not authorized to verify media");
 		}
 
 		const media = await Media.findById(id);
 		if (!media) {
-			res.status(404).json({ error: "Media not found" });
-			return;
+			throw createError(404, "Media not found");
 		}
 
 		media.verified = verified;
@@ -242,12 +260,12 @@ export const verifyMedia = async (
 };
 
 export const getVerifiedMedia = async (
-	req: Request,
-	res: Response,
+	req: Request<Record<string, never>, GetVerifiedMediaApiResponse, Record<string, never>, { page?: string; limit?: string; type?: string }>,
+	res: Response<GetVerifiedMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
-		const { page = 1, limit = 10, type } = req.query;
+		const { page = "1", limit = "10", type } = req.query;
 
 		const skip = (Number(page) - 1) * Number(limit);
 

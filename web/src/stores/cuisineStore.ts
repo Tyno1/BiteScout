@@ -1,3 +1,4 @@
+import type{ Cuisine } from "@shared/types/api/schemas";
 import type { 
   CreateCuisineRequest, 
   CreateCuisineResponse,
@@ -13,7 +14,7 @@ import { handleApiError } from "../utils/apiErrorHandler";
 
 type CuisineStore = {
 	// State
-	cuisines: GetAllCuisinesResponse;
+	cuisines: Cuisine[];
 	isLoading: boolean;
 	error: string | null;
 

@@ -1,18 +1,19 @@
-import type { RestaurantData } from "@/types/restaurantData"
+import type { Restaurant } from "@shared/types/api/schemas"
 
-export const DEFAULT_RESTAURANT_DATA: RestaurantData= {
+export const DEFAULT_RESTAURANT_DATA: Restaurant = {
+  _id: "",
   name: "",
-  logo: "ttt",
+  logo: undefined,
   description: "",
   cuisine: [],
-  priceRange: "",
+  priceRange: "$",
   address: "",
   phone: "",
   email: "",
   website: "",
   businessHours: [
     {
-      day: "",
+      day: "Monday",
       open: "",
       close: "",
       closed: false,

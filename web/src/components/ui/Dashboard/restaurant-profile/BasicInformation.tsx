@@ -1,34 +1,45 @@
-import {
-  Button,
-  IconButton,
-  Input,
-  Select,
-  Textarea,
-} from "@/components/atoms";
-import { RestaurantData } from "@/types/restaurantData";
+import { Button, IconButton, Select, Textarea } from "@/components/atoms";
+import type { Cuisine } from "@/types";
+import type { Restaurant } from "@shared/types/api/schemas";
 import { X } from "lucide-react";
+import { useState } from "react";
 
 type BasicInformation = {
   isEditing: boolean;
-  newCuisine: string;
-  setNewCuisine: (value: string) => void;
-  editableData: RestaurantData | null;
-  setEditableData: (value: RestaurantData) => void;
-  displayData: RestaurantData | null;
-  handleInputChange: (field: keyof RestaurantData, value: any) => void;
-  removeCuisine: (cuisine: string) => void;
+  cuisines: Cuisine[];
+  addCuisine: (cuisine: Cuisine) => void;
+  editableData: Restaurant | null;
+  setEditableData: (value: Restaurant) => void;
+  displayData: Restaurant | null;
+  handleInputChange: (
+    field: keyof Restaurant,
+    value: Restaurant[keyof Restaurant]
+  ) => void;
+  removeCuisine: (cuisine: Cuisine) => void;
 };
 
 export function BasicInformation({
   removeCuisine,
   isEditing,
-  newCuisine,
-  setNewCuisine,
-  editableData,
-  setEditableData,
+  addCuisine,
+  cuisines,
   displayData,
   handleInputChange,
 }: BasicInformation) {
+  const [selectedCuisine, setSelectedCuisine] = useState<string>("");
+
+  console.log(displayData?.cuisine);
+
+  const handleAddCuisine = () => {
+    if (!selectedCuisine) return;
+
+    const cuisineToAdd = cuisines.find((c) => c._id === selectedCuisine);
+    if (cuisineToAdd) {
+      addCuisine(cuisineToAdd);
+      setSelectedCuisine("");
+    }
+  };
+
   return (
     <section
       className="bg-white rounded-lg border-1 border-gray-100 p-6"
@@ -40,75 +51,75 @@ export function BasicInformation({
         </h2>
       </div>
 
-      {/* finsh setting up cuisine */}
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 w-full">
-            <label id="cuisine-type" className="font-medium text-black">
+            <label
+              htmlFor="cuisine-type"
+              id="cuisine-type"
+              className="font-medium text-black"
+            >
               Cuisine Type
             </label>
             <div className="flex gap-4 mt-2">
               {isEditing && (
                 <div className="flex items-center gap-2 w-full">
-                  <Input
+                  <Select
                     fullWidth
-                    outlineType={isEditing && "round"}
-                    type="text"
+                    outlineType="round"
                     name="cuisine-type"
-                    label="Cuisine Type"
-                    aria-labelledby="cuisine-type"
-                    value={newCuisine}
-                    onChange={(e) => setNewCuisine(e.target.value)}
-                    placeholder="Italian"
+                    label=""
+                    options={cuisines
+                      .filter(
+                        (
+                          cuisine
+                        ): cuisine is Cuisine & { _id: string; name: string } =>
+                          Boolean(cuisine._id && cuisine.name)
+                      )
+                      .map((cuisine) => ({
+                        value: cuisine._id,
+                        label: cuisine.name,
+                      }))}
+                    value={selectedCuisine}
+                    onChange={(e) => setSelectedCuisine(e.target.value)}
+                    placeholder={
+                      cuisines.length === 0
+                        ? "Loading cuisines..."
+                        : "Select cuisine type"
+                    }
                   />
                   <Button
                     text="Add"
                     variant="solid"
-                    onClick={() => {
-                      if (editableData && newCuisine.trim()) {
-                        setEditableData({
-                          ...editableData,
-                          cuisine: [...editableData.cuisine, newCuisine.trim()],
-                        });
-                        setNewCuisine("");
-                      } else {
-                        throw new Error(
-                          "Please enter a cuisine before adding."
-                        );
-                      }
-                      setNewCuisine("");
-                    }}
+                    onClick={handleAddCuisine}
+                    disabled={!selectedCuisine || cuisines.length === 0}
                   />
                 </div>
               )}
             </div>
             <div>
               <ul className="flex flex-wrap gap-2 mt-2">
-                {displayData?.cuisine?.map((cuisine: any) => (
-                  <div
-                    key={cuisine}
+                {displayData?.cuisine?.map((cuisine) => (
+                  <li
+                    key={cuisine?._id}
                     className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
-                    role="listitem"
                   >
-                    <span>{cuisine}</span>
+                    <span>{cuisine.name}</span>
                     {isEditing && (
                       <IconButton
                         variant="plain"
                         size="xs"
                         icon={<X size={15} />}
                         onClick={() => removeCuisine(cuisine)}
-                        aria-label={`Remove ${cuisine}`}
+                        aria-label={`Remove ${cuisine.name}`}
                       />
                     )}
-                  </div>
+                  </li>
                 ))}
                 {displayData?.cuisine?.length === 0 && (
-                  <p
-                    className="text-gray-500 text-sm  mt-2 bg-gray-100 p-4 rounded-xl italic"
-                    role="status"
-                  >
+                  <li className="text-gray-500 text-sm  mt-2 bg-gray-100 p-4 rounded-xl italic">
                     No Cuisine added yet
-                  </p>
+                  </li>
                 )}
               </ul>
             </div>
