@@ -1,17 +1,29 @@
-import { Request, Response, NextFunction } from "express";
+import type {CreateAllergenRequest, CreateAllergenResponse, 
+  DeleteAllergenRequest, DeleteAllergenResponse,
+  GetAllAllergensResponse,
+  GetAllergenByIdRequest, GetAllergenByIdResponse , UpdateAllergenRequest, UpdateAllergenResponse
+} from "@shared/types/allergens";
+import type { ApiError } from "@shared/types/common/errors.js";
+import type { NextFunction, Request, Response } from "express";
+import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import Allergen from "../models/Allergen.js";
+
+type GetAllAllergenApiResponse = GetAllAllergensResponse | ApiError;
+type GetAllergenByIdApiResponse = GetAllergenByIdResponse | ApiError;
+type CreateAllergenApiResponse = CreateAllergenResponse | ApiError;
+type UpdateAllergenApiResponse = UpdateAllergenResponse | ApiError;
+type DeleteAllergenApiResponse = DeleteAllergenResponse | ApiError;
 
 export const getAllergens = async (
   req: Request,
-  res: Response,
+  res: Response<GetAllAllergenApiResponse>,
   next: NextFunction
 ) => {
   try {
     const allergens = await Allergen.find();
 
     if (!allergens || allergens.length === 0) {
-      res.status(404).json({ error: "No allergens found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "No allergens found"));
     }
 
     res.status(200).json(allergens);
@@ -21,23 +33,23 @@ export const getAllergens = async (
 };
 
 export const getAllergen = async (
-  req: Request,
-  res: Response,
+  req: Request<GetAllergenByIdRequest>,
+  res: Response<GetAllergenByIdApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
 
     if (!id) {
-      res.status(400).json({ error: "Allergen ID is required" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Allergen ID is required")
+      );
     }
 
     const allergen = await Allergen.findById(id);
 
     if (!allergen) {
-      res.status(404).json({ error: "Allergen not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Allergen not found"));
     }
 
     res.status(200).json(allergen);
@@ -47,27 +59,29 @@ export const getAllergen = async (
 };
 
 export const createAllergens = async (
-  req: Request,
-  res: Response,
+  req: Request<CreateAllergenRequest>,
+  res: Response<CreateAllergenApiResponse>,
   next: NextFunction
 ) => {
   try {
     const body = req.body;
     const allergen = await Allergen.create(body);
+
     if (!allergen) {
-      res.status(400).json({ error: "Failed to create allergen" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Failed to create allergen")
+      );
     }
 
     res.status(201).json(allergen);
-  } catch (error: any) {
+  } catch (error) {
     return next(error);
   }
 };
 
 export const updateAllergens = async (
-  req: Request,
-  res: Response,
+  req: Request<{ id: string }, unknown, UpdateAllergenRequest>,
+  res: Response<UpdateAllergenApiResponse>,
   next: NextFunction
 ) => {
   try {
@@ -75,12 +89,14 @@ export const updateAllergens = async (
     const body = req.body;
 
     if (!id) {
-      res.status(400).json({ error: "Allergen ID is required" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Allergen ID is required")
+      );
     }
     if (!body) {
-      res.status(400).json({ error: "Allergen ID is required" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Allergen data is required")
+      );
     }
 
     const updatedAllergen = await Allergen.findByIdAndUpdate(id, body, {
@@ -89,8 +105,7 @@ export const updateAllergens = async (
     });
 
     if (!updatedAllergen) {
-      res.status(404).json({ error: "Allergen not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Allergen not found"));
     }
 
     res.status(200).json(updatedAllergen);
@@ -100,26 +115,29 @@ export const updateAllergens = async (
 };
 
 export const deleteAllergens = async (
-  req: Request,
-  res: Response,
+  req: Request<DeleteAllergenRequest>,
+  res: Response<DeleteAllergenApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
 
     if (!id) {
-      res.status(400).json({ error: "Allergen ID is required" });
-      return;
+      return next(
+        createError(ErrorCodes.BAD_REQUEST, "Allergen ID is required")
+      );
     }
 
     const deletedAllergen = await Allergen.findByIdAndDelete(id);
 
     if (!deletedAllergen) {
-      res.status(404).json({ error: "Allergen not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Allergen not found"));
     }
 
-    res.json({ message: "Allergen deleted successfully" });
+    res.status(200).json({
+      message: "Allergen deleted successfully",
+      data: { id: deletedAllergen._id },
+    });
   } catch (error) {
     return next(error);
   }

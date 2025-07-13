@@ -1,28 +1,33 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Table from "@/components/ui/dashboard/food-catalogue/Table";
-import Modal from "@/components/ui/dashboard/food-catalogue/Modal";
-import { FoodData } from "@/types/foodCatalogue";
-import useFoodDataStore from "@/stores/foodDataStore";
+
+import { Button } from "@/components/atoms";
+import { Modal } from "@/components/organisms";
+import { AddNewFood, Table } from "@/components/ui";
 import useAllergenStore from "@/stores/allergenStore";
-import useCuisineStore from "@/stores/cuisineStore";
 import useCourseStore from "@/stores/courseStore";
+import useCuisineStore from "@/stores/cuisineStore";
+import useFoodDataStore from "@/stores/foodDataStore";
+import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import useRestaurantStore from "@/stores/restaurantStore";
+import type { Allergen, FoodCatalogue } from "@shared/types/api/schemas";
+import type { Currency } from "@shared/types/common";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 export type formErrorType = Partial<{
-  name: string;
-  ingredients: string;
-  cuisineType: string;
-  course: string;
-  price: string;
-  allergens: string;
-  images: string;
-  restaurant: string;
+	name: string;
+	ingredients: string;
+	cuisineType: string;
+	course: string;
+	price: string;
+	allergens: string;
+	images: string;
+	restaurant: string;
 }>;
 
 export default function FoodCatalogueManagement(): React.ReactElement {
-  const CURRENCIES = [
+	  const CURRENCIES: Currency[] = [
     "GBP",
     "USD",
     "EUR",
@@ -37,196 +42,238 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     "THB",
     "ZAR",
   ];
-  const DEFAULT_FOOD_DATA = {
+	  const DEFAULT_FOOD_DATA: FoodCatalogue = {
     name: "",
     ingredients: [],
-    cuisineType: "",
-    course: "",
+    cuisineType: {name: "", description: ""},
+    course: {name: "", description: ""},
     price: {
-      currency: CURRENCIES[0],
+      currency: "GBP" as Currency,
       amount: 0,
     },
     allergens: [],
     images: [],
     restaurant: "",
   };
-  const DEFAULT_FORM_ERROR = {
-    name: "",
-    ingredients: "",
-    cuisineType: "",
-    course: "",
-    price: "",
-    allergens: "",
-    images: "",
-    restaurant: "",
-  };
+	const DEFAULT_FORM_ERROR = {
+		name: "",
+		ingredients: "",
+		cuisineType: "",
+		course: "",
+		price: "",
+		allergens: "",
+		images: "",
+		restaurant: "",
+	};
 
-  const { foodDatas, createFoodData, getFoodDatas, error, isLoading } =
-    useFoodDataStore();
-  const { restaurantData } = useRestaurantStore();
-  const {
-    allergens,
-    getAllergens,
-    error: allergenError,
-    isLoading: allergenLoading,
-  } = useAllergenStore();
+	const { foodDatas, createFoodData, getFoodDatas, error, isLoading } =
+		useFoodDataStore();
+	const { restaurantData } = useRestaurantStore();
+	const {
+		allergens,
+		getAllergens,
+		error: allergenError,
+		isLoading: allergenLoading,
+	} = useAllergenStore();
 
-  const {
-    cuisines,
-    getCuisines,
-    error: cuisineError,
-    isLoading: cuisineLoading,
-  } = useCuisineStore();
-  const {
-    courses,
-    getCourses,
-    error: courseError,
-    isLoading: courseLoading,
-  } = useCourseStore();
+	const {
+		cuisines,
+		getCuisines,
+		error: cuisineError,
+		isLoading: cuisineLoading,
+	} = useCuisineStore();
+	const {
+		courses,
+		getCourses,
+		error: courseError,
+		isLoading: courseLoading,
+	} = useCourseStore();
 
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [ingredient, setIngredient] = useState<string>("");
-  const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
-  const [newFood, setNewFood] = useState<FoodData>(DEFAULT_FOOD_DATA);
+	const router = useRouter();
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [ingredient, setIngredient] = useState<string>("");
+	const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
+	  const [newFood, setNewFood] = useState<FoodCatalogue>(DEFAULT_FOOD_DATA);
 
-  // functions for modal
-  const handleAddFood = async () => {
-    const errors: formErrorType = {
-      name: !newFood.name ? "Name is required" : "",
-      ingredients:
-        newFood.ingredients.length < 1 ? "Ingredients are required" : "",
-      cuisineType: !newFood.cuisineType ? "Cuisine type is required" : "",
-      course: !newFood.course ? "Course is required" : "",
-      price:
-        !newFood.price.amount || !newFood.price.currency
-          ? "Price is required"
-          : "",
-      allergens: newFood.allergens.length < 1 ? "Allergens are required" : "",
-      images: !newFood.images ? "At least one image is required" : "",
-      restaurant: !newFood.restaurant ? "Restaurant is required" : "",
-    };
+	// functions for modal
+	const handleAddFood = async () => {
+		const errors: formErrorType = {
+			name: !newFood.name ? "Name is required" : "",
+			ingredients:
+				newFood.ingredients.length < 1 ? "Ingredients are required" : "",
+			cuisineType: !newFood.cuisineType ? "Cuisine type is required" : "",
+			course: !newFood.course ? "Course is required" : "",
+			price:
+				!newFood.price.amount || !newFood.price.currency
+					? "Price is required"
+					: "",
+			      allergens: (!newFood.allergens || newFood.allergens.length < 1) ? "Allergens are required" : "",
+			images: !newFood.images ? "At least one image is required" : "",
+			restaurant: !newFood.restaurant ? "Restaurant is required" : "",
+		};
 
-    // Check if there are any errors
-    const hasErrors = Object.values(errors).some((error) => error !== "");
+		// Check if there are any errors
+		const hasErrors = Object.values(errors).some((error) => error !== "");
 
-    if (hasErrors) {
-      setFormError(errors);
-      console.log(errors);
-      return;
-    }
+		if (hasErrors) {
+			setFormError(errors);
+			console.log(errors);
+			return;
+		}
 
-    // If no errors, proceed with form submission
-    createFoodData(newFood);
-    setIsModalOpen(false);
-    setNewFood(DEFAULT_FOOD_DATA);
-    setFormError(DEFAULT_FORM_ERROR);
-  };
+		// If no errors, proceed with form submission
+		createFoodData(newFood);
+		setIsModalOpen(false);
+		setNewFood(DEFAULT_FOOD_DATA);
+		setFormError(DEFAULT_FORM_ERROR);
+	};
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setNewFood(DEFAULT_FOOD_DATA);
-    setFormError(DEFAULT_FORM_ERROR);
-  };
-  // create a component for form warning
-  const FormWarning = (message: string) => {
-    return <div className="text-xs text-red">{message}</div>;
-  };
+	const closeModal = () => {
+		setIsModalOpen(false);
+		setNewFood(DEFAULT_FOOD_DATA);
+		setFormError(DEFAULT_FORM_ERROR);
+	};
 
-  const toggleAllergen = (allergen: string): void => {
-    setNewFood((prev) => ({
-      ...prev,
-      allergens: prev.allergens.includes(allergen)
-        ? prev.allergens.filter((a) => a !== allergen)
-        : [...prev.allergens, allergen],
-    }));
-  };
+	// create a component for form warning
+	const FormWarning = (message: string) => {
+		return <div className="text-xs text-red">{message}</div>;
+	};
 
-  const handleAddIngredients = (ingredient: string) => {
-    if (!ingredient) {
-      return;
-    }
-    if (newFood.ingredients.includes(ingredient)) {
-      setFormError({ ingredients: "ingredient already included" });
-      return;
-    }
+	const toggleAllergen = (allergen: Allergen): void => {
+		setNewFood((prev) => ({
+			...prev,
+			allergens: (prev.allergens || []).some((a) => a._id === allergen._id)
+				? (prev.allergens || []).filter((a) => a._id !== allergen._id)
+				: [...(prev.allergens || []), allergen],
+		}));
+	};
 
-    setNewFood((prev) => ({
-      ...prev,
-      ingredients: [...prev.ingredients, ingredient],
-    }));
-    setIngredient("");
-    setFormError((prev) => ({ ...prev, ingredients: "" }));
-  };
+	const handleAddIngredients = (ingredient: string) => {
+		if (!ingredient) {
+			return;
+		}
+		if (newFood.ingredients.includes(ingredient)) {
+			setFormError({ ingredients: "ingredient already included" });
+			return;
+		}
 
-  const handleRemoveIngredients = (ingredient: string): void => {
-    setNewFood((prev) => ({
-      ...prev,
-      ingredients: prev.ingredients.filter((i) => i !== ingredient),
-    }));
-  };
+		setNewFood((prev) => ({
+			...prev,
+			ingredients: [...prev.ingredients, ingredient],
+		}));
+		setIngredient("");
+		setFormError((prev) => ({ ...prev, ingredients: "" }));
+	};
 
-  const handleImageUpload = (): void => {
-    // Handle image upload logic here
-  };
+	const handleRemoveIngredients = (ingredient: string): void => {
+		setNewFood((prev) => ({
+			...prev,
+			ingredients: prev.ingredients.filter((i) => i !== ingredient),
+		}));
+	};
 
-  // functions for table
+	const handleImageUpload = (): void => {
+		// Handle image upload logic here
+	};
 
-  const handleRowClick = (id: string) => {
-    router.push(`food-catalogue/${id}`);
-  };
+	// functions for table
 
-  useEffect(() => {
-    getCuisines();
-    getCourses();
-    getAllergens();
-    // Fetch foods data from the server here and update the foods state accordingly.
-  }, []);
+	const handleRowClick = (id: string) => {
+		router.push(`food-catalogue/${id}`);
+	};
 
-  useEffect(() => {
-    if (restaurantData?._id) {
-      setNewFood({ ...newFood, restaurant: restaurantData?._id });
-      getFoodDatas(restaurantData?._id);
-    }
-  }, [restaurantData, foodDatas]);
+	useEffect(() => {
+		getCuisines();
+		getCourses();
+		getAllergens();
+	}, [getCuisines, getCourses, getAllergens]);
 
-  return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Food Catalogue</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-black hover:bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Add New Item
-        </button>
-      </div>
+	useEffect(() => {
+		if (restaurantData?._id) {
+			console.log("Fetching food data for restaurant:", restaurantData._id);
 
-      {/* Food Catalogue Table */}
-      <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
+			setNewFood((prev) => ({
+				...prev,
+				restaurant: restaurantData._id as string,
+			}));
+			getFoodDatas(restaurantData?._id);
+		}
+	}, [restaurantData, getFoodDatas]);
 
-      {/* Modal */}
-      {isModalOpen && (
-        <Modal
-          setIsModalOpen={setIsModalOpen}
-          setNewFood={setNewFood}
-          newFood={newFood}
-          cuisineData={cuisines}
-          courseData={courses}
-          allergenData={allergens}
-          handleAddFood={handleAddFood}
-          handleImageUpload={handleImageUpload}
-          toggleAllergen={toggleAllergen}
-          currencies={CURRENCIES}
-          handleAddIngredients={handleAddIngredients}
-          handleRemoveIngredients={handleRemoveIngredients}
-          setIngredient={setIngredient}
-          ingredient={ingredient}
-          formError={formError}
-          FormWarning={FormWarning}
-          closeModal={closeModal}
-        />
-      )}
-    </div>
-  );
+	return (
+		<div className="container mx-auto p-4 w-full">
+			<div className="flex justify-between items-center mb-6">
+				<h1 className="text-2xl font-bold">Food Catalogue</h1>
+
+				<Button
+					variant="solid"
+					text="Add New Item"
+					onClick={() => setIsModalOpen(true)}
+				/>
+			</div>
+
+			{/* Loading Messages */}
+			{isLoading && (
+				<div className="text-blue-500 mb-4">Loading food data...</div>
+			)}
+			{allergenLoading && (
+				<div className="text-blue-500 mb-4">Loading allergens...</div>
+			)}
+			{cuisineLoading && (
+				<div className="text-blue-500 mb-4">Loading cuisines...</div>
+			)}
+			{courseLoading && (
+				<div className="text-blue-500 mb-4">Loading courses...</div>
+			)}
+
+			{/* Error Messages */}
+			{error && (
+				<div className="text-red-500 mb-4">Food Data Error: {error}</div>
+			)}
+			{allergenError && (
+				<div className="text-red-500 mb-4">
+					Allergens Error: {allergenError}
+				</div>
+			)}
+			{cuisineError && (
+				<div className="text-red-500 mb-4">Cuisines Error: {cuisineError}</div>
+			)}
+			{courseError && (
+				<div className="text-red-500 mb-4">Courses Error: {courseError}</div>
+			)}
+
+			{/* Food Catalogue Table */}
+			{foodDatas && (
+				<Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
+			)}
+
+			{/* Modal */}
+			{isModalOpen && (
+				<Modal
+					setIsModalOpen={setIsModalOpen}
+					modalTitle="Add New Food Item"
+					modalActionText="Add Food"
+					modalActionOnClick={handleAddFood}
+					closeModal={closeModal}
+				>
+					<AddNewFood
+						setNewFood={setNewFood}
+						newFood={newFood}
+						cuisineData={cuisines}
+						courseData={courses}
+						allergenData={allergens}
+						handleImageUpload={handleImageUpload}
+						toggleAllergen={toggleAllergen}
+						currencies={CURRENCIES}
+						handleAddIngredients={handleAddIngredients}
+						handleRemoveIngredients={handleRemoveIngredients}
+						setIngredient={setIngredient}
+						ingredient={ingredient}
+						formError={formError}
+						FormWarning={FormWarning}
+					/>
+				</Modal>
+			)}
+		</div>
+	);
 }

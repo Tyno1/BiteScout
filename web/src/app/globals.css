@@ -61,7 +61,7 @@
   --muted-foreground: var(--color-orange-600);
   --accent: var(--color-orange-300);
   --accent-foreground: var(--color-orange-50);
-  --destructive: var(--color-orange-700);
+  --destructive: var(--color-red-700);
   --border: var(--color-orange-800);
   --input: var(--color-orange-900);
   --ring: var(--color-orange-600);

@@ -1,5 +1,12 @@
-import { Button } from "@/components/atoms";
+import {
+  Button,
+  IconButton,
+  Input,
+  Select,
+  Textarea,
+} from "@/components/atoms";
 import { RestaurantData } from "@/types/restaurantData";
+import { X } from "lucide-react";
 
 type BasicInformation = {
   isEditing: boolean;
@@ -9,9 +16,11 @@ type BasicInformation = {
   setEditableData: (value: RestaurantData) => void;
   displayData: RestaurantData | null;
   handleInputChange: (field: keyof RestaurantData, value: any) => void;
+  removeCuisine: (cuisine: string) => void;
 };
 
 export function BasicInformation({
+  removeCuisine,
   isEditing,
   newCuisine,
   setNewCuisine,
@@ -33,23 +42,24 @@ export function BasicInformation({
 
       {/* finsh setting up cuisine */}
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 w-full">
-            <label
-              id="cuisine-label"
-              className="text-sm font-medium text-black"
-            >
+            <label id="cuisine-type" className="font-medium text-black">
               Cuisine Type
             </label>
-            {isEditing ? (
-              <>
-                <div className="flex gap-4 ">
-                  <input
-                    placeholder="Italian"
-                    className="rounded-md border border-gray-500 px-3 py-1 bg-white disabled:bg-gray-100 w-full"
-                    value={newCuisine}
+            <div className="flex gap-4 mt-2">
+              {isEditing && (
+                <div className="flex items-center gap-2 w-full">
+                  <Input
+                    fullWidth
+                    outlineType={isEditing && "round"}
                     type="text"
+                    name="cuisine-type"
+                    label="Cuisine Type"
+                    aria-labelledby="cuisine-type"
+                    value={newCuisine}
                     onChange={(e) => setNewCuisine(e.target.value)}
+                    placeholder="Italian"
                   />
                   <Button
                     text="Add"
@@ -70,65 +80,73 @@ export function BasicInformation({
                     }}
                   />
                 </div>
-                <div>
-                  <ul>
-                    {displayData?.cuisine?.map((cuisine: any) => (
-                      <li key={cuisine}>{cuisine.trim()}</li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            ) : (
-              <div>
-                <ul>
-                  {displayData?.cuisine && displayData?.cuisine?.length > 0 ? (
-                    displayData?.cuisine?.map((cuisine: any) => (
-                      <li key={cuisine}>{cuisine.trim()}</li>
-                    ))
-                  ) : (
-                    <div className="mt-2 text-sm text-gray-900">
-                      No Cuisines to display
-                    </div>
-                  )}
-                </ul>
-              </div>
-            )}
+              )}
+            </div>
+            <div>
+              <ul className="flex flex-wrap gap-2 mt-2">
+                {displayData?.cuisine?.map((cuisine: any) => (
+                  <div
+                    key={cuisine}
+                    className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
+                    role="listitem"
+                  >
+                    <span>{cuisine}</span>
+                    {isEditing && (
+                      <IconButton
+                        variant="plain"
+                        size="xs"
+                        icon={<X size={15} />}
+                        onClick={() => removeCuisine(cuisine)}
+                        aria-label={`Remove ${cuisine}`}
+                      />
+                    )}
+                  </div>
+                ))}
+                {displayData?.cuisine?.length === 0 && (
+                  <p
+                    className="text-gray-500 text-sm  mt-2 bg-gray-100 p-4 rounded-xl italic"
+                    role="status"
+                  >
+                    No Cuisine added yet
+                  </p>
+                )}
+              </ul>
+            </div>
           </div>
 
           <div className="space-y-2 flex flex-col">
-            <label id="price-label" className="text-sm font-medium text-black">
-              Price Range
-            </label>
-            <select
+            <Select
+              disabled={!isEditing}
+              label="Price Range"
+              name="price-range"
+              useLabel
+              outlineType={isEditing ? "round" : "none"}
+              inputSize="sm"
+              placeholder="Select price tier"
+              options={[
+                { value: "$", label: "$ (Budget)" },
+                { value: "$$", label: "$$ (Moderate)" },
+                { value: "$$$", label: "$$$ (Expensive)" },
+                { value: "$$$$", label: "$$$$ (Luxury)" },
+              ]}
               value={displayData?.priceRange}
               onChange={(e) => handleInputChange("priceRange", e.target.value)}
-              disabled={!isEditing}
-              className="w-full rounded-md border-1 border-gray-500 px-3 py-2 bg-white disabled:bg-gray-100/40"
-              aria-labelledby="price-label"
-            >
-              <option value="$">$ (Budget)</option>
-              <option value="$$">$$ (Moderate)</option>
-              <option value="$$$">$$$ (Expensive)</option>
-              <option value="$$$$">$$$$ (Luxury)</option>
-            </select>
+            />
           </div>
         </div>
 
         <div className="space-y-2 flex flex-col">
-          <label
-            id="description-label"
-            className="text-sm font-medium text-black"
-          >
-            Full Description
-          </label>
-          <textarea
+          <Textarea
+            fullWidth
+            outlineType={isEditing ? "round" : "none"}
+            name="description-label"
+            label="Full Description"
+            useLabel
+            rows={4}
+            disabled={!isEditing}
             value={displayData?.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             placeholder="Describe your restaurant"
-            disabled={!isEditing}
-            rows={4}
-            className="w-full rounded-md border border-1 border-gray-500 px-3 py-2 disabled:bg-gray-100/40"
-            aria-labelledby="description-label"
           />
         </div>
       </div>

@@ -1,5 +1,6 @@
-import Footer from "@/components/molecules/Footer";
-import Navbar from "@/components/molecules/Navbar";
+"use client"
+
+import { Footer, Navbar } from "@/components/molecules";
  
 export default function Services() {
   return (

@@ -1,48 +1,58 @@
-import { Course } from "@/types/foodCatalogue";
+import type { 
+  CreateCourseRequest, 
+  CreateCourseResponse,
+  DeleteCourseResponse,
+  GetAllCoursesResponse,
+  GetCourseByIdResponse,
+  UpdateCourseRequest,
+  UpdateCourseResponse
+} from "@shared/types/courses";
 import axios from "axios";
 import { create } from "zustand";
+import { handleApiError } from "../utils/apiErrorHandler";
 
 type CourseStore = {
   // State
-  courses: Course[];
+  courses: GetAllCoursesResponse;
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  createCourse: (course: Course) => Promise<void>;
-  getCourses: () => Promise<void>;
-  getCourse: (id: string) => Promise<void>;
-  updateCourse: ({
-    id,
-    course,
-  }: {
-    id: string;
-    course: Course;
-  }) => Promise<void>;
-  deleteCourse: (id: string) => Promise<void>;
+  createCourse: (course: CreateCourseRequest) => Promise<CreateCourseResponse | null>;
+  getCourses: () => Promise<GetAllCoursesResponse>;
+  getCourse: (id: string) => Promise<GetCourseByIdResponse | null>;
+  updateCourse: (id: string, course: UpdateCourseRequest) => Promise<UpdateCourseResponse | null>;
+  deleteCourse: (id: string) => Promise<DeleteCourseResponse | null>;
   resetCourses: () => void;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_COURSES = [{ _id: "", name: "", description: "" }];
 
-const useCourseStore = create<CourseStore>((set) => ({
-  courses: DEFAULT_COURSES,
+const useCourseStore = create<CourseStore>((set, get) => ({
+  courses: [],
   isLoading: false,
   error: null,
 
-  createCourse: async (course: Course) => {
+  createCourse: async (course: CreateCourseRequest) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.post(`${API_URL}/courses`, { course });
+      const response = await axios.post<CreateCourseResponse>(`${API_URL}/courses`, course);
 
-      set({ courses: response.data, isLoading: false });
+      // Update the courses list with the new course
+      set((state) => ({
+        courses: [...state.courses, response.data],
+        isLoading: false,
+      }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
@@ -50,55 +60,60 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(`${API_URL}/courses`);
+      const response = await axios.get<GetAllCoursesResponse>(`${API_URL}/courses`);
 
       set({ courses: response.data, isLoading: false });
       return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
       return [];
     }
   },
+
   getCourse: async (id: string) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(`${API_URL}/courses/${id}`);
+      const response = await axios.get<GetCourseByIdResponse>(`${API_URL}/courses/${id}`);
 
-      set({ courses: response.data, isLoading: false });
+      set({ isLoading: false });
       return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
       return null;
     }
   },
 
-  updateCourse: async ({
-    id,
-    course,
-  }: {
-    id: string;
-    course: Course;
-  }) => {
+  updateCourse: async (id: string, course: UpdateCourseRequest) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.put(`${API_URL}/courses/${id}`, {
-        course,
-      });
+      const response = await axios.put<UpdateCourseResponse>(`${API_URL}/courses/${id}`, course);
 
-      set({ courses: response.data, isLoading: false });
+      // Update the course in the list
+      set((state) => ({
+        courses: state.courses.map((item) => 
+          item._id === id ? response.data : item
+        ),
+        isLoading: false,
+      }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
@@ -106,22 +121,27 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      await axios.delete(`${API_URL}/Courses/${id}`);
+      const response = await axios.delete<DeleteCourseResponse>(`${API_URL}/courses/${id}`);
 
+      // Remove the course from the list
       set((state) => ({
-        Courses: state.courses.filter((course) => course._id !== id),
+        courses: state.courses.filter((course) => course._id !== id),
         isLoading: false,
       }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
   resetCourses: () =>
-    set({ courses: DEFAULT_COURSES, error: null, isLoading: false }),
+    set({ courses: [], error: null, isLoading: false }),
 }));
 
 export default useCourseStore;

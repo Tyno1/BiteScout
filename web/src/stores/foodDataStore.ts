@@ -1,16 +1,19 @@
-import { FoodData } from "@/types/foodCatalogue";
+import type{ FoodCatalogue } from "@shared/types/api/schemas";
+import type { Currency } from "@shared/types/common";
 import axios from "axios";
 import { create } from "zustand";
 
 type FoodDataStore = {
   // State
-  foodData: FoodData;
-  foodDatas: FoodData[];
+  foodData: FoodCatalogue;
+  foodDatas: FoodCatalogue[];
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  createFoodData: (FoodData: FoodData) => Promise<void>;
+  createFoodData: (
+    FoodData: FoodCatalogue
+  ) => Promise<{ success: boolean; error: string | null }>;
   getFoodDatas: (restaurantId: string) => Promise<void>;
   getFoodDataById: ({
     foodId,
@@ -18,7 +21,7 @@ type FoodDataStore = {
   }: {
     foodId: string;
     restaurantId: string;
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; error: string | null }>;
   updateFoodData: ({
     foodId,
     restaurantId,
@@ -26,7 +29,7 @@ type FoodDataStore = {
   }: {
     foodId: string;
     restaurantId: string;
-    foodData: FoodData;
+    foodData: FoodCatalogue;
   }) => Promise<void>;
   deleteFoodData: ({
     foodId,
@@ -39,41 +42,47 @@ type FoodDataStore = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_FOOD_DATA = {
-  _id: "",
+const DEFAULT_FOOD_DATA: FoodCatalogue = {
   name: "",
   ingredients: [],
-  cuisineType: "",
-  course: "",
+  cuisineType: {name: "", description: ""},
+  course: {name: "", description: ""},
   price: {
-    currency: "",
+    currency: "GBP" as Currency,
     amount: 0,
   },
   allergens: [],
   images: [],
   restaurant: "",
 };
-const useFoodDataStore = create<FoodDataStore>((set) => ({
+const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   foodData: DEFAULT_FOOD_DATA,
   foodDatas: [DEFAULT_FOOD_DATA],
   isLoading: false,
   error: null,
 
-  createFoodData: async (foodData: FoodData) => {
+  createFoodData: async (foodData: FoodCatalogue) => {
     try {
       set({ error: null, isLoading: true });
 
       const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
-
+      const newFood = response.data;
       set((state) => ({
-        FoodDatas: [...state.foodDatas, response.data],
-        isLoading: false,
+        foodDatas: get().foodDatas
+          ? [...get().foodDatas, newFood]
+          : [newFood],
       }));
+      return { success: true, error: null };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "An error has occurred",
+      };
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -106,13 +115,20 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
       const response = await axios.get(
         `${API_URL}/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
       );
+      console.log(response.data);
+      
 
       set({ foodData: response.data, isLoading: false });
+      return { success: true, error: null };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
         isLoading: false,
       });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "An error has occurred",
+      };
     }
   },
 
@@ -123,7 +139,7 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
   }: {
     foodId: string;
     restaurantId: string;
-    foodData: FoodData;
+    foodData: FoodCatalogue;
   }) => {
     try {
       set({ error: null, isLoading: true });
@@ -157,7 +173,9 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
       );
 
       set((state) => ({
-        foodDatas: state.foodDatas.filter((food) => food._id !== foodId),
+        foodDatas: state.foodDatas?.filter(
+          (food) => food?._id !== foodId
+        ),
         isLoading: false,
       }));
     } catch (error) {
@@ -169,7 +187,11 @@ const useFoodDataStore = create<FoodDataStore>((set) => ({
   },
 
   resetFoodDatas: () =>
-    set({ foodDatas: [DEFAULT_FOOD_DATA], error: null, isLoading: false }),
+    set({
+      foodDatas: [DEFAULT_FOOD_DATA],
+      error: null,
+      isLoading: false,
+    }),
 }));
 
 export default useFoodDataStore;

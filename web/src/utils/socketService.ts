@@ -1,54 +1,102 @@
 import { toast } from "react-toastify";
-import { io, Socket } from "socket.io-client";
+import { type Socket, io } from "socket.io-client";
 
 let socket: Socket | null = null;
-const backendServer = "http://localhost:5001";
+const backendServer =
+	process.env.NEXT_PUBLIC_BACKEND_URL_PLAIN || "http://localhost:5001";
 
 export const initializeSocket = (
-  userId: string,
-  addNotification: (notification: any) => void
+	userId: string,
+	addNotification: (notification: { type: string; data: Record<string, unknown>; id?: string; timestamp?: string }) => void,
 ): Socket => {
-  if (socket) return socket;
+	if (socket) return socket;
 
-  // Connect to your backend
-  socket = io(backendServer);
+	// Connect to your backend with enhanced configuration
+	socket = io(backendServer, {
+		transports: ["websocket", "polling"],
+		timeout: 20000,
+		forceNew: true,
+		reconnection: true,
+		reconnectionAttempts: 5,
+		reconnectionDelay: 1000,
+		// Add these options to prevent namespace issues
+		upgrade: true,
+		rememberUpgrade: true,
+		// Ensure we're connecting to the root namespace
+		path: "/socket.io/",
+	});
 
-  socket.on("connect", () => {
-    console.log("Connected to notification server");
+	socket.on("connect", () => {
+		console.log("Connected to notification server");
 
-    // Authenticate with user ID
-    if (socket) {
-      socket.emit("authenticate", userId);
-    }
-  });
+		// Authenticate with user ID
+		if (socket && userId) {
+			socket.emit("authenticate", userId);
+		}
+	});
 
-  // Listen for notifications
-  socket.on("notification", (notification) => {
-    console.log("Received notification:", notification);
+	socket.on("authenticated", (data) => {
+		console.log("Socket authenticated:", data.message);
+	});
 
-    // Dispatch to store
-    addNotification(notification);
+	// Listen for notifications
+	socket.on("notification", (notification) => {
+		console.log("Received notification:", notification);
 
-    // Optionally show a toast notification
-    if (notification.type === "access-request") {
-      toast.info(`New access request for ${notification.data.restaurantName}`);
-    }
-  });
+		// Dispatch to store
+		addNotification(notification);
 
-  socket.on("disconnect", () => {
-    console.log("Disconnected from notification server");
-  });
+		// Optionally show a toast notification
+		if (notification.type === "access-request") {
+			toast.info(`New access request for ${notification.data.restaurantName}`);
+		}
+	});
 
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error);
-  });
+	socket.on("disconnect", (reason) => {
+		console.log("Disconnected from notification server:", reason);
+	});
 
-  return socket;
+	socket.on("connect_error", (error) => {
+		console.error("Socket connection error:", error);
+		// Don't show error toast for namespace issues, just log them
+		if (!error.message?.includes("Invalid namespace")) {
+			toast.error("Connection to notification server failed");
+		}
+	});
+
+	socket.on("error", (error) => {
+		console.error("Socket error:", error);
+		if (error.message && !error.message.includes("Invalid namespace")) {
+			toast.error(error.message);
+		}
+	});
+
+	socket.on("reconnect", (attemptNumber) => {
+		console.log(
+			"Reconnected to notification server after",
+			attemptNumber,
+			"attempts",
+		);
+		// Re-authenticate after reconnection
+		if (userId) {
+			socket?.emit("authenticate", userId);
+		}
+	});
+
+	socket.on("reconnect_error", (error) => {
+		console.error("Socket reconnection error:", error);
+	});
+
+	return socket;
 };
 
 export const disconnectSocket = (): void => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
+	if (socket) {
+		socket.disconnect();
+		socket = null;
+	}
+};
+
+export const getSocket = (): Socket | null => {
+	return socket;
 };

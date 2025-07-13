@@ -1,118 +1,131 @@
-import { Cuisine } from "@/types/foodCatalogue";
+import type { 
+  CreateCuisineRequest, 
+  CreateCuisineResponse,
+  DeleteCuisineResponse,
+  GetAllCuisinesResponse,
+  GetCuisineByIdResponse,
+  UpdateCuisineRequest,
+  UpdateCuisineResponse
+} from "@shared/types/cuisines";
 import axios from "axios";
 import { create } from "zustand";
+import { handleApiError } from "../utils/apiErrorHandler";
 
 type CuisineStore = {
-  // State
-  cuisines: Cuisine[];
-  isLoading: boolean;
-  error: string | null;
+	// State
+	cuisines: GetAllCuisinesResponse;
+	isLoading: boolean;
+	error: string | null;
 
-  // Actions
-  createCuisine: (cuisine: Cuisine) => Promise<void>;
-  getCuisines: () => Promise<void>;
-  getCuisine: (id: string) => Promise<void>;
-  updateCuisine: ({
-    id,
-    cuisine,
-  }: {
-    id: string;
-    cuisine: Cuisine;
-  }) => Promise<void>;
-  deleteCuisine: (id: string) => Promise<void>;
-  resetCuisines: () => void;
+	// Actions
+	createCuisine: (cuisine: CreateCuisineRequest) => Promise<CreateCuisineResponse | null>;
+	getCuisines: () => Promise<GetAllCuisinesResponse>;
+	getCuisine: (id: string) => Promise<GetCuisineByIdResponse | null>;
+	updateCuisine: (id: string, cuisine: UpdateCuisineRequest) => Promise<UpdateCuisineResponse | null>;
+	deleteCuisine: (id: string) => Promise<DeleteCuisineResponse | null>;
+	resetCuisines: () => void;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_CUISINES = [{ _id: "", name: "", description: "" }];
 
-const useCuisineStore = create<CuisineStore>((set) => ({
-  cuisines: DEFAULT_CUISINES,
-  isLoading: false,
-  error: null,
+const useCuisineStore = create<CuisineStore>((set, get) => ({
+	cuisines: [],
+	isLoading: false,
+	error: null,
 
-  createCuisine: async (cuisine: Cuisine) => {
-    try {
-      set({ error: null, isLoading: true });
+	createCuisine: async (cuisine: CreateCuisineRequest) => {
+		try {
+			set({ error: null, isLoading: true });
 
-      const response = await axios.post(`${API_URL}/cuisines`, cuisine);
+			const response = await axios.post<CreateCuisineResponse>(`${API_URL}/cuisines`, cuisine);
 
-      set({ cuisines: response.data, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
-      });
-    }
-  },
+			// Update the cuisines list with the new cuisine
+			set((state) => ({
+				cuisines: [...state.cuisines, response.data],
+				isLoading: false,
+			}));
 
-  getCuisines: async () => {
-    try {
-      set({ error: null, isLoading: true });
+			return response.data;
+		} catch (error) {
+			const errorMessage = handleApiError(error);
+			set({ error: errorMessage, isLoading: false });
+			return null;
+		}
+	},
 
-      const response = await axios.get(`${API_URL}/cuisines`);
+	getCuisines: async () => {
+		try {
+			set({ error: null, isLoading: true });
 
-      set({ cuisines: response.data, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
-      });
-    }
-  },
+			const response = await axios.get<GetAllCuisinesResponse>(`${API_URL}/cuisines`);
 
-  getCuisine: async (id: string) => {
-    try {
-      set({ error: null, isLoading: true });
+			set({ cuisines: response.data, isLoading: false });
+			return response.data;
+		} catch (error) {
+			const errorMessage = handleApiError(error);
+			set({ error: errorMessage, isLoading: false });
+			return [];
+		}
+	},
 
-      const response = await axios.get(`${API_URL}/cuisines/${id}`);
+	getCuisine: async (id: string) => {
+		try {
+			set({ error: null, isLoading: true });
 
-      set({ cuisines: response.data, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
-      });
-    }
-  },
+			const response = await axios.get<GetCuisineByIdResponse>(`${API_URL}/cuisines/${id}`);
 
-  updateCuisine: async ({ id, cuisine }: { id: string; cuisine: Cuisine }) => {
-    try {
-      set({ error: null, isLoading: true });
+			set({ isLoading: false });
+			return response.data;
+		} catch (error) {
+			const errorMessage = handleApiError(error);
+			set({ error: errorMessage, isLoading: false });
+			return null;
+		}
+	},
 
-      const response = await axios.put(`${API_URL}/cuisines/${id}`, {
-        cuisine,
-      });
+	updateCuisine: async (id: string, cuisine: UpdateCuisineRequest) => {
+		try {
+			set({ error: null, isLoading: true });
 
-      set({ cuisines: response.data, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
-      });
-    }
-  },
+			const response = await axios.put<UpdateCuisineResponse>(`${API_URL}/cuisines/${id}`, cuisine);
 
-  deleteCuisine: async (id: string) => {
-    try {
-      set({ error: null, isLoading: true });
+			// Update the cuisine in the list
+			set((state) => ({
+				cuisines: state.cuisines.map((item) => 
+					item._id === id ? response.data : item
+				),
+				isLoading: false,
+			}));
 
-      await axios.delete(`${API_URL}/cuisines/${id}`);
+			return response.data;
+		} catch (error) {
+			const errorMessage = handleApiError(error);
+			set({ error: errorMessage, isLoading: false });
+			return null;
+		}
+	},
 
-      set((state) => ({
-        Cuisines: state.cuisines.filter((cuisine) => cuisine._id !== id),
-        isLoading: false,
-      }));
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "An error has occurred",
-        isLoading: false,
-      });
-    }
-  },
+	deleteCuisine: async (id: string) => {
+		try {
+			set({ error: null, isLoading: true });
 
-  resetCuisines: () =>
-    set({ cuisines: DEFAULT_CUISINES, error: null, isLoading: false }),
+			const response = await axios.delete<DeleteCuisineResponse>(`${API_URL}/cuisines/${id}`);
+
+			// Remove the cuisine from the list
+			set((state) => ({
+				cuisines: state.cuisines.filter((cuisine) => cuisine._id !== id),
+				isLoading: false,
+			}));
+
+			return response.data;
+		} catch (error) {
+			const errorMessage = handleApiError(error);
+			set({ error: errorMessage, isLoading: false });
+			return null;
+		}
+	},
+
+	resetCuisines: () => set({ cuisines: [], error: null, isLoading: false }),
 }));
 
 export default useCuisineStore;

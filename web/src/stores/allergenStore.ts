@@ -1,48 +1,58 @@
-import { Allergen } from "@/types/foodCatalogue";
+import type { 
+  CreateAllergenRequest, 
+  CreateAllergenResponse,
+  DeleteAllergenResponse,
+  GetAllAllergensResponse,
+  GetAllergenByIdResponse,
+  UpdateAllergenRequest,
+  UpdateAllergenResponse
+} from "@shared/types/allergens";
 import axios from "axios";
 import { create } from "zustand";
+import { handleApiError } from "../utils/apiErrorHandler";
 
 type AllergenStore = {
   // State
-  allergens: Allergen[];
+  allergens: GetAllAllergensResponse;
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  createAllergen: (allergen: Allergen) => Promise<void>;
-  getAllergens: () => Promise<Allergen[]>;
-  getAllergen: (id: string) => Promise<Allergen | null>;
-  updateAllergen: ({
-    id,
-    allergen,
-  }: {
-    id: string;
-    allergen: Allergen;
-  }) => Promise<void>;
-  deleteAllergen: (id: string) => Promise<void>;
+  createAllergen: (allergen: CreateAllergenRequest) => Promise<CreateAllergenResponse | null>;
+  getAllergens: () => Promise<GetAllAllergensResponse>;
+  getAllergen: (id: string) => Promise<GetAllergenByIdResponse | null>;
+  updateAllergen: (id: string, allergen: UpdateAllergenRequest) => Promise<UpdateAllergenResponse | null>;
+  deleteAllergen: (id: string) => Promise<DeleteAllergenResponse | null>;
   resetAllergens: () => void;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_ALLERGENS = [{ _id: "", name: "", description: "" }];
 
-const useAllergenStore = create<AllergenStore>((set) => ({
-  allergens: DEFAULT_ALLERGENS,
+const useAllergenStore = create<AllergenStore>((set, get) => ({
+  allergens: [],
   isLoading: false,
   error: null,
 
-  createAllergen: async (allergen: Allergen) => {
+  createAllergen: async (allergen: CreateAllergenRequest) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.post(`${API_URL}/allergens`, { allergen });
+      const response = await axios.post<CreateAllergenResponse>(`${API_URL}/allergens`, allergen);
 
-      set({ allergens: response.data, isLoading: false });
+      // Update the allergens list with the new allergen
+      set((state) => ({
+        allergens: [...state.allergens, response.data],
+        isLoading: false,
+      }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
@@ -50,55 +60,60 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(`${API_URL}/allergens`);
+      const response = await axios.get<GetAllAllergensResponse>(`${API_URL}/allergens`);
 
       set({ allergens: response.data, isLoading: false });
       return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
       return [];
     }
   },
+
   getAllergen: async (id: string) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(`${API_URL}/allergens/${id}`);
+      const response = await axios.get<GetAllergenByIdResponse>(`${API_URL}/allergens/${id}`);
 
-      set({ allergens: response.data, isLoading: false });
+      set({ isLoading: false });
       return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
       return null;
     }
   },
 
-  updateAllergen: async ({
-    id,
-    allergen,
-  }: {
-    id: string;
-    allergen: Allergen;
-  }) => {
+  updateAllergen: async (id: string, allergen: UpdateAllergenRequest) => {
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.put(`${API_URL}/allergens/${id}`, {
-        allergen,
-      });
+      const response = await axios.put<UpdateAllergenResponse>(`${API_URL}/allergens/${id}`, allergen);
 
-      set({ allergens: response.data, isLoading: false });
+      // Update the allergen in the list
+      set((state) => ({
+        allergens: state.allergens.map((item) => 
+          item._id === id ? response.data : item
+        ),
+        isLoading: false,
+      }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
@@ -106,22 +121,27 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      await axios.delete(`${API_URL}/allergens/${id}`);
+      const response = await axios.delete<DeleteAllergenResponse>(`${API_URL}/allergens/${id}`);
 
+      // Remove the allergen from the list
       set((state) => ({
         allergens: state.allergens.filter((allergen) => allergen._id !== id),
         isLoading: false,
       }));
+
+      return response.data;
     } catch (error) {
+      const errorMessage = handleApiError(error);
       set({
-        error: error instanceof Error ? error.message : "An error has occurred",
+        error: errorMessage,
         isLoading: false,
       });
+      return null;
     }
   },
 
   resetAllergens: () =>
-    set({ allergens: DEFAULT_ALLERGENS, error: null, isLoading: false }),
+    set({ allergens: [], error: null, isLoading: false }),
 }));
 
 export default useAllergenStore;
