@@ -1500,6 +1500,25 @@ components:
           additionalProperties: true
           description: "Additional metadata associated with the restaurant"
 
+    Currency:
+      type: string
+      enum:
+        - USD
+        - EUR
+        - GBP
+        - CAD
+        - AUD
+        - JPY
+        - CNY
+        - KRW
+        - MYR
+        - TWD
+        - VND
+        - THB
+        - ZAR
+      description: "Supported currency types"
+      example: "USD"
+
     Price:
       type: object
       required:
@@ -1511,21 +1530,7 @@ components:
           description: "The price amount"
           example: 25.99
         currency:
-          type: string
-          enum:
-            - USD
-            - EUR
-            - GBP
-            - CAD
-            - AUD
-            - JPY
-            - CNY
-            - KRW
-            - MYR
-            - TWD
-            - VND
-            - THB
-            - ZAR
+          $ref: "#/components/schemas/Currency"
           description: "Currency type"
           example: "USD"
 
@@ -1540,6 +1545,10 @@ components:
         - images
         - restaurant
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the food catalogue item"
+          example: "507f1f77bcf86cd799439016"
         name:
           type: string
           description: "The name of the food item"
@@ -1554,21 +1563,16 @@ components:
             - "Ground beef"
             - "Tomato sauce"
         cuisineType:
-          type: string
+          $ref: "#/components/schemas/Cuisine"
           description: "Cuisine type the food belongs to"
-          example: "Italian"
         allergens:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Allergen"
           description: "List of allergens associated with the food"
-          example:
-            - "Gluten"
-            - "Dairy"
         course:
-          type: string
+          $ref: "#/components/schemas/Course"
           description: "Course type the food belongs to (e.g., starter, main)"
-          example: "Main course"
         price:
           $ref: "#/components/schemas/Price"
           description: "Price details for the food item"

@@ -1434,6 +1434,12 @@ export interface components {
         [key: string]: unknown;
       };
     };
+    /**
+     * @description Supported currency types
+     * @example USD
+     * @enum {string}
+     */
+    Currency: "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY" | "CNY" | "KRW" | "MYR" | "TWD" | "VND" | "THB" | "ZAR";
     Price: {
       /**
        * @description The price amount
@@ -1443,11 +1449,15 @@ export interface components {
       /**
        * @description Currency type
        * @example USD
-       * @enum {string}
        */
-      currency: "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY" | "CNY" | "KRW" | "MYR" | "TWD" | "VND" | "THB" | "ZAR";
+      currency: components["schemas"]["Currency"];
     };
     FoodCatalogue: {
+      /**
+       * @description Unique identifier for the food catalogue item
+       * @example 507f1f77bcf86cd799439016
+       */
+      _id?: string;
       /**
        * @description The name of the food item
        * @example Spaghetti Bolognese
@@ -1462,24 +1472,12 @@ export interface components {
        * ]
        */
       ingredients: string[];
-      /**
-       * @description Cuisine type the food belongs to
-       * @example Italian
-       */
-      cuisineType: string;
-      /**
-       * @description List of allergens associated with the food
-       * @example [
-       *   "Gluten",
-       *   "Dairy"
-       * ]
-       */
-      allergens?: string[];
-      /**
-       * @description Course type the food belongs to (e.g., starter, main)
-       * @example Main course
-       */
-      course: string;
+      /** @description Cuisine type the food belongs to */
+      cuisineType: components["schemas"]["Cuisine"];
+      /** @description List of allergens associated with the food */
+      allergens?: components["schemas"]["Allergen"][];
+      /** @description Course type the food belongs to (e.g., starter, main) */
+      course: components["schemas"]["Course"];
       /** @description Price details for the food item */
       price: components["schemas"]["Price"];
       /**

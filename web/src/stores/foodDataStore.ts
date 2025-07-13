@@ -1,19 +1,18 @@
-import { DetailedFoodData, FoodData } from "@/types/foodCatalogue";
+import type{ FoodCatalogue } from "@shared/types/api/schemas";
+import type { Currency } from "@shared/types/common";
 import axios from "axios";
 import { create } from "zustand";
 
 type FoodDataStore = {
   // State
-  foodData: FoodData;
-  foodDatas: FoodData[];
-  DetailedFoodDatas?: DetailedFoodData[];
-  DetailedFoodData?: DetailedFoodData;
+  foodData: FoodCatalogue;
+  foodDatas: FoodCatalogue[];
   isLoading: boolean;
   error: string | null;
 
   // Actions
   createFoodData: (
-    FoodData: FoodData
+    FoodData: FoodCatalogue
   ) => Promise<{ success: boolean; error: string | null }>;
   getFoodDatas: (restaurantId: string) => Promise<void>;
   getFoodDataById: ({
@@ -30,7 +29,7 @@ type FoodDataStore = {
   }: {
     foodId: string;
     restaurantId: string;
-    foodData: FoodData;
+    foodData: FoodCatalogue;
   }) => Promise<void>;
   deleteFoodData: ({
     foodId,
@@ -43,14 +42,13 @@ type FoodDataStore = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_FOOD_DATA = {
-  _id: "",
+const DEFAULT_FOOD_DATA: FoodCatalogue = {
   name: "",
   ingredients: [],
-  cuisineType: "",
-  course: "",
+  cuisineType: {name: "", description: ""},
+  course: {name: "", description: ""},
   price: {
-    currency: "",
+    currency: "GBP" as Currency,
     amount: 0,
   },
   allergens: [],
@@ -63,15 +61,15 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   isLoading: false,
   error: null,
 
-  createFoodData: async (foodData: FoodData) => {
+  createFoodData: async (foodData: FoodCatalogue) => {
     try {
       set({ error: null, isLoading: true });
 
       const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
       const newFood = response.data;
       set((state) => ({
-        DetailedFoodDatas: get().DetailedFoodDatas
-          ? [...get().DetailedFoodDatas!, newFood]
+        foodDatas: get().foodDatas
+          ? [...get().foodDatas, newFood]
           : [newFood],
       }));
       return { success: true, error: null };
@@ -96,7 +94,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
         `${API_URL}/food-catalogue/restaurant/${restaurantId}`
       );
 
-      set({ DetailedFoodDatas: response.data, isLoading: false });
+      set({ foodDatas: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -120,7 +118,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
       console.log(response.data);
       
 
-      set({ DetailedFoodData: response.data, isLoading: false });
+      set({ foodData: response.data, isLoading: false });
       return { success: true, error: null };
     } catch (error) {
       set({
@@ -141,7 +139,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   }: {
     foodId: string;
     restaurantId: string;
-    foodData: FoodData;
+    foodData: FoodCatalogue;
   }) => {
     try {
       set({ error: null, isLoading: true });
@@ -151,7 +149,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
         foodData
       );
 
-      set({ DetailedFoodData: response.data, isLoading: false });
+      set({ foodData: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -175,8 +173,8 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
       );
 
       set((state) => ({
-        DetailedFoodDatas: state.DetailedFoodDatas?.filter(
-          (food) => food._id !== foodId
+        foodDatas: state.foodDatas?.filter(
+          (food) => food?._id !== foodId
         ),
         isLoading: false,
       }));
@@ -191,7 +189,6 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   resetFoodDatas: () =>
     set({
       foodDatas: [DEFAULT_FOOD_DATA],
-      DetailedFoodDatas: [],
       error: null,
       isLoading: false,
     }),
