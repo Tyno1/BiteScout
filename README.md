@@ -1,106 +1,29 @@
 # 🍽️ BiteScout
 
-A comprehensive restaurant management platform with real-time features, role-based access control, and multi-platform support.
+A visual-first food discovery platform with mobile app, web dashboard, and backend API.
 
-## 📋 Overview
+## 📋 Project Scope
 
-BiteScout is a full-stack restaurant management solution that helps restaurant owners and staff manage their operations efficiently. The platform includes features for food catalog management, user access control, real-time notifications, and comprehensive analytics.
+BiteScout is a full-stack application consisting of:
+
+- **📱 Mobile App** - React Native consumer app for food discovery
+- **🖥️ Web Dashboard** - Next.js admin interface for restaurants
+- **⚙️ Backend API** - Express.js server with MongoDB
+- **📦 Shared Package** - Common types and OpenAPI specifications
 
 ## 🏗️ Architecture
 
-The project follows a monorepo structure with the following components:
+Monorepo setup with modern tooling:
 
-- **🌐 Web App** - Next.js frontend with TypeScript and Tailwind CSS
-- **⚙️ Backend API** - Express.js server with MongoDB and Socket.IO
-- **📱 Mobile App** - React Native with Expo
-- **📦 Shared Package** - Common types and OpenAPI specifications
-
-## 🚀 Features
-
-### 🔐 Authentication & Authorization
-- JWT-based authentication with refresh tokens
-- Role-based access control (Owner, Admin, Editor, Viewer)
-- Secure password validation and encryption
-- Session management with NextAuth.js
-
-### 🍽️ Restaurant Management
-- Food catalog management with ingredients, allergens, and pricing
-- Cuisine and course categorization
-- Image upload and management
-- Real-time menu updates
-
-### 👥 User Management
-- Restaurant access requests and approvals
-- Team member role management
-- User profile management
-- Access control per restaurant
-
-### 🔔 Real-time Features
-- Live notifications for access requests
-- Real-time updates using Socket.IO
-- Instant status changes and alerts
-
-### 📊 Analytics & Insights
-- Restaurant performance metrics
-- Customer insights and analytics
-- Sales and inventory tracking
-
-## 🛠️ Tech Stack
-
-### Frontend (Web)
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **State Management**: Zustand
-- **UI Components**: Custom component library with Radix UI
-- **Authentication**: NextAuth.js
-- **HTTP Client**: Axios
-- **Testing**: Jest with React Testing Library
-
-### Backend
-- **Runtime**: Node.js with TypeScript
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT with bcrypt
-- **Real-time**: Socket.IO
-- **Validation**: Express middleware with custom validators
-- **Security**: CORS, rate limiting, security headers
-
-### Mobile
-- **Framework**: React Native with Expo
-- **Navigation**: React Navigation
-- **State Management**: Zustand
-- **HTTP Client**: Axios
-- **Icons**: Expo Vector Icons
-
-### Shared
-- **Type Generation**: OpenAPI TypeScript
-- **API Documentation**: OpenAPI 3.0 specification
-- **Package Management**: npm workspaces
+- **📱 Mobile App**: React Native with Expo
+- **🖥️ Web Dashboard**: Next.js with Tailwind
+- **⚙️ Backend**: Express + MongoDB
+- **📦 Shared**: OpenAPI types and shared logic
 
 ## 📁 Project Structure
 
 ```
 BiteScout/
-├── web/                    # Next.js frontend application
-│   ├── src/
-│   │   ├── app/           # App Router pages and layouts
-│   │   ├── components/    # Reusable UI components
-│   │   ├── stores/        # Zustand state management
-│   │   ├── types/         # TypeScript type definitions
-│   │   └── utils/         # Utility functions
-│   ├── package.json
-│   └── next.config.mjs
-├── backend/               # Express.js API server
-│   ├── src/
-│   │   ├── controllers/   # Route controllers
-│   │   ├── middleware/    # Express middleware
-│   │   ├── models/        # MongoDB schemas
-│   │   ├── routes/        # API routes
-│   │   ├── services/      # Business logic
-│   │   └── types/         # TypeScript types
-│   ├── package.json
-│   └── tsconfig.json
 ├── mobile/               # React Native mobile app
 │   ├── src/
 │   │   ├── screens/      # App screens
@@ -109,6 +32,25 @@ BiteScout/
 │   │   └── types/        # TypeScript types
 │   ├── package.json
 │   └── app.json
+├── web/                  # Next.js admin dashboard
+│   ├── src/
+│   │   ├── app/          # App Router pages and layouts
+│   │   ├── components/   # Reusable UI components
+│   │   ├── stores/       # Zustand state management
+│   │   ├── types/        # TypeScript type definitions
+│   │   └── utils/        # Utility functions
+│   ├── package.json
+│   └── next.config.mjs
+├── backend/              # Express.js API server
+│   ├── src/
+│   │   ├── controllers/  # Route controllers
+│   │   ├── middleware/   # Express middleware
+│   │   ├── models/       # MongoDB schemas
+│   │   ├── routes/       # API routes
+│   │   ├── services/     # Business logic
+│   │   └── types/        # TypeScript types
+│   ├── package.json
+│   └── tsconfig.json
 ├── shared/               # Shared types and specifications
 │   ├── types/           # Generated TypeScript types
 │   ├── openapi/         # OpenAPI specifications
@@ -118,7 +60,31 @@ BiteScout/
 └── README.md           # This file
 ```
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack
+
+### Mobile App
+- React Native (Expo)
+- Zustand for state
+- Axios + React Navigation
+- Expo Vector Icons
+
+### Web Dashboard
+- Next.js 15 (App Router)
+- Tailwind CSS + Radix UI
+- NextAuth.js for auth
+
+### Backend API
+- Node.js with Express + TypeScript
+- MongoDB (Mongoose ODM)
+- JWT auth with refresh tokens
+- Socket.IO for real-time updates
+
+### Shared
+- OpenAPI 3.0 Specification
+- Type-safe SDKs via OpenAPI Generator
+- Shared types and validators
+
+## 🚀 Development Setup
 
 ### Prerequisites
 
@@ -140,17 +106,17 @@ BiteScout/
    # Install root dependencies
    npm install
    
+   # Install mobile dependencies
+   cd mobile && npm install
+   
    # Install web dependencies
-   cd web && npm install
+   cd ../web && npm install
    
    # Install backend dependencies
    cd ../backend && npm install
    
    # Install shared dependencies
    cd ../shared && npm install
-   
-   # Install mobile dependencies
-   cd ../mobile && npm install
    ```
 
 3. **Set up environment variables**
@@ -194,14 +160,14 @@ BiteScout/
    ```
    Backend will be available at: http://localhost:5001
 
-3. **Start Web Frontend** (in new terminal)
+3. **Start Web Dashboard** (in new terminal)
    ```bash
    cd web
    npm run dev
    ```
-   Web app will be available at: http://localhost:3000
+   Web dashboard will be available at: http://localhost:3000
 
-4. **Start Mobile App** (optional)
+4. **Start Mobile App** (in new terminal)
    ```bash
    cd mobile
    npm start
@@ -217,7 +183,7 @@ BiteScout/
    npm start
    ```
 
-2. **Build Web Frontend**
+2. **Build Web Dashboard**
    ```bash
    cd web
    npm run build
@@ -226,7 +192,16 @@ BiteScout/
 
 ## 🔧 Available Scripts
 
-### Web App
+### Mobile App
+```bash
+cd mobile
+npm start               # Start Expo development server
+npm run android         # Run on Android
+npm run ios             # Run on iOS
+npm run web             # Run in web browser
+```
+
+### Web Dashboard
 ```bash
 cd web
 npm run dev          # Start development server
@@ -252,14 +227,21 @@ npm run build            # Build the package
 npm run watch            # Watch mode for development
 ```
 
-### Mobile App
-```bash
-cd mobile
-npm start               # Start Expo development server
-npm run android         # Run on Android
-npm run ios             # Run on iOS
-npm run web             # Run in web browser
-```
+## 📚 API Documentation
+
+The API is documented using OpenAPI 3.0 specification located in `shared/openapi/spec.yaml`. 
+
+### Available Endpoints
+
+- **Authentication**: `/api/auth/*` - Login, register, refresh tokens
+- **Users**: `/api/user/*` - User management and profiles
+- **Restaurants**: `/api/restaurants/*` - Restaurant CRUD operations
+- **Food Catalog**: `/api/food-catalogue/*` - Food item management
+- **Allergens**: `/api/allergens/*` - Allergen management
+- **Courses**: `/api/courses/*` - Course type management
+- **Cuisines**: `/api/cuisines/*` - Cuisine type management
+- **Access Control**: `/api/restaurant-access/*` - Restaurant access management
+- **Notifications**: `/api/notifications/*` - User notifications
 
 ## 🔐 Security Features
 
@@ -278,77 +260,6 @@ npm run web             # Run in web browser
 - **Rate Limiting** for authentication attempts
 - **Health Check Endpoints**
 - **Proper Error Logging** and handling
-
-### 🔐 **Security Best Practices**
-
-#### Environment Variables
-- Never commit `.env` files to version control
-- Use strong, unique secrets for JWT tokens
-- Rotate secrets regularly in production
-- Use different secrets for different environments
-
-#### Password Security
-- Minimum 8 characters
-- Must contain uppercase, lowercase, number, and special character
-- Consider implementing password strength indicators
-- Implement account lockout after failed attempts
-
-#### CORS Configuration
-- Configure `ALLOWED_ORIGINS` for your specific domains
-- Avoid using `*` in production
-- Regularly review and update allowed origins
-
-#### JWT Security
-- Use short expiration times for access tokens
-- Implement proper refresh token rotation
-- Store tokens securely (httpOnly cookies recommended)
-- Validate tokens on every request
-
-#### Database Security
-- Use connection pooling
-- Implement proper indexing
-- Regular backups
-- Monitor for suspicious queries
-
-## 📚 API Documentation
-
-The API is documented using OpenAPI 3.0 specification located in `shared/openapi/spec.yaml`. 
-
-### Available Endpoints
-
-- **Authentication**: `/api/auth/*` - Login, register, refresh tokens
-- **Users**: `/api/user/*` - User management and profiles
-- **Restaurants**: `/api/restaurants/*` - Restaurant CRUD operations
-- **Food Catalog**: `/api/food-catalogue/*` - Food item management
-- **Allergens**: `/api/allergens/*` - Allergen management
-- **Courses**: `/api/courses/*` - Course type management
-- **Cuisines**: `/api/cuisines/*` - Cuisine type management
-- **Access Control**: `/api/restaurant-access/*` - Restaurant access management
-- **Notifications**: `/api/notifications/*` - User notifications
-
-## 🧪 Testing
-
-### Web App Testing
-```bash
-cd web
-npm run test           # Run all tests
-npm run test:watch     # Run tests in watch mode
-```
-
-### Backend Testing
-```bash
-cd backend
-npm test              # Run backend tests
-```
-
-## 📱 Mobile Development
-
-The mobile app is built with React Native and Expo, providing:
-
-- Cross-platform compatibility (iOS & Android)
-- Hot reloading for development
-- Easy deployment and updates
-- Access to native device features
 
 ## 🔄 Real-time Features
 
@@ -399,6 +310,21 @@ BiteScout uses Socket.IO for real-time communication:
 - Track API response times
 - Monitor Socket.IO connection counts
 
+## 🧪 Testing
+
+### Web Dashboard Testing
+```bash
+cd web
+npm run test           # Run all tests
+npm run test:watch     # Run tests in watch mode
+```
+
+### Backend Testing
+```bash
+cd backend
+npm test              # Run backend tests
+```
+
 ## 🚀 Deployment
 
 ### Backend Deployment
@@ -406,7 +332,7 @@ BiteScout uses Socket.IO for real-time communication:
 2. Configure environment variables for production
 3. Deploy to your preferred platform (Heroku, AWS, DigitalOcean, etc.)
 
-### Web App Deployment
+### Web Dashboard Deployment
 1. Build the application: `npm run build`
 2. Deploy to Vercel, Netlify, or your preferred hosting platform
 3. Configure environment variables
@@ -435,16 +361,12 @@ This project is licensed under the ISC License - see the LICENSE file for detail
 
 For support and questions:
 - Create an issue in the repository
-- Check the [SETUP.md](./SETUP.md) for detailed setup instructions
 - Review the API documentation in `shared/openapi/spec.yaml`
 
 ## 🔗 Links
 
-- **Web App**: http://localhost:3000 (development)
+- **Mobile App**: Expo development build
+- **Web Dashboard**: http://localhost:3000 (development)
 - **Backend API**: http://localhost:5001 (development)
 - **API Documentation**: `shared/openapi/spec.yaml`
 - **Health Check**: http://localhost:5001/health
-
----
-
-**BiteScout** - Making restaurant management simple and efficient! 🍽️✨
