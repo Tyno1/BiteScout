@@ -1,11 +1,14 @@
+import type { UserType } from "@shared/types/api/schemas";
+import type { LoginPostRequest, LoginPostResponse } from "@shared/types/auth/login";
+import type { ApiError } from "@shared/types/common/errors";
+import axios from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import axios from "axios";
 import refreshAccessToken from "./utils/refreshAccessToken";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-async function getUserTypeDetails(userType: string) {
+async function getUserTypeDetails(userType: UserType["name"]) {
   try {
     const response = await axios.get(
       `${BACKEND_SERVER}/user-types/${userType}`
@@ -18,9 +21,22 @@ async function getUserTypeDetails(userType: string) {
       };
     }
 
+    console.warn(`UserType details not found for: ${userType}, using guest defaults`);
     return { name: "guest", level: 4 };
   } catch (error) {
-    console.error("Error fetching user type details:", error);
+    // Log detailed error information for debugging
+    if (axios.isAxiosError(error)) {
+      console.error(`Error fetching user type details for ${userType}:`, {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+    } else {
+      console.error(`Unexpected error fetching user type details for ${userType}:`, error);
+    }
+    
+    // Return guest defaults as fallback
     return { name: "guest", level: 4 };
   }
 }
@@ -44,12 +60,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         try {
-          const response = await axios.post(`${BACKEND_SERVER}/auth/login`, {
-            email: credentials.email,
-            password: credentials.password,
-          });
+          const response = await axios.post<LoginPostResponse>(
+            `${BACKEND_SERVER}/auth/login`,
+            {
+              email: credentials.email,
+              password: credentials.password,
+            } as LoginPostRequest
+          );
 
-          if (response.data && response.data.accessToken) {
+          if (response.data?.accessToken) {
             const { user, accessToken, refreshToken, expiresIn } =
               response.data;
 
@@ -62,11 +81,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               expiresIn,
               userType: user.userType,
             };
-          } else {
-            throw new Error("Invalid credentials");
           }
-        } catch (error: any) {
-          throw new Error(error.message || "Authentication failed");
+          throw new Error("Invalid credentials");
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.data) {
+            const apiError = error.response.data as ApiError;
+            
+            // Map API error codes to user-friendly messages
+            const errorMessages: Record<string, string> = {
+              'AUTHENTICATION_ERROR': 'Invalid email or password',
+              'RATE_LIMIT_EXCEEDED': 'Too many login attempts. Please try again later.',
+              'VALIDATION_ERROR': 'Invalid input data',
+              'INTERNAL_SERVER_ERROR': 'Server error. Please try again later.',
+            };
+            
+            const message = errorMessages[apiError.code] || apiError.message || 'Login failed';
+            throw new Error(message);
+          }
+          
+          // Handle network or other errors
+          if (axios.isAxiosError(error)) {
+            if (error.code === 'ECONNABORTED') {
+              throw new Error('Request timeout. Please try again.');
+            }
+            if (!error.response) {
+              throw new Error('Network error. Please check your connection.');
+            }
+          }
+          
+          // Fallback for unknown errors
+          throw new Error('An unexpected error occurred. Please try again.');
         }
       },
     }),
@@ -82,6 +126,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.refreshToken = user.refreshToken;
           token.expiresIn = user.expiresIn; // Set expiration time
         }
+        
         if (Date.now() < (token.expiresIn as number)) {
           return token;
         }

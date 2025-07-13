@@ -1,9 +1,6 @@
-// Restaurant Types - Organized by endpoint/concern
-export * from './create';
-export * from './get';
-export * from './search';
-export * from './update';
-export * from './delete';
+// Restaurant Types - All restaurant-related request, response, and error types
+export * from './list';
+export * from './detail';
 
 // Food Catalogue Types
 export * from './food-catalogue'; 

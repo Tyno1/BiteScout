@@ -1,16 +1,16 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import Image from "next/image";
-import { Loader2 } from "lucide-react";
 
 import useFoodDataStore from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
 import { CapitalizeFirstCharacter } from "@/utils/typography";
 
 export default function FoodDetailPage() {
-  const { DetailedFoodData, error, getFoodDataById, isLoading } =
+  const { foodData, error, getFoodDataById, isLoading } =
     useFoodDataStore();
   const { restaurantData } = useRestaurantStore();
   const params = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ export default function FoodDetailPage() {
     if (id && restaurantData?._id) {
       getFoodDataById({ foodId: id, restaurantId: restaurantData._id });
     }
-  }, [id, restaurantData?._id]);
+  }, [id, restaurantData?._id, getFoodDataById]);
 
   if (isLoading) {
     return (
@@ -46,10 +46,10 @@ export default function FoodDetailPage() {
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-6xl font-bold text-primary">
-          {CapitalizeFirstCharacter(DetailedFoodData?.name || "")}
+          {CapitalizeFirstCharacter(foodData?.name || "")}
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          ID: {DetailedFoodData?._id}
+          ID: {foodData?._id}
         </p>
       </div>
 
@@ -57,11 +57,11 @@ export default function FoodDetailPage() {
         {/* Left – Image */}
         <div>
           {/* create component to display and navigate images and open each on on click */}
-          {DetailedFoodData?.images && DetailedFoodData?.images?.length > 0 ? (
+          {foodData?.images && foodData?.images?.length > 0 ? (
             <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden border shadow-sm">
               <Image
-                src={DetailedFoodData.images[0]}
-                alt={DetailedFoodData.name}
+                src={foodData.images[0]}
+                alt={foodData.name}
                 fill
                 className="object-cover"
               />
@@ -79,9 +79,9 @@ export default function FoodDetailPage() {
           <div>
             <h2 className="text-lg font-semibold text-gray-700 mb-1">Price</h2>
             <p className="text-2xl font-bold text-primary">
-              {DetailedFoodData?.price.amount.toLocaleString("en-GB", {
+              {foodData?.price.amount.toLocaleString("en-GB", {
                 style: "currency",
-                currency: DetailedFoodData?.price.currency,
+                currency: foodData?.price.currency,
               })}
             </p>
           </div>
@@ -92,8 +92,8 @@ export default function FoodDetailPage() {
               Ingredients
             </h2>
             <ul className="list-disc list-inside text-base text-gray-800">
-              {DetailedFoodData?.ingredients.map((ing, i) => (
-                <li key={i}>{ing}</li>
+              {foodData?.ingredients.map((ing: string, i: number) => (
+                <li key={ing}>{ing}</li>
               ))}
             </ul>
           </div>
@@ -105,10 +105,10 @@ export default function FoodDetailPage() {
                 Cuisine
               </h3>
               <p className="text-base font-medium text-gray-900">
-                {DetailedFoodData?.cuisineType.name}
+                {foodData?.cuisineType.name}
               </p>
               <p className="text-sm text-gray-500">
-                {DetailedFoodData?.cuisineType.description}
+                {foodData?.cuisineType.description}
               </p>
             </div>
             <div>
@@ -116,24 +116,24 @@ export default function FoodDetailPage() {
                 Course
               </h3>
               <p className="text-base font-medium text-gray-900">
-                {DetailedFoodData?.course.name}
+                {foodData?.course.name}
               </p>
               <p className="text-sm text-gray-500">
-                {DetailedFoodData?.course.description}
+                {foodData?.course.description}
               </p>
             </div>
           </div>
 
           {/* Allergens */}
-          {DetailedFoodData?.allergens &&
-            DetailedFoodData?.allergens?.length > 0 && (
+          {foodData?.allergens &&
+            foodData?.allergens?.length > 0 && (
               <div>
                 <h2 className="text-lg font-semibold text-gray-700 mb-2">
                   Allergens
                 </h2>
                 <ul className="list-disc list-inside text-base text-gray-800">
-                  {DetailedFoodData.allergens.map((al, i) => (
-                    <li key={i}>{al.name}</li>
+                  {foodData.allergens.map((al) => (
+                    <li key={al._id}>{al.name}</li>
                   ))}
                 </ul>
               </div>

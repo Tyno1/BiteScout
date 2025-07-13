@@ -6,17 +6,19 @@ This directory contains all shared TypeScript types generated from the OpenAPI s
 
 ```
 types/
-├── generated.ts              # Auto-generated types from OpenAPI spec
+├── api.ts                   # Auto-generated types from OpenAPI spec
 ├── api/
-│   ├── paths.ts             # Request/response types by endpoint
 │   └── schemas.ts           # Schema types
 ├── auth/                    # Authentication types
-│   ├── register.ts          # Register request, response, errors
-│   ├── login.ts             # Login request, response, errors
-│   ├── refresh.ts           # Refresh token request, response, errors
+│   ├── register/            # Register endpoint types
+│   ├── login/               # Login endpoint types
+│   ├── refresh/             # Refresh token endpoint types
 │   └── index.ts
 ├── user/                    # User management types
-│   ├── update.ts            # User update request, response, errors
+│   ├── profile/             # User profile endpoint types
+│   └── index.ts
+├── userType/                # User type management types
+│   ├── types/               # User type endpoint types
 │   └── index.ts
 ├── restaurant/              # Restaurant management types
 │   ├── create.ts            # Restaurant creation
@@ -24,12 +26,32 @@ types/
 │   ├── search.ts            # Restaurant search
 │   ├── update.ts            # Restaurant updates
 │   ├── delete.ts            # Restaurant deletion
+│   ├── list/                # Restaurant list endpoint types
+│   ├── detail/              # Restaurant detail endpoint types
 │   ├── food-catalogue/      # Food catalogue types
 │   │   ├── create.ts        # Food item creation
 │   │   ├── get.ts           # Food item retrieval
 │   │   ├── update.ts        # Food item updates
 │   │   ├── delete.ts        # Food item deletion
 │   │   └── index.ts
+│   └── index.ts
+├── allergens/               # Allergen management types
+│   ├── get.ts               # Allergen retrieval
+│   ├── create.ts            # Allergen creation
+│   ├── update.ts            # Allergen updates
+│   ├── delete.ts            # Allergen deletion
+│   └── index.ts
+├── courses/                 # Course management types
+│   ├── get.ts               # Course retrieval
+│   ├── create.ts            # Course creation
+│   ├── update.ts            # Course updates
+│   ├── delete.ts            # Course deletion
+│   └── index.ts
+├── cuisines/                # Cuisine management types
+│   ├── get.ts               # Cuisine retrieval
+│   ├── create.ts            # Cuisine creation
+│   ├── update.ts            # Cuisine updates
+│   ├── delete.ts            # Cuisine deletion
 │   └── index.ts
 ├── access/                  # Restaurant access types
 │   ├── request.ts           # Access requests
@@ -51,13 +73,22 @@ Each concern (like `register`, `login`, etc.) groups all related types together:
 
 ```typescript
 // Import all auth types
-import { RegisterRequest, RegisterResponse, RegisterError400 } from '@shared/types/auth';
+import { RegisterPostRequest, RegisterPostResponse } from '@shared/types/auth';
 
 // Import specific restaurant types
 import { CreateRestaurantRequest, CreateRestaurantResponse } from '@shared/types/restaurant';
 
 // Import food catalogue types
 import { CreateFoodCatalogueRequest, CreateFoodCatalogueResponse } from '@shared/types/restaurant/food-catalogue';
+
+// Import allergen types
+import { GetAllAllergensResponse, CreateAllergenRequest } from '@shared/types/allergens';
+
+// Import course types
+import { GetAllCoursesResponse, UpdateCourseRequest } from '@shared/types/courses';
+
+// Import cuisine types
+import { GetAllCuisinesResponse, DeleteCuisineRequest } from '@shared/types/cuisines';
 ```
 
 ## Organization Principle

@@ -10,12 +10,17 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "..",  // Changed from "./src" to ".."
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
     "types": ["node", "express"],
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "baseUrl": "..",  // Changed from "." to ".."
+    "paths": {
+      "@shared/*": ["shared/*"],  // Updated path
+      "@shared/types/*": ["shared/types/*"]  // Updated path
+    }
   },
   "ts-node": {
     "esm": true,
@@ -24,8 +29,12 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "../shared/**/*.ts"  // Added shared types
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules", 
+    "dist",
+    "../frontend/**/*"  // Exclude frontend files
+  ]
 }
-

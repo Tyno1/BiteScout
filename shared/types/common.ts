@@ -1,30 +1,39 @@
-// Common types used across all projects
+// Common types used across the application
 
-export interface BaseEntity {
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Currency type for price fields
+export type Currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY" | "CNY" | "KRW" | "MYR" | "TWD" | "VND" | "THB" | "ZAR";
 
+// Pagination types
 export interface PaginationParams {
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
-    currentPage: number;
+    page: number;
+    limit: number;
+    total: number;
     totalPages: number;
-    totalItems: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
+    hasNext: boolean;
+    hasPrev: boolean;
   };
 }
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
+// Filter types
+export interface BaseFilters {
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+// Error types
+export interface ApiError {
+  message: string;
   error?: string;
-  message?: string;
+  statusCode?: number;
+  timestamp?: string;
 } 
