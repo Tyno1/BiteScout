@@ -46,24 +46,7 @@ export function RestaurantProfileHero({
               displayData.name
             )}
           </h1>
-          <p className="text-white" role="contentinfo">
-            {isEditing ? (
-              <Input
-                outlineType={isEditing ? "round" : "none"}
-                type="text"
-                name="restaurant-description"
-                label="Restaurant description"
-                disabled={!isEditing}
-                value={displayData.description}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                placeholder="Add description here"
-              />
-            ) : (
-              displayData.description
-            )}
-          </p>
+         
         </div>
         <div className="flex gap-2" role="toolbar" aria-label="Profile actions">
           {isEditing ? (

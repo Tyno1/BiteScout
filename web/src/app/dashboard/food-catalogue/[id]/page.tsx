@@ -45,7 +45,8 @@ export default function FoodDetailPage() {
     );
   }
 
-  if (error || !foodData) {
+  // Show error only if there's an actual error and we're not loading
+  if (error && !isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="text-center">
@@ -53,6 +54,30 @@ export default function FoodDetailPage() {
             Error loading food data
           </h1>
           <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not found state if no food data and not loading
+  if (!foodData || foodData._id === "") {
+    return (
+      <div className="max-w-6xl mx-auto px-6 py-10">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-600">
+            Food item not found
+          </h1>
+          <p className="text-gray-500 mt-2">
+            The food item you're looking for doesn't exist or has been removed.
+          </p>
+          <div className="mt-6">
+            <a 
+              href="/dashboard/food-catalogue" 
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              ← Back to Food Catalogue
+            </a>
+          </div>
         </div>
       </div>
     );

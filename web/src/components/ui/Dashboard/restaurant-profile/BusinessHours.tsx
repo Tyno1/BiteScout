@@ -1,5 +1,7 @@
 import { Input } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 import type{ BusinessHour } from "@shared/types/api/schemas";
+import { Clock, Info, Sparkles } from "lucide-react";
 
 type BusinessHourPops = {
   businessHours: BusinessHour[];
@@ -13,15 +15,35 @@ export function BusinessHours({
   handleBusinessHoursChange,
 }: BusinessHourPops) {
   return (
-    <section
-      className="bg-white rounded-lg border-1 border-gray-100 p-6"
+    <Card
+      Component="section"
+      padding="lg"
+      header={
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-gray-600" />
+            <h2 id="hours-heading" className="text-lg font-semibold">
+              Business Hours
+            </h2>
+          </div>
+          {isEditing && (
+            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
+              <Sparkles className="w-4 h-4" />
+              <span>
+                <strong>Important:</strong> Set accurate business hours so customers know when you're open and can plan their visits!
+              </span>
+            </div>
+          )}
+        </div>
+      }
       aria-labelledby="hours-heading"
     >
-      <div className="mb-4">
-        <h2 id="hours-heading" className="text-lg font-semibold">
-          Business Hours
-        </h2>
-      </div>
+      {isEditing && (
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
+          <Info className="w-4 h-4" />
+          <span>Set your opening and closing times for each day. Check "Closed" if you don't operate on that day.</span>
+        </div>
+      )}
       <table className="w-full border-collapse" aria-label="Business hours">
         <thead>
           <tr className="border-b border-gray-200">
@@ -94,6 +116,6 @@ export function BusinessHours({
           ))}
         </tbody>
       </table>
-    </section>
+    </Card>
   );
 }

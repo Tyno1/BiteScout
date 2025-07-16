@@ -1,19 +1,16 @@
-import type { components } from './api';
+// Re-export types from the centralized enums file
+export type { AccessRoles } from './api/enums';
+export { AccessRoleEnum, AccessStatusEnum } from './api/enums';
 
-// Extract the union types from generated schemas
-export type AccessStatusEnum = components['schemas']['RestaurantAccess']['status'];
-export type AccessRoleEnum = components['schemas']['RestaurantAccess']['role'];
-export type UserTypeEnum = components['schemas']['UserType']['name'];
-
-// Create enum objects for runtime usage
-export const AccessStatus = {
+// For backward compatibility, re-export the enum values with different names
+export const AccessStatusValues = {
   Pending: 'pending' as const,
   Approved: 'approved' as const,
   Suspended: 'suspended' as const,
   Innactive: 'innactive' as const,
 } as const;
 
-export const AccessRole = {
+export const AccessRoleValues = {
   Guest: 'guest' as const,
   User: 'user' as const,
   Moderator: 'moderator' as const,
@@ -21,20 +18,6 @@ export const AccessRole = {
   Root: 'root' as const,
 } as const;
 
-export const UserType = {
-  Guest: 'guest' as const,
-  User: 'user' as const,
-  Moderator: 'moderator' as const,
-  Admin: 'admin' as const,
-  Root: 'root' as const,
-} as const;
-
-// Type assertions to ensure the enum objects match the generated types
-export type AccessStatusValues = typeof AccessStatus[keyof typeof AccessStatus];
-export type AccessRoleValues = typeof AccessRole[keyof typeof AccessRole];
-export type UserTypeValues = typeof UserType[keyof typeof UserType];
-
-// Verify that our enum values match the generated types
-type _AssertAccessStatus = AccessStatusValues extends AccessStatusEnum ? true : never;
-type _AssertAccessRole = AccessRoleValues extends AccessRoleEnum ? true : never;
-type _AssertUserType = UserTypeValues extends UserTypeEnum ? true : never; 
+// Type aliases for backward compatibility
+export type AccessStatusValuesType = typeof AccessStatusValues[keyof typeof AccessStatusValues];
+export type AccessRoleValuesType = typeof AccessRoleValues[keyof typeof AccessRoleValues]; 

@@ -82,13 +82,7 @@ export const getFoodCatalogueByRestaurantId = async (
       .populate("allergens")
       .populate("images");
 
-    if (!result || result.length === 0) {
-      return next(
-        createError(ErrorCodes.NOT_FOUND, "No food catalogue items found")
-      );
-    }
-
-    res.status(200).json(result);
+    res.status(200).json(result || []);
   } catch (error) {
     return next(error);
   }
@@ -106,7 +100,9 @@ export const createFoodCatalogue = async (
       return next(createError(ErrorCodes.BAD_REQUEST, "Invalid request body"));
     }
 
-    const newFoodItem = await FoodCatalogue.create(body);
+    		// Remove _id from body to prevent validation errors
+		const { _id, ...foodData } = body;
+		const newFoodItem = await FoodCatalogue.create(foodData);
 
     if (!newFoodItem) {
       return next(

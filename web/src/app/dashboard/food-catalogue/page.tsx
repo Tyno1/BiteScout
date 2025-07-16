@@ -185,7 +185,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     router.push(`food-catalogue/${id}`);
   };
 
-
   useEffect(() => {
     getCuisines();
     getCourses();
@@ -209,49 +208,96 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
-        <Button
-          variant="solid"
-          text="Add New Item"
-          onClick={() => setIsModalOpen(true)}
-        />
+        {foodDatas && foodDatas.length > 0 ? (
+          <Button
+            variant="solid"
+            text="Add New Item"
+            onClick={() => setIsModalOpen(true)}
+          />
+        ) : null}
       </div>
 
-      {/* Loading Messages */}
-      {isLoading && (
-        <div className="text-blue-500 mb-4">Loading food data...</div>
-      )}
-      {allergenLoading && (
-        <div className="text-blue-500 mb-4">Loading allergens...</div>
-      )}
-      {cuisineLoading && (
-        <div className="text-blue-500 mb-4">Loading cuisines...</div>
-      )}
-      {courseLoading && (
-        <div className="text-blue-500 mb-4">Loading courses...</div>
-      )}
+      {/* Initial Loading State - Show only one loading message */}
+      {(isLoading || allergenLoading || cuisineLoading || courseLoading) &&
+        !foodDatas && (
+          <div className="text-center py-8">
+            <div className="inline-flex items-center space-x-2 text-blue-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+              <span>Setting up your food catalogue...</span>
+            </div>
+          </div>
+        )}
 
-      {/* Error Messages */}
-      {error && (
-        <div className="text-red-500 mb-4">Food Data Error: {error}</div>
-      )}
-      {allergenError && (
-        <div className="text-red-500 mb-4">
-          Allergens Error: {allergenError}
+      {/* Error State - Only show critical errors */}
+      {(error || allergenError || cuisineError || courseError) && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Setup Issue</h3>
+              <div className="mt-2 text-sm text-red-700">
+                {error && <p>Food data: {error}</p>}
+                {allergenError && <p>Allergens: {allergenError}</p>}
+                {cuisineError && <p>Cuisines: {cuisineError}</p>}
+                {courseError && <p>Courses: {courseError}</p>}
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-      {cuisineError && (
-        <div className="text-red-500 mb-4">Cuisines Error: {cuisineError}</div>
-      )}
-      {courseError && (
-        <div className="text-red-500 mb-4">Courses Error: {courseError}</div>
       )}
 
       {/* Food Catalogue Table */}
       {foodDatas && foodDatas.length > 0 ? (
         <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
-      ) : !isLoading ? (
-        <div className="text-center py-8 text-gray-500">
-          No food items found. Add some food items to get started.
+      ) : !isLoading &&
+        !allergenLoading &&
+        !cuisineLoading &&
+        !courseLoading ? (
+        <div className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <div className="mb-6">
+              <svg
+                className="mx-auto h-16 w-16 text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Welcome to your Food Catalogue!
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Start building your menu by adding your first food item. You can
+              include ingredients, allergens, pricing, and images.
+            </p>
+            <Button
+              variant="solid"
+              text="Add Your First Food Item"
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center"
+            />
+          </div>
         </div>
       ) : null}
 

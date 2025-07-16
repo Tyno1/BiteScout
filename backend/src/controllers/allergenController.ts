@@ -65,7 +65,9 @@ export const createAllergens = async (
 ) => {
   try {
     const body = req.body;
-    const allergen = await Allergen.create(body);
+    	// Remove _id from body to prevent validation errors
+	const { _id, ...allergenData } = body;
+	const allergen = await Allergen.create(allergenData);
 
     if (!allergen) {
       return next(

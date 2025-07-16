@@ -66,7 +66,9 @@ export const createCourse = async (
     if (!body) {
       return next(createError(ErrorCodes.BAD_REQUEST, "Course data is required"));
     }
-    const course = await Course.create(body);
+    	// Remove _id from body to prevent validation errors
+	const { _id, ...courseData } = body;
+	const course = await Course.create(courseData);
     if (!course) {
       return next(createError(ErrorCodes.BAD_REQUEST, "Failed to create course"));
     }

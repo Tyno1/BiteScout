@@ -2,9 +2,11 @@
 
 import { useApprovedAccess } from "@/app/hooks/useApprovedAccess";
 import { useRole } from "@/app/hooks/useRole";
+import { DEFAULT_BUSINESS_HOURS } from "@/app/onboarding/constants";
 import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/BasicInformation";
 import { BusinessHours } from "@/components/ui/dashboard/restaurant-profile/BusinessHours";
 import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile/ContactInformation";
+import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
 import useCuisineStore from "@/stores/cuisineStore";
@@ -13,21 +15,18 @@ import { getMediaUrl } from "@/utils/mediaUtils";
 import type {
   BusinessHour,
   Cuisine,
+  DeliveryLink,
   Restaurant,
-  RestaurantFeature,
 } from "@shared/types/api/schemas";
+
+// RestaurantFeature is a union type of all possible restaurant features
+type RestaurantFeature = NonNullable<Restaurant["features"]>[number];
+
+
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
-const DEFAULT_BUSINESS_HOURS: BusinessHour[] = [
-  { day: "Monday", open: "09:00", close: "17:00", closed: false },
-  { day: "Tuesday", open: "09:00", close: "17:00", closed: false },
-  { day: "Wednesday", open: "09:00", close: "17:00", closed: false },
-  { day: "Thursday", open: "09:00", close: "17:00", closed: false },
-  { day: "Friday", open: "09:00", close: "17:00", closed: false },
-  { day: "Saturday", open: "09:00", close: "17:00", closed: false },
-  { day: "Sunday", open: "09:00", close: "17:00", closed: false },
-];
 
 export default function RestaurantProfile() {
   const { data: session } = useSession();
@@ -43,15 +42,18 @@ export default function RestaurantProfile() {
     getRestaurantByOwnerId,
     getRestaurantById,
     updateRestaurant,
+    getDeliveryLinks,
+    addDeliveryLink,
+    deleteDeliveryLink,
+    isLoading: deliveryLinksLoading,
   } = useRestaurantStore();
   const { cuisines, getCuisines } = useCuisineStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
-  const [businessHours, setBusinessHours] = useState<BusinessHour[]>(
-    DEFAULT_BUSINESS_HOURS
-  );
+
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
+  const [deliveryLinks, setDeliveryLinks] = useState<DeliveryLink[]>([]);
 
   // Get the display data (either editable or current)
   const displayData = editableData || restaurantData;
@@ -74,10 +76,7 @@ export default function RestaurantProfile() {
       : DEFAULT_BUSINESS_HOURS;
   }, [restaurantData?.businessHours]);
 
-  // Update business hours when displayData changes
-  useEffect(() => {
-    setBusinessHours(mergedBusinessHours);
-  }, [mergedBusinessHours]);
+
 
   const handleImageUpload = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,10 +114,10 @@ export default function RestaurantProfile() {
 
     setEditableData({
       ...restaurantData,
-      businessHours: businessHours,
+      businessHours: mergedBusinessHours,
     });
     setIsEditing(true);
-  }, [restaurantData, businessHours]);
+  }, [restaurantData, mergedBusinessHours]);
 
   const handleCancel = useCallback(() => {
     setIsEditing(false);
@@ -165,6 +164,47 @@ export default function RestaurantProfile() {
       };
     });
   }, []); // No dependencies needed
+
+  // Delivery links handlers
+  const loadDeliveryLinks = useCallback(async () => {
+    const currentRestaurantId = restaurantId || displayData?._id || "";
+    if (!currentRestaurantId) return;
+    try {
+      const links = await getDeliveryLinks(currentRestaurantId);
+      setDeliveryLinks(links);
+    } catch (error) {
+      toast.error("Failed to load delivery links");
+    }
+  }, [restaurantId, displayData?._id, getDeliveryLinks]);
+
+  const handleAddDeliveryLink = useCallback(async (data: Partial<DeliveryLink>) => {
+    const currentRestaurantId = restaurantId || displayData?._id || "";
+    if (!currentRestaurantId) return;
+    try {
+      await addDeliveryLink(currentRestaurantId, data);
+      await loadDeliveryLinks();
+      toast.success("Delivery link added");
+    } catch (error) {
+      toast.error("Failed to add delivery link");
+    }
+  }, [restaurantId, displayData?._id, addDeliveryLink, loadDeliveryLinks]);
+
+  const handleDeleteDeliveryLink = useCallback(async (id: string) => {
+    const currentRestaurantId = restaurantId || displayData?._id || "";
+    if (!currentRestaurantId) return;
+    try {
+      await deleteDeliveryLink(currentRestaurantId, id);
+      await loadDeliveryLinks();
+      toast.success("Delivery link removed");
+    } catch (error) {
+      toast.error("Failed to remove delivery link");
+    }
+  }, [restaurantId, displayData?._id, deleteDeliveryLink, loadDeliveryLinks]);
+
+  // Load delivery links when restaurant changes
+  useEffect(() => {
+    loadDeliveryLinks();
+  }, [loadDeliveryLinks]);
 
   console.log(restaurantData);
 
@@ -304,8 +344,8 @@ export default function RestaurantProfile() {
         <BusinessHours
           businessHours={
             isEditing
-              ? editableData?.businessHours || businessHours
-              : businessHours
+              ? editableData?.businessHours || mergedBusinessHours
+              : mergedBusinessHours
           }
           isEditing={isEditing}
           handleBusinessHoursChange={handleBusinessHoursChange}
@@ -320,6 +360,15 @@ export default function RestaurantProfile() {
           handleInputChange={handleInputChange}
         />
 
+         <DeliveryLinks
+          isEditing={isEditing}
+          restaurantId={restaurantId || displayData?._id || ""}
+          links={deliveryLinks}
+          isLoading={deliveryLinksLoading}
+          onAdd={handleAddDeliveryLink}
+          onDelete={handleDeleteDeliveryLink}
+        />
+
         {/* Status Messages for Screen Readers */}
         <div className="sr-only" aria-live="polite">
           {isEditing
@@ -327,6 +376,22 @@ export default function RestaurantProfile() {
             : "View mode. Click the edit button to make changes."}
         </div>
       </div>
+
+      {/* Floating Mode Indicator */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm ${
+          isEditing 
+            ? "bg-primary/90 text-white" 
+            : "bg-gray-100/80 text-gray-600"
+        }`}>
+          <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+            isEditing ? "bg-white" : "bg-gray-500"
+          }`}></div>
+          {isEditing ? "Edit" : "View"}
+        </div>
+      </div>
+
+    
     </main>
   );
 }

@@ -1,133 +1,125 @@
-import type {
-	DeleteRestaurantAccessRequest,
-	DeleteRestaurantAccessResponse,
-	GetRestaurantAccessByOwnerRequest,
-	GetRestaurantAccessByOwnerResponse,
-	GetRestaurantAccessByUserRequest,
-	GetRestaurantAccessByUserResponse,
-	GrantRestaurantAccessRequest,
-	GrantRestaurantAccessResponse,
-	RequestRestaurantAccessRequest,
-	RequestRestaurantAccessResponse,
-	SuspendRestaurantAccessRequest,
-	SuspendRestaurantAccessResponse,
-	UpdateRestaurantAccessRequest,
-	UpdateRestaurantAccessResponse,
-} from "@shared/types/access";
-import type { RestaurantAccess as RestaurantAccessType } from "@shared/types/api/schemas.js";
-import type { ApiError } from "@shared/types/common/errors.js";
 import type { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
+import type {
+  DeleteRestaurantAccessRequest,
+  DeleteRestaurantAccessResponse,
+  GetRestaurantAccessByOwnerRequest,
+  GetRestaurantAccessByOwnerResponse,
+  GetRestaurantAccessByUserRequest,
+  GetRestaurantAccessByUserResponse,
+  GrantRestaurantAccessRequest,
+  GrantRestaurantAccessResponse,
+  RequestRestaurantAccessRequest,
+  RequestRestaurantAccessResponse,
+  SuspendRestaurantAccessRequest,
+  SuspendRestaurantAccessResponse,
+  UpdateRestaurantAccessRequest,
+  UpdateRestaurantAccessResponse,
+} from "../../../shared/types/access/index.js";
+import * as enums from "../../../shared/types/api/enums.js";
+const { AccessRoleEnum, AccessStatusEnum } = enums;
+import type { AccessRoles } from "../../../shared/types/api/enums.js";
+import type {
+  RestaurantAccess as RestaurantAccessType,
+} from "../../../shared/types/api/schemas.js";
+import type { ApiError } from "../../../shared/types/common/errors.js";
 import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import RestaurantAccess from "../models/RestaurantAccess.js";
 import RestaurantData from "../models/RestaurantData.js";
 import User from "../models/User.js";
 import { createAndSendNotification } from "../services/notificationService.js";
 
-type AccessRole = RestaurantAccessType["role"];
-type AccessStatus = RestaurantAccessType["status"];
 
-export const AccessStatusEnum: Record<string, AccessStatus> = {
-	Pending: "pending" as const,
-	Approved: "approved" as const,
-	Suspended: "suspended" as const,
-	Innactive: "innactive" as const,
-} as const;
 
-export const AccessRoleEnum: Record<string, AccessRole> = {
-	Guest: "guest" as const,
-	User: "user" as const,
-	Moderator: "moderator" as const,
-	Admin: "admin" as const,
-	Root: "root" as const,
-} as const;
+
 
 // Combined response types for each endpoint
 type RequestRestaurantAccessApiResponse =
-	| RequestRestaurantAccessResponse
-	| ApiError;
+  | RequestRestaurantAccessResponse
+  | ApiError;
 type GetRestaurantAccessByUserApiResponse =
-	| GetRestaurantAccessByUserResponse
-	| ApiError;
+  | GetRestaurantAccessByUserResponse
+  | ApiError;
 type GetRestaurantAccessByOwnerApiResponse =
-	| GetRestaurantAccessByOwnerResponse
-	| ApiError;
+  | GetRestaurantAccessByOwnerResponse
+  | ApiError;
 type GrantRestaurantAccessApiResponse =
-	| GrantRestaurantAccessResponse
-	| ApiError;
+  | GrantRestaurantAccessResponse
+  | ApiError;
 type SuspendRestaurantAccessApiResponse =
-	| SuspendRestaurantAccessResponse
-	| ApiError;
+  | SuspendRestaurantAccessResponse
+  | ApiError;
 type DeleteRestaurantAccessApiResponse =
-	| DeleteRestaurantAccessResponse
-	| ApiError;
+  | DeleteRestaurantAccessResponse
+  | ApiError;
 type UpdateRestaurantAccessApiResponse =
-	| UpdateRestaurantAccessResponse
-	| ApiError;
+  | UpdateRestaurantAccessResponse
+  | ApiError;
 
 /**
  * Notifies the owner of a restaurant about a new access request.
  */
 const notifyRestaurantOwner = async (
-	req: Request,
-	restaurantId: string,
-	userId: string,
-	newRestaurantAccess: RestaurantAccessType,
+  req: Request,
+  restaurantId: string,
+  userId: string,
+  newRestaurantAccess: RestaurantAccessType
 ) => {
-	const restaurant = await RestaurantData.findById(restaurantId);
-	if (!restaurant) {
-		return { error: "Restaurant not found", status: 404 };
-	}
+  const restaurant = await RestaurantData.findById(restaurantId);
+  if (!restaurant) {
+    return { error: "Restaurant not found", status: 404 };
+  }
 
-	if (restaurant?.ownerId) {
-		const io = req.app.get("io");
-		const connectedUsers = req.app.get("connectedUsers");
-		const ownerSocketId = connectedUsers.get(restaurant.ownerId.toString());
+  if (restaurant?.ownerId) {
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+    const ownerSocketId = connectedUsers.get(restaurant.ownerId.toString());
 
-		if (ownerSocketId) {
-			const requester = await User.findById(userId);
-			await createAndSendNotification(
-				io,
-				connectedUsers,
-				restaurant.ownerId.toString(),
-				{
-					type: "access-request",
-					data: {
-						accessId: newRestaurantAccess._id,
-						restaurantId: restaurant._id,
-						restaurantName: restaurant.name,
-						requesterName: requester?.name || "Unknown user",
-						requesterEmail: requester?.email || "",
-						requestTime: newRestaurantAccess.createdAt,
-					},
-				},
-			);
-		}
-	}
+    if (ownerSocketId) {
+      const requester = await User.findById(userId);
+      await createAndSendNotification(
+        io,
+        connectedUsers,
+        restaurant.ownerId.toString(),
+        {
+          type: "access-request",
+          data: {
+            accessId: newRestaurantAccess._id,
+            restaurantId: restaurant._id,
+            restaurantName: restaurant.name,
+            requesterName: requester?.name || "Unknown user",
+            requesterEmail: requester?.email || "",
+            requestTime: newRestaurantAccess.createdAt,
+          },
+        }
+      );
+    }
+  }
 
-	return null;
+  return null;
 };
 
 /**
  * Updates the user type of a user.
  */
 const updateUserUsertype = async (
-	usertype: AccessRole,
-	userId: string,
-	res: Response,
+  usertype: AccessRoles,
+  userId: string,
+  res: Response
 ) => {
-	const user = await User.findByIdAndUpdate(
-		userId,
-		{ userType: usertype?.toLowerCase() },
-		{ new: true },
-	);
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { userType: usertype?.toLowerCase() },
+    { new: true }
+  );
 
-	if (!user) {
-		return {
-			error: "User not found during access request process",
-			status: 404,
-		};
-	}
-	return { user };
+  if (!user) {
+    return {
+      error: "User not found during access request process",
+      status: 404,
+    };
+  }
+  return { user };
 };
 
 /**
@@ -137,151 +129,137 @@ const updateUserUsertype = async (
  * and sends a notification to the restaurant owner if the request is successful.
  */
 export const RequestAuthorization = async (
-	req: Request<
-		{ restaurantId: string },
-		unknown,
-		RequestRestaurantAccessRequest
-	>,
-	res: Response<RequestRestaurantAccessApiResponse>,
-	next: NextFunction,
+  req: Request<
+    { restaurantId: string },
+    unknown,
+    RequestRestaurantAccessRequest
+  >,
+  res: Response<RequestRestaurantAccessApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { restaurantId } = req.params;
-		const { userId } = req.body;
+  try {
+    const { restaurantId } = req.params;
+    const { userId } = req.body;
 
-		if (!userId || !restaurantId) {
-			return next(
-				createError(
-					ErrorCodes.BAD_REQUEST,
-					"User ID and Restaurant ID are required",
-				),
-			);
-		}
+    if (!userId || !restaurantId) {
+      return next(
+        createError(
+          ErrorCodes.BAD_REQUEST,
+          "User ID and Restaurant ID are required"
+        )
+      );
+    }
 
-		const existingUser = await RestaurantAccess.findOne({
-			userId,
-			restaurantId,
-		});
-		if (existingUser) {
-			return next(
-				createError(
-					ErrorCodes.CONFLICT,
-					"User already has access to this restaurant",
-				),
-			);
-		}
+    const existingUser = await RestaurantAccess.findOne({
+      userId,
+      restaurantId,
+    });
+    if (existingUser) {
+      return next(
+        createError(
+          ErrorCodes.CONFLICT,
+          "User already has access to this restaurant"
+        )
+      );
+    }
 
-		const newRestaurantAccess = await RestaurantAccess.create({
-			restaurantId,
-			userId,
-			role: AccessRoleEnum.User,
-			status: AccessStatusEnum.Pending,
-		});
+    const newRestaurantAccess = await RestaurantAccess.create({
+      restaurantId,
+      userId,
+      role: AccessRoleEnum.User,
+      status: AccessStatusEnum.Pending,
+    });
 
-		if (!newRestaurantAccess) {
-			return next(
-				createError(
-					ErrorCodes.INTERNAL_SERVER_ERROR,
-					"Failed to create user access request",
-				),
-			);
-		}
+    if (!newRestaurantAccess) {
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "Failed to create user access request"
+        )
+      );
+    }
 
-		const notificationError = await notifyRestaurantOwner(
-			req,
-			restaurantId,
-			userId,
-			newRestaurantAccess,
-		);
-		if (notificationError) {
-			return next(
-				createError(notificationError.status, notificationError.error),
-			);
-		}
+    const notificationError = await notifyRestaurantOwner(
+      req,
+      restaurantId,
+      userId,
+      newRestaurantAccess
+    );
+    if (notificationError) {
+      return next(
+        createError(notificationError.status, notificationError.error)
+      );
+    }
 
-		res.status(201).json({
-			message: "Authorization request sent successfully",
-			restaurantAccess: newRestaurantAccess,
-		});
-	} catch (error) {
-		return next(error);
-	}
+    res.status(201).json({
+      message: "Authorization request sent successfully",
+      restaurantAccess: newRestaurantAccess,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
  * Retrieves all restaurant access records for a specific user.
  */
 export const GetRestaurantAccessByUserId = async (
-	req: Request<GetRestaurantAccessByUserRequest>,
-	res: Response<GetRestaurantAccessByUserApiResponse>,
-	next: NextFunction,
+  req: Request<GetRestaurantAccessByUserRequest>,
+  res: Response<GetRestaurantAccessByUserApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { userId } = req.params;
+  try {
+    const { userId } = req.params;
 
-		if (!userId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "User ID is required"));
-		}
+    if (!userId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "User ID is required"));
+    }
 
-		const restaurantAccesses = await RestaurantAccess.find({ userId: userId });
+    const restaurantAccesses = await RestaurantAccess.find({ userId: userId });
 
-		if (!restaurantAccesses || restaurantAccesses.length === 0) {
-			return next(
-				createError(
-					ErrorCodes.NOT_FOUND,
-					"No restaurant access found for this user",
-				),
-			);
-		}
-
-		res.status(200).json({ restaurantAccesses });
-	} catch (error) {
-		return next(error);
-	}
+    // Return empty array instead of 404 error when no access records found
+    // This allows frontend to handle empty states gracefully
+    res.status(200).json({ restaurantAccesses: restaurantAccesses || [] });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
  * Retrieves all restaurant access records for a specific owner.
  */
 export const GetRestaurantAccessByOwnerId = async (
-	req: Request<GetRestaurantAccessByOwnerRequest>,
-	res: Response<GetRestaurantAccessByOwnerApiResponse>,
-	next: NextFunction,
+  req: Request<GetRestaurantAccessByOwnerRequest>,
+  res: Response<GetRestaurantAccessByOwnerApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { ownerId } = req.params;
+  try {
+    const { ownerId } = req.params;
 
-		if (!ownerId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Owner ID is required"));
-		}
+    if (!ownerId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Owner ID is required"));
+    }
 
-		const restaurant = await RestaurantData.findOne({ ownerId });
+    const restaurant = await RestaurantData.findOne({ ownerId: new mongoose.Types.ObjectId(ownerId) });
 
-		if (!restaurant) {
-			return next(
-				createError(ErrorCodes.NOT_FOUND, "No restaurant found for this owner"),
-			);
-		}
+    if (!restaurant) {
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "No restaurant found for this owner")
+      );
+    }
 
-		const restaurantAccesses = await RestaurantAccess.find({
-			restaurantId: restaurant._id,
-		})
-			.populate("userId")
-			.populate("restaurantId");
+    const restaurantAccesses = await RestaurantAccess.find({
+      restaurantId: restaurant._id,
+    })
+      .populate("userId")
+      .populate("restaurantId");
 
-		if (!restaurantAccesses || restaurantAccesses.length === 0) {
-			return next(
-				createError(
-					ErrorCodes.NOT_FOUND,
-					"No restaurant access found for this owner",
-				),
-			);
-		}
-
-		res.status(200).json({ restaurantAccesses });
-	} catch (error) {
-		return next(error);
-	}
+    // Return empty array instead of 404 error when no access records found
+    // This allows frontend to handle empty states gracefully
+    res.status(200).json({ restaurantAccesses: restaurantAccesses || [] });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
@@ -289,126 +267,126 @@ export const GetRestaurantAccessByOwnerId = async (
  * and updates the user's type to "moderator" upon granting access.
  */
 export const GrantAccess = async (
-	req: Request<GrantRestaurantAccessRequest>,
-	res: Response<GrantRestaurantAccessApiResponse>,
-	next: NextFunction,
+  req: Request<GrantRestaurantAccessRequest>,
+  res: Response<GrantRestaurantAccessApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { accessId } = req.params;
+  try {
+    const { accessId } = req.params;
 
-		if (!accessId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
-		}
+    if (!accessId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
+    }
 
-		const accessRecord = await RestaurantAccess.findByIdAndUpdate(
-			accessId,
-			{ status: AccessStatusEnum.Approved },
-			{ new: true },
-		);
+    const accessRecord = await RestaurantAccess.findByIdAndUpdate(
+      accessId,
+      { status: AccessStatusEnum.Approved },
+      { new: true }
+    );
 
-		if (!accessRecord) {
-			return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
-		}
+    if (!accessRecord) {
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
+    }
 
-		try {
-			const updatedUser = await updateUserUsertype(
-				AccessRoleEnum.Moderator,
-				accessRecord.userId.toString(),
-				res,
-			);
+    try {
+      const updatedUser = await updateUserUsertype(
+        AccessRoleEnum.Moderator,
+        accessRecord.userId.toString(),
+        res
+      );
 
-			if (updatedUser?.error) {
-				return next(createError(updatedUser.status, updatedUser.error));
-			}
-		} catch (error) {
-			return next(
-				createError(
-					ErrorCodes.INTERNAL_SERVER_ERROR,
-					"An error occurred while updating the user type",
-				),
-			);
-		}
+      if (updatedUser?.error) {
+        return next(createError(updatedUser.status, updatedUser.error));
+      }
+    } catch (error) {
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "An error occurred while updating the user type"
+        )
+      );
+    }
 
-		res.status(200).json({
-			message: "Access granted successfully",
-			accessRecord,
-		});
-	} catch (error) {
-		return next(error);
-	}
+    res.status(200).json({
+      message: "Access granted successfully",
+      accessRecord,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
  * Updates the role of a user in a specific restaurant.
  */
 export const UpdateRole = async (
-	req: Request<{ accessId: string }, unknown, UpdateRestaurantAccessRequest>,
-	res: Response<UpdateRestaurantAccessApiResponse>,
-	next: NextFunction,
+  req: Request<{ accessId: string }, unknown, UpdateRestaurantAccessRequest>,
+  res: Response<UpdateRestaurantAccessApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { accessId } = req.params;
-		const { role } = req.body;
+  try {
+    const { accessId } = req.params;
+    const { role } = req.body;
 
-		if (!accessId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
-		}
+    if (!accessId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
+    }
 
-		if (!role) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Role is required"));
-		}
+    if (!role) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Role is required"));
+    }
 
-		const accessRecord = await RestaurantAccess.findByIdAndUpdate(
-			accessId,
-			{ role },
-			{ new: true },
-		);
+    const accessRecord = await RestaurantAccess.findByIdAndUpdate(
+      accessId,
+      { role },
+      { new: true }
+    );
 
-		if (!accessRecord) {
-			return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
-		}
+    if (!accessRecord) {
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
+    }
 
-		res.status(200).json({
-			message: "Role updated successfully",
-			accessRecord,
-		});
-	} catch (error) {
-		return next(error);
-	}
+    res.status(200).json({
+      message: "Role updated successfully",
+      accessRecord,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
  * Suspends a user's access to a specific restaurant.
  */
 export const SuspendAccess = async (
-	req: Request<SuspendRestaurantAccessRequest>,
-	res: Response<SuspendRestaurantAccessApiResponse>,
-	next: NextFunction,
+  req: Request<SuspendRestaurantAccessRequest>,
+  res: Response<SuspendRestaurantAccessApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { accessId } = req.params;
+  try {
+    const { accessId } = req.params;
 
-		if (!accessId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
-		}
+    if (!accessId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
+    }
 
-		const accessRecord = await RestaurantAccess.findByIdAndUpdate(
-			accessId,
-			{ status: AccessStatusEnum.Suspended },
-			{ new: true },
-		);
+    const accessRecord = await RestaurantAccess.findByIdAndUpdate(
+      accessId,
+      { status: AccessStatusEnum.Suspended },
+      { new: true }
+    );
 
-		if (!accessRecord) {
-			return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
-		}
+    if (!accessRecord) {
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
+    }
 
-		res.status(200).json({
-			message: "Access Suspended Successfully",
-			accessRecord,
-		});
-	} catch (error) {
-		return next(error);
-	}
+    res.status(200).json({
+      message: "Access Suspended Successfully",
+      accessRecord,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 /**
@@ -416,51 +394,51 @@ export const SuspendAccess = async (
  * and updates the user's type to "guest" upon deletion.
  */
 export const DeleteAccess = async (
-	req: Request<DeleteRestaurantAccessRequest>,
-	res: Response<DeleteRestaurantAccessApiResponse>,
-	next: NextFunction,
+  req: Request<DeleteRestaurantAccessRequest>,
+  res: Response<DeleteRestaurantAccessApiResponse>,
+  next: NextFunction
 ) => {
-	try {
-		const { accessId } = req.params;
+  try {
+    const { accessId } = req.params;
 
-		if (!accessId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
-		}
+    if (!accessId) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
+    }
 
-		const accessRecord = await RestaurantAccess.findByIdAndUpdate(
-			accessId,
-			{ status: AccessStatusEnum.Innactive },
-			{ new: true },
-		);
+    const accessRecord = await RestaurantAccess.findByIdAndUpdate(
+      accessId,
+      { status: AccessStatusEnum.Innactive },
+      { new: true }
+    );
 
-		if (!accessRecord) {
-			return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
-		}
+    if (!accessRecord) {
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
+    }
 
-		try {
-			const updatedUser = await updateUserUsertype(
-				AccessRoleEnum.Guest,
-				accessRecord.userId.toString(),
-				res,
-			);
+    try {
+      const updatedUser = await updateUserUsertype(
+        AccessRoleEnum.Guest,
+        accessRecord.userId.toString(),
+        res
+      );
 
-			if (updatedUser?.error) {
-				return next(createError(updatedUser.status, updatedUser.error));
-			}
-		} catch (error) {
-			return next(
-				createError(
-					ErrorCodes.INTERNAL_SERVER_ERROR,
-					"An error occurred while updating the user type",
-				),
-			);
-		}
+      if (updatedUser?.error) {
+        return next(createError(updatedUser.status, updatedUser.error));
+      }
+    } catch (error) {
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "An error occurred while updating the user type"
+        )
+      );
+    }
 
-		res.status(200).json({
-			message: "Access deleted successfully",
-			accessRecord,
-		});
-	} catch (error) {
-		return next(error);
-	}
+    res.status(200).json({
+      message: "Access deleted successfully",
+      accessRecord,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };

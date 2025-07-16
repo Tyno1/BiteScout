@@ -46,7 +46,9 @@ export const createReview = async (
 			return;
 		}
 
-		const newReview = await Review.create(body);
+		// Remove _id from body to prevent validation errors
+		const { _id, ...reviewData } = body;
+		const newReview = await Review.create(reviewData);
 
 		if (!newReview) {
 			res.status(400).json({ error: "Could not create review" });

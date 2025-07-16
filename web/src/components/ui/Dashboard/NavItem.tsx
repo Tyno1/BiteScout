@@ -30,17 +30,17 @@ export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
         }}
         className={`
           flex items-center 
-          px-2 py-4
+          px-2 py-3
           transition-colors w-full
           focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:ring-rounded-lg
           ${
             isActive
-              ? "bg-primary border-1 border-primary text-white rounded-lg"
+              ? "bg-primary/10 border-1 border-primary text-primary rounded-lg"
               : "hover:bg-primary/20 text-gray-900 rounded-lg"
           }
         `}
       >
-        <span className="mr-4 w-5 h-5">{icon}</span>
+        <span className="mr-4 w-4 h-4">{icon}</span>
         <span className="text-sm font-medium">{text}</span>
       </button>
     </li>

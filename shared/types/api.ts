@@ -309,6 +309,63 @@ export interface paths {
       };
     };
   };
+  "/api/restaurants/filter": {
+    /** Filter restaurants by various criteria including feature categories */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Restaurant name to search for */
+          name?: string;
+          /** @description Cuisine type to filter by */
+          cuisine?: string;
+          /** @description Price range to filter by */
+          priceRange?: "$" | "$$" | "$$$" | "$$$$";
+          /** @description Comma-separated list of specific features to filter by */
+          features?: string;
+          /** @description Comma-separated list of feature categories to filter by */
+          featureCategories?: string;
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of results per page */
+          limit?: number;
+        };
+      };
+      responses: {
+        /** @description List of filtered restaurants */
+        200: {
+          content: {
+            "application/json": {
+              restaurants?: components["schemas"]["Restaurant"][];
+              pagination?: {
+                /** @example 1 */
+                currentPage?: number;
+                /** @example 5 */
+                totalPages?: number;
+                /** @example 50 */
+                totalRestaurants?: number;
+                /** @example true */
+                hasNextPage?: boolean;
+                /** @example false */
+                hasPrevPage?: boolean;
+              };
+              filters?: {
+                /** @description Currently applied filters */
+                applied?: Record<string, never>;
+                /** @description Available filter options */
+                available?: Record<string, never>;
+              };
+            };
+          };
+        };
+        /** @description Invalid filter parameters */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
   "/api/restaurants/{id}": {
     /** Get restaurant by ID */
     get: {
@@ -358,6 +415,164 @@ export interface paths {
         /** @description Restaurant deleted */
         204: {
           content: never;
+        };
+      };
+    };
+  };
+  "/api/restaurants/{id}/delivery-links": {
+    /** Get delivery links for a restaurant */
+    get: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+        };
+      };
+      responses: {
+        /** @description List of delivery links */
+        200: {
+          content: {
+            "application/json": components["schemas"]["DeliveryLink"][];
+          };
+        };
+        /** @description Restaurant not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /** Add a delivery link to a restaurant */
+    post: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description Display name for the delivery link
+             * @example Uber Eats
+             */
+            name: string;
+            /**
+             * Format: uri
+             * @description URL to the delivery service
+             * @example https://ubereats.com/restaurant/123
+             */
+            url: string;
+            /**
+             * @description Delivery platform name
+             * @example Uber Eats
+             * @enum {string}
+             */
+            platform: "Uber Eats" | "DoorDash" | "Grubhub" | "Postmates" | "Instacart" | "Amazon Fresh" | "Walmart Grocery" | "Shipt" | "Custom" | "Other";
+            /**
+             * @description Whether this delivery link is active
+             * @default true
+             */
+            isActive?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Delivery link created */
+        201: {
+          content: {
+            "application/json": components["schemas"]["DeliveryLink"];
+          };
+        };
+        /** @description Invalid input */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Restaurant not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/restaurants/{id}/delivery-links/{linkId}": {
+    /** Update a delivery link */
+    put: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+          /** @description Delivery link ID */
+          linkId: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description Display name for the delivery link */
+            name?: string;
+            /**
+             * Format: uri
+             * @description URL to the delivery service
+             */
+            url?: string;
+            /**
+             * @description Delivery platform name
+             * @enum {string}
+             */
+            platform?: "Uber Eats" | "DoorDash" | "Grubhub" | "Postmates" | "Instacart" | "Amazon Fresh" | "Walmart Grocery" | "Shipt" | "Custom" | "Other";
+            /** @description Whether this delivery link is active */
+            isActive?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Delivery link updated */
+        200: {
+          content: {
+            "application/json": components["schemas"]["DeliveryLink"];
+          };
+        };
+        /** @description Invalid input */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Restaurant or delivery link not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /** Delete a delivery link */
+    delete: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+          /** @description Delivery link ID */
+          linkId: string;
+        };
+      };
+      responses: {
+        /** @description Delivery link deleted */
+        204: {
+          content: never;
+        };
+        /** @description Restaurant or delivery link not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
         };
       };
     };
@@ -427,7 +642,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description List of food catalogue items */
+        /** @description List of food catalogue items (empty array if no items found) */
         200: {
           content: {
             "application/json": components["schemas"]["FoodCatalogue"][];
@@ -552,7 +767,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description List of restaurant access for user */
+        /** @description List of restaurant access for user (empty array if no access records found) */
         200: {
           content: {
             "application/json": {
@@ -572,7 +787,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description List of restaurant access for owner */
+        /** @description List of restaurant access for owner (empty array if no access records found) */
         200: {
           content: {
             "application/json": {
@@ -1643,45 +1858,23 @@ export interface paths {
   "/api/media/{id}/verify": {
     /**
      * Verify media
-     * @description Verify or unverify a media item (admin/moderator only)
+     * @description Mark media as verified by moderators
      */
-    post: {
+    patch: {
       parameters: {
         path: {
-          /** @description The ID of the media to verify */
           id: string;
         };
       };
-      requestBody: {
-        content: {
-          "application/json": {
-            /**
-             * @description Whether to verify or unverify the media
-             * @example true
-             */
-            verified: boolean;
-          };
-        };
-      };
       responses: {
-        /** @description Media verification status updated successfully */
+        /** @description Media verified successfully */
         200: {
           content: {
-            "application/json": {
-              media?: components["schemas"]["Media"];
-              /** @example Media verified successfully */
-              message?: string;
-            };
+            "application/json": components["schemas"]["Media"];
           };
         };
-        /** @description User not authenticated */
-        401: {
-          content: {
-            "application/json": components["schemas"]["ErrorResponse"];
-          };
-        };
-        /** @description Not authorized to verify media */
-        403: {
+        /** @description Invalid request */
+        400: {
           content: {
             "application/json": components["schemas"]["ErrorResponse"];
           };
@@ -1755,6 +1948,494 @@ export interface paths {
         };
         /** @description Internal server error */
         500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts": {
+    /**
+     * Get all posts
+     * @description Retrieve all posts with optional filtering
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of posts per page */
+          limit?: number;
+          /** @description Filter by cuisine type ID */
+          cuisine?: string;
+          /** @description Filter by course type ID */
+          course?: string;
+          /** @description Filter by visibility setting */
+          visibility?: "public" | "private" | "followers";
+        };
+      };
+      responses: {
+        /** @description List of posts with pagination */
+        200: {
+          content: {
+            "application/json": {
+              posts?: components["schemas"]["Post"][];
+              pagination?: {
+                currentPage?: number;
+                totalPages?: number;
+                totalPosts?: number;
+                hasNextPage?: boolean;
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+    };
+    /**
+     * Create a new post
+     * @description Create a new food post with media, location, and optional food catalogue reference
+     */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Post"];
+        };
+      };
+      responses: {
+        /** @description Post created successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["Post"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/{id}": {
+    /**
+     * Get post by ID
+     * @description Retrieve a specific post by its ID
+     */
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Post retrieved successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Post"];
+          };
+        };
+        /** @description Post not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Update post
+     * @description Update an existing post
+     */
+    put: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["Post"];
+        };
+      };
+      responses: {
+        /** @description Post updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Post"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to update this post */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Post not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Delete post
+     * @description Delete a post
+     */
+    delete: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Post deleted successfully */
+        204: {
+          content: never;
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to delete this post */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Post not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/user/{userId}": {
+    /**
+     * Get posts by user
+     * @description Retrieve all posts created by a specific user
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of posts per page */
+          limit?: number;
+        };
+        path: {
+          userId: string;
+        };
+      };
+      responses: {
+        /** @description List of user posts with pagination */
+        200: {
+          content: {
+            "application/json": {
+              posts?: components["schemas"]["Post"][];
+              pagination?: {
+                currentPage?: number;
+                totalPages?: number;
+                totalPosts?: number;
+                hasNextPage?: boolean;
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/restaurant/{restaurantId}": {
+    /**
+     * Get posts by restaurant
+     * @description Retrieve all posts associated with a specific restaurant
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of posts per page */
+          limit?: number;
+        };
+        path: {
+          restaurantId: string;
+        };
+      };
+      responses: {
+        /** @description List of restaurant posts with pagination */
+        200: {
+          content: {
+            "application/json": {
+              posts?: components["schemas"]["Post"][];
+              pagination?: {
+                currentPage?: number;
+                totalPages?: number;
+                totalPosts?: number;
+                hasNextPage?: boolean;
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/food/{foodCatalogueId}": {
+    /**
+     * Get posts by food catalogue item
+     * @description Retrieve all posts that reference a specific food catalogue item
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of posts per page */
+          limit?: number;
+        };
+        path: {
+          foodCatalogueId: string;
+        };
+      };
+      responses: {
+        /** @description List of food posts with pagination */
+        200: {
+          content: {
+            "application/json": {
+              posts?: components["schemas"]["Post"][];
+              pagination?: {
+                currentPage?: number;
+                totalPages?: number;
+                totalPosts?: number;
+                hasNextPage?: boolean;
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/{id}/like": {
+    /**
+     * Like or unlike a post
+     * @description Toggle like status for a post
+     */
+    post: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Like status updated successfully */
+        200: {
+          content: {
+            "application/json": {
+              post?: components["schemas"]["Post"];
+              liked?: boolean;
+              likeCount?: number;
+            };
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Post not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/search": {
+    /**
+     * Search posts
+     * @description Search posts by food name, caption, or tags
+     */
+    get: {
+      parameters: {
+        query: {
+          /** @description Search query */
+          q: string;
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of posts per page */
+          limit?: number;
+        };
+      };
+      responses: {
+        /** @description Search results with pagination */
+        200: {
+          content: {
+            "application/json": {
+              posts?: components["schemas"]["Post"][];
+              pagination?: {
+                currentPage?: number;
+                totalPages?: number;
+                totalPosts?: number;
+                hasNextPage?: boolean;
+                hasPrevPage?: boolean;
+              };
+            };
+          };
+        };
+        /** @description Search query is required */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/{postId}/tag-food": {
+    /**
+     * Tag food in post
+     * @description Add or update a food tag in a post with optional rating and review
+     */
+    post: {
+      parameters: {
+        path: {
+          /** @description ID of the post to tag food in */
+          postId: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description ID of the food catalogue item to tag
+             * @example 507f1f77bcf86cd799439016
+             */
+            foodCatalogueId: string;
+            /**
+             * @description Type of tag for this food item
+             * @default primary
+             * @example primary
+             * @enum {string}
+             */
+            tagType?: "primary" | "secondary" | "mentioned" | "reviewed";
+            /**
+             * @description Optional rating for this food item (1-5)
+             * @example 5
+             */
+            rating?: number;
+            /**
+             * @description Optional review text for this food item
+             * @example Delicious! The best pizza I've ever had.
+             */
+            review?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Food tagged successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Post"];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to modify this post */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Post not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/posts/{postId}/tag-food/{foodCatalogueId}": {
+    /**
+     * Remove food tag from post
+     * @description Remove a food tag from a post
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description ID of the post to remove tag from */
+          postId: string;
+          /** @description ID of the food catalogue item to remove tag for */
+          foodCatalogueId: string;
+        };
+      };
+      responses: {
+        /** @description Food tag removed successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Post"];
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Not authorized to modify this post */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Post not found */
+        404: {
           content: {
             "application/json": components["schemas"]["ErrorResponse"];
           };
@@ -1945,9 +2626,11 @@ export interface components {
       /** @description Operating hours for each day of the week */
       businessHours?: components["schemas"]["BusinessHour"][];
       /** @description List of features available at the restaurant */
-      features?: ("Outdoor seating" | "Indoor dining" | "Private dining rooms" | "Bar seating" | "Counter seating" | "Rooftop dining" | "Garden dining" | "Waterfront dining" | "Street-side dining" | "Patio dining" | "Take-out" | "Delivery" | "Drive-through" | "Curbside pickup" | "Catering" | "Private events" | "Corporate events" | "Wedding catering" | "Party catering" | "Food trucks" | "Free WiFi" | "Mobile ordering" | "Online reservations" | "Contactless payment" | "Digital menus" | "QR code menus" | "Self-service kiosks" | "Table service" | "Counter service" | "Buffet service" | "Wheelchair accessible" | "Accessible parking" | "Accessible restrooms" | "Braille menus" | "Service animal friendly" | "Elevator access" | "Ramp access" | "Live music" | "Sports on TV" | "Background music" | "Dance floor" | "Karaoke" | "Trivia nights" | "Comedy nights" | "Wine tastings" | "Cooking classes" | "Chef's table" | "Free parking" | "Valet parking" | "Street parking" | "Parking garage" | "Bike parking" | "Near public transit" | "Uber/Lyft friendly" | "Kid-friendly" | "High chairs" | "Kids menu" | "Play area" | "Changing tables" | "Family restrooms" | "Birthday parties" | "Vegetarian options" | "Vegan options" | "Gluten-free options" | "Halal options" | "Kosher options" | "Dairy-free options" | "Nut-free options" | "Low-sodium options" | "Organic ingredients" | "Local ingredients" | "Full bar" | "Wine list" | "Craft beer" | "Cocktails" | "Happy hour" | "BYOB" | "Coffee service" | "Tea service" | "Juice bar" | "Smoothies" | "Gift cards" | "Loyalty program" | "Rewards program" | "Group discounts" | "Student discounts" | "Senior discounts" | "Military discounts" | "Corporate accounts" | "Catering delivery" | "Event planning" | "Contactless delivery" | "Sanitized surfaces" | "Staff wearing masks" | "Temperature checks" | "Social distancing" | "Air purification" | "UV sanitization" | "Health inspections" | "Food safety certified" | "Allergen information" | "Credit cards accepted" | "Cash only" | "Digital payments" | "Split bills" | "Gratuity included" | "Tipping accepted" | "Corporate billing" | "Invoice available" | "24/7 service" | "Late night dining" | "Breakfast service" | "Lunch service" | "Dinner service" | "Brunch service" | "Holiday hours" | "Seasonal hours" | "Reservations required" | "Walk-ins welcome" | "Romantic dining" | "Anniversary specials" | "Birthday celebrations" | "Date night" | "Business meetings" | "Networking events" | "Graduation parties" | "Holiday parties" | "Corporate lunches" | "Team building")[];
+      features?: string[];
       /** @description Gallery media items for the restaurant */
       gallery?: components["schemas"]["Media"][];
+      /** @description List of delivery links for the restaurant */
+      deliveryLinks?: components["schemas"]["DeliveryLink"][];
       /** @description Additional metadata associated with the restaurant */
       meta?: {
         [key: string]: unknown;
@@ -2243,6 +2926,192 @@ export interface components {
        * @example an ordinary user with restaurant access
        */
       description: string;
+    };
+    DeliveryLink: {
+      /**
+       * @description Unique identifier for the delivery link
+       * @example 507f1f77bcf86cd799439018
+       */
+      _id?: string;
+      /**
+       * @description ID of the restaurant this delivery link belongs to
+       * @example 507f1f77bcf86cd799439011
+       */
+      restaurantId: string;
+      /**
+       * @description Display name for the delivery link
+       * @example Uber Eats
+       */
+      name: string;
+      /**
+       * Format: uri
+       * @description URL to the delivery service
+       * @example https://ubereats.com/restaurant/123
+       */
+      url: string;
+      /**
+       * @description Delivery platform name
+       * @example Uber Eats
+       * @enum {string}
+       */
+      platform: "Uber Eats" | "DoorDash" | "Grubhub" | "Postmates" | "Instacart" | "Amazon Fresh" | "Walmart Grocery" | "Shipt" | "Custom" | "Other";
+      /**
+       * @description Whether this delivery link is active
+       * @default true
+       */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @description When the delivery link was created
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description When the delivery link was last updated
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    Post: {
+      /**
+       * @description Unique identifier for the post
+       * @example 507f1f77bcf86cd799439019
+       */
+      _id?: string;
+      /**
+       * @description ID of the user who created the post
+       * @example 507f1f77bcf86cd799439011
+       */
+      userId: string;
+      /**
+       * @description Array of media IDs associated with the post
+       * @example [
+       *   "507f1f77bcf86cd799439017"
+       * ]
+       */
+      media: string[];
+      /**
+       * @description Name of the food item in the post
+       * @example Margherita Pizza
+       */
+      foodName: string;
+      /**
+       * @description Array of food items tagged in this post with metadata
+       * @example []
+       */
+      taggedFoods?: ({
+          /**
+           * @description ID of the food catalogue item being tagged
+           * @example 507f1f77bcf86cd799439016
+           */
+          foodCatalogueId: string;
+          /**
+           * @description Type of tag for this food item
+           * @default primary
+           * @example primary
+           * @enum {string}
+           */
+          tagType: "primary" | "secondary" | "mentioned" | "reviewed";
+          /**
+           * @description Optional rating for this food item (1-5)
+           * @example 5
+           */
+          rating?: number;
+          /**
+           * @description Optional review text for this food item
+           * @example Delicious! The best pizza I've ever had.
+           */
+          review?: string;
+          /**
+           * Format: date-time
+           * @description When this food was tagged
+           * @example 2025-04-20T15:30:00Z
+           */
+          taggedAt: string;
+        })[];
+      /** @description Price information for the food item */
+      price: components["schemas"]["Price"];
+      /** @description Location information including restaurant and coordinates */
+      location: {
+        /**
+         * @description ID of the restaurant where the food was consumed
+         * @example 507f1f77bcf86cd799439011
+         */
+        restaurantId: string;
+        coordinates: {
+          /**
+           * @description Type of geometry
+           * @default Point
+           * @enum {string}
+           */
+          type: "Point";
+          /**
+           * @description Longitude and latitude coordinates [longitude, latitude]
+           * @example [
+           *   -73.935242,
+           *   40.73061
+           * ]
+           */
+          coordinates: number[];
+        };
+      };
+      /**
+       * @description ID of the cuisine type
+       * @example 507f1f77bcf86cd799439015
+       */
+      cuisine: string;
+      /**
+       * @description ID of the course type
+       * @example 507f1f77bcf86cd799439014
+       */
+      course: string;
+      /**
+       * @description Array of allergen IDs
+       * @example [
+       *   "507f1f77bcf86cd799439013"
+       * ]
+       */
+      allergens?: string[];
+      /**
+       * @description Optional caption or description for the post
+       * @example Amazing pizza! The crust was perfectly crispy 🍕
+       */
+      caption?: string;
+      /**
+       * @description Array of tags for categorizing the post
+       * @example [
+       *   "delicious",
+       *   "authentic",
+       *   "wood-fired"
+       * ]
+       */
+      tags?: string[];
+      /**
+       * @description Array of user IDs who liked the post
+       * @example [
+       *   "507f1f77bcf86cd799439011"
+       * ]
+       */
+      likes?: string[];
+      /**
+       * @description Visibility setting for the post
+       * @default public
+       * @enum {string}
+       */
+      visibility?: "public" | "private" | "followers";
+      /**
+       * Format: date-time
+       * @description When the post was created
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @description When the post was last updated
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
     };
   };
   responses: never;

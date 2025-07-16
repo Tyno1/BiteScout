@@ -225,13 +225,12 @@ export const deleteMedia = async (
 };
 
 export const verifyMedia = async (
-	req: Request<{ id: string }, VerifyMediaApiResponse, VerifyMediaRequest>,
+	req: Request<{ id: string }, VerifyMediaApiResponse>,
 	res: Response<VerifyMediaApiResponse>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const { verified } = req.body;
 
 		// Only admins/moderators can verify media
 		if (req.user?.userType !== "admin" && req.user?.userType !== "moderator") {
@@ -243,17 +242,15 @@ export const verifyMedia = async (
 			throw createError(404, "Media not found");
 		}
 
-		media.verified = verified;
+		// Toggle verification status
+		media.verified = !media.verified;
 		await media.save();
 
 		await media.populate([
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
-		res.json({
-			media,
-			message: `Media ${verified ? "verified" : "unverified"} successfully`,
-		});
+		res.json(media);
 	} catch (error) {
 		return next(error);
 	}

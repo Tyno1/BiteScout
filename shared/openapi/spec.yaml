@@ -334,6 +334,103 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/restaurants/filter:
+    get:
+      summary: Filter restaurants by various criteria including feature categories
+      parameters:
+        - in: query
+          name: name
+          description: Restaurant name to search for
+          schema:
+            type: string
+            example: "Pizza"
+        - in: query
+          name: cuisine
+          description: Cuisine type to filter by
+          schema:
+            type: string
+            example: "Italian"
+        - in: query
+          name: priceRange
+          description: Price range to filter by
+          schema:
+            type: string
+            enum: ["$", "$$", "$$$", "$$$$"]
+            example: "$$"
+        - in: query
+          name: features
+          description: Comma-separated list of specific features to filter by
+          schema:
+            type: string
+            example: "Outdoor seating,Delivery,Free WiFi"
+        - in: query
+          name: featureCategories
+          description: Comma-separated list of feature categories to filter by
+          schema:
+            type: string
+            example: "Seating & Dining,Service Types"
+        - in: query
+          name: page
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 1
+        - in: query
+          name: limit
+          description: Number of results per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+            example: 10
+      responses:
+        200:
+          description: List of filtered restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurants:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Restaurant"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        example: 1
+                      totalPages:
+                        type: integer
+                        example: 5
+                      totalRestaurants:
+                        type: integer
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        example: false
+                  filters:
+                    type: object
+                    properties:
+                      applied:
+                        type: object
+                        description: "Currently applied filters"
+                      available:
+                        type: object
+                        description: "Available filter options"
+        400:
+          description: Invalid filter parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/restaurants/{id}:
     get:
       summary: Get restaurant by ID
@@ -382,6 +479,190 @@ paths:
       responses:
         204:
           description: Restaurant deleted
+
+  /api/restaurants/{id}/delivery-links:
+    get:
+      summary: Get delivery links for a restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      responses:
+        200:
+          description: List of delivery links
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryLink"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Add a delivery link to a restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - url
+                - platform
+              properties:
+                name:
+                  type: string
+                  description: "Display name for the delivery link"
+                  example: "Uber Eats"
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the delivery service"
+                  example: "https://ubereats.com/restaurant/123"
+                platform:
+                  type: string
+                  enum:
+                    - "Uber Eats"
+                    - "DoorDash"
+                    - "Grubhub"
+                    - "Postmates"
+                    - "Instacart"
+                    - "Amazon Fresh"
+                    - "Walmart Grocery"
+                    - "Shipt"
+                    - "Custom"
+                    - "Other"
+                  description: "Delivery platform name"
+                  example: "Uber Eats"
+                isActive:
+                  type: boolean
+                  default: true
+                  description: "Whether this delivery link is active"
+      responses:
+        201:
+          description: Delivery link created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryLink"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/restaurants/{id}/delivery-links/{linkId}:
+    put:
+      summary: Update a delivery link
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+        - in: path
+          name: linkId
+          required: true
+          schema:
+            type: string
+          description: Delivery link ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Display name for the delivery link"
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the delivery service"
+                platform:
+                  type: string
+                  enum:
+                    - "Uber Eats"
+                    - "DoorDash"
+                    - "Grubhub"
+                    - "Postmates"
+                    - "Instacart"
+                    - "Amazon Fresh"
+                    - "Walmart Grocery"
+                    - "Shipt"
+                    - "Custom"
+                    - "Other"
+                  description: "Delivery platform name"
+                isActive:
+                  type: boolean
+                  description: "Whether this delivery link is active"
+      responses:
+        200:
+          description: Delivery link updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryLink"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant or delivery link not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete a delivery link
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+        - in: path
+          name: linkId
+          required: true
+          schema:
+            type: string
+          description: Delivery link ID
+      responses:
+        204:
+          description: Delivery link deleted
+        404:
+          description: Restaurant or delivery link not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/food-catalogue/restaurant/{restaurantId}/catalogue/{foodId}:
     get:
       summary: Get food catalogue item by ID
@@ -456,7 +737,7 @@ paths:
             type: string
       responses:
         200:
-          description: List of food catalogue items
+          description: List of food catalogue items (empty array if no items found)
           content:
             application/json:
               schema:
@@ -583,7 +864,7 @@ paths:
             type: string
       responses:
         200:
-          description: List of restaurant access for user
+          description: List of restaurant access for user (empty array if no access records found)
           content:
             application/json:
               schema:
@@ -604,7 +885,7 @@ paths:
             type: string
       responses:
         200:
-          description: List of restaurant access for owner
+          description: List of restaurant access for owner (empty array if no access records found)
           content:
             application/json:
               schema:
@@ -1671,52 +1952,26 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
   /api/media/{id}/verify:
-    post:
+    patch:
       summary: Verify media
-      description: Verify or unverify a media item (admin/moderator only)
+      description: Mark media as verified by moderators
       security:
         - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
-          description: The ID of the media to verify
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - verified
-              properties:
-                verified:
-                  type: boolean
-                  description: "Whether to verify or unverify the media"
-                  example: true
       responses:
         200:
-          description: Media verification status updated successfully
+          description: Media verified successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  media:
-                    $ref: "#/components/schemas/Media"
-                  message:
-                    type: string
-                    example: "Media verified successfully"
-        401:
-          description: User not authenticated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        403:
-          description: Not authorized to verify media
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid request
           content:
             application/json:
               schema:
@@ -1807,6 +2062,564 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/posts:
+    post:
+      summary: Create a new post
+      description: Create a new food post with media, location, and optional food catalogue reference
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        201:
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: Get all posts
+      description: Retrieve all posts with optional filtering
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+        - in: query
+          name: cuisine
+          schema:
+            type: string
+          description: Filter by cuisine type ID
+        - in: query
+          name: course
+          schema:
+            type: string
+          description: Filter by course type ID
+        - in: query
+          name: visibility
+          schema:
+            type: string
+            enum: ["public", "private", "followers"]
+            default: "public"
+          description: Filter by visibility setting
+      responses:
+        200:
+          description: List of posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/{id}:
+    get:
+      summary: Get post by ID
+      description: Retrieve a specific post by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update post
+      description: Update an existing post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        200:
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to update this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete post
+      description: Delete a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Post deleted successfully
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to delete this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/user/{userId}:
+    get:
+      summary: Get posts by user
+      description: Retrieve all posts created by a specific user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of user posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/restaurant/{restaurantId}:
+    get:
+      summary: Get posts by restaurant
+      description: Retrieve all posts associated with a specific restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of restaurant posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/food/{foodCatalogueId}:
+    get:
+      summary: Get posts by food catalogue item
+      description: Retrieve all posts that reference a specific food catalogue item
+      parameters:
+        - in: path
+          name: foodCatalogueId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of food posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/{id}/like:
+    post:
+      summary: Like or unlike a post
+      description: Toggle like status for a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Like status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                    $ref: "#/components/schemas/Post"
+                  liked:
+                    type: boolean
+                  likeCount:
+                    type: integer
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/search:
+    get:
+      summary: Search posts
+      description: Search posts by food name, caption, or tags
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: Search results with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+        400:
+          description: Search query is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/{postId}/tag-food:
+    post:
+      summary: Tag food in post
+      description: Add or update a food tag in a post with optional rating and review
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to tag food in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - foodCatalogueId
+              properties:
+                foodCatalogueId:
+                  type: string
+                  description: ID of the food catalogue item to tag
+                  example: "507f1f77bcf86cd799439016"
+                tagType:
+                  type: string
+                  enum: ["primary", "secondary", "mentioned", "reviewed"]
+                  default: "primary"
+                  description: Type of tag for this food item
+                  example: "primary"
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  description: Optional rating for this food item (1-5)
+                  example: 5
+                review:
+                  type: string
+                  maxLength: 200
+                  description: Optional review text for this food item
+                  example: "Delicious! The best pizza I've ever had."
+      responses:
+        200:
+          description: Food tagged successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to modify this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/{postId}/tag-food/{foodCatalogueId}:
+    delete:
+      summary: Remove food tag from post
+      description: Remove a food tag from a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to remove tag from
+        - in: path
+          name: foodCatalogueId
+          required: true
+          schema:
+            type: string
+          description: ID of the food catalogue item to remove tag for
+      responses:
+        200:
+          description: Food tag removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to modify this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     ErrorResponse:
@@ -1878,6 +2691,7 @@ components:
         - email
         - password
         - userType
+
     Allergen:
       type: object
       properties:
@@ -1902,6 +2716,7 @@ components:
       required:
         - name
         - description
+
     Course:
       type: object
       properties:
@@ -1926,6 +2741,7 @@ components:
       required:
         - name
         - description
+
     Cuisine:
       type: object
       properties:
@@ -1950,6 +2766,7 @@ components:
       required:
         - name
         - description
+
     BusinessHour:
       type: object
       properties:
@@ -1975,6 +2792,7 @@ components:
           type: boolean
           default: false
           description: "Indicates if the restaurant is closed on this day"
+
     Restaurant:
       type: object
       required:
@@ -2038,169 +2856,17 @@ components:
           type: array
           items:
             type: string
-            enum:
-              # Seating & Dining
-              - "Outdoor seating"
-              - "Indoor dining"
-              - "Private dining rooms"
-              - "Bar seating"
-              - "Counter seating"
-              - "Rooftop dining"
-              - "Garden dining"
-              - "Waterfront dining"
-              - "Street-side dining"
-              - "Patio dining"
-              
-              # Service Types
-              - "Take-out"
-              - "Delivery"
-              - "Drive-through"
-              - "Curbside pickup"
-              - "Catering"
-              - "Private events"
-              - "Corporate events"
-              - "Wedding catering"
-              - "Party catering"
-              - "Food trucks"
-              
-              # Technology & Convenience
-              - "Free WiFi"
-              - "Mobile ordering"
-              - "Online reservations"
-              - "Contactless payment"
-              - "Digital menus"
-              - "QR code menus"
-              - "Self-service kiosks"
-              - "Table service"
-              - "Counter service"
-              - "Buffet service"
-              
-              # Accessibility
-              - "Wheelchair accessible"
-              - "Accessible parking"
-              - "Accessible restrooms"
-              - "Braille menus"
-              - "Service animal friendly"
-              - "Elevator access"
-              - "Ramp access"
-              
-              # Entertainment & Atmosphere
-              - "Live music"
-              - "Sports on TV"
-              - "Background music"
-              - "Dance floor"
-              - "Karaoke"
-              - "Trivia nights"
-              - "Comedy nights"
-              - "Wine tastings"
-              - "Cooking classes"
-              - "Chef's table"
-              
-              # Parking & Transportation
-              - "Free parking"
-              - "Valet parking"
-              - "Street parking"
-              - "Parking garage"
-              - "Bike parking"
-              - "Near public transit"
-              - "Uber/Lyft friendly"
-              
-              # Family & Kids
-              - "Kid-friendly"
-              - "High chairs"
-              - "Kids menu"
-              - "Play area"
-              - "Changing tables"
-              - "Family restrooms"
-              - "Birthday parties"
-              
-              # Dietary Accommodations
-              - "Vegetarian options"
-              - "Vegan options"
-              - "Gluten-free options"
-              - "Halal options"
-              - "Kosher options"
-              - "Dairy-free options"
-              - "Nut-free options"
-              - "Low-sodium options"
-              - "Organic ingredients"
-              - "Local ingredients"
-              
-              # Beverages & Bar
-              - "Full bar"
-              - "Wine list"
-              - "Craft beer"
-              - "Cocktails"
-              - "Happy hour"
-              - "BYOB"
-              - "Coffee service"
-              - "Tea service"
-              - "Juice bar"
-              - "Smoothies"
-              
-              # Special Services
-              - "Gift cards"
-              - "Loyalty program"
-              - "Rewards program"
-              - "Group discounts"
-              - "Student discounts"
-              - "Senior discounts"
-              - "Military discounts"
-              - "Corporate accounts"
-              - "Catering delivery"
-              - "Event planning"
-              
-              # Health & Safety
-              - "Contactless delivery"
-              - "Sanitized surfaces"
-              - "Staff wearing masks"
-              - "Temperature checks"
-              - "Social distancing"
-              - "Air purification"
-              - "UV sanitization"
-              - "Health inspections"
-              - "Food safety certified"
-              - "Allergen information"
-              
-              # Payment & Financial
-              - "Credit cards accepted"
-              - "Cash only"
-              - "Digital payments"
-              - "Split bills"
-              - "Gratuity included"
-              - "Tipping accepted"
-              - "Corporate billing"
-              - "Invoice available"
-              
-              # Hours & Availability
-              - "24/7 service"
-              - "Late night dining"
-              - "Breakfast service"
-              - "Lunch service"
-              - "Dinner service"
-              - "Brunch service"
-              - "Holiday hours"
-              - "Seasonal hours"
-              - "Reservations required"
-              - "Walk-ins welcome"
-              
-              # Special Occasions
-              - "Romantic dining"
-              - "Anniversary specials"
-              - "Birthday celebrations"
-              - "Date night"
-              - "Business meetings"
-              - "Networking events"
-              - "Graduation parties"
-              - "Holiday parties"
-              - "Corporate lunches"
-              - "Team building"
           description: "List of features available at the restaurant"
         gallery:
           type: array
           items:
             $ref: "#/components/schemas/Media"
           description: "Gallery media items for the restaurant"
+        deliveryLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryLink"
+          description: "List of delivery links for the restaurant"
         meta:
           type: object
           additionalProperties: true
@@ -2537,3 +3203,204 @@ components:
           type: string
           description: "Description of the user type"
           example: "an ordinary user with restaurant access"
+
+    DeliveryLink:
+      type: object
+      required:
+        - name
+        - url
+        - platform
+        - restaurantId
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the delivery link"
+          example: "507f1f77bcf86cd799439018"
+        restaurantId:
+          type: string
+          description: "ID of the restaurant this delivery link belongs to"
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          description: "Display name for the delivery link"
+          example: "Uber Eats"
+        url:
+          type: string
+          format: uri
+          description: "URL to the delivery service"
+          example: "https://ubereats.com/restaurant/123"
+        platform:
+          type: string
+          enum:
+            - "Uber Eats"
+            - "DoorDash"
+            - "Grubhub"
+            - "Postmates"
+            - "Instacart"
+            - "Amazon Fresh"
+            - "Walmart Grocery"
+            - "Shipt"
+            - "Custom"
+            - "Other"
+          description: "Delivery platform name"
+          example: "Uber Eats"
+        isActive:
+          type: boolean
+          default: true
+          description: "Whether this delivery link is active"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the delivery link was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the delivery link was last updated"
+          example: "2025-04-20T15:30:00Z"
+
+    Post:
+      type: object
+      required:
+        - userId
+        - media
+        - foodName
+        - price
+        - location
+        - cuisine
+        - course
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the post"
+          example: "507f1f77bcf86cd799439019"
+        userId:
+          type: string
+          description: "ID of the user who created the post"
+          example: "507f1f77bcf86cd799439011"
+        media:
+          type: array
+          items:
+            type: string
+          description: "Array of media IDs associated with the post"
+          example: ["507f1f77bcf86cd799439017"]
+        foodName:
+          type: string
+          description: "Name of the food item in the post"
+          example: "Margherita Pizza"
+        taggedFoods:
+          type: array
+          items:
+            type: object
+            required:
+              - foodCatalogueId
+              - tagType
+              - taggedAt
+            properties:
+              foodCatalogueId:
+                type: string
+                description: "ID of the food catalogue item being tagged"
+                example: "507f1f77bcf86cd799439016"
+              tagType:
+                type: string
+                enum: ["primary", "secondary", "mentioned", "reviewed"]
+                default: "primary"
+                description: "Type of tag for this food item"
+                example: "primary"
+              rating:
+                type: number
+                minimum: 1
+                maximum: 5
+                description: "Optional rating for this food item (1-5)"
+                example: 5
+              review:
+                type: string
+                maxLength: 200
+                description: "Optional review text for this food item"
+                example: "Delicious! The best pizza I've ever had."
+              taggedAt:
+                type: string
+                format: date-time
+                description: "When this food was tagged"
+                example: "2025-04-20T15:30:00Z"
+          description: "Array of food items tagged in this post with metadata"
+          example: []
+        price:
+          $ref: "#/components/schemas/Price"
+          description: "Price information for the food item"
+        location:
+          type: object
+          required:
+            - restaurantId
+            - coordinates
+          properties:
+            restaurantId:
+              type: string
+              description: "ID of the restaurant where the food was consumed"
+              example: "507f1f77bcf86cd799439011"
+            coordinates:
+              type: object
+              required:
+                - type
+                - coordinates
+              properties:
+                type:
+                  type: string
+                  enum: ["Point"]
+                  default: "Point"
+                  description: "Type of geometry"
+                coordinates:
+                  type: array
+                  items:
+                    type: number
+                  minItems: 2
+                  maxItems: 2
+                  description: "Longitude and latitude coordinates [longitude, latitude]"
+                  example: [-73.935242, 40.730610]
+          description: "Location information including restaurant and coordinates"
+        cuisine:
+          type: string
+          description: "ID of the cuisine type"
+          example: "507f1f77bcf86cd799439015"
+        course:
+          type: string
+          description: "ID of the course type"
+          example: "507f1f77bcf86cd799439014"
+        allergens:
+          type: array
+          items:
+            type: string
+          description: "Array of allergen IDs"
+          example: ["507f1f77bcf86cd799439013"]
+        caption:
+          type: string
+          maxLength: 500
+          description: "Optional caption or description for the post"
+          example: "Amazing pizza! The crust was perfectly crispy 🍕"
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Array of tags for categorizing the post"
+          example: ["delicious", "authentic", "wood-fired"]
+        likes:
+          type: array
+          items:
+            type: string
+          description: "Array of user IDs who liked the post"
+          example: ["507f1f77bcf86cd799439011"]
+        visibility:
+          type: string
+          enum: ["public", "private", "followers"]
+          default: "public"
+          description: "Visibility setting for the post"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the post was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the post was last updated"
+          example: "2025-04-20T15:30:00Z"

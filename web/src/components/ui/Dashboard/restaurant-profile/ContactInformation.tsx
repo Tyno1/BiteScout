@@ -1,5 +1,6 @@
 import { Input } from "@/components/atoms";
-import { Globe, Mail, MapPin, Phone } from "lucide-react";
+import { Card } from "@/components/organisms";
+import { Globe, Mail, MapPin, Phone, Sparkles, Info } from "lucide-react";
 
 export function ContactInformation({
   isEditing,
@@ -7,17 +8,38 @@ export function ContactInformation({
   handleInputChange,
 }: any) {
   return (
-    <section
-      className="bg-white rounded-lg border-1 border-gray-100 p-6"
+    <Card
+      Component="section"
+      padding="lg"
+      header={
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Phone className="w-5 h-5 text-gray-600" />
+            <h2 id="contact-info-heading" className="text-lg font-semibold">
+              Contact Information
+            </h2>
+          </div>
+          {isEditing && (
+            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
+              <Sparkles className="w-4 h-4" />
+              <span>
+                <strong>Help customers reach you:</strong> Provide accurate contact details so customers can call, email, or visit your website!
+              </span>
+            </div>
+          )}
+        </div>
+      }
       aria-labelledby="contact-info-heading"
     >
-      <div className="mb-4">
-        <h2 id="contact-info-heading" className="text-lg font-semibold">
-          Contact Information
-        </h2>
-      </div>
+      {isEditing && (
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
+          <Info className="w-4 h-4" />
+          <span>Fill in your contact details. The more information you provide, the easier it is for customers to reach you.</span>
+        </div>
+      )}
       <div className="space-y-6">
         <Input
+          placeholder="Enter your address"
           icon={<MapPin size={18} className="text-gray-900" />}
           outlineType={isEditing && "round"}
           type="text"
@@ -43,6 +65,7 @@ export function ContactInformation({
           />
 
           <Input
+            placeholder="Enter your email"
             icon={<Mail size={18} className="text-gray-900" />}
             outlineType={isEditing && "round"}
             type="email"
@@ -56,6 +79,7 @@ export function ContactInformation({
         </div>
 
         <Input
+          placeholder="Enter your website"
           icon={<Globe size={18} className="text-gray-900" />}
           outlineType={isEditing && "round"}
           type="url"
@@ -67,6 +91,6 @@ export function ContactInformation({
           onChange={(e) => handleInputChange("website", e.target.value)}
         />
       </div>
-    </section>
+    </Card>
   );
 }

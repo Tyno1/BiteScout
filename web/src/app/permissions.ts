@@ -1,24 +1,58 @@
-import { AccessRoles, Roles } from "@/types";
+import * as enums from "@shared/types/api/enums";
+const { AccessRoleEnum } = enums;
+import type { AccessRoles } from "@shared/types/api/enums";
+
 import { Routes } from "./routes";
 
 export const Permissions: Record<string, AccessRoles[]> = {
-  [Routes.dashboard.teamManagement]: [Roles.ADMIN, Roles.ROOT],
-  // general routes
-  [Routes.dashboard.base]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.restaurantProfile]: [
-    Roles.ADMIN,
-    Roles.ROOT,
-    Roles.MODERATOR,
+  [Routes.dashboard.teamManagement]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
   ],
-  [Routes.dashboard.foodCatalogue]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.userManagement]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.notifications]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.analytics]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.reviews]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
-  [Routes.dashboard.aiAudio]: [Roles.ADMIN, Roles.ROOT, Roles.MODERATOR],
+  // general routes
+  [Routes.dashboard.base]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.restaurantProfile]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.foodCatalogue]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.userManagement]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.notifications]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.analytics]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.reviews]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
+  [Routes.dashboard.aiAudio]: [
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
+  ],
   [Routes.dashboard.customerInsights]: [
-    Roles.ADMIN,
-    Roles.ROOT,
-    Roles.MODERATOR,
+    AccessRoleEnum.Admin,
+    AccessRoleEnum.Root,
+    AccessRoleEnum.Moderator,
   ],
 };

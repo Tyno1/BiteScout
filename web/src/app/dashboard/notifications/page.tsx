@@ -1,12 +1,13 @@
 "use client";
 import { Button } from "@/components/atoms";
-import useNotificationStore from "@/stores/notificationStore";
-import { Notification } from "@/types";
-import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
-import { Bell, Mail, AlertCircle } from "lucide-react";
 import { NotificationCard } from "@/components/ui";
+import useNotificationStore from "@/stores/notificationStore";
+import type { Notification } from "@/types/notification";
+import type { Notification as ApiNotification } from "@shared/types/api/schemas";
+import { AlertCircle, Bell, Mail } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type FilteredNotificationType = {
   accessRequest: Notification[];
@@ -32,7 +33,7 @@ export default function Notifications() {
       system: [],
     };
 
-    notifications.forEach((notification) => {
+    for (const notification of notifications) {
       if (notification.type === "access-request") {
         groupedNotifications.accessRequest.push(notification);
       } else if (notification.type === "message") {
@@ -40,7 +41,7 @@ export default function Notifications() {
       } else if (notification.type === "system") {
         groupedNotifications.system.push(notification);
       }
-    });
+    }
 
     return groupedNotifications;
   }, [notifications]);
@@ -77,21 +78,16 @@ export default function Notifications() {
             size="sm"
             text="Mark as Read"
             onClick={() =>
-              notification._id && handleMarkAsRead(notification?._id)
+              notification._id && handleMarkAsRead(notification._id)
             }
           />
         </div>
       );
-    } else {
-      return (
-        <Button
-          color="primary"
-          variant="outline"
-          size="sm"
-          text="Mark as Read"
-        />
-      );
     }
+
+    return (
+      <Button color="primary" variant="outline" size="sm" text="Mark as Read" />
+    );
   };
   const readNotification = (notifications: Notification[]) => {
     const filter = notifications.filter((notification) => !notification.read);
@@ -140,6 +136,7 @@ export default function Notifications() {
               {Object.entries(filteredNotifications).map(
                 ([type, notification]) => (
                   <button
+                    type="button"
                     key={type}
                     onClick={() => setSelectedType(type)}
                     className={`flex items-center justify-center ${
