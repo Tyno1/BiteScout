@@ -1,6 +1,18 @@
 import { Input } from "@/components/atoms";
+import { Restaurant } from "@shared/types/api/schemas";
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
+
+type RestaurantProfileHeroProps = {
+  image1: string;
+  isEditing: boolean;
+  displayData: Restaurant;
+  handleInputChange: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
+  handleSave: () => void;
+  handleEdit: () => void;
+  handleCancel: () => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
 export function RestaurantProfileHero({
   image1,
@@ -11,7 +23,7 @@ export function RestaurantProfileHero({
   handleEdit,
   handleCancel,
   handleImageUpload,
-}: any) {
+}: RestaurantProfileHeroProps) {
   return (
     <section
       className="relative h-[30vh] w-full bg-black text-white flex flex-col items-start justify-center px-14"

@@ -33,6 +33,7 @@ export default function TeamManagement() {
       resetAccess();
     };
   }, [
+    resetAccess,
     session?.user?._id,
     session?.user?.restaurantCount,
     getRestaurantAccessListByOwnerId,
@@ -111,7 +112,7 @@ export default function TeamManagement() {
                 Managing team for:{" "}
                 <span className="font-bold text-gray-900">
                   {typeof restaurantAccessList[0]?.restaurantId === "object"
-                    ? restaurantAccessList[0]?.restaurantId?.name
+                    ? (restaurantAccessList[0]?.restaurantId as { name: string })?.name
                     : ""}
                 </span>
               </h2>

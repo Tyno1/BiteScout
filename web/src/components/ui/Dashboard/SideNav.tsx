@@ -30,7 +30,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
   //   handle navigation
   const handleNav = (navName: string) => {
     router.push(navName);
-    setIsMenuOpen && setIsMenuOpen(false);
+    if (setIsMenuOpen) setIsMenuOpen(false);
   };
 
   return (

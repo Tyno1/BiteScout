@@ -150,7 +150,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 
 				// If the token is expired, try to refresh it
-				return await refreshAccessToken(token);
+				return await refreshAccessToken({ refreshToken: token.refreshToken as string });
 			} catch (error) {
 				console.error("Error in JWT callback:", error);
 				return {

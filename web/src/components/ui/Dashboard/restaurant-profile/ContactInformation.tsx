@@ -1,12 +1,19 @@
 import { Input } from "@/components/atoms";
 import { Card } from "@/components/organisms";
+import { Restaurant } from "@shared/types/api/schemas";
 import { Globe, Mail, MapPin, Phone, Sparkles, Info } from "lucide-react";
+
+type ContactInformationProps = {
+  isEditing: boolean;
+  displayData: Restaurant;
+  handleInputChange: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
+};
 
 export function ContactInformation({
   isEditing,
   displayData,
   handleInputChange,
-}: any) {
+}: ContactInformationProps) {
   return (
     <Card
       Component="section"
@@ -41,7 +48,7 @@ export function ContactInformation({
         <Input
           placeholder="Enter your address"
           icon={<MapPin size={18} className="text-gray-900" />}
-          outlineType={isEditing && "round"}
+          outlineType={isEditing ? "round" : "none"}
           type="text"
           name="address"
           label="Address"
@@ -54,7 +61,7 @@ export function ContactInformation({
         <div className="grid grid-cols-2 gap-6">
           <Input
             icon={<Phone size={18} className="text-gray-900" />}
-            outlineType={isEditing && "round"}
+            outlineType={isEditing ? "round" : "none"}
             type="tel"
             name="phone-label"
             label="Phone"
@@ -67,7 +74,7 @@ export function ContactInformation({
           <Input
             placeholder="Enter your email"
             icon={<Mail size={18} className="text-gray-900" />}
-            outlineType={isEditing && "round"}
+            outlineType={isEditing ? "round" : "none"}
             type="email"
             name="email-label"
             label="Email"
@@ -81,7 +88,7 @@ export function ContactInformation({
         <Input
           placeholder="Enter your website"
           icon={<Globe size={18} className="text-gray-900" />}
-          outlineType={isEditing && "round"}
+          outlineType={isEditing ? "round" : "none"}
           type="url"
           name="website-label"
           label="Website"

@@ -95,7 +95,7 @@ export async function doCredentialLogin(
       return {
         success: true,
       };
-    } catch (error) {
+    } catch {
       return {
         errors: {
           email: ["Invalid email or password"],

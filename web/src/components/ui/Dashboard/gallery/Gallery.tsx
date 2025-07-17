@@ -3,6 +3,7 @@ import { Card } from "@/components/organisms";
 import { Eye, Plus, Trash2, Upload } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Media } from "@shared/types/api/schemas";
+import Image from "next/image";
 
 type GalleryProps = {
   isEditing: boolean;
@@ -137,9 +138,11 @@ export function Gallery({
               key={image._id}
               className="relative group aspect-square bg-gray rounded-lg overflow-hidden"
             >
-              <img
+              <Image
                 src={image.url || "/api/placeholder/300/300"}
                 alt={image.title || "Restaurant image"}
+                width={300}
+                height={300}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
@@ -288,7 +291,7 @@ export function Gallery({
                 ×
               </Button>
             </div>
-            <img
+            <Image
               src={selectedImage.url}
               alt={selectedImage.title || "Selected image"}
               className="w-full h-auto rounded-lg mb-4"

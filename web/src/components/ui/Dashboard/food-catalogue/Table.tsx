@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState } from "@tanstack/react-table";
 import {
   ArrowDownUp,
   ArrowDownWideNarrow,
@@ -111,7 +111,7 @@ const column: ColumnType[] = [
 ];
 
 export function Table({ foodDatas, handleRowClick }: TableProps) {
-  const [columnFilters, setColumnFilters] = useState<[]>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [filterName, setFilterName] = useState<string>("name");
 
   // Debug logging
@@ -200,7 +200,7 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
                 }
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
-                    row.original._id && handleRowClick(row.original._id);
+                    if (row.original._id) handleRowClick(row.original._id);
                   }
                 }}
                 tabIndex={0}

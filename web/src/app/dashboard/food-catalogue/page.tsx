@@ -6,9 +6,9 @@ import { AddNewFood, Table } from "@/components/ui";
 import useAllergenStore from "@/stores/allergenStore";
 import useCourseStore from "@/stores/courseStore";
 import useCuisineStore from "@/stores/cuisineStore";
-import useFoodDataStore from "@/stores/foodDataStore";
-import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
+import useFoodDataStore, { DEFAULT_FOOD_DATA } from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
+// import useRestaurantStore from "@/stores/restaurantStore";
 import type { Allergen, FoodCatalogue } from "@shared/types/api/schemas";
 import type { Currency } from "@shared/types/common";
 import { useRouter } from "next/navigation";
@@ -42,19 +42,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     "THB",
     "ZAR",
   ];
-  const DEFAULT_FOOD_DATA: FoodCatalogue = {
-    name: "",
-    ingredients: [],
-    cuisineType: { name: "", description: "" },
-    course: { name: "", description: "" },
-    price: {
-      currency: "GBP" as Currency,
-      amount: 0,
-    },
-    allergens: [],
-    images: [],
-    restaurant: "",
-  };
   const DEFAULT_FORM_ERROR = {
     name: "",
     ingredients: "",
@@ -101,16 +88,13 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       name: !newFood.name ? "Name is required" : "",
       ingredients:
         newFood.ingredients.length < 1 ? "Ingredients are required" : "",
-      cuisineType: !newFood.cuisineType ? "Cuisine type is required" : "",
-      course: !newFood.course ? "Course is required" : "",
+      cuisineType: !newFood.cuisineType.name ? "Cuisine type is required" : "",
+      course: !newFood.course.name  ? "Course is required" : "",
       price:
         !newFood.price.amount || !newFood.price.currency
           ? "Price is required"
           : "",
-      allergens:
-        !newFood.allergens || newFood.allergens.length < 1
-          ? "Allergens are required"
-          : "",
+    
       images: !newFood.images ? "At least one image is required" : "",
       restaurant: !newFood.restaurant ? "Restaurant is required" : "",
     };
@@ -139,7 +123,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   // create a component for form warning
   const FormWarning = (message: string) => {
-    return <div className="text-xs text-red">{message}</div>;
+    return <div className="text-xs text-destructive">{message}</div>;
   };
 
   const toggleAllergen = (allergen: Allergen): void => {
@@ -190,6 +174,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     getCourses();
     getAllergens();
   }, [getCuisines, getCourses, getAllergens]);
+
+
 
   useEffect(() => {
     if (restaurantData?._id) {

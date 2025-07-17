@@ -25,7 +25,7 @@ export function Hero() {
             transition={{ duration: 1, type: "spring", bounce: 0.6 }}
             className="font-black text-5xl md:text-7xl lg:text-8xl mb-4 leading-[1]"
           >
-            Taste Your City's
+            Taste Your City&apos;s
             <br />
             Hidden Flavors
           </motion.h1>

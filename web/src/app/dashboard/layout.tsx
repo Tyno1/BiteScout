@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [accessChecked, setAccessChecked] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
-  const { restaurantAccessList, resetAccess } = useRestaurantAccessStore();
+  const { restaurantAccessList } = useRestaurantAccessStore();
   const router = useRouter();
 
   const handleMenuClick = () => {

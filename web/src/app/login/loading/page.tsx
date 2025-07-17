@@ -33,7 +33,7 @@ export default function AuthLoader() {
     };
 
     handleRestaurantData();
-  }, [session?.data?.user?._id, session.data?.user?.restaurantCount, router]);
+  }, [session?.data?.user?._id, session.data?.user?.restaurantCount, session?.data?.user?.userTypeDetails?.level, router]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50">
@@ -50,7 +50,7 @@ export default function AuthLoader() {
             Preparing your experience
           </h1>
           <p className="text-muted-foreground">
-            We're getting everything ready for you
+            We&apos;re getting everything ready for you
           </p>
         </div>
 

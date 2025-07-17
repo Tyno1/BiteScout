@@ -17,10 +17,8 @@ import type {
   Cuisine,
   DeliveryLink,
   Restaurant,
+  RestaurantFeature,
 } from "@shared/types/api/schemas";
-
-// RestaurantFeature is a union type of all possible restaurant features
-type RestaurantFeature = NonNullable<Restaurant["features"]>[number];
 
 
 import { useSession } from "next-auth/react";
@@ -172,7 +170,7 @@ export default function RestaurantProfile() {
     try {
       const links = await getDeliveryLinks(currentRestaurantId);
       setDeliveryLinks(links);
-    } catch (error) {
+    } catch {
       toast.error("Failed to load delivery links");
     }
   }, [restaurantId, displayData?._id, getDeliveryLinks]);
@@ -184,7 +182,7 @@ export default function RestaurantProfile() {
       await addDeliveryLink(currentRestaurantId, data);
       await loadDeliveryLinks();
       toast.success("Delivery link added");
-    } catch (error) {
+    } catch {
       toast.error("Failed to add delivery link");
     }
   }, [restaurantId, displayData?._id, addDeliveryLink, loadDeliveryLinks]);
@@ -196,7 +194,7 @@ export default function RestaurantProfile() {
       await deleteDeliveryLink(currentRestaurantId, id);
       await loadDeliveryLinks();
       toast.success("Delivery link removed");
-    } catch (error) {
+    } catch {
       toast.error("Failed to remove delivery link");
     }
   }, [restaurantId, displayData?._id, deleteDeliveryLink, loadDeliveryLinks]);
@@ -295,7 +293,7 @@ export default function RestaurantProfile() {
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-lg text-red-600">
-          You don't have access to any restaurant data.
+          You don&apos;t have access to any restaurant data.
         </div>
       </div>
     );

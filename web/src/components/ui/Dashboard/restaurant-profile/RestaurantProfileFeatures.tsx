@@ -1,12 +1,11 @@
 import { IconButton, Select } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type { Restaurant } from "@shared/types/api/schemas";
-import { ChevronDown, ChevronRight, Plus, X, Sparkles, Info, CheckCircle, Tag } from "lucide-react";
+import type { Restaurant, RestaurantFeature } from "@shared/types/api/schemas";
+import { ChevronDown, ChevronRight, Plus, Sparkles, Info, CheckCircle, Tag } from "lucide-react";
 import { useState } from "react";
 import {
   ALL_FEATURES,
   FEATURE_CATEGORIES,
-  type RestaurantFeature,
   type CategorizedFeature,
   categorizeFeatures,
 } from "../../../../utils";
@@ -142,7 +141,7 @@ export function RestaurantProfileFeatures({
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm text-gray-foreground bg-gray px-3 py-2 rounded-lg">
             <Info className="w-4 h-4" />
-            <span>Click on categories to expand and select features. This helps organize your restaurant's amenities.</span>
+            <span>Click on categories to expand and select features. This helps organize your restaurant&apos;s amenities.</span>
           </div>
           {Object.entries(FEATURE_CATEGORIES).map(([category, availableFeatures]: [string, RestaurantFeature[]]) => {
             const selectedFeatures = categorizedFeatures.find(cat => cat.category === category)?.features || [];

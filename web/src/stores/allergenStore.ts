@@ -28,7 +28,7 @@ type AllergenStore = {
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const useAllergenStore = create<AllergenStore>((set, get) => ({
+const useAllergenStore = create<AllergenStore>((set) => ({
   allergens: [],
   isLoading: false,
   error: null,

@@ -1,4 +1,4 @@
-import { RestaurantAccess } from "@/types";
+import { RestaurantAccess } from "@shared/types/api/schemas";
 
 const getApprovedAccessList = (restaurantAccessList: RestaurantAccess[]) => {
   return restaurantAccessList.filter((access) => access.status === "approved");

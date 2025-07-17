@@ -28,7 +28,6 @@ const DELIVERY_PLATFORMS = [
 
 export function DeliveryLinks({
   isEditing,
-  restaurantId,
   links,
   isLoading,
   onAdd,
@@ -55,7 +54,7 @@ export function DeliveryLinks({
 
       setNewLink({ name: "", platform: "" as string, url: "" });
     } catch (error) {
-      // Error handling is done in parent component
+console.log(error);
     }
   };
 
@@ -63,7 +62,7 @@ export function DeliveryLinks({
     try {
       await onDelete(id);
     } catch (error) {
-      // Error handling is done in parent component
+console.log(error);
     }
   };
 
@@ -145,7 +144,7 @@ export function DeliveryLinks({
         <div className="border-t pt-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
             <Info className="w-4 h-4" />
-            <span>Add your restaurant's delivery platform links. Include the platform name, link name, and URL.</span>
+            <span>Add your restaurant&apos;s delivery platform links. Include the platform name, link name, and URL.</span>
           </div>
           <h3 className="text-md font-medium mb-3">Add New Delivery Link</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">

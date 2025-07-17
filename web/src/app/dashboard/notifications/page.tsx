@@ -2,17 +2,20 @@
 import { Button } from "@/components/atoms";
 import { NotificationCard } from "@/components/ui";
 import useNotificationStore from "@/stores/notificationStore";
-import type { Notification } from "@/types/notification";
-import type { Notification as ApiNotification } from "@shared/types/api/schemas";
-import { AlertCircle, Bell, Mail } from "lucide-react";
+import type { Notification  } from "@shared/types/api/schemas";
+import { AlertCircle, Bell, Shield, UserCheck, UserX } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+// Define notification categories based on the API spec types
 type FilteredNotificationType = {
-  accessRequest: Notification[];
-  message: Notification[];
-  system: Notification[];
+  accessRequest: Notification[];    // access_request
+  accessGranted: Notification[];    // access_granted
+  accessDenied: Notification[];     // access_denied
+  accessSuspended: Notification[];  // access_suspended
+  restaurantUpdate: Notification[]; // restaurant_update
+  system: Notification[];           // system
 };
 
 export default function Notifications() {
@@ -26,34 +29,54 @@ export default function Notifications() {
   } = useNotificationStore();
   const [selectedType, setSelectedType] = useState("accessRequest");
 
+  // Group notifications by type for better organization
   const filteredNotifications = useMemo<FilteredNotificationType>(() => {
     const groupedNotifications: FilteredNotificationType = {
       accessRequest: [],
-      message: [],
+      accessGranted: [],
+      accessDenied: [],
+      accessSuspended: [],
+      restaurantUpdate: [],
       system: [],
     };
 
     for (const notification of notifications) {
-      if (notification.type === "access-request") {
-        groupedNotifications.accessRequest.push(notification);
-      } else if (notification.type === "message") {
-        groupedNotifications.message.push(notification);
-      } else if (notification.type === "system") {
-        groupedNotifications.system.push(notification);
+      switch (notification.type) {
+        case "access_request":
+          groupedNotifications.accessRequest.push(notification);
+          break;
+        case "access_granted":
+          groupedNotifications.accessGranted.push(notification);
+          break;
+        case "access_denied":
+          groupedNotifications.accessDenied.push(notification);
+          break;
+        case "access_suspended":
+          groupedNotifications.accessSuspended.push(notification);
+          break;
+        case "restaurant_update":
+          groupedNotifications.restaurantUpdate.push(notification);
+          break;
+        case "system":
+          groupedNotifications.system.push(notification);
+          break;
       }
     }
 
     return groupedNotifications;
   }, [notifications]);
 
-  // Map notification types to their icons
+  // Map notification types to their icons for better UX
   const notificationIcons = {
     accessRequest: <Bell className="w-5 h-5" />,
-    message: <Mail className="w-5 h-5" />,
+    accessGranted: <UserCheck className="w-5 h-5" />,
+    accessDenied: <UserX className="w-5 h-5" />,
+    accessSuspended: <Shield className="w-5 h-5" />,
+    restaurantUpdate: <AlertCircle className="w-5 h-5" />,
     system: <AlertCircle className="w-5 h-5" />,
   };
 
-  // Format the type name for display
+  // Format the type name for display (e.g., "accessRequest" -> "Access Request")
   const formatTypeName = (type: string) => {
     return type
       .replace(/([a-z])([A-Z])/g, "$1 $2")
@@ -62,7 +85,7 @@ export default function Notifications() {
 
   // Get appropriate action buttons based on notification type
   const renderActionButtons = (notification: Notification) => {
-    if (notification.type === "access-request") {
+    if (notification.type === "access_request") {
       return (
         <div className="flex space-x-2 items-center">
           <Button
@@ -71,7 +94,30 @@ export default function Notifications() {
             size="sm"
             text="Manage Request"
             onClick={() => router.push("/dashboard/team-management")}
-          />{" "}
+          />
+          <Button
+            color="primary"
+            variant="outline"
+            size="sm"
+            text="Mark as Read"
+            onClick={() =>
+              notification._id && handleMarkAsRead(notification._id)
+            }
+          />
+        </div>
+      );
+    }
+
+    if (notification.type === "access_granted" || notification.type === "access_denied" || notification.type === "access_suspended") {
+      return (
+        <div className="flex space-x-2 items-center">
+          <Button
+            color="primary"
+            variant="outline"
+            size="sm"
+            text="View Details"
+            onClick={() => router.push("/dashboard/team-management")}
+          />
           <Button
             color="primary"
             variant="outline"
@@ -86,29 +132,43 @@ export default function Notifications() {
     }
 
     return (
-      <Button color="primary" variant="outline" size="sm" text="Mark as Read" />
+      <Button 
+        color="primary" 
+        variant="outline" 
+        size="sm" 
+        text="Mark as Read"
+        onClick={() =>
+          notification._id && handleMarkAsRead(notification._id)
+        }
+      />
     );
   };
+
+  // Count unread notifications for a specific category
   const readNotification = (notifications: Notification[]) => {
-    const filter = notifications.filter((notification) => !notification.read);
+    const filter = notifications.filter((notification) => !notification.isRead);
     return filter.length;
   };
 
+  // Mark all notifications as read
   const handlemarkAllAsRead = () => {
     if (notifications.length > 0 && session?.user?._id) {
       markAllNotificationsAsRead(session.user._id);
     }
   };
+
+  // Mark a single notification as read
   const handleMarkAsRead = (notificationId: string) => {
-    const markarkAsRead = async () => {
+    const markAsRead = async () => {
       if (session?.user?._id) {
         await markNotificationAsRead(notificationId, session.user._id);
         await fetchNotifications(session.user._id);
       }
     };
-    markarkAsRead();
+    markAsRead();
   };
 
+  // Fetch notifications when component mounts or user changes
   useEffect(() => {
     if (session?.user?._id) {
       fetchNotifications(session.user._id);
@@ -131,7 +191,7 @@ export default function Notifications() {
 
         {filteredNotifications && (
           <>
-            {/* notification header */}
+            {/* Notification category tabs */}
             <div className="flex flex-col md:flex-row justify-between mb-6 w-full md:w-[70%]">
               {Object.entries(filteredNotifications).map(
                 ([type, notification]) => (
@@ -162,7 +222,7 @@ export default function Notifications() {
                 )
               )}
             </div>
-            {/* notification list */}
+            {/* Notification list */}
             <div className="mt-4">
               {filteredNotifications[
                 selectedType as keyof FilteredNotificationType
@@ -188,7 +248,7 @@ export default function Notifications() {
                   <h3 className="text-lg font-medium text-gray-700">
                     No {formatTypeName(selectedType)} Notifications
                   </h3>
-                  <p className="text-gray-500 mt-2">You're all caught up!</p>
+                  <p className="text-gray-500 mt-2">You&apos;re all caught up!</p>
                 </div>
               )}
             </div>

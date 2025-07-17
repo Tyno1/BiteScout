@@ -30,7 +30,7 @@ export default function GalleryPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gallery</h1>
           <p className="text-gray-600 mt-2">
-            Manage your restaurant's photo gallery and media content
+            Manage your restaurant&apos;s photo gallery and media content
           </p>
         </div>
         <button

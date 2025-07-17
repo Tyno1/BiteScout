@@ -1,4 +1,4 @@
-import type { Restaurant } from "@shared/types/api/schemas";
+import type { Restaurant, RestaurantFeature } from "@shared/types/api/schemas";
 import { FEATURE_CATEGORIES } from "./featureUtils";
 
 export interface FilterOptions {
@@ -96,7 +96,7 @@ export function restaurantMatchesCategories(
 
   const requiredFeatures = categoriesToFeatures(categories);
   return requiredFeatures.some(feature => 
-    restaurant.features?.includes(feature)
+    restaurant.features?.includes(feature as RestaurantFeature)
   );
 }
 
@@ -132,6 +132,6 @@ export function filterRestaurantsByFeatures(
   if (!features.length) return restaurants;
 
   return restaurants.filter(restaurant => 
-    features.some(feature => restaurant.features?.includes(feature as any))
+    features.some(feature => restaurant.features?.includes(feature as RestaurantFeature))
   );
 } 

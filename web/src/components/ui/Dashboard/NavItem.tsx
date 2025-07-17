@@ -15,7 +15,10 @@ export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
   const pathname = usePathname();
 
   const isActive = path
-    ? path !== "/dashboard" ? pathname === path || pathname.startsWith(`${path}/`) : pathname === path : false;
+    ? path !== "/dashboard"
+      ? pathname === path || pathname.startsWith(`${path}/`)
+      : pathname === path
+    : false;
 
   return (
     <li className="w-full">
@@ -25,7 +28,7 @@ export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
           if (text === "Logout") {
             signOut({ callbackUrl: "/" });
           } else {
-            handleNav && handleNav(path ? path : "/");
+            if (handleNav) handleNav(path ? path : "/");
           }
         }}
         className={`

@@ -11,7 +11,6 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   value?: string;
   onClick: () => void;
   className?: string;
-  iconStyle?: string;
   variant: "solid" | "outline" | "plain";
   ariaLabel?: string;
   isPressed?: boolean;
@@ -31,7 +30,6 @@ export function IconButton({
   className = "",
   variant = "solid",
   ariaLabel,
-  iconStyle,
   isPressed = false,
   isExpanded = false,
   ...props

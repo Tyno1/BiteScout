@@ -1,7 +1,6 @@
 import { handleApiError } from "@/utils/apiErrorHandler";
 import apiClient from "@/utils/authClient";
 import type { BusinessHour, DeliveryLink, Restaurant } from "@shared/types/api/schemas";
-import type { ApiError } from "@shared/types/common/errors.js";
 import type {
   CreateRestaurantRequest,
   CreateRestaurantResponse,

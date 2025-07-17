@@ -100,7 +100,15 @@ export function Select({
           {label}
         </label>
       )}
-
+    {errorMessage && (
+        <p
+          id={`${uniqueId}-error`}
+          className="text-sm text-red-500 mt-1"
+          role="alert"
+        >
+          {errorMessage}
+        </p>
+      )}
       <div className="relative">
         {icon && (
           <div
@@ -159,15 +167,7 @@ export function Select({
         )}
       </div>
 
-      {errorMessage && (
-        <p
-          id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
-          role="alert"
-        >
-          {errorMessage}
-        </p>
-      )}
+  
 
       {helperText && !errorMessage && (
         <p id={`${uniqueId}-helper`} className="text-sm text-gray-500 mt-1">

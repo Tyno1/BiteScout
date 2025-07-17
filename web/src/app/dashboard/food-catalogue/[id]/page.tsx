@@ -68,7 +68,7 @@ export default function FoodDetailPage() {
             Food item not found
           </h1>
           <p className="text-gray-500 mt-2">
-            The food item you're looking for doesn't exist or has been removed.
+            The food item you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <div className="mt-6">
             <a 

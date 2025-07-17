@@ -1,34 +1,35 @@
-import { Button, IconButton, Input } from "@/components/atoms";
+import { Button, Input } from "@/components/atoms";
 import { Filter, Search } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { ColumnFiltersState } from "@tanstack/react-table";
 import { ColumnType } from "./Table";
 
 type TableFilterProps = {
-  columnFilters?: any;
-  setColumnFilters?: (value: any) => void;
+  columnFilters?: ColumnFiltersState;
+  setColumnFilters?: (value: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => void;
   filterName?: string;
   setFilterName?: (value: string) => void;
   column: ColumnType[];
 };
 
 export const TableFilter = ({
-  columnFilters,
+  columnFilters = [],
   setColumnFilters,
   filterName,
   setFilterName,
   column,
 }: TableFilterProps) => {
   const name =
-    columnFilters.find((filter: any) => filter.id === filterName)?.value || "";
+    (columnFilters.find((filter) => filter.id === filterName)?.value as string) || "";
 
   const handleFilterChange = (id: string, value: string) => {
     if (setColumnFilters) {
-      setColumnFilters((prev: any) =>
-        prev.filter((filter: any) => filter.id !== id).concat({ id, value })
+      setColumnFilters((prev: ColumnFiltersState) =>
+        prev.filter((filter) => filter.id !== id).concat({ id, value })
       );
     }
   };
@@ -62,18 +63,21 @@ export const TableFilter = ({
           <PopoverContent>
             <div className="flex flex-col gap-2 items-start">
               {column.map((col: ColumnType) => {
+                // Only render buttons for columns that have a string header
+                if (!col.header || typeof col.header !== 'string') {
+                  return null;
+                }
+                
                 return (
-                  col?.header && (
-                    <Button
-                      key={col.id}
-                      variant="plain"
-                      size="sm"
-                      fullWidth
-                      text={col?.header.toString()}
-                      className="items-left"
-                      onClick={() => col.id && setFilterName?.(col?.id)}
-                    />
-                  )
+                  <Button
+                    key={col.id}
+                    variant="plain"
+                    size="sm"
+                    fullWidth
+                    text={col.header}
+                    className="items-left"
+                    onClick={() => col.id && setFilterName?.(col.id)}
+                  />
                 );
               })}
             </div>

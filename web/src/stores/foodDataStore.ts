@@ -42,7 +42,7 @@ type FoodDataStore = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_FOOD_DATA: FoodCatalogue = {
+export const DEFAULT_FOOD_DATA: FoodCatalogue = {
   _id: "",
   name: "",
   ingredients: [],
@@ -55,6 +55,8 @@ const DEFAULT_FOOD_DATA: FoodCatalogue = {
   allergens: [],
   images: [],
   restaurant: "",
+  isAvailable: true,
+  isFeatured: false,
 };
 const useFoodDataStore = create<FoodDataStore>((set, get) => ({
   foodData: DEFAULT_FOOD_DATA,
@@ -68,7 +70,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
 
       const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
       const newFood = response.data;
-      set((state) => ({
+      set(({
         foodDatas: get().foodDatas
           ? [...get().foodDatas, newFood]
           : [newFood],

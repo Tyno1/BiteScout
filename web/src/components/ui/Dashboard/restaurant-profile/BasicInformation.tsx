@@ -1,7 +1,7 @@
 import { Button, IconButton, Select, Textarea } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import type { Cuisine, Restaurant } from "@shared/types/api/schemas";
-import { X, Info, Sparkles, ChefHat, DollarSign } from "lucide-react";
+import { X, Info, ChefHat, DollarSign } from "lucide-react";
 import { useState } from "react";
 
 type BasicInformation = {

@@ -30,7 +30,7 @@ export function BusinessHours({
             <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
               <Sparkles className="w-4 h-4" />
               <span>
-                <strong>Important:</strong> Set accurate business hours so customers know when you're open and can plan their visits!
+                <strong>Important:</strong> Set accurate business hours so customers know when you&apos;re open and can plan their visits!
               </span>
             </div>
           )}
@@ -41,7 +41,7 @@ export function BusinessHours({
       {isEditing && (
         <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
           <Info className="w-4 h-4" />
-          <span>Set your opening and closing times for each day. Check "Closed" if you don't operate on that day.</span>
+          <span>Set your opening and closing times for each day. Check &quot;Closed&quot; if you don&apos;t operate on that day.</span>
         </div>
       )}
       <table className="w-full border-collapse" aria-label="Business hours">

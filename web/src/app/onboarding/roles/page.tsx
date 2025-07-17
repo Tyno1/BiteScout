@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { DEFAULT_BUSINESS_HOURS, DEFAULT_RESTAURANT_DATA } from "../constants";
+import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
   const { createRestaurant } = useRestaurantStore();
@@ -98,7 +98,7 @@ export default function Onboarding() {
 
     // Create restaurant
     try {
-      const result = await createRestaurant(preparedData);
+       await createRestaurant(preparedData);
       await handleSuccessfulCreation();
     } catch (error) {
       const errorMessage =
@@ -106,7 +106,7 @@ export default function Onboarding() {
       handleCreationError(errorMessage);
     }
   };
-  session?.data?.user?.accessToken;
+
   const prepareRestaurantData = (): Restaurant => {
     
 
