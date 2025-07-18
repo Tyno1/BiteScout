@@ -27,7 +27,7 @@ export function Testimonials() {
             },
           ].map((testimonial, index) => (
             <div key={index} className="bg-white p-8 rounded-xl shadow-sm">
-              <p className="text-gray-600 mb-6 italic">"{testimonial.quote}"</p>
+              <p className="text-gray-600 mb-6 italic">&quot;{testimonial.quote}&quot;</p>
               <div>
                 <p className="font-bold">{testimonial.author}</p>
                 <p className="text-sm text-gray-500">{testimonial.role}</p>

@@ -56,7 +56,7 @@ const foodCatalogue = new Schema({
     type: PriceSchema,
     required: true,
   },
-  media: [
+  images: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Media",
@@ -66,6 +66,32 @@ const foodCatalogue = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "restaurantData",
     required: true,
+  },
+  // Analytics fields
+  analytics: {
+    totalMentions: {
+      type: Number,
+      default: 0,
+    },
+    totalLikes: {
+      type: Number,
+      default: 0,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    totalRatings: {
+      type: Number,
+      default: 0,
+    },
+    trendingScore: {
+      type: Number,
+      default: 0,
+    },
+    lastMentioned: {
+      type: Date,
+    },
   },
 });
 

@@ -19,7 +19,7 @@ type CourseStore = {
 
   // Actions
   createCourse: (course: CreateCourseRequest) => Promise<CreateCourseResponse | null>;
-  getCourses: () => Promise<GetAllCoursesResponse>;
+  getCourses: (onSuccess?: (courses: GetAllCoursesResponse) => void) => Promise<GetAllCoursesResponse>;
   getCourse: (id: string) => Promise<GetCourseByIdResponse | null>;
   updateCourse: (id: string, course: UpdateCourseRequest) => Promise<UpdateCourseResponse | null>;
   deleteCourse: (id: string) => Promise<DeleteCourseResponse | null>;
@@ -28,7 +28,7 @@ type CourseStore = {
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const useCourseStore = create<CourseStore>((set, get) => ({
+const useCourseStore = create<CourseStore>((set) => ({
   courses: [],
   isLoading: false,
   error: null,
@@ -56,13 +56,14 @@ const useCourseStore = create<CourseStore>((set, get) => ({
     }
   },
 
-  getCourses: async () => {
+  getCourses: async (onSuccess) => {
     try {
       set({ error: null, isLoading: true });
 
       const response = await axios.get<GetAllCoursesResponse>(`${API_URL}/courses`);
 
       set({ courses: response.data, isLoading: false });
+      onSuccess?.(response.data);
       return response.data;
     } catch (error) {
       const errorMessage = handleApiError(error);

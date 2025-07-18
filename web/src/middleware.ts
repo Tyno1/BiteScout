@@ -1,10 +1,10 @@
 import type { Session } from "@auth/core/types";
+import type { AccessRoles } from "@shared/types/api/enums";
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentSession } from "./app/actions/getSessionAction";
 import { Permissions } from "./app/permissions";
-import type { AccessRoles } from "./types";
 import { getMatchingRoute } from "./utils/getMatchingRoute";
 import { getRoleFromToken } from "./utils/getRoleFromSession";
 
@@ -77,6 +77,9 @@ export async function middleware(request: NextRequest) {
 		if (!matchingRoute) return NextResponse.next();
 
 		const allowedRoles = Permissions[matchingRoute];
+
+		console.log("allowedRoles", allowedRoles);
+		console.log("role", role);
 
 		if (allowedRoles && !allowedRoles.includes(role)) {
 			console.warn(

@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "node --loader ts-node/esm src/index.ts"
+    "dev": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts"
   },
   "author": "Anthony Ukutegbe",
   "license": "ISC",
@@ -39,6 +39,7 @@
     "@types/node": "^22.13.8",
     "@types/node-fetch": "^2.6.12",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"
   }
 }

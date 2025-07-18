@@ -14,6 +14,7 @@ import {
   ChartNoAxesCombined,
   House,
   LogOut,
+  Images,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { NavItem } from "@/components/ui";
@@ -29,13 +30,13 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
   //   handle navigation
   const handleNav = (navName: string) => {
     router.push(navName);
-    setIsMenuOpen && setIsMenuOpen(false);
+    if (setIsMenuOpen) setIsMenuOpen(false);
   };
 
   return (
     <div className="h-[100vh] w-full bg-white border-r border-gray-200 flex flex-col">
       <nav className="flex-1 p-4 w-full h-full">
-        <ul className="w-full h-screen">
+        <ul className="w-full h-screen space-y-1">
           <NavItem
             handleNav={handleNav}
             icon={<Home />}
@@ -53,6 +54,12 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             icon={<CookingPot />}
             text="Food Catalogue"
             path="/dashboard/food-catalogue"
+          />
+          <NavItem
+            handleNav={handleNav}
+            icon={<Images />}
+            text="Gallery"
+            path="/dashboard/gallery"
           />
           <NavItem
             handleNav={handleNav}

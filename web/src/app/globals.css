@@ -43,6 +43,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-gray: var(--gray);
+  --color-gray-foreground: var(--gray-foreground);
 }
 
 :root {
@@ -80,6 +82,8 @@
   --sidebar-ring: var(--color-orange-600);
   --success: var(--color-green-500);
   --success-foreground: var(--color-green-50);
+  --gray: var(--color-gray-100);
+  --gray-foreground: var(--color-gray-600);
 }
 
 .dark {
@@ -114,6 +118,8 @@
   --sidebar-accent-foreground: var(--color-orange-50);
   --sidebar-border: var(--color-orange-900);
   --sidebar-ring: var(--color-orange-600);
+  --gray: var(--color-gray-800);
+  --gray-foreground: var(--color-gray-200);
 }
 
 @layer base {

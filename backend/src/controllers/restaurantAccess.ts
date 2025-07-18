@@ -1,89 +1,69 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
+import type {
+  DeleteRestaurantAccessRequest,
+  DeleteRestaurantAccessResponse,
+  GetRestaurantAccessByOwnerRequest,
+  GetRestaurantAccessByOwnerResponse,
+  GetRestaurantAccessByUserRequest,
+  GetRestaurantAccessByUserResponse,
+  GrantRestaurantAccessRequest,
+  GrantRestaurantAccessResponse,
+  RequestRestaurantAccessRequest,
+  RequestRestaurantAccessResponse,
+  SuspendRestaurantAccessRequest,
+  SuspendRestaurantAccessResponse,
+  UpdateRestaurantAccessRequest,
+  UpdateRestaurantAccessResponse,
+} from "../../../shared/types/access/index.js";
+import * as enums from "../../../shared/types/api/enums.js";
+const { AccessRoleEnum, AccessStatusEnum } = enums;
+import type { AccessRoles } from "../../../shared/types/api/enums.js";
+import type {
+  RestaurantAccess as RestaurantAccessType,
+} from "../../../shared/types/api/schemas.js";
+import type { ApiError } from "../../../shared/types/common/errors.js";
+import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import RestaurantAccess from "../models/RestaurantAccess.js";
 import RestaurantData from "../models/RestaurantData.js";
 import User from "../models/User.js";
 import { createAndSendNotification } from "../services/notificationService.js";
 
-export enum UserType {
-  Guest = "guest",
-  User = "user",
-  Moderator = "moderator",
-  Admin = "admin",
-  Root = "root",
-}
 
-export enum AccessStatus {
-  Pending = "pending",
-  Approved = "approved",
-  Suspended = "suspended",
-  Innactive = "innactive",
-}
 
-const validateRequest = (
-  userId: string,
-  restaurantId: string,
-  res: Response
-): boolean => {
-  if (!userId) {
-    res.status(400).json({ error: "User ID is required" });
-    return false;
-  }
-  if (!restaurantId) {
-    res.status(400).json({ error: "Restaurant ID is required" });
-    return false;
-  }
-  return true;
-};
 
-const checkExistingAccess = async (
-  userId: string,
-  restaurantId: string,
-  res: Response
-): Promise<boolean> => {
-  const existingUser = await RestaurantAccess.findOne({ userId, restaurantId });
-  if (existingUser) {
-    res
-      .status(403)
-      .json({ error: "User already has access to this restaurant" });
-    return true;
-  }
-  return false;
-};
 
-const createAccessRequest = async (
-  userId: string,
-  restaurantId: string,
-  res: Response
-) => {
-  const newRestaurantAccess = await RestaurantAccess.create({
-    restaurantId,
-    userId,
-    role: "staff",
-    status: "pending",
-  });
-
-  if (!newRestaurantAccess) {
-    res.status(500).json({ error: "Failed to create user access request" });
-    return null;
-  }
-
-  return newRestaurantAccess;
-};
+// Combined response types for each endpoint
+type RequestRestaurantAccessApiResponse =
+  | RequestRestaurantAccessResponse
+  | ApiError;
+type GetRestaurantAccessByUserApiResponse =
+  | GetRestaurantAccessByUserResponse
+  | ApiError;
+type GetRestaurantAccessByOwnerApiResponse =
+  | GetRestaurantAccessByOwnerResponse
+  | ApiError;
+type GrantRestaurantAccessApiResponse =
+  | GrantRestaurantAccessResponse
+  | ApiError;
+type SuspendRestaurantAccessApiResponse =
+  | SuspendRestaurantAccessResponse
+  | ApiError;
+type DeleteRestaurantAccessApiResponse =
+  | DeleteRestaurantAccessResponse
+  | ApiError;
+type UpdateRestaurantAccessApiResponse =
+  | UpdateRestaurantAccessResponse
+  | ApiError;
 
 /**
  * Notifies the owner of a restaurant about a new access request.
- *
- * @param req - The HTTP request object, which contains application-level properties such as `io` (Socket.IO instance) and `connectedUsers` (a map of connected user IDs to their socket IDs).
- * @param restaurantId - The ID of the restaurant for which access is being requested.
- * @param userId - The ID of the user requesting access to the restaurant.
- * @param newRestaurantAccess - The new access request object containing details about the request.
- * @returns An object with an error message and status code if the restaurant is not found, or `null` if the notification is successfully sent or no notification is required.
  */
 const notifyRestaurantOwner = async (
   req: Request,
   restaurantId: string,
   userId: string,
-  newRestaurantAccess: any
+  newRestaurantAccess: RestaurantAccessType
 ) => {
   const restaurant = await RestaurantData.findById(restaurantId);
   if (!restaurant) {
@@ -121,19 +101,15 @@ const notifyRestaurantOwner = async (
 
 /**
  * Updates the user type of a user.
- * @param usertype - The new user type to assign.
- * @param userId - The ID of the user to update.
- * @param res - The response object for sending error responses.
- * @returns The updated user object if successful, or an error object if the user type or user is not found.
  */
 const updateUserUsertype = async (
-  usertype: UserType,
+  usertype: AccessRoles,
   userId: string,
   res: Response
 ) => {
   const user = await User.findByIdAndUpdate(
     userId,
-    { userType: usertype.toLowerCase() },
+    { userType: usertype?.toLowerCase() },
     { new: true }
   );
 
@@ -146,29 +122,62 @@ const updateUserUsertype = async (
   return { user };
 };
 
-// This function handles the authorization request for a user to access a restaurant
-// It checks if the user ID and restaurant ID are provided, validates them,
-// checks if the user already has access, creates a new access request,
-// and sends a notification to the restaurant owner if the request is successful
+/**
+ * Handles the authorization request for a user to access a restaurant.
+ * Checks if the user ID and restaurant ID are provided, validates them,
+ * checks if the user already has access, creates a new access request,
+ * and sends a notification to the restaurant owner if the request is successful.
+ */
 export const RequestAuthorization = async (
-  req: Request,
-  res: Response,
+  req: Request<
+    { restaurantId: string },
+    unknown,
+    RequestRestaurantAccessRequest
+  >,
+  res: Response<RequestRestaurantAccessApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { restaurantId } = req.params;
     const { userId } = req.body;
 
-    if (!validateRequest(userId, restaurantId, res)) return;
+    if (!userId || !restaurantId) {
+      return next(
+        createError(
+          ErrorCodes.BAD_REQUEST,
+          "User ID and Restaurant ID are required"
+        )
+      );
+    }
 
-    if (await checkExistingAccess(userId, restaurantId, res)) return;
-
-    const newRestaurantAccess = await createAccessRequest(
+    const existingUser = await RestaurantAccess.findOne({
       userId,
       restaurantId,
-      res
-    );
-    if (!newRestaurantAccess) return;
+    });
+    if (existingUser) {
+      return next(
+        createError(
+          ErrorCodes.CONFLICT,
+          "User already has access to this restaurant"
+        )
+      );
+    }
+
+    const newRestaurantAccess = await RestaurantAccess.create({
+      restaurantId,
+      userId,
+      role: AccessRoleEnum.User,
+      status: AccessStatusEnum.Pending,
+    });
+
+    if (!newRestaurantAccess) {
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "Failed to create user access request"
+        )
+      );
+    }
 
     const notificationError = await notifyRestaurantOwner(
       req,
@@ -177,68 +186,66 @@ export const RequestAuthorization = async (
       newRestaurantAccess
     );
     if (notificationError) {
-      res
-        .status(notificationError.status)
-        .json({ error: notificationError.error });
-      return;
+      return next(
+        createError(notificationError.status, notificationError.error)
+      );
     }
 
-    res.status(200).json({
+    res.status(201).json({
       message: "Authorization request sent successfully",
       restaurantAccess: newRestaurantAccess,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
-// This function retrieves all restaurant access records for a specific user who isnt the owner
 
+/**
+ * Retrieves all restaurant access records for a specific user.
+ */
 export const GetRestaurantAccessByUserId = async (
-  req: Request,
-  res: Response,
+  req: Request<GetRestaurantAccessByUserRequest>,
+  res: Response<GetRestaurantAccessByUserApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { userId } = req.params;
 
     if (!userId) {
-      res.status(400).json({ error: "User ID is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "User ID is required"));
     }
 
     const restaurantAccesses = await RestaurantAccess.find({ userId: userId });
 
-    if (!restaurantAccesses || restaurantAccesses.length === 0) {
-      res
-        .status(404)
-        .json({ error: "No restaurant access found for this user" });
-      return;
-    }
-
-    res.status(200).json({ restaurantAccesses });
+    // Return empty array instead of 404 error when no access records found
+    // This allows frontend to handle empty states gracefully
+    res.status(200).json({ restaurantAccesses: restaurantAccesses || [] });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
-// This function retrieves all restaurant access records for a specific owner
+
+/**
+ * Retrieves all restaurant access records for a specific owner.
+ */
 export const GetRestaurantAccessByOwnerId = async (
-  req: Request,
-  res: Response,
+  req: Request<GetRestaurantAccessByOwnerRequest>,
+  res: Response<GetRestaurantAccessByOwnerApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { ownerId } = req.params;
 
     if (!ownerId) {
-      res.status(400).json({ error: "Owner ID is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "Owner ID is required"));
     }
 
-    const restaurant = await RestaurantData.findOne({ ownerId });
+    const restaurant = await RestaurantData.findOne({ ownerId: new mongoose.Types.ObjectId(ownerId) });
 
     if (!restaurant) {
-      res.status(404).json({ error: "No restaurant found for this owner" });
-      return;
+      return next(
+        createError(ErrorCodes.NOT_FOUND, "No restaurant found for this owner")
+      );
     }
 
     const restaurantAccesses = await RestaurantAccess.find({
@@ -247,181 +254,191 @@ export const GetRestaurantAccessByOwnerId = async (
       .populate("userId")
       .populate("restaurantId");
 
-    if (!restaurantAccesses || restaurantAccesses.length === 0) {
-      res
-        .status(404)
-        .json({ error: "No restaurant access found for this owner" });
-      return;
-    }
-
-    res.status(200).json({ restaurantAccesses });
+    // Return empty array instead of 404 error when no access records found
+    // This allows frontend to handle empty states gracefully
+    res.status(200).json({ restaurantAccesses: restaurantAccesses || [] });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-// This function grants access to a user for a specific restaurant
-// and updates the user's type to "user" upon granting access
+/**
+ * Grants access to a user for a specific restaurant
+ * and updates the user's type to "moderator" upon granting access.
+ */
 export const GrantAccess = async (
-  req: Request,
-  res: Response,
+  req: Request<GrantRestaurantAccessRequest>,
+  res: Response<GrantRestaurantAccessApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { accessId } = req.params;
 
     if (!accessId) {
-      res.status(400).json({ error: "Access Id is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
     }
 
     const accessRecord = await RestaurantAccess.findByIdAndUpdate(
       accessId,
-      { status: AccessStatus.Approved },
+      { status: AccessStatusEnum.Approved },
       { new: true }
     );
 
     if (!accessRecord) {
-      res.status(404).json({ error: "Access record not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
     }
+
     try {
       const updatedUser = await updateUserUsertype(
-        UserType.Moderator,
+        AccessRoleEnum.Moderator,
         accessRecord.userId.toString(),
         res
       );
 
       if (updatedUser?.error) {
-        res.status(updatedUser.status).json({ error: updatedUser.error });
-        return;
+        return next(createError(updatedUser.status, updatedUser.error));
       }
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "An error occurred while updating the user type" });
-      return;
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "An error occurred while updating the user type"
+        )
+      );
     }
 
-    res
-      .status(200)
-      .json({ message: "Access granted successfully", accessRecord });
+    res.status(200).json({
+      message: "Access granted successfully",
+      accessRecord,
+    });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-// This function updates the role of a user in a specific restaurant
+/**
+ * Updates the role of a user in a specific restaurant.
+ */
 export const UpdateRole = async (
-  req: Request,
-  res: Response,
+  req: Request<{ accessId: string }, unknown, UpdateRestaurantAccessRequest>,
+  res: Response<UpdateRestaurantAccessApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { accessId } = req.params;
+    const { role } = req.body;
 
     if (!accessId) {
-      res.status(400).json({ error: "Access Id is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
+    }
+
+    if (!role) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Role is required"));
     }
 
     const accessRecord = await RestaurantAccess.findByIdAndUpdate(
       accessId,
-      { role: "manager" },
+      { role },
       { new: true }
     );
 
     if (!accessRecord) {
-      res.status(404).json({ error: "Access record not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
     }
 
-    res
-      .status(200)
-      .json({ message: "Role updated successfully", accessRecord });
+    res.status(200).json({
+      message: "Role updated successfully",
+      accessRecord,
+    });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
+/**
+ * Suspends a user's access to a specific restaurant.
+ */
 export const SuspendAccess = async (
-  req: Request,
-  res: Response,
+  req: Request<SuspendRestaurantAccessRequest>,
+  res: Response<SuspendRestaurantAccessApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { accessId } = req.params;
 
     if (!accessId) {
-      res.status(400).json({ error: "Access Id is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
     }
 
     const accessRecord = await RestaurantAccess.findByIdAndUpdate(
       accessId,
-      { status: AccessStatus.Suspended },
+      { status: AccessStatusEnum.Suspended },
       { new: true }
     );
 
     if (!accessRecord) {
-      res.status(404).json({ error: "Access record not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
     }
 
-    res
-      .status(200)
-      .json({ message: "Access Suspended Successfully", accessRecord });
+    res.status(200).json({
+      message: "Access Suspended Successfully",
+      accessRecord,
+    });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-// This function deletes a user's access to a specific restaurant
+/**
+ * Deletes a user's access to a specific restaurant
+ * and updates the user's type to "guest" upon deletion.
+ */
 export const DeleteAccess = async (
-  req: Request,
-  res: Response,
+  req: Request<DeleteRestaurantAccessRequest>,
+  res: Response<DeleteRestaurantAccessApiResponse>,
   next: NextFunction
 ) => {
   try {
     const { accessId } = req.params;
 
     if (!accessId) {
-      res.status(400).json({ error: "Access Id is required" });
-      return;
+      return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
     }
 
     const accessRecord = await RestaurantAccess.findByIdAndUpdate(
       accessId,
-      { status: AccessStatus.Innactive },
+      { status: AccessStatusEnum.Innactive },
       { new: true }
     );
 
     if (!accessRecord) {
-      res.status(404).json({ error: "Access record not found" });
-      return;
+      return next(createError(ErrorCodes.NOT_FOUND, "Access record not found"));
     }
+
     try {
       const updatedUser = await updateUserUsertype(
-        UserType.Guest,
+        AccessRoleEnum.Guest,
         accessRecord.userId.toString(),
         res
       );
 
       if (updatedUser?.error) {
-        res.status(updatedUser.status).json({ error: updatedUser.error });
-        return;
+        return next(createError(updatedUser.status, updatedUser.error));
       }
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "An error occurred while updating the user type" });
-      return;
+      return next(
+        createError(
+          ErrorCodes.INTERNAL_SERVER_ERROR,
+          "An error occurred while updating the user type"
+        )
+      );
     }
 
-    res
-      .status(200)
-      .json({ message: "Access deleted successfully", accessRecord });
+    res.status(200).json({
+      message: "Access deleted successfully",
+      accessRecord,
+    });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

@@ -3,7 +3,7 @@ import axios from "axios";
 
 const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-async function refreshAccessToken(token: any) {  
+async function refreshAccessToken(token: { refreshToken: string }) {  
   try {    
     const response = await axios.post(`${BACKEND_SERVER}/auth/refresh`, {
       refreshToken: token.refreshToken

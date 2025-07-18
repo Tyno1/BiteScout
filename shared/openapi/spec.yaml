@@ -308,15 +308,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Restaurant"
-  /api/restaurants/search:
+  /api/restaurants/search/{name}:
     get:
       summary: Search restaurants by name
       parameters:
-        - in: query
+        - in: path
           name: name
-          required: false
+          required: true
+          description: Restaurant name to search for
           schema:
             type: string
+            example: "Pizza"
       responses:
         200:
           description: List of matching restaurants
@@ -326,6 +328,109 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Restaurant"
+        400:
+          description: Restaurant name is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/restaurants/filter:
+    get:
+      summary: Filter restaurants by various criteria including feature categories
+      parameters:
+        - in: query
+          name: name
+          description: Restaurant name to search for
+          schema:
+            type: string
+            example: "Pizza"
+        - in: query
+          name: cuisine
+          description: Cuisine type to filter by
+          schema:
+            type: string
+            example: "Italian"
+        - in: query
+          name: priceRange
+          description: Price range to filter by
+          schema:
+            type: string
+            enum: ["$", "$$", "$$$", "$$$$"]
+            example: "$$"
+        - in: query
+          name: features
+          description: Comma-separated list of specific features to filter by
+          schema:
+            type: string
+            example: "Outdoor seating,Delivery,Free WiFi"
+        - in: query
+          name: featureCategories
+          description: Comma-separated list of feature categories to filter by
+          schema:
+            type: string
+            example: "Seating & Dining,Service Types"
+        - in: query
+          name: page
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            example: 1
+        - in: query
+          name: limit
+          description: Number of results per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+            example: 10
+      responses:
+        200:
+          description: List of filtered restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurants:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Restaurant"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        example: 1
+                      totalPages:
+                        type: integer
+                        example: 5
+                      totalRestaurants:
+                        type: integer
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        example: false
+                  filters:
+                    type: object
+                    properties:
+                      applied:
+                        type: object
+                        description: "Currently applied filters"
+                      available:
+                        type: object
+                        description: "Available filter options"
+        400:
+          description: Invalid filter parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/restaurants/{id}:
     get:
       summary: Get restaurant by ID
@@ -374,6 +479,190 @@ paths:
       responses:
         204:
           description: Restaurant deleted
+
+  /api/restaurants/{id}/delivery-links:
+    get:
+      summary: Get delivery links for a restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      responses:
+        200:
+          description: List of delivery links
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryLink"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Add a delivery link to a restaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - url
+                - platform
+              properties:
+                name:
+                  type: string
+                  description: "Display name for the delivery link"
+                  example: "Uber Eats"
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the delivery service"
+                  example: "https://ubereats.com/restaurant/123"
+                platform:
+                  type: string
+                  enum:
+                    - "Uber Eats"
+                    - "DoorDash"
+                    - "Grubhub"
+                    - "Postmates"
+                    - "Instacart"
+                    - "Amazon Fresh"
+                    - "Walmart Grocery"
+                    - "Shipt"
+                    - "Custom"
+                    - "Other"
+                  description: "Delivery platform name"
+                  example: "Uber Eats"
+                isActive:
+                  type: boolean
+                  default: true
+                  description: "Whether this delivery link is active"
+      responses:
+        201:
+          description: Delivery link created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryLink"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/restaurants/{id}/delivery-links/{linkId}:
+    put:
+      summary: Update a delivery link
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+        - in: path
+          name: linkId
+          required: true
+          schema:
+            type: string
+          description: Delivery link ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Display name for the delivery link"
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the delivery service"
+                platform:
+                  type: string
+                  enum:
+                    - "Uber Eats"
+                    - "DoorDash"
+                    - "Grubhub"
+                    - "Postmates"
+                    - "Instacart"
+                    - "Amazon Fresh"
+                    - "Walmart Grocery"
+                    - "Shipt"
+                    - "Custom"
+                    - "Other"
+                  description: "Delivery platform name"
+                isActive:
+                  type: boolean
+                  description: "Whether this delivery link is active"
+      responses:
+        200:
+          description: Delivery link updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryLink"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant or delivery link not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete a delivery link
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+        - in: path
+          name: linkId
+          required: true
+          schema:
+            type: string
+          description: Delivery link ID
+      responses:
+        204:
+          description: Delivery link deleted
+        404:
+          description: Restaurant or delivery link not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/food-catalogue/restaurant/{restaurantId}/catalogue/{foodId}:
     get:
       summary: Get food catalogue item by ID
@@ -448,7 +737,7 @@ paths:
             type: string
       responses:
         200:
-          description: List of food catalogue items
+          description: List of food catalogue items (empty array if no items found)
           content:
             application/json:
               schema:
@@ -557,7 +846,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authorization request sent successfully"
+                  restaurantAccess:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/user/{userId}:
     get:
       summary: Get restaurant access by user ID
@@ -569,13 +864,16 @@ paths:
             type: string
       responses:
         200:
-          description: List of restaurant access for user
+          description: List of restaurant access for user (empty array if no access records found)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  restaurantAccesses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/owner/{ownerId}:
     get:
       summary: Get restaurant access by owner ID
@@ -587,13 +885,16 @@ paths:
             type: string
       responses:
         200:
-          description: List of restaurant access for owner
+          description: List of restaurant access for owner (empty array if no access records found)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  restaurantAccesses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/grant:
     patch:
       summary: Grant restaurant access
@@ -609,7 +910,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access granted successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/suspend:
     patch:
       summary: Suspend restaurant access
@@ -625,7 +932,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access Suspended Successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/delete:
     patch:
       summary: Delete restaurant access
@@ -641,7 +954,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access deleted successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/update:
     patch:
       summary: Update restaurant access role
@@ -666,7 +985,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RestaurantAccess"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Role updated successfully"
+                  accessRecord:
+                    $ref: "#/components/schemas/RestaurantAccess"
   /api/user-types:
     get:
       summary: Get all user types
@@ -1256,6 +1581,1045 @@ paths:
                     type: string
                     example: "Internal server error"
 
+  /api/media:
+    post:
+      summary: Create new media
+      description: Upload and create a new media item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+                - type
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: "URL to the media file"
+                  example: "https://example.com/images/restaurant-photo.jpg"
+                type:
+                  type: string
+                  enum:
+                    - "image"
+                    - "video"
+                    - "audio"
+                  description: "Type of media file"
+                  example: "image"
+                title:
+                  type: string
+                  description: "Title or caption for the media"
+                  example: "Restaurant Interior"
+                description:
+                  type: string
+                  description: "Description of the media content"
+                  example: "Beautiful interior view of the restaurant"
+                associatedWith:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "post"
+                        - "dish"
+                        - "restaurant"
+                      description: "Type of content this media is associated with"
+                      example: "post"
+                    id:
+                      type: string
+                      description: "ID of the associated content"
+                      example: "507f1f77bcf86cd799439016"
+                  description: "Information about what this media is associated with"
+                fileSize:
+                  type: number
+                  description: "Size of the media file in bytes"
+                  example: 2048576
+                mimeType:
+                  type: string
+                  description: "MIME type of the media file"
+                  example: "image/jpeg"
+                dimensions:
+                  type: object
+                  properties:
+                    width:
+                      type: number
+                      description: "Width of the media in pixels"
+                      example: 1920
+                    height:
+                      type: number
+                      description: "Height of the media in pixels"
+                      example: 1080
+                  description: "Dimensions of the media (for images/videos)"
+      responses:
+        201:
+          description: Media created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/{id}:
+    get:
+      summary: Get media by ID
+      description: Retrieve a specific media item by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update media
+      description: Update an existing media item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: "Title or caption for the media"
+                  example: "Updated Restaurant Interior"
+                description:
+                  type: string
+                  description: "Description of the media content"
+                  example: "Updated description of the restaurant interior"
+                associatedWith:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "post"
+                        - "dish"
+                        - "restaurant"
+                      description: "Type of content this media is associated with"
+                      example: "post"
+                    id:
+                      type: string
+                      description: "ID of the associated content"
+                      example: "507f1f77bcf86cd799439016"
+                  description: "Information about what this media is associated with"
+      responses:
+        200:
+          description: Media updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to update this media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete media
+      description: Delete a media item by its ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the media to delete
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Media deleted successfully"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to delete this media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/associated/{type}/{id}:
+    get:
+      summary: Get media by associated item
+      description: Retrieve media items associated with a specific content type and ID
+      parameters:
+        - in: path
+          name: type
+          required: true
+          description: Type of content (post, dish, restaurant)
+          schema:
+            type: string
+            enum:
+              - "post"
+              - "dish"
+              - "restaurant"
+        - in: path
+          name: id
+          required: true
+          description: ID of the associated content
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid type or missing ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/user/{userId}:
+    get:
+      summary: Get user's media
+      description: Retrieve media items uploaded by a specific user with pagination
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        200:
+          description: User's media retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      totalMedia:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/{id}/verify:
+    patch:
+      summary: Verify media
+      description: Mark media as verified by moderators
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Media verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Media not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/verified:
+    get:
+      summary: Get verified media
+      description: Retrieve verified media items with optional filtering and pagination
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: type
+          required: false
+          description: Filter by media type (post, dish)
+          schema:
+            type: string
+            enum:
+              - "post"
+              - "dish"
+      responses:
+        200:
+          description: Verified media retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      totalMedia:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNextPage:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrevPage:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts:
+    post:
+      summary: Create a new post
+      description: Create a new food post with media, location, and optional food catalogue reference
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        201:
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: Get all posts
+      description: Retrieve all posts with optional filtering
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+        - in: query
+          name: cuisine
+          schema:
+            type: string
+          description: Filter by cuisine type ID
+        - in: query
+          name: course
+          schema:
+            type: string
+          description: Filter by course type ID
+        - in: query
+          name: visibility
+          schema:
+            type: string
+            enum: ["public", "private", "followers"]
+            default: "public"
+          description: Filter by visibility setting
+      responses:
+        200:
+          description: List of posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/{id}:
+    get:
+      summary: Get post by ID
+      description: Retrieve a specific post by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update post
+      description: Update an existing post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        200:
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to update this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete post
+      description: Delete a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Post deleted successfully
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to delete this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/user/{userId}:
+    get:
+      summary: Get posts by user
+      description: Retrieve all posts created by a specific user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of user posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/restaurant/{restaurantId}:
+    get:
+      summary: Get posts by restaurant
+      description: Retrieve all posts associated with a specific restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of restaurant posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/food/{foodCatalogueId}:
+    get:
+      summary: Get posts by food catalogue item
+      description: Retrieve all posts that reference a specific food catalogue item
+      parameters:
+        - in: path
+          name: foodCatalogueId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: List of food posts with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+
+  /api/posts/{id}/like:
+    post:
+      summary: Like or unlike a post
+      description: Toggle like status for a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Like status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                    $ref: "#/components/schemas/Post"
+                  liked:
+                    type: boolean
+                  likeCount:
+                    type: integer
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/search:
+    get:
+      summary: Search posts
+      description: Search posts by food name, caption, or tags
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of posts per page
+      responses:
+        200:
+          description: Search results with pagination
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalPosts:
+                        type: integer
+                      hasNextPage:
+                        type: boolean
+                      hasPrevPage:
+                        type: boolean
+        400:
+          description: Search query is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/{postId}/tag-food:
+    post:
+      summary: Tag food in post
+      description: Add or update a food tag in a post with optional rating and review
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to tag food in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - foodCatalogueId
+              properties:
+                foodCatalogueId:
+                  type: string
+                  description: ID of the food catalogue item to tag
+                  example: "507f1f77bcf86cd799439016"
+                tagType:
+                  type: string
+                  enum: ["primary", "secondary", "mentioned", "reviewed"]
+                  default: "primary"
+                  description: Type of tag for this food item
+                  example: "primary"
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  description: Optional rating for this food item (1-5)
+                  example: 5
+                review:
+                  type: string
+                  maxLength: 200
+                  description: Optional review text for this food item
+                  example: "Delicious! The best pizza I've ever had."
+      responses:
+        200:
+          description: Food tagged successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to modify this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/{postId}/tag-food/{foodCatalogueId}:
+    delete:
+      summary: Remove food tag from post
+      description: Remove a food tag from a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+          description: ID of the post to remove tag from
+        - in: path
+          name: foodCatalogueId
+          required: true
+          schema:
+            type: string
+          description: ID of the food catalogue item to remove tag for
+      responses:
+        200:
+          description: Food tag removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Not authorized to modify this post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     ErrorResponse:
@@ -1327,6 +2691,7 @@ components:
         - email
         - password
         - userType
+
     Allergen:
       type: object
       properties:
@@ -1351,6 +2716,7 @@ components:
       required:
         - name
         - description
+
     Course:
       type: object
       properties:
@@ -1375,6 +2741,7 @@ components:
       required:
         - name
         - description
+
     Cuisine:
       type: object
       properties:
@@ -1399,6 +2766,7 @@ components:
       required:
         - name
         - description
+
     BusinessHour:
       type: object
       properties:
@@ -1424,29 +2792,37 @@ components:
           type: boolean
           default: false
           description: "Indicates if the restaurant is closed on this day"
+
     Restaurant:
       type: object
       required:
         - ownerId
         - name
       properties:
+        _id:
+          type: string
+          description: "Unique identifier for the restaurant"
+          example: "507f1f77bcf86cd799439011"
         ownerId:
           type: string
           description: "Unique identifier for the restaurant owner"
+        owner:
+          type: boolean
+          default: false
+          description: "Whether the current user is the owner of this restaurant"
         name:
           type: string
           description: "Name of the restaurant"
         logo:
-          type: string
-          format: uri
-          description: "URL to the restaurant's logo image"
+          $ref: "#/components/schemas/Media"
+          description: "Restaurant logo media"
         description:
           type: string
           description: "Brief description of the restaurant"
         cuisine:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Cuisine"
           description: "List of cuisines offered by the restaurant"
         priceRange:
           type: string
@@ -1480,21 +2856,17 @@ components:
           type: array
           items:
             type: string
-            enum:
-              - "Outdoor seating"
-              - "Dining area"
-              - "Take-out"
-              - "Delivery"
-              - "Catering"
-              - "Wifi"
-              - "Parking"
           description: "List of features available at the restaurant"
         gallery:
           type: array
           items:
-            type: string
-            format: uri
-          description: "URLs to images in the restaurant's gallery"
+            $ref: "#/components/schemas/Media"
+          description: "Gallery media items for the restaurant"
+        deliveryLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryLink"
+          description: "List of delivery links for the restaurant"
         meta:
           type: object
           additionalProperties: true
@@ -1579,12 +2951,8 @@ components:
         images:
           type: array
           items:
-            type: string
-            format: uri
-          description: "List of image URLs for the food item"
-          example:
-            - "https://example.com/images/spaghetti-bolognese-1.jpg"
-            - "https://example.com/images/spaghetti-bolognese-2.jpg"
+            $ref: "#/components/schemas/Media"
+          description: "Media items for the food item"
         restaurant:
           type: string
           description: "ID of the restaurant offering the food item"
@@ -1648,15 +3016,103 @@ components:
           description: "When the notification was last updated"
           example: "2025-04-20T15:30:00Z"
 
+    Media:
+      type: object
+      required:
+        - url
+        - type
+        - uploadedBy
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the media"
+          example: "507f1f77bcf86cd799439017"
+        url:
+          type: string
+          format: uri
+          description: "URL to the media file"
+          example: "https://example.com/images/restaurant-photo.jpg"
+        type:
+          type: string
+          enum:
+            - "image"
+            - "video"
+            - "audio"
+          description: "Type of media file"
+          example: "image"
+        title:
+          type: string
+          description: "Title or caption for the media"
+          example: "Restaurant Interior"
+        description:
+          type: string
+          description: "Description of the media content"
+          example: "Beautiful interior view of the restaurant"
+        uploadedBy:
+          type: string
+          description: "ID of the user who uploaded the media"
+          example: "507f1f77bcf86cd799439011"
+        associatedWith:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - "post"
+                - "dish"
+                - "restaurant"
+              description: "Type of content this media is associated with"
+              example: "post"
+            id:
+              type: string
+              description: "ID of the associated content"
+              example: "507f1f77bcf86cd799439016"
+          description: "Information about what this media is associated with"
+        verified:
+          type: boolean
+          default: false
+          description: "Whether the media has been verified by moderators"
+          example: false
+        fileSize:
+          type: number
+          description: "Size of the media file in bytes"
+          example: 2048576
+        mimeType:
+          type: string
+          description: "MIME type of the media file"
+          example: "image/jpeg"
+        dimensions:
+          type: object
+          properties:
+            width:
+              type: number
+              description: "Width of the media in pixels"
+              example: 1920
+            height:
+              type: number
+              description: "Height of the media in pixels"
+              example: 1080
+          description: "Dimensions of the media (for images/videos)"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the media was uploaded"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the media was last updated"
+          example: "2025-04-20T15:30:00Z"
+
     RestaurantAccess:
       type: object
       required:
-        - id
+        - _id
         - userId
         - restaurantId
         - status
       properties:
-        id:
+        _id:
           type: string
           description: "Unique identifier for the access record"
           example: "access_12345"
@@ -1672,20 +3128,21 @@ components:
           type: string
           enum:
             - "pending"
-            - "granted"
-            - "denied"
+            - "approved"
             - "suspended"
+            - "innactive"
           description: "Current status of the access request"
           example: "pending"
         role:
           type: string
           enum:
-            - "viewer"
-            - "editor"
+            - "guest"
+            - "user"
+            - "moderator"
             - "admin"
-            - "owner"
-          description: "Role assigned to the user"
-          example: "viewer"
+            - "root"
+          description: "Role assigned to the user (references UserType.name)"
+          example: "user"
         requestedAt:
           type: string
           format: date-time
@@ -1709,6 +3166,16 @@ components:
           type: string
           description: "Additional notes about the access"
           example: "Temporary access for project collaboration"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the access record was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the access record was last updated"
+          example: "2025-04-20T15:30:00Z"
 
     UserType:
       type: object
@@ -1736,3 +3203,204 @@ components:
           type: string
           description: "Description of the user type"
           example: "an ordinary user with restaurant access"
+
+    DeliveryLink:
+      type: object
+      required:
+        - name
+        - url
+        - platform
+        - restaurantId
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the delivery link"
+          example: "507f1f77bcf86cd799439018"
+        restaurantId:
+          type: string
+          description: "ID of the restaurant this delivery link belongs to"
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          description: "Display name for the delivery link"
+          example: "Uber Eats"
+        url:
+          type: string
+          format: uri
+          description: "URL to the delivery service"
+          example: "https://ubereats.com/restaurant/123"
+        platform:
+          type: string
+          enum:
+            - "Uber Eats"
+            - "DoorDash"
+            - "Grubhub"
+            - "Postmates"
+            - "Instacart"
+            - "Amazon Fresh"
+            - "Walmart Grocery"
+            - "Shipt"
+            - "Custom"
+            - "Other"
+          description: "Delivery platform name"
+          example: "Uber Eats"
+        isActive:
+          type: boolean
+          default: true
+          description: "Whether this delivery link is active"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the delivery link was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the delivery link was last updated"
+          example: "2025-04-20T15:30:00Z"
+
+    Post:
+      type: object
+      required:
+        - userId
+        - media
+        - foodName
+        - price
+        - location
+        - cuisine
+        - course
+      properties:
+        _id:
+          type: string
+          description: "Unique identifier for the post"
+          example: "507f1f77bcf86cd799439019"
+        userId:
+          type: string
+          description: "ID of the user who created the post"
+          example: "507f1f77bcf86cd799439011"
+        media:
+          type: array
+          items:
+            type: string
+          description: "Array of media IDs associated with the post"
+          example: ["507f1f77bcf86cd799439017"]
+        foodName:
+          type: string
+          description: "Name of the food item in the post"
+          example: "Margherita Pizza"
+        taggedFoods:
+          type: array
+          items:
+            type: object
+            required:
+              - foodCatalogueId
+              - tagType
+              - taggedAt
+            properties:
+              foodCatalogueId:
+                type: string
+                description: "ID of the food catalogue item being tagged"
+                example: "507f1f77bcf86cd799439016"
+              tagType:
+                type: string
+                enum: ["primary", "secondary", "mentioned", "reviewed"]
+                default: "primary"
+                description: "Type of tag for this food item"
+                example: "primary"
+              rating:
+                type: number
+                minimum: 1
+                maximum: 5
+                description: "Optional rating for this food item (1-5)"
+                example: 5
+              review:
+                type: string
+                maxLength: 200
+                description: "Optional review text for this food item"
+                example: "Delicious! The best pizza I've ever had."
+              taggedAt:
+                type: string
+                format: date-time
+                description: "When this food was tagged"
+                example: "2025-04-20T15:30:00Z"
+          description: "Array of food items tagged in this post with metadata"
+          example: []
+        price:
+          $ref: "#/components/schemas/Price"
+          description: "Price information for the food item"
+        location:
+          type: object
+          required:
+            - restaurantId
+            - coordinates
+          properties:
+            restaurantId:
+              type: string
+              description: "ID of the restaurant where the food was consumed"
+              example: "507f1f77bcf86cd799439011"
+            coordinates:
+              type: object
+              required:
+                - type
+                - coordinates
+              properties:
+                type:
+                  type: string
+                  enum: ["Point"]
+                  default: "Point"
+                  description: "Type of geometry"
+                coordinates:
+                  type: array
+                  items:
+                    type: number
+                  minItems: 2
+                  maxItems: 2
+                  description: "Longitude and latitude coordinates [longitude, latitude]"
+                  example: [-73.935242, 40.730610]
+          description: "Location information including restaurant and coordinates"
+        cuisine:
+          type: string
+          description: "ID of the cuisine type"
+          example: "507f1f77bcf86cd799439015"
+        course:
+          type: string
+          description: "ID of the course type"
+          example: "507f1f77bcf86cd799439014"
+        allergens:
+          type: array
+          items:
+            type: string
+          description: "Array of allergen IDs"
+          example: ["507f1f77bcf86cd799439013"]
+        caption:
+          type: string
+          maxLength: 500
+          description: "Optional caption or description for the post"
+          example: "Amazing pizza! The crust was perfectly crispy 🍕"
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Array of tags for categorizing the post"
+          example: ["delicious", "authentic", "wood-fired"]
+        likes:
+          type: array
+          items:
+            type: string
+          description: "Array of user IDs who liked the post"
+          example: ["507f1f77bcf86cd799439011"]
+        visibility:
+          type: string
+          enum: ["public", "private", "followers"]
+          default: "public"
+          description: "Visibility setting for the post"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the post was created"
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "When the post was last updated"
+          example: "2025-04-20T15:30:00Z"

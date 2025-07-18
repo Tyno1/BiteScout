@@ -1,25 +1,15 @@
 {
-  "name": "@bitescout/shared",
+  "name": "shared",
   "version": "1.0.0",
-  "description": "Shared types and OpenAPI specs for BiteScout",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "openapi"
-  ],
+  "type": "module",
+  "private": true,
   "scripts": {
-    "build": "tsc",
     "generate-types": "openapi-typescript openapi/spec.yaml -o types/api.ts",
-    "generate-client": "openapi-generator-cli generate -i openapi/spec.yaml -g typescript-axios -o clients/typescript",
-    "watch": "tsc --watch"
+    "build": "npm run generate-types",
+    "watch": "npm run generate-types -- --watch",
+    "clean": "rm -rf dist types/api.ts"
   },
   "devDependencies": {
-    "typescript": "^5.8.2",
-    "openapi-typescript": "^6.7.0",
-    "@openapitools/openapi-generator-cli": "^2.7.0"
-  },
-  "peerDependencies": {
-    "typescript": ">=5.0.0"
+    "openapi-typescript": "^6.7.0"
   }
 } 

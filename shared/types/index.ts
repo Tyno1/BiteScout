@@ -13,6 +13,8 @@ export * from './notifications';
 export * from './allergens';
 export * from './courses';
 export * from './cuisines';
+export * from './media';
+export * from './post';
 
 // Common types
 export * from './common';
@@ -28,5 +30,7 @@ export type {
   Course,
   Cuisine,
   UserType,
-  ErrorResponse
+  Media,
+  ErrorResponse,
+  Post
 } from './api/schemas'; 

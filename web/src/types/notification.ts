@@ -1,3 +1,7 @@
+// Re-export the shared API Notification type for consistency
+export type { Notification } from "@shared/types/api/schemas";
+
+// Legacy type for backward compatibility (deprecated)
 export type NotificationData = {
   id?: string;
   accessId: string;
@@ -5,11 +9,12 @@ export type NotificationData = {
   restaurantName: string;
   requesterName: string;
   requesterEmail: string;
-message?: string;
+  message?: string;
   requestTime: number;
 };
 
-export type Notification = {
+// Legacy type for backward compatibility (deprecated)
+export type LegacyNotification = {
   _id?: string;
   read: boolean;
   userId: string;

@@ -1,18 +1,18 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { Spinner } from "@/components/atoms";
+import { SideNav, TopNav } from "@/components/ui";
+import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { TopNav, SideNav } from "@/components/ui";
-import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
-import { Spinner } from "@/components/atoms";
+import { type ReactNode, useEffect, useState } from "react";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [accessChecked, setAccessChecked] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
-  const { restaurantAccessList, resetAccess } = useRestaurantAccessStore();
+  const { restaurantAccessList } = useRestaurantAccessStore();
   const router = useRouter();
 
   const handleMenuClick = () => {
@@ -66,7 +66,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
     restaurantAccessList,
     router,
     accessChecked,
-    resetAccess,
+    // resetAccess,
   ]);
 
   // Show loading state while checking permissions
@@ -92,7 +92,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       )}
 
       {/* Main content layout */}
-      <div className="flex h-full w-full fixed top-16">
+      <div className="flex h-[90vh] w-full fixed top-16">
         {/* Desktop sidebar - hidden on mobile */}
         <div className="w-64 shrink-0 md:block hidden overflow-hidden">
           <SideNav />

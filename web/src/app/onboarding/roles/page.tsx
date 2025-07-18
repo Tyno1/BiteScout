@@ -2,16 +2,16 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useUpdateUser } from "@/app/hooks/useUpdateUser";
+import { Spinner } from "@/components/atoms/loaders/Spinners";
+import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
+import useRestaurantStore from "@/stores/restaurantStore";
+import type { Restaurant } from "@shared/types/api/schemas";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useUpdateUser } from "@/app/hooks/useUpdateUser";
-import type { RestaurantData } from "@/types/restaurantData";
-import { RoleOnboardingForm, FormErrorState } from "@/components/ui";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
-import useRestaurantStore from "@/stores/restaurantStore";
-import { Spinner } from "@/components/atoms/loaders/Spinners";
 
 export default function Onboarding() {
   const { createRestaurant } = useRestaurantStore();
@@ -20,7 +20,7 @@ export default function Onboarding() {
   const { updateUser } = useUpdateUser();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState<RestaurantData>(
+  const [restaurantData, setRestaurantData] = useState<Restaurant>(
     DEFAULT_RESTAURANT_DATA
   );
   const [apiError, setApiError] = useState("");
@@ -97,29 +97,23 @@ export default function Onboarding() {
     console.log("Prepared restaurant data:", preparedData);
 
     // Create restaurant
-    const result = await createRestaurant(preparedData);
-
-    if (result.success) {
+    try {
+       await createRestaurant(preparedData);
       await handleSuccessfulCreation();
-    } else {
-      handleCreationError(result.error);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An error occurred";
+      handleCreationError(errorMessage);
     }
   };
-  {
-    session?.data?.user?.accessToken;
-  }
-  const prepareRestaurantData = (): RestaurantData => {
-    const businessHours = restaurantData.businessHours.map((hour) => ({
-      day: hour.day || "Monday",
-      open: hour.open || "09:00",
-      close: hour.close || "17:00",
-      closed: hour.closed || false,
-    }));
+
+  const prepareRestaurantData = (): Restaurant => {
+    
 
     return {
       ...restaurantData,
       ownerId: session?.data?.user?._id || "",
-      businessHours,
+      ...restaurantData.businessHours,
       priceRange: restaurantData.priceRange || "$",
     };
   };
@@ -141,9 +135,9 @@ export default function Onboarding() {
     }
   };
 
-  const handleCreationError = (error: any) => {
+  const handleCreationError = (error: string | undefined) => {
     console.log("Restaurant creation error:", error);
-    setApiError(error);
+    setApiError(error || "An error occurred");
   };
 
   const handleEmployeeSubmission = () => {
@@ -161,6 +155,7 @@ export default function Onboarding() {
     }));
     toast.error("Something went wrong. Please try again later.");
   };
+  console.log(session.data?.user?.restaurantCount);
 
   useEffect(() => {
     if (

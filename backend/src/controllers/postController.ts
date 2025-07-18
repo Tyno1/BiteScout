@@ -1,3 +1,4 @@
+/// <reference path="../types/express.d.ts" />
 import type { NextFunction, Request, Response } from "express";
 import Post from "../models/Post.js";
 
@@ -31,21 +32,22 @@ export const createPost = async (
 			return;
 		}
 
-		const newPost = await Post.create(body);
+		// Remove _id from body to prevent validation errors
+		const { _id, ...postData } = body;
+		const newPost = await Post.create(postData);
 
 		if (!newPost) {
 			res.status(400).json({ error: "Could not create post" });
 			return;
 		}
 
-		// Populate user, restaurant, cuisine, course, allergen, foodCatalogue, and media data
+		// Populate user, restaurant, cuisine, course, allergen, and media data
 		await newPost.populate([
 			{ path: "userId", select: "name username imageUrl" },
 			{ path: "location.restaurantId", select: "name" },
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" },
 			{ path: "media", select: "url type verified uploadedBy" }
 		]);
 
@@ -69,7 +71,7 @@ export const getPostById = async (
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 			{ path: "media", select: "url type verified uploadedBy" },
 			{ path: "likes", select: "name username imageUrl" }
 		]);
@@ -119,7 +121,7 @@ export const getAllPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
@@ -161,7 +163,7 @@ export const getUserPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
@@ -203,7 +205,7 @@ export const getRestaurantPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
@@ -212,6 +214,53 @@ export const getRestaurantPosts = async (
 
 		const total = await Post.countDocuments({
 			"location.restaurantId": restaurantId,
+		});
+
+		res.json({
+			posts,
+			pagination: {
+				currentPage: Number(page),
+				totalPages: Math.ceil(total / Number(limit)),
+				totalPosts: total,
+				hasNextPage: skip + posts.length < total,
+				hasPrevPage: Number(page) > 1,
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getFoodPosts = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+): Promise<void> => {
+	try {
+		const { foodCatalogueId } = req.params;
+		const { page = 1, limit = 10 } = req.query;
+
+		const skip = (Number(page) - 1) * Number(limit);
+
+		// Find posts that tag this food
+		const posts = await Post.find({
+			"taggedFoods.foodCatalogueId": foodCatalogueId
+		})
+			.populate([
+				{ path: "userId", select: "name username imageUrl" },
+				{ path: "location.restaurantId", select: "name" },
+				{ path: "cuisine", select: "name" },
+				{ path: "course", select: "name" },
+							{ path: "allergens", select: "name" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" }
+			])
+			.sort({ createdAt: -1 })
+			.skip(skip)
+			.limit(Number(limit));
+
+		const total = await Post.countDocuments({
+			"taggedFoods.foodCatalogueId": foodCatalogueId
 		});
 
 		res.json({
@@ -260,7 +309,7 @@ export const updatePost = async (
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 			{ path: "media", select: "url type verified uploadedBy" }
 		]);
 
@@ -343,7 +392,7 @@ export const likePost = async (
 			{ path: "cuisine", select: "name" },
 			{ path: "course", select: "name" },
 			{ path: "allergens", select: "name" },
-			{ path: "foodCatalogueId", select: "name ingredients" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 			{ path: "media", select: "url type verified uploadedBy" },
 			{ path: "likes", select: "name username imageUrl" }
 		]);
@@ -389,7 +438,7 @@ export const searchPosts = async (
 				{ path: "cuisine", select: "name" },
 				{ path: "course", select: "name" },
 				{ path: "allergens", select: "name" },
-				{ path: "foodCatalogueId", select: "name ingredients" },
+				{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
 				{ path: "media", select: "url type verified uploadedBy" }
 			])
 			.sort({ createdAt: -1 })
@@ -417,5 +466,173 @@ export const searchPosts = async (
 		});
 	} catch (error) {
 		next(error);
+	}
+};
+
+export const tagFoodInPost = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+): Promise<void> => {
+	try {
+		const { postId } = req.params;
+		const { foodCatalogueId, tagType = "primary", rating, review } = req.body;
+
+		if (!foodCatalogueId) {
+			res.status(400).json({ error: "Food catalogue ID is required" });
+			return;
+		}
+
+		// Check if post exists and user owns it
+		const post = await Post.findById(postId);
+		if (!post) {
+			res.status(404).json({ error: "Post not found" });
+			return;
+		}
+
+		if (post.userId.toString() !== req.user?.id) {
+			res.status(403).json({ error: "Not authorized to modify this post" });
+			return;
+		}
+
+		// Check if food is already tagged
+		const existingTag = post.taggedFoods?.find(
+			(tag: any) => tag.foodCatalogueId.toString() === foodCatalogueId
+		);
+
+		if (existingTag) {
+			// Update existing tag
+			existingTag.tagType = tagType;
+			if (rating !== undefined) existingTag.rating = rating;
+			if (review !== undefined) existingTag.review = review;
+			existingTag.taggedAt = new Date();
+		} else {
+			// Add new tag
+			if (!post.taggedFoods) post.taggedFoods = [];
+			post.taggedFoods.push({
+				foodCatalogueId,
+				tagType,
+				rating,
+				review,
+				taggedAt: new Date(),
+			});
+		}
+
+		await post.save();
+
+		// Update food catalogue analytics
+		await updateFoodCatalogueAnalytics(foodCatalogueId);
+
+		// Populate the updated post
+		await post.populate([
+			{ path: "userId", select: "name username imageUrl" },
+			{ path: "location.restaurantId", select: "name" },
+			{ path: "cuisine", select: "name" },
+			{ path: "course", select: "name" },
+			{ path: "allergens", select: "name" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" }
+		]);
+
+		res.json(post);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+export const removeFoodTag = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+): Promise<void> => {
+	try {
+		const { postId, foodCatalogueId } = req.params;
+
+		// Check if post exists and user owns it
+		const post = await Post.findById(postId);
+		if (!post) {
+			res.status(404).json({ error: "Post not found" });
+			return;
+		}
+
+		if (post.userId.toString() !== req.user?.id) {
+			res.status(403).json({ error: "Not authorized to modify this post" });
+			return;
+		}
+
+		// Remove the tag
+		if (post.taggedFoods) {
+			post.taggedFoods = post.taggedFoods.filter(
+				(tag: any) => tag.foodCatalogueId.toString() !== foodCatalogueId
+			);
+		}
+
+		await post.save();
+
+		// Update food catalogue analytics
+		await updateFoodCatalogueAnalytics(foodCatalogueId);
+
+		// Populate the updated post
+		await post.populate([
+			{ path: "userId", select: "name username imageUrl" },
+			{ path: "location.restaurantId", select: "name" },
+			{ path: "cuisine", select: "name" },
+			{ path: "course", select: "name" },
+			{ path: "allergens", select: "name" },
+			{ path: "taggedFoods.foodCatalogueId", select: "name ingredients" },
+			{ path: "media", select: "url type verified uploadedBy" }
+		]);
+
+		res.json(post);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+// Helper function to update food catalogue analytics
+const updateFoodCatalogueAnalytics = async (foodCatalogueId: string): Promise<void> => {
+	try {
+		const FoodCatalogue = (await import("../models/FoodCatalogue.js")).default;
+		
+		// Get all posts that tag this food
+		const posts = await Post.find({
+			"taggedFoods.foodCatalogueId": foodCatalogueId
+		});
+
+		// Calculate analytics
+		const totalMentions = posts.length;
+		const totalLikes = posts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
+		
+		// Calculate average rating
+		const ratings = posts.flatMap(post => 
+			post.taggedFoods
+				?.filter((tag: any) => tag.foodCatalogueId.toString() === foodCatalogueId)
+				?.map((tag: any) => tag.rating)
+				?.filter((rating: any) => rating !== undefined) || []
+		);
+		
+		const averageRating = ratings.length > 0 
+			? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length 
+			: 0;
+
+		// Calculate trending score (mentions + likes + recency)
+		const now = new Date();
+		const trendingScore = posts.reduce((score, post) => {
+			const daysSincePost = (now.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+			const recencyBonus = Math.max(0, 30 - daysSincePost); // Bonus for recent posts
+			return score + (post.likes?.length || 0) + recencyBonus;
+		}, 0);
+
+		// Update food catalogue
+		await FoodCatalogue.findByIdAndUpdate(foodCatalogueId, {
+			"analytics.totalMentions": totalMentions,
+			"analytics.totalLikes": totalLikes,
+			"analytics.averageRating": averageRating,
+			"analytics.totalRatings": ratings.length,
+			"analytics.trendingScore": trendingScore,
+			"analytics.lastMentioned": totalMentions > 0 ? new Date() : null,
+		});
+	} catch (error) {
+		console.error("Error updating food catalogue analytics:", error);
 	}
 };

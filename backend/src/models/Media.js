@@ -9,8 +9,16 @@ const mediaSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["image", "video"],
+      enum: ["image", "video", "audio"],
       required: true,
+    },
+    title: {
+      type: String,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
     },
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +28,7 @@ const mediaSchema = new mongoose.Schema(
     associatedWith: {
       type: {
         type: String,
-        enum: ["post", "dish"],
+        enum: ["post", "dish", "restaurant"],
         required: true,
       },
       id: {
@@ -32,6 +40,20 @@ const mediaSchema = new mongoose.Schema(
     verified: {
       type: Boolean,
       default: false,
+    },
+    fileSize: {
+      type: Number,
+    },
+    mimeType: {
+      type: String,
+    },
+    dimensions: {
+      width: {
+        type: Number,
+      },
+      height: {
+        type: Number,
+      },
     },
   },
   { timestamps: true }
@@ -45,7 +67,16 @@ mediaSchema.index({ type: 1 });
 
 // Virtual for getting the referenced model name
 mediaSchema.virtual("associatedWith.ref").get(function () {
-  return this.associatedWith.type === "post" ? "Post" : "FoodCatalogue";
+  switch (this.associatedWith.type) {
+    case "post":
+      return "Post";
+    case "dish":
+      return "FoodCatalogue";
+    case "restaurant":
+      return "RestaurantData";
+    default:
+      return null;
+  }
 });
 
 // Ensure virtuals are serialized

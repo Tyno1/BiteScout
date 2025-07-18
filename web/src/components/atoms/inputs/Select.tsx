@@ -1,6 +1,6 @@
-import { SelectHTMLAttributes, ReactNode, ChangeEvent } from "react";
 import clsx from "clsx";
-import { ArrowDown, ChevronDown } from "lucide-react";
+import {  ChevronDown } from "lucide-react";
+import type { ChangeEvent, ReactNode, SelectHTMLAttributes } from "react";
 
 interface Option {
   value: string;
@@ -100,7 +100,15 @@ export function Select({
           {label}
         </label>
       )}
-
+    {errorMessage && (
+        <p
+          id={`${uniqueId}-error`}
+          className="text-sm text-red-500 mt-1"
+          role="alert"
+        >
+          {errorMessage}
+        </p>
+      )}
       <div className="relative">
         {icon && (
           <div
@@ -122,7 +130,7 @@ export function Select({
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
           className={clsx(
-            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 appearance-none",
+            "w-full focus:outline-none focus:ring-2 focus:ring-ring focus:border-0 cursor-pointer appearance-none",
             themeStyles,
             outlineMap[outlineType ?? "none"],
             sizeMap[inputSize],
@@ -159,15 +167,7 @@ export function Select({
         )}
       </div>
 
-      {errorMessage && (
-        <p
-          id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
-          role="alert"
-        >
-          {errorMessage}
-        </p>
-      )}
+  
 
       {helperText && !errorMessage && (
         <p id={`${uniqueId}-helper`} className="text-sm text-gray-500 mt-1">

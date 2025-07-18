@@ -1,4 +1,4 @@
-import { RestaurantAccess } from "@/types/restaurantAccess";
+import { RestaurantAccess } from "@shared/types/api/schemas";
 import apiClient from "@/utils/authClient";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -65,7 +65,7 @@ const DEFAULT_RESTAURANT_ACCESS: RestaurantAccess = {
   _id: "",
   userId: "",
   restaurantId: "",
-  role: "",
+  role: undefined,
   status: "pending",
 };
 
