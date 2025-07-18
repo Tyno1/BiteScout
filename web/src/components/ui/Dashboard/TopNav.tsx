@@ -4,6 +4,7 @@ import { IconButton, Input } from "@/components/atoms";
 import { Bell, ChefHat, Menu } from "lucide-react";
 import { NotificationBadge } from "@/components/atoms/badges";
 import { User } from "@/types";
+import Image from "next/image";
 
 type TopNavProps = {
   onMenuClick: () => void;
@@ -54,9 +55,11 @@ export function TopNav({ onMenuClick, user }: TopNavProps) {
 
           {/* User profile */}
           <div className="flex items-center gap-2 cursor-pointer">
-            <img
+            <Image
               src={user?.image || "/placeholder.svg"}
               alt={user?.name || "User"}
+              width={32}
+              height={32}
               className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
             />
             <div className="hidden md:flex flex-col items-start">

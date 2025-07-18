@@ -20,7 +20,6 @@ type MobileLinkProp = {
   text: string;
 };
 
-interface WebLinkProp extends MobileLinkProp {}
 
 export function Navbar({ theme }: NavTheme) {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +47,7 @@ export function Navbar({ theme }: NavTheme) {
     );
   };
 
-  const WebLinkItem = ({ path, text }: WebLinkProp) => {
+  const WebLinkItem = ({ path, text }: MobileLinkProp) => {
     return (
       <Link
         href={path}
@@ -67,7 +66,7 @@ export function Navbar({ theme }: NavTheme) {
       }`}
     >
       <Link href="/" className="flex-shrink-0">
-        <img src="none" alt="Bite Scout" />
+        <Image src="/logo.png" alt="Bite Scout" width={120} height={40} />
       </Link>
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center">

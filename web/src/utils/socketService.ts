@@ -1,13 +1,52 @@
 import { toast } from "react-toastify";
 import { type Socket, io } from "socket.io-client";
+import type { Notification } from "@shared/types/api/schemas";
 
 let socket: Socket | null = null;
 const backendServer =
 	process.env.NEXT_PUBLIC_BACKEND_URL_PLAIN || "http://localhost:5001";
 
+// Type for socket notifications that may have different structure
+interface SocketNotification {
+  _id?: string;
+  id?: string;
+  userId?: string;
+  type: "access_request" | "access_granted" | "access_denied" | "access_suspended" | "restaurant_update" | "system" | string;
+  title?: string;
+  message?: string;
+  data?: {
+    message?: string;
+    [key: string]: unknown;
+  };
+  metadata?: Record<string, unknown>;
+  timestamp?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Transform socket notification to match API spec
+const transformSocketNotification = (socketNotification: SocketNotification): Notification => {
+  const validTypes = ["access_request", "access_granted", "access_denied", "access_suspended", "restaurant_update", "system"] as const;
+  const notificationType = (validTypes as readonly string[]).includes(socketNotification.type)
+    ? socketNotification.type as "access_request" | "access_granted" | "access_denied" | "access_suspended" | "restaurant_update" | "system"
+    : "system";
+    
+  return {
+    _id: socketNotification._id || socketNotification.id || "",
+    userId: socketNotification.userId || "",
+    type: notificationType,
+    title: socketNotification.title || "Notification",
+    message: socketNotification.message || socketNotification.data?.message || "New notification",
+    isRead: false,
+    metadata: socketNotification.metadata || socketNotification.data || {},
+    createdAt: socketNotification.timestamp || socketNotification.createdAt || new Date().toISOString(),
+    updatedAt: socketNotification.timestamp || socketNotification.updatedAt || new Date().toISOString(),
+  };
+};
+
 export const initializeSocket = (
 	userId: string,
-	addNotification: (notification: { type: string; data: Record<string, unknown>; id?: string; timestamp?: string }) => void,
+	addNotification: (notification: Notification) => void,
 ): Socket => {
 	if (socket) return socket;
 
@@ -40,15 +79,17 @@ export const initializeSocket = (
 	});
 
 	// Listen for notifications
-	socket.on("notification", (notification) => {
-		console.log("Received notification:", notification);
+	socket.on("notification", (socketNotification) => {
+		console.log("Received notification:", socketNotification);
 
-		// Dispatch to store
+		// Transform to API spec format and dispatch to store
+		const notification = transformSocketNotification(socketNotification);
 		addNotification(notification);
 
 		// Optionally show a toast notification
-		if (notification.type === "access-request") {
-			toast.info(`New access request for ${notification.data.restaurantName}`);
+		if (notification.type === "access_request") {
+			const restaurantName = notification.metadata?.restaurantName || "restaurant";
+			toast.info(`New access request for ${restaurantName}`);
 		}
 	});
 

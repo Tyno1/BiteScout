@@ -57,35 +57,35 @@ export function Button({
         ? "text-secondary"
         : variant === "solid"
         ? "bg-yellow text-white"
-        : "border border-2 border-yellow bg-none text-yellow"
+        : "border border-1 border-yellow bg-none text-yellow"
     }`,
     danger: `hover:bg-destructive focus:ring-destructive ${
       variant === "plain"
         ? "text-destructive hover:text-white"
         : variant === "solid"
         ? "text-white bg-destructive"
-        : "border border-2 border-destructive bg-none text-destructive hover:text-white"
+        : "border border-1 border-destructive bg-none text-destructive hover:text-white"
     }`,
     success: `hover:bg-success focus:ring-success ${
       variant === "plain"
         ? "text-success hover:text-white"
         : variant === "solid"
         ? "bg-success text-white"
-        : "border border-2 border-success bg-none text-success"
+        : "border border-1 border-success bg-none text-success"
     } `,
     black: `hover:bg-black focus:ring-black ${
       variant === "plain"
         ? "text-black"
         : variant === "solid"
         ? "bg-black text-white"
-        : "border border-2 border-black bg-none text-black hover:text-white"
+        : "border border-1 border-black bg-none text-black hover:text-white"
     } `,
     white: `hover:bg-gray-400 focus:ring-white ${
       variant === "plain"
         ? "text-white"
         : variant === "solid"
         ? "bg-white text-black"
-        : "border border-2 border-white bg-none text-white"
+        : "border border-1 border-white bg-none text-white"
     } `,
   };
 

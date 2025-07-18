@@ -1,8 +1,8 @@
-import { AccessRoles } from "@/types";
+import { getRoleFromToken } from "@/utils/getRoleFromSession";
+import type { AccessRoles } from "@shared/types/api/enums";
+import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { getCurrentSession } from "../actions/getSessionAction";
-import type { Session } from "next-auth";
-import { getRoleFromToken } from "@/utils/getRoleFromSession";
 
 type ReturnType = {
   isLoading: boolean;

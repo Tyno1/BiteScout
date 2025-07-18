@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Star, MapPin, Volume2 } from "lucide-react";
+import Image from "next/image";
 
 export function TopMeals() {
   const [selectedType, setSelectedType] = useState<string>("Fine Dinning");
@@ -118,9 +119,11 @@ export function TopMeals() {
               key={meal.id}
               className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden flex gap-2"
             >
-              <img
+              <Image
                 src={meal.image}
                 alt={meal.name}
+                width={96}
+                height={96}
                 className="w-24 h-24 object-cover"
               />
               <div className="py-4 px-4 flex-1 flex justify-between">

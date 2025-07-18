@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../atoms";
+import { Session } from "next-auth";
 
 type NavProp = {
   toggleMenu: () => void;
@@ -10,7 +11,7 @@ type NavProp = {
     path: string;
     text: string;
   }) => React.JSX.Element;
-  session: any;
+  session: Session | null;
   handleRoute: (path: string) => void;
 };
 

@@ -3,4 +3,7 @@ export * from './list';
 export * from './detail';
 
 // Food Catalogue Types
-export * from './food-catalogue'; 
+export * from './food-catalogue';
+
+// Delivery Link Types
+export * from './delivery-links'; 

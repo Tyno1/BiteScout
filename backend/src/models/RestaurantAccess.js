@@ -14,7 +14,7 @@ const restaurantAccessSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["manager", "staff"],
+    enum: ["guest", "user", "moderator", "admin", "root"],
     required: true,
   },
   status: {
@@ -23,6 +23,10 @@ const restaurantAccessSchema = new Schema({
     default: "pending",
   },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },

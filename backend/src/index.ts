@@ -18,6 +18,7 @@ import mediaRoutes from "./routes/media.js";
 import notificationRoutes from "./routes/notification.js";
 import postRoutes from "./routes/post.js";
 import restaurantRoutes from "./routes/restaurant.js";
+
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
 import reviewRoutes from "./routes/review.js";
 import userRoutes from "./routes/user.js";
@@ -175,6 +176,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", authMiddleware, restaurantRoutes);
+
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/restaurant-access", restaurantAccessRoutes);

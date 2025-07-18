@@ -41,7 +41,7 @@ const UserManagement = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewUser((prev) => ({
       ...prev,

@@ -1,23 +1,24 @@
 import { useEffect } from "react";
 import { initializeSocket, disconnectSocket } from "@/utils/socketService";
 import useNotificationStore from "@/stores/notificationStore";
-import { Notification } from "@/types/notification";
+import type { Notification } from "@shared/types/api/schemas";
 
 type useNotificationProps = {
   userId: string | undefined;
 };
+
 type useNotificationReturn = {
   notifications: Notification[];
   unreadCount: number;
   isLoading: boolean;
 };
+
 export const useNotifications = ({
   userId,
 }: useNotificationProps): useNotificationReturn => {
   const { fetchNotifications, notifications, unreadCount, isLoading, addNotification } =
     useNotificationStore();
     
-
   useEffect(() => {
     if (userId) {
       // 1. Initialize socket connection for real-time updates

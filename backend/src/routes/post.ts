@@ -6,11 +6,26 @@ const router = express.Router();
 // Create a new post
 router.post("/", controller.createPost);
 
-// Get all posts with pagination and filtering
+// Get all posts
 router.get("/", controller.getAllPosts);
 
-// Search posts (must come before /:id route)
-router.get("/search", controller.searchPosts);
+// Get post by ID
+router.get("/:id", controller.getPostById);
+
+// Update post
+router.put("/:id", controller.updatePost);
+
+// Delete post
+router.delete("/:id", controller.deletePost);
+
+// Like/unlike post
+router.post("/:id/like", controller.likePost);
+
+// Tag food in post
+router.post("/:postId/tag-food", controller.tagFoodInPost);
+
+// Remove food tag from post
+router.delete("/:postId/tag-food/:foodCatalogueId", controller.removeFoodTag);
 
 // Get posts by user
 router.get("/user/:userId", controller.getUserPosts);
@@ -18,16 +33,10 @@ router.get("/user/:userId", controller.getUserPosts);
 // Get posts by restaurant
 router.get("/restaurant/:restaurantId", controller.getRestaurantPosts);
 
-// Like/unlike a post (must come before /:id route)
-router.post("/:id/like", controller.likePost);
+// Get posts by food catalogue item
+router.get("/food/:foodCatalogueId", controller.getFoodPosts);
 
-// Get a specific post by ID
-router.get("/:id", controller.getPostById);
-
-// Update a post
-router.put("/:id", controller.updatePost);
-
-// Delete a post
-router.delete("/:id", controller.deletePost);
+// Search posts
+router.get("/search", controller.searchPosts);
 
 export default router; 

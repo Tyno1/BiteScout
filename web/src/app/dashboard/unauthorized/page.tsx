@@ -40,7 +40,7 @@ export default function UnauthorizedPage() {
           </h1>
           
           <p className="text-gray-600 mb-6 leading-relaxed">
-            You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+            You don&apos;t have permission to access this page. Please contact your administrator if you believe this is an error.
           </p>
 
           <div className="space-y-3">

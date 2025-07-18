@@ -10,7 +10,13 @@ export function PopularDestinationCard({ item }: DestinationCardType) {
     <>
       <div key={item} className="relative group cursor-pointer">
         <div className="relative h-80 w-full rounded-xl overflow-hidden">
-          <Image src={RestImg} objectFit="cover" alt={`image${item}`} />
+          <Image 
+            src={RestImg} 
+            alt={`image${item}`}
+            width={400}
+            height={320}
+            className="object-cover w-full h-full"
+          />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>

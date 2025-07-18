@@ -78,7 +78,9 @@ export const createCuisine = async (
       );
     }
 
-    const newCuisineType = await CuisineType.create(body);
+    // Remove _id from body to prevent validation errors
+    const { _id, ...cuisineData } = body;
+    const newCuisineType = await CuisineType.create(cuisineData);
 
     if (!newCuisineType) {
       return next(

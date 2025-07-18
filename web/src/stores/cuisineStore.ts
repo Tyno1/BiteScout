@@ -1,3 +1,4 @@
+import type{ Cuisine } from "@shared/types/api/schemas";
 import type { 
   CreateCuisineRequest, 
   CreateCuisineResponse,
@@ -13,13 +14,13 @@ import { handleApiError } from "../utils/apiErrorHandler";
 
 type CuisineStore = {
 	// State
-	cuisines: GetAllCuisinesResponse;
+	cuisines: Cuisine[];
 	isLoading: boolean;
 	error: string | null;
 
 	// Actions
 	createCuisine: (cuisine: CreateCuisineRequest) => Promise<CreateCuisineResponse | null>;
-	getCuisines: () => Promise<GetAllCuisinesResponse>;
+	getCuisines: (onSuccess?: (cuisines: GetAllCuisinesResponse) => void) => Promise<GetAllCuisinesResponse>;
 	getCuisine: (id: string) => Promise<GetCuisineByIdResponse | null>;
 	updateCuisine: (id: string, cuisine: UpdateCuisineRequest) => Promise<UpdateCuisineResponse | null>;
 	deleteCuisine: (id: string) => Promise<DeleteCuisineResponse | null>;
@@ -28,7 +29,7 @@ type CuisineStore = {
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const useCuisineStore = create<CuisineStore>((set, get) => ({
+const useCuisineStore = create<CuisineStore>((set) => ({
 	cuisines: [],
 	isLoading: false,
 	error: null,
@@ -53,13 +54,16 @@ const useCuisineStore = create<CuisineStore>((set, get) => ({
 		}
 	},
 
-	getCuisines: async () => {
+	getCuisines: async (onSuccess?: (cuisines: GetAllCuisinesResponse) => void) => {
 		try {
 			set({ error: null, isLoading: true });
 
 			const response = await axios.get<GetAllCuisinesResponse>(`${API_URL}/cuisines`);
 
 			set({ cuisines: response.data, isLoading: false });
+			if (onSuccess) {
+				onSuccess(response.data);
+			}
 			return response.data;
 		} catch (error) {
 			const errorMessage = handleApiError(error);

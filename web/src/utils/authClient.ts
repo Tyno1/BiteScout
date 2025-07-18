@@ -47,7 +47,9 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // You could trigger a session refresh here if needed
       console.error("Authentication error:", error);
-      await refreshAccessToken(session?.user);
+      if (session?.user?.refreshToken) {
+        await refreshAccessToken({ refreshToken: session.user.refreshToken });
+      }
       // Optionally redirect to login
       // window.location.href = "/login";
     }

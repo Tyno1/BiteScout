@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 
 interface reviewProps {
   id: number;
@@ -34,7 +33,7 @@ export default function Reviews() {
     resolved: false,
     tags: [],
   };
-  const [reviews, setReviews] = useState<reviewProps[]>([
+const reviews = [
     {
       id: 1,
       user: {
@@ -70,7 +69,7 @@ export default function Reviews() {
       resolved: true,
       tags: ["Service", "Improvement Needed"],
     },
-  ]);
+  ] as reviewProps[];
 
   const [selectedReview, setSelectedReview] =
     useState<reviewProps>(defaultReview);
@@ -79,30 +78,30 @@ export default function Reviews() {
     setSelectedReview(review);
   };
 
-  const renderMediaPreview = (media) => {
-    return media.map((item, index) => {
-      if (item.type === "image") {
-        return (
-          <div key={index} className="w-24 h-24 relative mr-2">
-            <Image
-              src={item.url}
-              alt={`Review media ${index + 1}`}
-              fill
-              className="object-cover rounded"
-            />
-          </div>
-        );
-      }
-      return (
-        <video
-          key={index}
-          src={item.url}
-          className="w-24 h-24 object-cover rounded"
-          controls
-        />
-      );
-    });
-  };
+  // const renderMediaPreview = (media: Media[]) => {
+  //   return media.map((item, index) => {
+  //     if (item.type === "image") {
+  //       return (
+  //         <div key={index} className="w-24 h-24 relative mr-2">
+  //           <Image
+  //             src={item.url}
+  //             alt={`Review media ${index + 1}`}
+  //             fill
+  //             className="object-cover rounded"
+  //           />
+  //         </div>
+  //       );
+  //     }
+  //     return (
+  //       <video
+  //         key={index}
+  //         src={item.url}
+  //         className="w-24 h-24 object-cover rounded"
+  //         controls
+  //       />
+  //     );
+  //   });
+  // };
 
   return (
     <div className="container mx-auto p-6">
@@ -136,14 +135,14 @@ export default function Reviews() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 truncate">{review.dish}</p>
-                <div className="flex items-center mt-2">
+                {/* <div className="flex items-center mt-2">
                   {renderMediaPreview(review.media).slice(0, 2)}
                   {review.media.length > 2 && (
                     <div className="ml-2 text-sm text-gray-500">
                       +{review.media.length - 2} more
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
@@ -213,7 +212,7 @@ export default function Reviews() {
             <div>
               <h3 className="font-semibold mb-2">Media</h3>
               <div className="flex flex-wrap gap-2">
-                {renderMediaPreview(selectedReview.media)}
+                {/* {renderMediaPreview(selectedReview.media)} */}
               </div>
             </div>
           </div>

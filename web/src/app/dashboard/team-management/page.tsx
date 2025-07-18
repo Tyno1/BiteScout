@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-import { useSession } from "next-auth/react";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
-import { Trash2, Ban, CheckCircle, User } from "lucide-react";
-import { AccessStatus } from "@/types";
+import type { RestaurantAccess } from "@shared/types/api/schemas";
+import { Ban, CheckCircle, Trash2, User } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function TeamManagement() {
   const { data: session } = useSession();
@@ -33,12 +33,13 @@ export default function TeamManagement() {
       resetAccess();
     };
   }, [
+    resetAccess,
     session?.user?._id,
     session?.user?.restaurantCount,
     getRestaurantAccessListByOwnerId,
   ]);
 
-  const handleStatusChange = async (accessId: string, status: AccessStatus) => {
+  const handleStatusChange = async (accessId: string, status: RestaurantAccess["status"]) => {
     try {
       switch (status) {
         // case where button is clicked to approve access
@@ -61,7 +62,7 @@ export default function TeamManagement() {
     }
   };
 
-  const getStatusBadge = (status: AccessStatus) => {
+  const getStatusBadge = (status: RestaurantAccess["status"]) => {
     switch (status) {
       case "approved":
         return (
@@ -111,7 +112,7 @@ export default function TeamManagement() {
                 Managing team for:{" "}
                 <span className="font-bold text-gray-900">
                   {typeof restaurantAccessList[0]?.restaurantId === "object"
-                    ? restaurantAccessList[0]?.restaurantId?.name
+                    ? (restaurantAccessList[0]?.restaurantId as { name: string })?.name
                     : ""}
                 </span>
               </h2>

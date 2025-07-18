@@ -47,10 +47,11 @@ export function useUpdateUser() {
           userType: data.userType,
         },
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error("Error updating user:", err);
-      setError(err.message || "Failed to update user");
-      throw err;
+      setError(error.message || "Failed to update user");
+      throw error;
     } finally {
       setIsLoading(false);
     }

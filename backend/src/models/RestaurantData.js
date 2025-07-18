@@ -31,27 +31,55 @@ const BusinessHourSchema = new Schema({
   },
 });
 
+const DeliveryLinkSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  url: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  platform: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+}, { timestamps: true });
+
+
+
 const restaurantData = new Schema({
   ownerId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   name: {
     type: String,
     required: true,
     trim: true,
-    unique: true,
   },
   logo: {
     type: String,
+    trim: true,
   },
   description: {
     type: String,
     trim: true,
   },
-  cuisine: {
-    type: [String],
-  },
+  cuisine: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CuisineType",
+    },
+  ],
   priceRange: {
     type: String,
     enum: ["$", "$$", "$$$", "$$$$"],
@@ -62,39 +90,32 @@ const restaurantData = new Schema({
   },
   phone: {
     type: String,
-    match: /^\+?[\d\s-()]+$/,
+    trim: true,
   },
   email: {
     type: String,
-    lowercase: true,
     trim: true,
-    match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
   },
   website: {
     type: String,
+    trim: true,
   },
   businessHours: {
     type: [BusinessHourSchema],
   },
+  deliveryLinks: {
+    type: [DeliveryLinkSchema],
+  },
+  gallery: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Media",
+    },
+  ],
   features: {
     type: [String],
-    enum: [
-      "Outdoor seating",
-      "Dining area",
-      "Take-out",
-      "Delivery",
-      "Catering",
-      "Wifi",
-      "Parking",
-    ],
   },
-  gallery: {
-    type: [String],
-  },
-  meta: {
-    type: Object,
-  },
-});
+}, { timestamps: true });
 
 export default mongoose.models.RestaurantData ||
   model("RestaurantData", restaurantData);

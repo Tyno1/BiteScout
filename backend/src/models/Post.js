@@ -65,11 +65,34 @@ const postSchema = new mongoose.Schema(
 			required: true,
 			trim: true,
 		},
-		foodCatalogueId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "FoodCatalogue",
-			required: false,
-		},
+		// Enhanced food tagging system
+		taggedFoods: [
+			{
+				foodCatalogueId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "FoodCatalogue",
+					required: true,
+				},
+				tagType: {
+					type: String,
+					enum: ["primary", "secondary", "mentioned", "reviewed"],
+					default: "primary",
+				},
+				rating: {
+					type: Number,
+					min: 1,
+					max: 5,
+				},
+				review: {
+					type: String,
+					maxlength: 200,
+				},
+				taggedAt: {
+					type: Date,
+					default: Date.now,
+				},
+			},
+		],
 		price: {
 			type: priceSchema,
 			required: true,
@@ -132,8 +155,9 @@ postSchema.index({ cuisine: 1, course: 1 });
 // Index for visibility
 postSchema.index({ visibility: 1, createdAt: -1 });
 
-// Index for food catalogue posts
-postSchema.index({ foodCatalogueId: 1, createdAt: -1 });
+// Index for tagged foods
+postSchema.index({ "taggedFoods.foodCatalogueId": 1, createdAt: -1 });
+postSchema.index({ "taggedFoods.tagType": 1, createdAt: -1 });
 
 // Virtual for like count
 postSchema.virtual("likeCount").get(function () {

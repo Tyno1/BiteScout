@@ -3,14 +3,14 @@ import axios from "axios";
 
 type UseFetchResponse<T> = {
   loading: boolean;
-  error: any;
+  error: Error | null;
   data: T | null;
   refresh: () => void;
 };
 
 const useFetch = <T,>(url: string): UseFetchResponse<T> => {
   const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [shouldRefresh, setShouldRefresh] = useState<boolean>(false);
 
@@ -25,7 +25,7 @@ const useFetch = <T,>(url: string): UseFetchResponse<T> => {
         setData(response.data);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         setError(error);
         setLoading(false);
       });

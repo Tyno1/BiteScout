@@ -1,4 +1,4 @@
-import type { AccessRoles } from "@/types";
+import type { AccessRoles } from "@shared/types/api/enums";
 import { type JwtPayload, jwtDecode } from "jwt-decode";
 
 type CustomJwtPayload = JwtPayload & {

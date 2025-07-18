@@ -63,7 +63,7 @@ const RestaurantSearch = () => {
 
     try {
       await getRestaurantsByName(searchTerm);
-    } catch (error) {
+    } catch {
       setFormError("Error searching for restaurants");
     } finally {
       setIsSubmitting(false);
@@ -96,7 +96,7 @@ const RestaurantSearch = () => {
     };
 
     fetchRestaurantAccess();
-  }, [userId, getRestaurantListAccess, isSubmitting]);
+  }, [userId, getRestaurantListAccess, isSubmitting, resetAccess]);
 
   // Redirect to dashboard if user has access to any restaurant
   useEffect(() => {
@@ -145,7 +145,7 @@ const RestaurantSearch = () => {
       return (
         <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-md">
           <p className="text-center text-yellow-700">
-            No restaurants found matching "{searchTerm}". Please try a different
+            No restaurants found matching &apos;{searchTerm}&apos;. Please try a different
             search term.
           </p>
         </div>
@@ -157,7 +157,7 @@ const RestaurantSearch = () => {
         <SearchResultCard
           key={restaurant?._id}
           handleRestaurantSelect={handleRestaurantSelect}
-          data={restaurant}
+          data={{_id: restaurant._id ?? "", name: restaurant.name ?? ""}}
           restaurantAccessList={restaurantAccessList}
         />
       ));
@@ -178,7 +178,7 @@ const RestaurantSearch = () => {
               Search Restaurant
             </h1>
             <p className="text-sm text-gray-500">
-              Enter your restaurant's name in the search bar below.
+              Enter your restaurant&apos;s name in the search bar below.
             </p>
           </div>
 

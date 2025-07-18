@@ -1,6 +1,6 @@
-import { Notification } from "@/types/notification";
 import { create } from "zustand";
 import apiClient from "@/utils/authClient";
+import type { Notification } from "@shared/types/api/schemas";
 
 type NotificationStore = {
   // State
@@ -36,11 +36,11 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
       const response = await apiClient.get(`/notifications/${userId}`);      
       set({
         notifications: response.data,
-        unreadCount: response.data.filter((item: Notification) => !item.read)
+        unreadCount: response.data.filter((item: Notification) => !item.isRead)
           .length,
       });
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -62,10 +62,10 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
       const notifications = get().notifications.map((item) =>
         item._id === updatedNotification._id ? updatedNotification : item
       );
-      const unreadCount = notifications.filter((item) => !item.read).length;
+      const unreadCount = notifications.filter((item) => !item.isRead).length;
       set({ notifications, unreadCount });
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -82,11 +82,11 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
       await apiClient.patch(`/notifications/${userId}/read-all`, {});
       const notifications = get().notifications.map((item) => ({
         ...item,
-        read: true,
+        isRead: true,
       }));
       set({ notifications, unreadCount: 0 });
       return { success: true, error: null };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -100,7 +100,7 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
 
   addNotification: (notification) => {
     const notifications = [notification, ...get().notifications];
-    const unreadCount = notification.read
+    const unreadCount = notification.isRead
       ? get().unreadCount
       : get().unreadCount + 1;
     set({ notifications, unreadCount });

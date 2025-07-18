@@ -4,18 +4,14 @@ import React from "react";
 type NotificationBadgeProps = {
   userId: string | undefined;
 };
+
 export function NotificationBadge({ userId }: NotificationBadgeProps) {
-  if (!userId) {
-    return null; // Ensure userId is defined before calling the hook
-  }
+  // Call the hook first, before any conditional returns
   const { unreadCount } = useNotifications({ userId });
 
-  if (unreadCount === 0) {
-    return (
-      <div className="badge bg-red-500 text-white">
-        {/* Display "0" if there are no unread notifications */}0
-      </div>
-    );
+  // Return null if no userId or no unread notifications
+  if (!userId || unreadCount === 0) {
+    return null;
   }
 
   return (
