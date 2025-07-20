@@ -1,0 +1,29 @@
+{
+  "name": "bitescout",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "yarn@1.22.21",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "docker:dev": "docker-compose up -d",
+    "docker:dev:build": "docker-compose up -d --build",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "docker-compose -f docker-compose.prod.yml up -d --build",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "deploy:render": "echo 'Push to GitHub and deploy via Render dashboard'",
+    "predeploy": "npm run build"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+} 

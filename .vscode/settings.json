@@ -1,0 +1,10 @@
+{
+    "yaml.validate": false,
+    "yaml.format.enable": true,
+    "yaml.hover": true,
+    "yaml.completion": true,
+    "openapi.enable": true,
+    "openapi.validate": true,
+    "swagger.enable": true,
+    "swagger.validate": true
+}

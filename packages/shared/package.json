@@ -1,0 +1,18 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "main": "types/index.ts",
+  "types": "types/index.ts",
+  "scripts": {
+    "generate-types": "openapi-typescript openapi/spec.yaml -o types/api.ts",
+    "build": "npm run generate-types",
+    "dev": "npm run generate-types -- --watch",
+    "watch": "npm run generate-types -- --watch",
+    "clean": "rm -rf dist types/api.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.7.0"
+  }
+} 
