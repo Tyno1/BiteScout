@@ -7,9 +7,9 @@ import type {
   UpdateCourseRequest,
   UpdateCourseResponse
 } from "shared/types/courses";
-import axios from "axios";
 import { create } from "zustand";
 import { handleApiError } from "../utils/apiErrorHandler";
+import apiClient from "../utils/authClient";
 
 type CourseStore = {
   // State
@@ -26,8 +26,6 @@ type CourseStore = {
   resetCourses: () => void;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 const useCourseStore = create<CourseStore>((set) => ({
   courses: [],
   isLoading: false,
@@ -37,7 +35,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.post<CreateCourseResponse>(`${API_URL}/courses`, course);
+      const response = await apiClient.post<CreateCourseResponse>(`/courses`, course);
 
       // Update the courses list with the new course
       set((state) => ({
@@ -60,7 +58,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get<GetAllCoursesResponse>(`${API_URL}/courses`);
+      const response = await apiClient.get<GetAllCoursesResponse>(`/courses`);
 
       set({ courses: response.data, isLoading: false });
       onSuccess?.(response.data);
@@ -79,7 +77,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get<GetCourseByIdResponse>(`${API_URL}/courses/${id}`);
+      const response = await apiClient.get<GetCourseByIdResponse>(`/courses/${id}`);
 
       set({ isLoading: false });
       return response.data;
@@ -97,7 +95,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.put<UpdateCourseResponse>(`${API_URL}/courses/${id}`, course);
+      const response = await apiClient.put<UpdateCourseResponse>(`/courses/${id}`, course);
 
       // Update the course in the list
       set((state) => ({
@@ -122,7 +120,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.delete<DeleteCourseResponse>(`${API_URL}/courses/${id}`);
+      const response = await apiClient.delete<DeleteCourseResponse>(`/courses/${id}`);
 
       // Remove the course from the list
       set((state) => ({

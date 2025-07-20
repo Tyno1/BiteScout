@@ -1,6 +1,6 @@
 import type{ FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import axios from "axios";
+import apiClient from "../utils/authClient";
 import { create } from "zustand";
 
 type FoodDataStore = {
@@ -41,7 +41,7 @@ type FoodDataStore = {
   resetFoodDatas: () => void;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export const DEFAULT_FOOD_DATA: FoodCatalogue = {
   _id: "",
   name: "",
@@ -68,7 +68,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
+      const response = await apiClient.post(`/food-catalogue`, foodData);
       const newFood = response.data;
       set(({
         foodDatas: get().foodDatas
@@ -93,8 +93,8 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(
-        `${API_URL}/food-catalogue/restaurant/${restaurantId}`
+      const response = await apiClient.get(
+        `/food-catalogue/restaurant/${restaurantId}`
       );
 
       set({ foodDatas: response.data, isLoading: false });
@@ -115,8 +115,8 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get(
-        `${API_URL}/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
+      const response = await apiClient.get(
+        `/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
       );
       console.log(response.data);
       
@@ -147,8 +147,8 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.put(
-        `${API_URL}/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`,
+      const response = await apiClient.put(
+        `/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`,
         foodData
       );
 
@@ -171,8 +171,8 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      await axios.delete(
-        `${API_URL}/restaurant/${restaurantId}/catalogue/${foodId}`
+      await apiClient.delete(
+        `/restaurant/${restaurantId}/catalogue/${foodId}`
       );
 
       set((state) => ({

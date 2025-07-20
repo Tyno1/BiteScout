@@ -1,13 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+import apiClient from "../../utils/authClient";
 import { useSession } from "next-auth/react";
-
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
-if (!BACKEND_API) {
-  throw new Error(
-    "NEXT_PUBLIC_BACKEND_URL is not defined in the environment variables"
-  );
-}
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -29,7 +22,7 @@ export function useUpdateUser() {
     setError(null);
 
     try {
-      const response = await axios.put(`${BACKEND_API}/users/${id}`);
+      const response = await apiClient.put(`/users/${id}`);
 
       if (!response.data) {
         setError("No data returned from the server");
