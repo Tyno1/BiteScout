@@ -70,7 +70,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
 
       const response = await axios.post(`${API_URL}/food-catalogue`, foodData);
       const newFood = response.data;
-      set(( {
+      set(({
         foodDatas: get().foodDatas
           ? [...get().foodDatas, newFood]
           : [newFood],
