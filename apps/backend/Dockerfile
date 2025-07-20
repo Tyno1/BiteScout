@@ -16,6 +16,8 @@ COPY . .
 # Build the TypeScript backend
 WORKDIR /app/apps/backend
 RUN yarn build
+RUN ls -la dist/
+RUN find . -name "*.js" -type f
 
 # Backend-specific environment variables
 ENV NODE_ENV=production

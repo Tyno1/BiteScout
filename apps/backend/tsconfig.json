@@ -10,13 +10,13 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "..",  // Changed from "./src" to ".."
+    "rootDir": "./src",
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
     "types": ["node", "express"],
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "baseUrl": "..",  // Changed from "." to ".."
+    "baseUrl": ".",
     "paths": {
       "shared/*": ["../shared/*"],
       "@shared/*": ["../shared/*"]
@@ -30,7 +30,7 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/types/**/*.d.ts",
-    "../shared/**/*.ts"  // Added shared types
+    "../shared/**/*.ts"
   ],
   "exclude": [
     "node_modules", 
