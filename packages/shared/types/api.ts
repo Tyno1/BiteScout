@@ -46,14 +46,12 @@ export interface paths {
                  * @example anthony@test.com
                  */
                 email?: string;
-                userType?: {
-                  /** @example user */
-                  name?: string;
-                  /** @example 1 */
-                  level?: number;
-                  /** @example an ordinary user with restaurnat access */
-                  description?: string;
-                };
+                /**
+                 * @description User role/type
+                 * @example guest
+                 * @enum {string}
+                 */
+                userType?: "guest" | "user" | "admin" | "moderator" | "root";
               };
             };
           };
@@ -1018,7 +1016,7 @@ export interface paths {
         /** @description List of user types */
         200: {
           content: {
-            "application/json": components["schemas"]["UserType"][];
+            "application/json": components["schemas"]["UserTypeInfo"][];
           };
         };
       };
@@ -1040,7 +1038,7 @@ export interface paths {
         /** @description User type retrieved successfully */
         200: {
           content: {
-            "application/json": components["schemas"]["UserType"];
+            "application/json": components["schemas"]["UserTypeInfo"];
           };
         };
         /** @description User type not found */
@@ -2613,7 +2611,12 @@ export interface components {
       password: string;
       /** @example false */
       isVerified?: boolean;
-      userType: components["schemas"]["UserType"];
+      /**
+       * @description User role/type
+       * @example admin
+       * @enum {string}
+       */
+      userType: "guest" | "user" | "admin" | "moderator" | "root";
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -3119,12 +3122,7 @@ export interface components {
        */
       updatedAt?: string;
     };
-    UserType: {
-      /**
-       * @description Unique identifier for the user type
-       * @example 507f1f77bcf86cd799439012
-       */
-      _id?: string;
+    UserTypeInfo: {
       /**
        * @description Name of the user type
        * @example user

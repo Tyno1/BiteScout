@@ -11,6 +11,12 @@
     "test:watch": "jest --watchAll",
     "generate-types": "openapi-typescript ../../packages/shared/openapi/spec.yaml -o ./src/docs/openapi/types.d.ts"
   },
+  "resolutions": {
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.7",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
     "@auth0/nextjs-auth0": "^3.7.0",
@@ -20,7 +26,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@types/js-yaml": "^4.0.9",
     "animate.css": "^4.1.1",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -44,6 +50,7 @@
     "tailwind-merge": "^3.3.0",
     "tw-animate-css": "^1.3.3",
     "yaml": "^2.7.1",
+    "styled-jsx": "^5.1.2",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },

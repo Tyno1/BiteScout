@@ -60,17 +60,10 @@ paths:
                         format: email
                         example: anthony@test.com
                       userType:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                            example: user
-                          level:
-                            type: number
-                            example: 1
-                          description:
-                            type: string
-                            example: an ordinary user with restaurnat access
+                        type: string
+                        enum: ["guest", "user", "admin", "moderator", "root"]
+                        description: "User role/type"
+                        example: "guest"
         400:
           description: Missing required field or invalid user type
           content:
@@ -1154,7 +1147,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserType"
+                  $ref: "#/components/schemas/UserTypeInfo"
 
   /api/user-types/{userType}:
     get:
@@ -1175,7 +1168,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserType"
+                $ref: "#/components/schemas/UserTypeInfo"
         404:
           description: User type not found
           content:
@@ -2828,7 +2821,10 @@ components:
           type: boolean
           example: false
         userType:
-          $ref: "#/components/schemas/UserType"
+          type: string
+          enum: ["guest", "user", "admin", "moderator", "root"]
+          description: "User role/type"
+          example: "admin"
         createdAt:
           type: string
           format: date-time
@@ -3414,17 +3410,14 @@ components:
           description: "When the access record was last updated"
           example: "2025-04-20T15:30:00Z"
 
-    UserType:
+
+    UserTypeInfo:
       type: object
       required:
         - name
         - level
         - description
       properties:
-        _id:
-          type: string
-          description: "Unique identifier for the user type"
-          example: "507f1f77bcf86cd799439012"
         name:
           type: string
           enum: ["guest", "user", "admin", "moderator", "root"]
