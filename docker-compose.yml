@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  # Backend API
+  # Backend API (Development)
   backend:
     build:
       context: .
-      dockerfile: apps/backend/Dockerfile
+      dockerfile: apps/backend/Dockerfile.dev
     ports:
       - "5002:5001"
     environment:
@@ -14,12 +14,13 @@ services:
       - MONGODB_CONNECTION_STRING=mongodb+srv://tynoukus:Tyno4real@foodapp.xvp0l.mongodb.net/?retryWrites=true&w=majority&appName=FoodApp
       - JWT_SECRET=your-super-secret-jwt-key-for-development-only
       - JWT_REFRESH_SECRET=your-super-secret-jwt-refresh-key-for-development-only
+      - ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
 
-  # Web App
+  # Web App (Development)
   web:
     build:
       context: .
-      dockerfile: apps/web/Dockerfile
+      dockerfile: apps/web/Dockerfile.dev
     ports:
       - "3001:3000"
     environment:
@@ -28,6 +29,7 @@ services:
       - NEXT_PUBLIC_BACKEND_URL_PLAIN=http://localhost:5002
       - BACKEND_URL_SERVER=http://backend:5001/api
       - NEXTAUTH_SECRET=your-super-secret-nextauth-key-for-development-only
+      - NEXTAUTH_URL=http://localhost:3001
     volumes:
       - .:/app
       - /app/node_modules
