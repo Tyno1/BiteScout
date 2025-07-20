@@ -21,9 +21,8 @@ RUN yarn build
 WORKDIR /app/apps/backend
 RUN yarn build
 
-# Copy shared types to backend for runtime access
-RUN mkdir -p dist/shared/types
-RUN cp -r ../../packages/shared/types/* dist/shared/types/
+# Install dependencies again to ensure shared package is linked
+RUN yarn install
 
 # Debug: Show what was built
 RUN echo "=== Build Output ==="
