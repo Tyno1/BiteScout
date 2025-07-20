@@ -9,7 +9,7 @@ import { Server } from "socket.io";
 import authMiddleware from "./middleware/authmiddleware.js";
 import errorHandler from "./middleware/errorHandler";
 
-import authRoutes from "../src/routes/auth.js";
+import authRoutes from "./routes/auth.js";
 import allergenRoutes from "./routes/alergen.js";
 import courseRoutes from "./routes/course.js";
 import cuisineRoutes from "./routes/cuisine.js";
