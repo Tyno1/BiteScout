@@ -19,26 +19,20 @@
       }
     ],
     "paths": {
-<<<<<<< HEAD:web/tsconfig.json
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-=======
       "@/*": ["./src/*"],
       "@/images/*": ["./public/images/*"],
       "@/icons/*": ["./public/icons/*"],
       "@shared/*": ["../shared/*"],
       "@shared/types/*": ["../shared/types/*"]
-    },
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "tailwind.config.ts"
-, "jest.setup.ts"  ],
->>>>>>> dev:apps/web/tsconfig.json
+    "tailwind.config.ts",
+    "jest.setup.ts"
+  ],
   "exclude": ["node_modules"]
 }

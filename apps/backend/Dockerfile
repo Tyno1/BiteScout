@@ -13,6 +13,10 @@ RUN yarn install
 
 COPY . .
 
+# Build the shared package first
+WORKDIR /app/packages/shared
+RUN yarn build
+
 # Build the TypeScript backend
 WORKDIR /app/apps/backend
 RUN yarn build

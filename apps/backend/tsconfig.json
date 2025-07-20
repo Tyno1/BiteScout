@@ -18,8 +18,8 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "baseUrl": ".",
     "paths": {
-      "shared/*": ["../shared/*"],
-      "@shared/*": ["../shared/*"]
+      "shared/*": ["../shared/types/*"],
+      "@shared/*": ["../shared/types/*"]
     }
   },
   "ts-node": {
