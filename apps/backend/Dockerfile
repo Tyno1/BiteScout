@@ -18,11 +18,10 @@ WORKDIR /app/apps/backend
 RUN yarn build
 
 # Backend-specific environment variables
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=5001
-ENV MONGODB_CONNECTION_STRING=mongodb://mongo:27017/bitescout
 
 EXPOSE 5001
 
-# Run backend dev command
-CMD ["yarn", "dev"] 
+# Run backend production command
+CMD ["yarn", "start"] 

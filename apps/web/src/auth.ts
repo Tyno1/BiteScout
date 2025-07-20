@@ -9,9 +9,10 @@ import axios from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import refreshAccessToken from "./utils/refreshAccessToken";
+import config from "./utils/config";
 
-// Use server-side URL for docker server-side requests, client-side URL for client-side requests
-const BACKEND_SERVER = process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL;
+// Use server-side URL for server-side requests, client-side URL for client-side requests
+const BACKEND_SERVER = config.backend.server;
 
 async function getUserTypeDetails(userType: UserType["name"]) {
 	try {

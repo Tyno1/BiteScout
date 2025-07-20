@@ -13,11 +13,7 @@ RUN yarn install
 
 COPY . .
 
-# Build the Next.js app
-WORKDIR /app/apps/web
-RUN yarn build
-
 EXPOSE 3000
 
-# Run web production command
-CMD ["yarn", "start"] 
+# Run web dev command
+CMD ["yarn", "dev"] 
