@@ -88,7 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 							accessToken,
 							refreshToken,
 							expiresIn,
-							userType: user?.userType?.name,
+							userType: user?.userType,
 						};
 					}
 					throw new Error("Invalid credentials");
@@ -129,7 +129,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user, trigger, session }) {
+		async jwt({ token, user, trigger, session }: { 
+			token: import("next-auth/jwt").JWT; 
+			user?: import("next-auth").User; 
+			trigger?: "signIn" | "signUp" | "update"; 
+			session?: import("next-auth").Session;
+		}) {
 			try {
 				// Only update token when user is provided (on sign in)
 				if (user) {
@@ -145,8 +150,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 
 				if (trigger === "update" && session) {
-					token.restaurantCount = session.restaurantCount;
-					token.userType = session.userType;
+					token.restaurantCount = session.user.restaurantCount;
+					token.userType = session.user.userType;
 				}
 
 				// If the token is expired, try to refresh it
@@ -160,7 +165,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			}
 		},
 
-		async session({ session, token }) {
+		async session({ session, token }: { session: import("next-auth").Session; token: import("next-auth/jwt").JWT }) {
 			try {
 				if (token.accessToken) {
 					session.user.accessToken = token.accessToken as string;
