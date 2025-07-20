@@ -8,9 +8,9 @@ import type {
   UpdateCuisineRequest,
   UpdateCuisineResponse
 } from "shared/types/cuisines";
-import axios from "axios";
 import { create } from "zustand";
 import { handleApiError } from "../utils/apiErrorHandler";
+import apiClient from "../utils/authClient";
 
 type CuisineStore = {
 	// State
@@ -27,8 +27,6 @@ type CuisineStore = {
 	resetCuisines: () => void;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 const useCuisineStore = create<CuisineStore>((set) => ({
 	cuisines: [],
 	isLoading: false,
@@ -38,7 +36,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await axios.post<CreateCuisineResponse>(`${API_URL}/cuisines`, cuisine);
+			const response = await apiClient.post<CreateCuisineResponse>(`/cuisines`, cuisine);
 
 			// Update the cuisines list with the new cuisine
 			set((state) => ({
@@ -58,7 +56,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await axios.get<GetAllCuisinesResponse>(`${API_URL}/cuisines`);
+			const response = await apiClient.get<GetAllCuisinesResponse>(`/cuisines`);
 
 			set({ cuisines: response.data, isLoading: false });
 			if (onSuccess) {
@@ -76,7 +74,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await axios.get<GetCuisineByIdResponse>(`${API_URL}/cuisines/${id}`);
+			const response = await apiClient.get<GetCuisineByIdResponse>(`/cuisines/${id}`);
 
 			set({ isLoading: false });
 			return response.data;
@@ -91,7 +89,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await axios.put<UpdateCuisineResponse>(`${API_URL}/cuisines/${id}`, cuisine);
+			const response = await apiClient.put<UpdateCuisineResponse>(`/cuisines/${id}`, cuisine);
 
 			// Update the cuisine in the list
 			set((state) => ({
@@ -113,7 +111,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await axios.delete<DeleteCuisineResponse>(`${API_URL}/cuisines/${id}`);
+			const response = await apiClient.delete<DeleteCuisineResponse>(`/cuisines/${id}`);
 
 			// Remove the cuisine from the list
 			set((state) => ({

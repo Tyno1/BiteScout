@@ -17,9 +17,7 @@ COPY . .
 WORKDIR /app/apps/web
 RUN yarn build
 
-ENV NEXT_PUBLIC_API_URL=http://backend:5001
-ENV NEXT_PUBLIC_AUTH_URL=http://localhost:3000
-ENV NEXT_PUBLIC_SOCKET_URL=http://backend:5001
+
 
 EXPOSE 3000
 

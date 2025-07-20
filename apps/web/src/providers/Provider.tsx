@@ -7,7 +7,15 @@ type ProviderProps ={
   session:Session | null;
 }
 const Provider = ({ children, session }: ProviderProps) => {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <SessionProvider 
+      session={session}
+      refetchInterval={5 * 60} // Refetch every 5 minutes instead of default
+      refetchOnWindowFocus={false} // Don't refetch when window gains focus
+    >
+      {children}
+    </SessionProvider>
+  );
 };
 
 export default Provider;

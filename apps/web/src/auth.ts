@@ -10,7 +10,8 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import refreshAccessToken from "./utils/refreshAccessToken";
 
-const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
+// Use server-side URL for docker server-side requests, client-side URL for client-side requests
+const BACKEND_SERVER = process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL;
 
 async function getUserTypeDetails(userType: UserType["name"]) {
 	try {
@@ -155,7 +156,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 
 				// If the token is expired, try to refresh it
-				return await refreshAccessToken({ refreshToken: token.refreshToken as string });
+				const refreshedToken = await refreshAccessToken({ refreshToken: token.refreshToken as string });
+				return {
+					...token,
+					...refreshedToken,
+				};
 			} catch (error) {
 				console.error("Error in JWT callback:", error);
 				return {

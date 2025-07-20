@@ -7,9 +7,9 @@ import type {
   UpdateAllergenRequest,
   UpdateAllergenResponse
 } from "shared/types/allergens";
-import axios from "axios";
 import { create } from "zustand";
 import { handleApiError } from "../utils/apiErrorHandler";
+import apiClient from "../utils/authClient";
 
 type AllergenStore = {
   // State
@@ -26,7 +26,6 @@ type AllergenStore = {
   resetAllergens: () => void;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const useAllergenStore = create<AllergenStore>((set) => ({
   allergens: [],
@@ -37,7 +36,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.post<CreateAllergenResponse>(`${API_URL}/allergens`, allergen);
+      const response = await apiClient.post<CreateAllergenResponse>(`/allergens`, allergen);
 
       // Update the allergens list with the new allergen
       set((state) => ({
@@ -60,7 +59,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get<GetAllAllergensResponse>(`${API_URL}/allergens`);
+      const response = await apiClient.get<GetAllAllergensResponse>(`/allergens`);
 
       set({ allergens: response.data, isLoading: false });
       return response.data;
@@ -78,7 +77,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.get<GetAllergenByIdResponse>(`${API_URL}/allergens/${id}`);
+      const response = await apiClient.get<GetAllergenByIdResponse>(`/allergens/${id}`);
 
       set({ isLoading: false });
       return response.data;
@@ -96,7 +95,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.put<UpdateAllergenResponse>(`${API_URL}/allergens/${id}`, allergen);
+      const response = await apiClient.put<UpdateAllergenResponse>(`/allergens/${id}`, allergen);
 
       // Update the allergen in the list
       set((state) => ({
@@ -121,7 +120,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await axios.delete<DeleteAllergenResponse>(`${API_URL}/allergens/${id}`);
+      const response = await apiClient.delete<DeleteAllergenResponse>(`/allergens/${id}`);
 
       // Remove the allergen from the list
       set((state) => ({
