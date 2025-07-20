@@ -18,6 +18,8 @@ WORKDIR /app/apps/backend
 RUN yarn build
 RUN ls -la dist/
 RUN find . -name "*.js" -type f
+RUN ls -la dist/middleware/
+RUN ls -la dist/routes/
 
 # Backend-specific environment variables
 ENV NODE_ENV=production

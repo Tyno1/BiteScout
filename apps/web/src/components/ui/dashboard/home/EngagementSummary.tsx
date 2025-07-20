@@ -27,7 +27,7 @@ export const EngagementSummary = () => {
         <div className="flex items-center justify-between h-40">
           <div className="text-2xl font-bold">100</div>
           <div className="text-sm text-gray-500">
-            <span className="text-green-500">+10%</span> from last month
+            <span className="text-green-500">+10%</span> from last month 
           </div>
         </div>
       </Card>
