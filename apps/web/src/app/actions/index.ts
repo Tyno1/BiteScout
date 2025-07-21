@@ -4,8 +4,8 @@ import { signIn, signOut } from "@/auth";
 import type {
   RegisterPostRequest,
   RegisterPostResponse,
-} from "shared/types/auth/register";
-import type { ApiError } from "shared/types/common/errors";
+} from "@shared/types/auth/register";
+import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import { z } from "zod";
 
