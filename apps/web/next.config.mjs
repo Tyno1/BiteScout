@@ -5,6 +5,9 @@ const nextConfig = {
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
     ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ['axios'],
+  },
   webpack: (config) => {
     config.resolve.fallback = {
       crypto: false,
