@@ -20,7 +20,7 @@
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
     "@auth0/nextjs-auth0": "^3.7.0",
-    "shared": "*",
+    "shared": "file:../../packages/shared",
     "@radix-ui/react-popover": "^1.1.14",
     "@tailwindcss/postcss": "^4.1.1",
     "@tanstack/react-table": "^8.21.3",

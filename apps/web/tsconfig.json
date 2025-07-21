@@ -22,8 +22,8 @@
       "@/*": ["./src/*"],
       "@/images/*": ["./public/images/*"],
       "@/icons/*": ["./public/icons/*"],
-      "@shared/*": ["../shared/*"],
-      "@shared/types/*": ["../shared/types/*"]
+      "shared/*": ["../../packages/shared/types/*"],
+      "@shared/*": ["../../packages/shared/types/*"]
     }
   },
   "include": [

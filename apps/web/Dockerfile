@@ -13,6 +13,10 @@ RUN yarn install
 
 COPY . .
 
+# Build the shared package first
+WORKDIR /app/packages/shared
+RUN yarn build
+
 # Build the Next.js app
 WORKDIR /app/apps/web
 RUN yarn build
