@@ -19,5 +19,6 @@ ENV PORT=5001
 
 EXPOSE 5001
 
-# Run backend dev command
+# Set working directory and run backend dev command
+WORKDIR /app/apps/backend
 CMD ["yarn", "dev"] 

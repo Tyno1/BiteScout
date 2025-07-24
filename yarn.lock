@@ -10241,6 +10241,9 @@ shallowequal@^1.1.0:
   resolved "https://registry.npmjs.org/shallowequal/-/shallowequal-1.1.0.tgz"
   integrity sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==
 
+"shared@file:packages/shared":
+  version "1.0.0"
+
 sharp@^0.34.3:
   version "0.34.3"
   resolved "https://registry.npmjs.org/sharp/-/sharp-0.34.3.tgz"

@@ -16,6 +16,7 @@ services:
       - JWT_REFRESH_SECRET=your-super-secret-jwt-refresh-key-for-development-only
       - ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
 
+
   # Web App (Development)
   web:
     build:
@@ -32,8 +33,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    working_dir: /app/apps/web
-    command: sh -c "yarn install && yarn dev"
     depends_on:
       - backend
 
