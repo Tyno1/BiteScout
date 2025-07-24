@@ -15,5 +15,6 @@ COPY . .
 
 EXPOSE 3000
 
-# Run web dev command
+# Set working directory and run web dev command
+WORKDIR /app/apps/web
 CMD ["yarn", "dev"] 
