@@ -52,9 +52,8 @@ git push origin main
 
 **Frontend Service:**
 - `NODE_ENV` = `production`
-- `NEXT_PUBLIC_BACKEND_URL` = `https://bitescout-backend.onrender.com/api`
-- `NEXT_PUBLIC_BACKEND_URL_PLAIN` = `https://bitescout-backend.onrender.com`
-- `BACKEND_URL_SERVER` = `https://bitescout-backend.onrender.com/api`
+- `NEXT_PUBLIC_BACKEND_URL` = `https://bitescout-backend.onrender.com`
+- `BACKEND_URL_SERVER` = `https://bitescout-backend.onrender.com`
 - `NEXTAUTH_SECRET` = Your production NextAuth secret
 - `NEXTAUTH_URL` = `https://bitescout-web.onrender.com`
 

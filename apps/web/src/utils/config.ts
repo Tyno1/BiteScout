@@ -3,9 +3,9 @@ const config = {
   // Backend URLs
   backend: {
     // For server-side requests (SSR, API routes)
-    server: process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL,
+    server: process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
     // For client-side requests (browser)
-    client: process.env.NEXT_PUBLIC_BACKEND_URL,
+    client: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
   },
   
   // NextAuth configuration

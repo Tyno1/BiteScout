@@ -4,7 +4,7 @@ import type { Notification } from "shared/types/api/schemas";
 
 let socket: Socket | null = null;
 const backendServer =
-	process.env.NEXT_PUBLIC_BACKEND_URL_PLAIN || "http://localhost:5001";
+	process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
 
 // Type for socket notifications that may have different structure
 interface SocketNotification {
