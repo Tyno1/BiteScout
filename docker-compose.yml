@@ -25,9 +25,8 @@ services:
       - "3001:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:5002/api
-      - NEXT_PUBLIC_BACKEND_URL_PLAIN=http://localhost:5002
-      - BACKEND_URL_SERVER=http://backend:5001/api
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:5002
+      - BACKEND_URL_SERVER=http://backend:5001
       - NEXTAUTH_SECRET=your-super-secret-nextauth-key-for-development-only
       - NEXTAUTH_URL=http://localhost:3001
     volumes:

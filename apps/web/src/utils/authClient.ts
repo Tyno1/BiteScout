@@ -6,7 +6,9 @@ import axios, {
 import { getSession } from "next-auth/react";
 import refreshAccessToken from "./refreshAccessToken";
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
+// Get base URL and add /api suffix
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+const BACKEND_API = `${BASE_URL}/api`;
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BACKEND_API,
