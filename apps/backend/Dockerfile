@@ -21,9 +21,17 @@ RUN yarn build
 # Install dependencies again to ensure shared package is linked
 RUN yarn install
 
-# Copy shared types to backend for runtime access
-RUN mkdir -p dist/shared/types
-RUN cp -r ../../packages/shared/types/* dist/shared/types/
+# Copy shared dist to backend for runtime access
+RUN mkdir -p dist/shared
+RUN cp -r ../../packages/shared/dist/* dist/shared/
+
+# Debug: Show what was built
+RUN echo "=== Shared Package Dist ==="
+RUN ls -la ../../packages/shared/dist/
+RUN echo "=== Backend Dist ==="
+RUN ls -la dist/
+RUN echo "=== Shared in Backend Dist ==="
+RUN ls -la dist/shared/ || echo "No shared directory"
 
 # Debug: Show what was built
 RUN echo "=== Build Output ==="
