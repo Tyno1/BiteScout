@@ -10,6 +10,10 @@
       "types": "./types/index.ts",
       "import": "./dist/index.js"
     },
+    "./types": {
+      "types": "./types/index.ts",
+      "import": "./dist/index.js"
+    },
     "./types/*": {
       "types": "./types/*",
       "import": "./dist/*.js"
