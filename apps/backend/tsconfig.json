@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../../",
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
@@ -18,8 +18,8 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "baseUrl": ".",
     "paths": {
-      "shared/*": ["../../packages/shared/types/*"],
-      "@shared/*": ["../../packages/shared/types/*"]
+      "shared/*": ["../../packages/shared/*"],
+      "@shared/*": ["../../packages/shared/*"]
     }
   },
   "ts-node": {
@@ -30,7 +30,7 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/types/**/*.d.ts",
-    "../shared/**/*.ts"
+    "../../packages/shared/types/**/*.ts"
   ],
   "exclude": [
     "node_modules", 
