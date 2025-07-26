@@ -16,8 +16,7 @@ import type {
   UpdateRestaurantAccessRequest,
   UpdateRestaurantAccessResponse,
 } from "shared/types/access";
-import * as enums from "shared/types/api/enums";
-const { AccessRoleEnum, AccessStatusEnum } = enums;
+import { AccessRoleEnum, AccessStatusEnum } from "shared/types/api/enums";
 import type { AccessRoles } from "shared/types/api/enums";
 import type {
   RestaurantAccess as RestaurantAccessType,

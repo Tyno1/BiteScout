@@ -14,10 +14,6 @@
       "types": "./types/*",
       "import": "./dist/*.js"
     },
-    "./types/api/*": {
-      "types": "./types/api/*",
-      "import": "./dist/api/*.js"
-    },
     "./types/api/enums": {
       "types": "./types/api/enums.ts",
       "import": "./dist/api/enums.js"
@@ -25,6 +21,10 @@
     "./types/api/schemas": {
       "types": "./types/api/schemas.ts",
       "import": "./dist/api/schemas.js"
+    },
+    "./types/api/paths": {
+      "types": "./types/api/paths.ts",
+      "import": "./dist/api/paths.js"
     }
   },
   "scripts": {
