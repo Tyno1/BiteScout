@@ -9,7 +9,6 @@ import type {
 import type { ApiError } from "shared/types/common/errors";
 import type { GetOwnerRestaurantsResponse } from "shared/types/restaurant/get";
 import config from "./utils/config";
-import refreshAccessToken from "./utils/refreshAccessToken";
 
 // Server-side refresh function that uses BACKEND_SERVER
 async function refreshAccessTokenServer(token: { refreshToken: string }) {
