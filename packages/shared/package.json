@@ -13,6 +13,10 @@
     "./types/*": {
       "types": "./types/*",
       "import": "./dist/*.js"
+    },
+    "./types/api/*": {
+      "types": "./types/api/*",
+      "import": "./dist/api/*.js"
     }
   },
   "scripts": {

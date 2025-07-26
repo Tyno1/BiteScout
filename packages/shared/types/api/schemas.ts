@@ -21,3 +21,22 @@ export type ErrorResponse = components["schemas"]["ErrorResponse"];
 export type Post = components["schemas"]["Post"];
 // Re-export the components schemas for easier access
 export type { components } from "../api";
+
+// AccessRoleEnum and AccessStatusEnum moved from enums.ts
+export type AccessRoles = components["schemas"]["RestaurantAccess"]["role"];
+export type AccessStatus = components["schemas"]["RestaurantAccess"]["status"];
+
+export const AccessRoleEnum: Record<string, AccessRoles> = {
+  Guest: "guest" as const,
+  User: "user" as const,
+  Moderator: "moderator" as const,
+  Admin: "admin" as const,
+  Root: "root" as const,
+} as const;
+
+export const AccessStatusEnum: Record<string, AccessStatus> = {
+  Pending: "pending" as const,
+  Approved: "approved" as const,
+  Suspended: "suspended" as const,
+  Innactive: "innactive" as const,
+} as const;

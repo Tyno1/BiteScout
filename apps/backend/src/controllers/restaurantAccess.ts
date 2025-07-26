@@ -16,8 +16,8 @@ import type {
   UpdateRestaurantAccessRequest,
   UpdateRestaurantAccessResponse,
 } from "shared/types/access";
-import { AccessRoleEnum, AccessStatusEnum } from "shared/types/api/enums";
-import type { AccessRoles } from "shared/types/api/enums";
+import type { AccessRoles } from "shared/types/api/schemas";
+import { AccessRoleEnum, AccessStatusEnum } from "shared/types/api/schemas";
 import type {
   RestaurantAccess as RestaurantAccessType,
 } from "shared/types/api/schemas";

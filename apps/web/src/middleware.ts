@@ -1,8 +1,8 @@
 import type { Session } from "@auth/core/types";
-import type { AccessRoles } from "shared/types/api/enums";
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import type { AccessRoles } from "shared/types/api/schemas";
 import { getCurrentSession } from "./app/actions/getSessionAction";
 import { Permissions } from "./app/permissions";
 import { getMatchingRoute } from "./utils/getMatchingRoute";

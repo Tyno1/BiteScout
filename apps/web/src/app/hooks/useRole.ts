@@ -1,7 +1,7 @@
 import { getRoleFromToken } from "@/utils/getRoleFromSession";
-import type { AccessRoles } from "shared/types/api/enums";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
+import type { AccessRoles } from "shared/types/api/schemas";
 import { getCurrentSession } from "../actions/getSessionAction";
 
 type ReturnType = {
