@@ -1,3 +1,6 @@
+import axios from "axios";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import type { UserType } from "shared/types/api/schemas";
 import type {
 	LoginPostRequest,
@@ -5,11 +8,36 @@ import type {
 } from "shared/types/auth/login";
 import type { ApiError } from "shared/types/common/errors";
 import type { GetOwnerRestaurantsResponse } from "shared/types/restaurant/get";
-import axios from "axios";
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import refreshAccessToken from "./utils/refreshAccessToken";
 import config from "./utils/config";
+import refreshAccessToken from "./utils/refreshAccessToken";
+
+// Server-side refresh function that uses BACKEND_SERVER
+async function refreshAccessTokenServer(token: { refreshToken: string }) {
+  try {
+    const response = await axios.post(`${BACKEND_SERVER}/api/auth/refresh`, {
+      refreshToken: token.refreshToken
+    });
+
+    const refreshed = response.data;
+    
+    if (!refreshed.accessToken) {
+      throw new Error("No access token returned");
+    }
+
+    return {
+      ...token,
+      accessToken: refreshed.accessToken,
+      expiresIn: refreshed.expiresIn,
+      refreshToken: refreshed.refreshToken ?? token.refreshToken, // fallback
+    };
+  } catch (error) {
+    console.error("Error refreshing access token (server):", error);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 // Use server-side URL for server-side requests, client-side URL for client-side requests
 const BACKEND_SERVER = config.backend.server;
@@ -17,7 +45,7 @@ const BACKEND_SERVER = config.backend.server;
 async function getUserTypeDetails(userType: UserType["name"]) {
 	try {
 		const response = await axios.get(
-			`${BACKEND_SERVER}/user-types/${userType}`,
+			`${BACKEND_SERVER}/api/user-types/${userType}`,
 		);
 
 		if (response.data) {
@@ -72,7 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 				try {
 					const response = await axios.post<LoginPostResponse>(
-						`${BACKEND_SERVER}/auth/login`,
+						`${BACKEND_SERVER}/api/auth/login`,
 						{
 							email: credentials.email,
 							password: credentials.password,
@@ -156,8 +184,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					token.userType = session.user.userType;
 				}
 
-				// If the token is expired, try to refresh it
-				const refreshedToken = await refreshAccessToken({ refreshToken: token.refreshToken as string });
+				// If the token is expired, try to refresh it (server-side)
+				const refreshedToken = await refreshAccessTokenServer({ refreshToken: token.refreshToken as string });
 				return {
 					...token,
 					...refreshedToken,
@@ -194,7 +222,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 				if (token._id) {
 					const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
-						`${BACKEND_SERVER}/restaurants/owner-restaurants/${token._id}`,
+						`${BACKEND_SERVER}/api/restaurants/owner-restaurants/${token._id}`,
 						{
 							headers: {
 								Authorization: `Bearer ${token.accessToken}`,

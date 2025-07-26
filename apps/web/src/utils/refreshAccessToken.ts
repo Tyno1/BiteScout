@@ -1,11 +1,12 @@
 
 import axios from "axios";
 
-const BACKEND_SERVER = process.env.NEXT_PUBLIC_BACKEND_URL;
+// Use the client-side backend URL for refresh requests
+const BACKEND_CLIENT = process.env.BACKEND_URL_CLIENT || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
 
 async function refreshAccessToken(token: { refreshToken: string }) {  
   try {    
-    const response = await axios.post(`${BACKEND_SERVER}/auth/refresh`, {
+    const response = await axios.post(`${BACKEND_CLIENT}/api/auth/refresh`, {
       refreshToken: token.refreshToken
     });
 
