@@ -1,6 +1,6 @@
 import { useRole } from "@/app/hooks/useRole";
-import type { AccessRoles } from "shared/types/api/enums";
 import type React from "react";
+import type { AccessRoles } from "shared/types/api/schemas";
 
 type AccessManagerProps = {
 	children: React.ReactNode;
