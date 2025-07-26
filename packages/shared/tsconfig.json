@@ -13,7 +13,8 @@
     "rootDir": "./types",
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "composite": true
   },
   "include": [
     "types/**/*.ts"

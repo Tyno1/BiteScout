@@ -18,9 +18,9 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "baseUrl": ".",
     "paths": {
-      "shared/*": ["../../packages/shared/*"],
-      "@shared/*": ["../../packages/shared/*"]
-    }
+      "shared/*": ["../../packages/shared/types/*"]
+    },
+    "composite": true
   },
   "ts-node": {
     "esm": true,
@@ -35,5 +35,8 @@
     "node_modules", 
     "dist",
     "../frontend/**/*"  // Exclude frontend files
+  ],
+  "references": [
+    { "path": "../../packages/shared" }
   ]
 }
