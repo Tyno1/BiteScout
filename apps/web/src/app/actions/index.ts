@@ -8,22 +8,7 @@ import type {
 import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import { z } from "zod";
-
-export type SignInResponse = {
-  error?: string;
-  url?: string;
-  ok: boolean;
-};
-export type RegisterFormState = {
-  success?: boolean;
-  errors?: {
-    firstName?: string[];
-    lastName?: string[];
-    email?: string[];
-    password?: string[];
-  };
-  systemError?: string;
-};
+import type { RegisterFormState, SignInResponse } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 

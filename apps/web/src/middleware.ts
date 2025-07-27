@@ -3,10 +3,32 @@ import type { Session } from "@auth/core/types";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { AccessRoles } from "shared/types/api/schemas";
+import { checkRestaurantAccessAction } from "./app/actions/checkRestaurantAccessAction";
 import { getCurrentSession } from "./app/actions/getSessionAction";
+import { needsRestaurantAccess } from "./app/config/restaurantRoutes";
 import { Permissions } from "./app/permissions";
 import { getMatchingRoute } from "./utils/getMatchingRoute";
 import { getRoleFromToken } from "./utils/getRoleFromSession";
+
+// Helper function to extract restaurant ID from various route patterns
+function extractRestaurantId(request: NextRequest): string | null {
+  const { pathname, searchParams } = request.nextUrl;
+  
+  // Method 1: URL parameter (most common)
+  const idFromParams = searchParams.get('id') || searchParams.get('restaurantId');
+  if (idFromParams) return idFromParams;
+  
+  // Method 2: Restaurant profile route pattern
+  if (pathname.startsWith("/dashboard/restaurant-profile/")) {
+    const segments = pathname.split('/');
+    const restaurantIndex = segments.findIndex(segment => segment === 'restaurant-profile');
+    if (restaurantIndex !== -1 && segments[restaurantIndex + 1]) {
+      return segments[restaurantIndex + 1];
+    }
+  }
+  
+  return null;
+}
 
 export async function middleware(request: NextRequest) {
 	try {
@@ -87,6 +109,33 @@ export async function middleware(request: NextRequest) {
 			const nextUrl = request.nextUrl.clone();
 			nextUrl.pathname = "/dashboard/unauthorized";
 			return NextResponse.rewrite(nextUrl);
+		}
+
+		// 🎯 NEW: Restaurant-specific access control using server action
+		// Check if this is a restaurant-related route that needs specific access
+		if (needsRestaurantAccess(pathname)) {
+			const restaurantId = extractRestaurantId(request);
+			
+			// If no restaurant ID in URL, allow access (user will see their own restaurant)
+			if (!restaurantId) {
+				return NextResponse.next();
+			}
+			
+			// Check if user has access to this specific restaurant using server action
+			const { hasAccess, error } = await checkRestaurantAccessAction(
+				session.user._id,
+				restaurantId,
+				role
+			);
+			
+			if (!hasAccess) {
+				console.warn(
+					`Restaurant access denied: User ${session.user._id} not allowed for restaurant ${restaurantId} on route ${pathname}. Error: ${error}`,
+				);
+				const nextUrl = request.nextUrl.clone();
+				nextUrl.pathname = "/dashboard/unauthorized";
+				return NextResponse.rewrite(nextUrl);
+			}
 		}
 
 		// If all checks pass, allow the request to proceed
