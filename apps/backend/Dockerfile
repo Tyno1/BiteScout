@@ -19,6 +19,9 @@ COPY . .
 # Build all packages using Turbo (handles workspace dependencies automatically)
 RUN yarn turbo run build --filter=shared --filter=backend
 
+# Ensure workspace linking is working by reinstalling dependencies
+RUN yarn install --ignore-engines --network-timeout 100000 --retry 3
+
 # Debug: Show what was built
 RUN echo "=== Shared Package Build Output ==="
 RUN ls -la packages/shared/dist/ || echo "No shared dist"
@@ -26,6 +29,8 @@ RUN echo "=== Backend Build Output ==="
 RUN ls -la apps/backend/dist/ || echo "No backend dist"
 RUN echo "=== Backend node_modules/shared ==="
 RUN ls -la apps/backend/node_modules/shared/ || echo "No shared in node_modules"
+RUN echo "=== Root node_modules/shared ==="
+RUN ls -la node_modules/shared/ || echo "No shared in root node_modules"
 
 # Backend-specific environment variables
 ENV NODE_ENV=production
