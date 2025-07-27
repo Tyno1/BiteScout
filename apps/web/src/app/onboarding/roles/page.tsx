@@ -6,11 +6,11 @@ import { useUpdateUser } from "@/app/hooks/useUpdateUser";
 import { Spinner } from "@/components/atoms/loaders/Spinners";
 import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
 import useRestaurantStore from "@/stores/restaurantStore";
-import type { Restaurant } from "shared/types/api/schemas";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import type { Restaurant } from "shared/types/api/schemas";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {

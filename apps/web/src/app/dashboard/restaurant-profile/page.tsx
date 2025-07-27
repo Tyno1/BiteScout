@@ -21,6 +21,7 @@ import type {
 } from "shared/types/api/schemas";
 
 
+import { Spinner } from "@/components/atoms";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
@@ -37,21 +38,56 @@ export default function RestaurantProfile() {
   const {
     restaurantData,
     isLoading: restaurantLoading,
-    getRestaurantByOwnerId,
-    getRestaurantById,
+    getRestaurantByOwnerId: getRestaurantByOwnerIdFromStore,
+    getRestaurantById: getRestaurantByIdFromStore,
     updateRestaurant,
     getDeliveryLinks,
     addDeliveryLink,
     deleteDeliveryLink,
     isLoading: deliveryLinksLoading,
   } = useRestaurantStore();
-  const { cuisines, getCuisines } = useCuisineStore();
+  const { cuisines, getCuisines: getCuisinesFromStore } = useCuisineStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
+  const [hasShownLoading, setHasShownLoading] = useState(false);
 
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
   const [deliveryLinks, setDeliveryLinks] = useState<DeliveryLink[]>([]);
+
+  // Unified loading state to prevent UI flickering
+  const isInitialLoading = useMemo(() => {
+    // Show loading if any of the critical data is still loading
+    return roleLoading || accessLoading || restaurantLoading;
+  }, [roleLoading, accessLoading, restaurantLoading]);
+
+  // Check if we have all the data we need to render
+  const hasRequiredData = useMemo(() => {
+    // We need user role and either access info or restaurant data
+    if (roleLoading || accessLoading) return false;
+    
+    // For admin/root users, we need restaurant data
+    if (userRole === "root" || userRole === "admin") {
+      return !!restaurantData;
+    }
+    
+    // For regular users, we need access info and restaurant data
+    if (!hasAccess) return false;
+    return !!restaurantData;
+  }, [roleLoading, accessLoading, userRole, hasAccess, restaurantData]);
+
+  // Memoize the functions to prevent unnecessary re-renders
+  const getCuisines = useCallback(() => {
+    getCuisinesFromStore();
+  }, [getCuisinesFromStore]);
+
+  const getRestaurantByOwnerId = useCallback((userId: string) => {
+    getRestaurantByOwnerIdFromStore(userId);
+  }, [getRestaurantByOwnerIdFromStore]);
+
+  const getRestaurantById = useCallback((id: string) => {
+    getRestaurantByIdFromStore(id);
+  }, [getRestaurantByIdFromStore]);
 
   // Get the display data (either editable or current)
   const displayData = editableData || restaurantData;
@@ -204,6 +240,20 @@ export default function RestaurantProfile() {
     loadDeliveryLinks();
   }, [loadDeliveryLinks]);
 
+  // Track loading state to prevent flickering
+  useEffect(() => {
+    if (isInitialLoading) {
+      setHasShownLoading(true);
+    } else if (hasShownLoading) {
+      // Add a small delay before hiding loading to prevent flickering
+      const timer = setTimeout(() => {
+        setHasShownLoading(false);
+      }, 300); // 300ms minimum loading time
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoading, hasShownLoading]);
+
   console.log(restaurantData);
 
   const handleInputChange = useCallback(
@@ -274,36 +324,38 @@ export default function RestaurantProfile() {
     userRole,
   ]);
 
-  // Loading state
-  if (restaurantLoading || accessLoading || roleLoading) {
+  // Unified loading state with minimum display time
+  if (isInitialLoading || hasShownLoading) {
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">Loading restaurant data...</div>
-      </div>
-    );
-  }
-  // No access state
-  if (
-    !accessLoading &&
-    !roleLoading &&
-    !hasAccess &&
-    userRole !== "root" &&
-    userRole !== "admin"
-  ) {
-    return (
-      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg text-red-600">
-          You don&apos;t have access to any restaurant data.
+        <div className="flex flex-col items-center space-y-4">
+          <Spinner />
+          <div className="text-lg">Loading restaurant data...</div>
         </div>
       </div>
     );
   }
 
-  // No data state
-  if (!displayData) {
+  // No access state (only show after loading is complete)
+  if (!hasRequiredData && !isInitialLoading) {
+    if (userRole !== "root" && userRole !== "admin" && !hasAccess) {
+      return (
+        <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="text-lg text-red-600">
+              You don&apos;t have access to any restaurant data.
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // No data state
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">No restaurant data found.</div>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="text-lg">No restaurant data found.</div>
+        </div>
       </div>
     );
   }
@@ -384,7 +436,7 @@ export default function RestaurantProfile() {
         }`}>
           <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
             isEditing ? "bg-white" : "bg-gray-500"
-          }`}></div>
+          }`}/>
           {isEditing ? "Edit" : "View"}
         </div>
       </div>

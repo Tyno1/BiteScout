@@ -117,4 +117,7 @@ Thumbs.db
 *.backup
 
 # TypeScript
-*.tsbuildinfo 
+*.tsbuildinfo
+
+# Turbo cache
+.turbo/ 

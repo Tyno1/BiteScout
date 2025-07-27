@@ -82,6 +82,8 @@ async function getUserTypeDetails(userType: UserType["name"]) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	session: {
 		strategy: "jwt",
+		maxAge: 30 * 24 * 60 * 60, // 30 days
+		updateAge: 24 * 60 * 60, // 24 hours - only update session once per day
 	},
 	secret: process.env.NEXTAUTH_SECRET,
 	providers: [
@@ -219,19 +221,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					session.user.userTypeDetails = { name: "guest", level: 4 };
 				}
 
-				if (token._id) {
-					const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
-						`${BACKEND_SERVER}/api/restaurants/owner-restaurants/${token._id}`,
-						{
-							headers: {
-								Authorization: `Bearer ${token.accessToken}`,
+				if (token._id && !token.restaurantCount) {
+					// Only fetch restaurant count if not already cached in token
+					try {
+						const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
+							`${BACKEND_SERVER}/api/restaurants/owner-restaurants/${token._id}`,
+							{
+								headers: {
+									Authorization: `Bearer ${token.accessToken}`,
+								},
 							},
-						},
-					);
+						);
 
-					const restaurantCount = restaurant.data.length;
-
-					session.user.restaurantCount = restaurantCount;
+						const restaurantCount = restaurant.data.length;
+						token.restaurantCount = restaurantCount; // Cache in token
+						session.user.restaurantCount = restaurantCount;
+					} catch (error) {
+						console.error("Error fetching restaurant count:", error);
+						session.user.restaurantCount = 0;
+					}
+				} else if (token.restaurantCount) {
+					// Use cached restaurant count
+					session.user.restaurantCount = token.restaurantCount;
 				}
 
 				return session;

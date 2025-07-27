@@ -5,7 +5,7 @@ import { SideNav, TopNav } from "@/components/ui";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +14,36 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const { data: session, status: sessionStatus } = useSession();
   const { restaurantAccessList } = useRestaurantAccessStore();
   const router = useRouter();
+
+  // Stabilize the access check function to prevent unnecessary re-renders
+  const checkAccessRights = useCallback(() => {
+    if (isLoading || sessionStatus === "loading" || accessChecked) {
+      return;
+    }
+
+    const isOwner = !!(
+      session?.user?.restaurantCount && session.user.restaurantCount >= 1
+    );
+    const isAdmin = restaurantAccessList.some(
+      (access) => access.status === "approved"
+    );
+
+    // Check access rights
+    if (!isOwner && !isAdmin) {
+      console.log("Redirecting to onboarding/roles...");
+      router.push("/onboarding/roles");
+    }
+
+    // Mark that we've checked access
+    setAccessChecked(true);
+  }, [
+    isLoading,
+    sessionStatus,
+    session?.user?.restaurantCount,
+    restaurantAccessList,
+    accessChecked,
+    router,
+  ]);
 
   const handleMenuClick = () => {
     setIsMenuOpen((prev) => !prev);
@@ -39,35 +69,8 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   // Effect to check access rights once hydration is complete
   useEffect(() => {
-    // Skip if we're still loading hydration state or session
-    if (isLoading || sessionStatus === "loading" || accessChecked) {
-      return;
-    }
-
-    const isOwner = !!(
-      session?.user?.restaurantCount && session.user.restaurantCount >= 1
-    );
-    const isAdmin = restaurantAccessList.some(
-      (access) => access.status === "approved"
-    );
-
-    // Check access rights
-    if (!isOwner && !isAdmin) {
-      console.log("Redirecting to onboarding/roles...");
-      router.push("/onboarding/roles");
-    }
-
-    // Mark that we've checked access
-    setAccessChecked(true);
-  }, [
-    isLoading,
-    sessionStatus,
-    session?.user?.restaurantCount,
-    restaurantAccessList,
-    router,
-    accessChecked,
-    // resetAccess,
-  ]);
+    checkAccessRights();
+  }, [checkAccessRights]);
 
   // Show loading state while checking permissions
   if (sessionStatus === "loading" || (isLoading && !accessChecked)) {

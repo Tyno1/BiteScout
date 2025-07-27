@@ -78,8 +78,7 @@ export async function middleware(request: NextRequest) {
 
 		const allowedRoles = Permissions[matchingRoute];
 
-		console.log("allowedRoles", allowedRoles);
-		console.log("role", role);
+		// Debug logs removed for production performance
 
 		if (allowedRoles && !allowedRoles.includes(role)) {
 			console.warn(

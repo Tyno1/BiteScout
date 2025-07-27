@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { Loader2, UtensilsCrossed } from "lucide-react";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Loader2, UtensilsCrossed } from "lucide-react";
+import { useEffect } from "react";
 
 export default function AuthLoader() {
   const session = useSession();
@@ -39,7 +39,7 @@ export default function AuthLoader() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50">
       <div className="flex flex-col items-center justify-center space-y-6 px-4 text-center">
         <div className="relative">
-          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 opacity-75 blur-sm"></div>
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 opacity-75 blur-sm"/>
           <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-background shadow-lg">
             <UtensilsCrossed className="h-12 w-12 text-white" />
           </div>
@@ -64,7 +64,7 @@ export default function AuthLoader() {
 
       <div className="mt-16 flex flex-col items-center justify-center">
         <div className="h-1 w-48 overflow-hidden rounded-full bg-muted">
-          <div className="animate-progress h-full bg-gradient-to-r from-orange-500 to-red-500"></div>
+          <div className="animate-progress h-full bg-gradient-to-r from-orange-500 to-red-500"/>
         </div>
       </div>
     </div>
