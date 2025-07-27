@@ -7,10 +7,9 @@ WORKDIR /app
 
 COPY . .
 
-# Build the shared package first (before installing dependencies)
-WORKDIR /app
-RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
+# Build the shared package first
 WORKDIR /app/packages/shared
+RUN yarn install
 RUN yarn build
 
 # Debug: Show what was built in shared package
@@ -21,7 +20,7 @@ RUN ls -la dist/ || echo "No dist directory"
 RUN echo "=== Shared Package Types Directory ==="
 RUN ls -la types/ || echo "No types directory"
 
-# Now install all dependencies (including workspace dependencies)
+# Install all dependencies (including file-based shared package)
 WORKDIR /app
 RUN yarn cache clean
 RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
