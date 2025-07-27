@@ -7,7 +7,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN yarn install
+# Clear yarn cache and retry installation with network resilience
+RUN yarn cache clean
+RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
 
 
 # Build the shared package first
@@ -19,19 +21,12 @@ WORKDIR /app/apps/backend
 RUN yarn build
 
 # Install dependencies again to ensure shared package is linked
-RUN yarn install
+RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
 
-# Copy shared dist to backend for runtime access
-RUN mkdir -p dist/shared
-RUN cp -r ../../packages/shared/dist/* dist/shared/
-
-# Debug: Show what was built
-RUN echo "=== Shared Package Dist ==="
-RUN ls -la ../../packages/shared/dist/
-RUN echo "=== Backend Dist ==="
-RUN ls -la dist/
-RUN echo "=== Shared in Backend Dist ==="
-RUN ls -la dist/shared/ || echo "No shared directory"
+# Copy shared package dist to backend node_modules for runtime access
+RUN mkdir -p node_modules/shared
+RUN cp -r ../../packages/shared/dist/* node_modules/shared/
+RUN cp ../../packages/shared/package.json node_modules/shared/
 
 # Debug: Show what was built
 RUN echo "=== Build Output ==="
