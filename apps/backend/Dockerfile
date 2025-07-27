@@ -7,13 +7,9 @@ WORKDIR /app
 
 COPY . .
 
-# Clear yarn cache and retry installation with network resilience
-RUN yarn cache clean
-RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
-
-
-# Build the shared package first
+# Build the shared package first (before installing dependencies)
 WORKDIR /app/packages/shared
+RUN yarn install
 RUN yarn build
 
 # Debug: Show what was built in shared package
@@ -23,6 +19,11 @@ RUN echo "=== Shared Package Dist Directory ==="
 RUN ls -la dist/ || echo "No dist directory"
 RUN echo "=== Shared Package Types Directory ==="
 RUN ls -la types/ || echo "No types directory"
+
+# Now install all dependencies (including workspace dependencies)
+WORKDIR /app
+RUN yarn cache clean
+RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
 
 # Build the TypeScript backend
 WORKDIR /app/apps/backend
