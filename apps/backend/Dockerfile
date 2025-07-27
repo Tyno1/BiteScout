@@ -16,6 +16,14 @@ RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-ti
 WORKDIR /app/packages/shared
 RUN yarn build
 
+# Debug: Show what was built in shared package
+RUN echo "=== Shared Package Build Output ==="
+RUN ls -la
+RUN echo "=== Shared Package Dist Directory ==="
+RUN ls -la dist/ || echo "No dist directory"
+RUN echo "=== Shared Package Types Directory ==="
+RUN ls -la types/ || echo "No types directory"
+
 # Build the TypeScript backend
 WORKDIR /app/apps/backend
 RUN yarn build
@@ -27,6 +35,10 @@ RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-ti
 RUN mkdir -p node_modules/shared
 RUN cp -r ../../packages/shared/dist/* node_modules/shared/
 RUN cp ../../packages/shared/package.json node_modules/shared/
+
+# Debug: Show what was copied to node_modules/shared
+RUN echo "=== Backend node_modules/shared ==="
+RUN ls -la node_modules/shared/ || echo "No shared directory"
 
 # Debug: Show what was built
 RUN echo "=== Build Output ==="
