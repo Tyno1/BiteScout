@@ -8,8 +8,9 @@ WORKDIR /app
 COPY . .
 
 # Build the shared package first (before installing dependencies)
+WORKDIR /app
+RUN yarn install --network-timeout 100000 --retry 3 || yarn install --network-timeout 100000 --retry 3
 WORKDIR /app/packages/shared
-RUN yarn install
 RUN yarn build
 
 # Debug: Show what was built in shared package
