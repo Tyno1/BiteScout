@@ -2,19 +2,22 @@
 
 import type React from "react";
 
+import { useRestaurantAccess } from "@/app/hooks/useRestaurantAccess";
 import { useUpdateUser } from "@/app/hooks/useUpdateUser";
 import { Spinner } from "@/components/atoms/loaders/Spinners";
 import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
 import useRestaurantStore from "@/stores/restaurantStore";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import type { Restaurant } from "shared/types/api/schemas";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
   const { createRestaurant } = useRestaurantStore();
+  const {isOwner, isLoading, getRestaurantListAccess,getFirstApprovedRestaurantId, getRestaurantById } = useRestaurantAccess()
+
   const session = useSession();
   const router = useRouter();
   const { updateUser } = useUpdateUser();
@@ -155,19 +158,52 @@ export default function Onboarding() {
     }));
     toast.error("Something went wrong. Please try again later.");
   };
-  console.log(session.data?.user?.restaurantCount);
+
+  const checkRestaurantAccess = useCallback(async () => {
+    try {
+      // Only fetch if we have a user ID
+      if (!session.data?.user?._id) {
+        setShouldRender(true);
+        return false;
+      }
+      
+      await getRestaurantListAccess(session.data.user._id); 
+      const approvedRestaurantId = getFirstApprovedRestaurantId();
+      
+      if (approvedRestaurantId) {
+        router.push("/dashboard");
+        return true;
+      }
+      
+      // If no approved restaurant, stay on the page
+      setShouldRender(true);
+      return false;
+    } catch (error) {
+      console.error("Error checking restaurant access:", error);
+      setShouldRender(true);
+      return false;
+    }
+  }, [getFirstApprovedRestaurantId, getRestaurantListAccess, session.data?.user?._id, router]);
 
   useEffect(() => {
-    if (
-      session?.data?.user?.restaurantCount &&
-      session.data.user?.restaurantCount >= 1
-    ) {
-      router.push("/dashboard");
-      setShouldRender(false);
-    } else {
-      setShouldRender(true);
-    }
-  }, [session, router]);
+    // Show loading immediately while we check
+    setShouldRender(false);
+    
+    const checkAccess = async () => {
+      try {
+        if (isOwner) {
+          router.push("/dashboard");
+          return;
+        }
+        await checkRestaurantAccess();
+      } catch (error) {
+        console.error("Error in access check:", error);
+        setShouldRender(true);
+      }
+    };
+    
+    checkAccess();
+  }, [router, isOwner, checkRestaurantAccess]);
 
   if (!shouldRender)
     return (

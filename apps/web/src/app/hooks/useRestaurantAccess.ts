@@ -1,7 +1,7 @@
 import useCuisineStore from "@/stores/cuisineStore";
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useRole } from "./useRole";
 
 export const useRestaurantAccess = () => {
@@ -22,7 +22,16 @@ export const useRestaurantAccess = () => {
     restaurantAccessList,
     getRestaurantListAccess: originalGetRestaurantListAccess,
     isLoading: accessLoading,
+    resetAccess,
   } = useRestaurantAccessStore();
+
+  // Reset restaurant access store when user session changes
+  useEffect(() => {
+    if (!session?.user?._id) {
+      // User is not logged in, reset the store
+      resetAccess();
+    }
+  }, [session?.user?._id, resetAccess]);
 
   // Memoize the getRestaurantListAccess function to prevent infinite loops
   const getRestaurantListAccess = useCallback(async (userId: string) => {
