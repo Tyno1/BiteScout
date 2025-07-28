@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   # Backend API (Development)
@@ -30,6 +30,7 @@ services:
       - BACKEND_URL_SERVER=http://backend:5001
       - NEXTAUTH_SECRET=your-super-secret-nextauth-key-for-development-only
       - NEXTAUTH_URL=http://localhost:3001
+      - BACKEND_URL_CLIENT=http://localhost:5002
     volumes:
       - .:/app
       - /app/node_modules

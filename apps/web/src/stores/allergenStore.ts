@@ -36,7 +36,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await apiClient.post<CreateAllergenResponse>(`/allergens`, allergen);
+      const response = await apiClient.post<CreateAllergenResponse>("/allergens", allergen);
 
       // Update the allergens list with the new allergen
       set((state) => ({
@@ -59,7 +59,7 @@ const useAllergenStore = create<AllergenStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await apiClient.get<GetAllAllergensResponse>(`/allergens`);
+      const response = await apiClient.get<GetAllAllergensResponse>("/allergens");
 
       set({ allergens: response.data, isLoading: false });
       return response.data;

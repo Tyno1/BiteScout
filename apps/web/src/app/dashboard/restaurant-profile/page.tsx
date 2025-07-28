@@ -1,55 +1,39 @@
 "use client";
 
-import { useApprovedAccess } from "@/app/hooks/useApprovedAccess";
-import { useRole } from "@/app/hooks/useRole";
+import { useRestaurantAccess } from "@/app/hooks/useRestaurantAccess";
 import { DEFAULT_BUSINESS_HOURS } from "@/app/onboarding/constants";
+import { Spinner } from "@/components/atoms";
 import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/BasicInformation";
 import { BusinessHours } from "@/components/ui/dashboard/restaurant-profile/BusinessHours";
 import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile/ContactInformation";
 import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
-import useCuisineStore from "@/stores/cuisineStore";
-import useRestaurantStore from "@/stores/restaurantStore";
 import { getMediaUrl } from "@/utils/mediaUtils";
-import type {
-  BusinessHour,
-  Cuisine,
-  DeliveryLink,
-  Restaurant,
-  RestaurantFeature,
-} from "shared/types/api/schemas";
-
-
-import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-
+import type { BusinessHour, Cuisine, DeliveryLink, Restaurant, RestaurantFeature } from "shared/types/api/schemas";
 
 export default function RestaurantProfile() {
-  const { data: session } = useSession();
-  const { userRole, isLoading: roleLoading } = useRole();
-  const {
-    hasAccess,
-    restaurantId,
-    isLoading: accessLoading,
-  } = useApprovedAccess();
   const {
     restaurantData,
-    isLoading: restaurantLoading,
-    getRestaurantByOwnerId,
-    getRestaurantById,
+    session,
+    cuisines,
+    restaurantAccessList,
+    isLoading,
+    deliveryLinksLoading,
+    isOwner,
+    loadRestaurantData,
+    getRestaurantListAccess,
     updateRestaurant,
     getDeliveryLinks,
     addDeliveryLink,
     deleteDeliveryLink,
-    isLoading: deliveryLinksLoading,
-  } = useRestaurantStore();
-  const { cuisines, getCuisines } = useCuisineStore();
+    getCuisines,
+  } = useRestaurantAccess();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
-
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
   const [deliveryLinks, setDeliveryLinks] = useState<DeliveryLink[]>([]);
 
@@ -74,13 +58,24 @@ export default function RestaurantProfile() {
       : DEFAULT_BUSINESS_HOURS;
   }, [restaurantData?.businessHours]);
 
-
-
   const handleImageUpload = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       // Handle image upload logic here
       console.log("Image uploaded:", file);
+    },
+    []
+  );
+
+  const handleInputChange = useCallback(
+    (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => {
+      setEditableData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          [field]: value,
+        };
+      });
     },
     []
   );
@@ -134,7 +129,6 @@ export default function RestaurantProfile() {
     });
   }, []);
 
-
   const addCuisine = useCallback((cuisine: Cuisine) => {
     setEditableData((prev) => {
       if (!prev) return prev;
@@ -161,11 +155,11 @@ export default function RestaurantProfile() {
         cuisine: prev.cuisine?.filter((c) => c !== cuisine),
       };
     });
-  }, []); // No dependencies needed
+  }, []);
 
   // Delivery links handlers
   const loadDeliveryLinks = useCallback(async () => {
-    const currentRestaurantId = restaurantId || displayData?._id || "";
+    const currentRestaurantId = restaurantData?._id || "";
     if (!currentRestaurantId) return;
     try {
       const links = await getDeliveryLinks(currentRestaurantId);
@@ -173,10 +167,10 @@ export default function RestaurantProfile() {
     } catch {
       toast.error("Failed to load delivery links");
     }
-  }, [restaurantId, displayData?._id, getDeliveryLinks]);
+  }, [restaurantData?._id, getDeliveryLinks]);
 
   const handleAddDeliveryLink = useCallback(async (data: Partial<DeliveryLink>) => {
-    const currentRestaurantId = restaurantId || displayData?._id || "";
+    const currentRestaurantId = restaurantData?._id || "";
     if (!currentRestaurantId) return;
     try {
       await addDeliveryLink(currentRestaurantId, data);
@@ -185,39 +179,19 @@ export default function RestaurantProfile() {
     } catch {
       toast.error("Failed to add delivery link");
     }
-  }, [restaurantId, displayData?._id, addDeliveryLink, loadDeliveryLinks]);
+  }, [restaurantData?._id, addDeliveryLink, loadDeliveryLinks]);
 
-  const handleDeleteDeliveryLink = useCallback(async (id: string) => {
-    const currentRestaurantId = restaurantId || displayData?._id || "";
+  const handleDeleteDeliveryLink = useCallback(async (linkId: string) => {
+    const currentRestaurantId = restaurantData?._id || "";
     if (!currentRestaurantId) return;
     try {
-      await deleteDeliveryLink(currentRestaurantId, id);
+      await deleteDeliveryLink(currentRestaurantId, linkId);
       await loadDeliveryLinks();
-      toast.success("Delivery link removed");
+      toast.success("Delivery link deleted");
     } catch {
-      toast.error("Failed to remove delivery link");
+      toast.error("Failed to delete delivery link");
     }
-  }, [restaurantId, displayData?._id, deleteDeliveryLink, loadDeliveryLinks]);
-
-  // Load delivery links when restaurant changes
-  useEffect(() => {
-    loadDeliveryLinks();
-  }, [loadDeliveryLinks]);
-
-  console.log(restaurantData);
-
-  const handleInputChange = useCallback(
-    (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => {
-      setEditableData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          [field]: value,
-        };
-      });
-    },
-    []
-  );
+  }, [restaurantData?._id, deleteDeliveryLink, loadDeliveryLinks]);
 
   const handleBusinessHoursChange = useCallback(
     (
@@ -242,68 +216,85 @@ export default function RestaurantProfile() {
     []
   );
 
+  // Load delivery links when restaurant changes
+  useEffect(() => {
+    if (restaurantData?._id) {
+      loadDeliveryLinks();
+    }
+  }, [restaurantData?._id, loadDeliveryLinks]);
+
+  // Load cuisines
   useEffect(() => {
     getCuisines();
   }, [getCuisines]);
 
-  // Effect for admin/root users
+  // Load restaurant access list for non-owners
   useEffect(() => {
-    if (!session?.user?._id || !userRole) return;
-    if (userRole !== "root" && userRole !== "admin") return;
-    // if (restaurantData) return; // Don't refetch if we have data
+    if (!session?.user?._id) return;
+    getRestaurantListAccess(session.user._id);
+  }, [session?.user?._id, getRestaurantListAccess]);
 
-    const userId = session.user._id;
-    getRestaurantByOwnerId(userId);
-  }, [session?.user?._id, userRole, getRestaurantByOwnerId]);
-
-  // Effect for regular users with access
+  // Load restaurant data using the flexible approach
   useEffect(() => {
-    if (!session?.user?._id || !userRole) return;
-    if (userRole === "root" || userRole === "admin") return;
-    if (accessLoading || !hasAccess || !restaurantId) return;
-    if (restaurantData) return; // Don't refetch if we have data
+    if (!session?.user?._id) return;
+    if (restaurantData?._id) return; // Don't refetch if we have valid data
 
-    getRestaurantById(restaurantId);
-  }, [
-    session?.user?._id,
-    hasAccess,
-    restaurantId,
-    accessLoading,
-    restaurantData,
-    getRestaurantById,
-    userRole,
-  ]);
+    loadRestaurantData();
+  }, [session?.user?._id, loadRestaurantData, restaurantData?._id]);
 
   // Loading state
-  if (restaurantLoading || accessLoading || roleLoading) {
+  if (isLoading) {
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">Loading restaurant data...</div>
-      </div>
-    );
-  }
-  // No access state
-  if (
-    !accessLoading &&
-    !roleLoading &&
-    !hasAccess &&
-    userRole !== "root" &&
-    userRole !== "admin"
-  ) {
-    return (
-      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg text-red-600">
-          You don&apos;t have access to any restaurant data.
+        <div className="flex flex-col items-center space-y-4">
+          <Spinner />
+          <div className="text-lg">Loading restaurant data...</div>
         </div>
       </div>
     );
   }
 
-  // No data state
-  if (!displayData) {
+  // Handle different user scenarios
+  if (!restaurantData?._id) {
+    // Check if user has any approved restaurant access
+    const hasApprovedAccess = restaurantAccessList.some(
+      (access) => access.status === "approved"
+    );
+
+    if (isOwner) {
+      return (
+        <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="text-lg">No restaurant data found.</div>
+            <div className="text-sm text-gray-600">Please contact support if you believe this is an error.</div>
+          </div>
+        </div>
+      );
+    }
+    
+    if (hasApprovedAccess) {
+      return (
+        <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="flex flex-col items-center space-y-4">
+            <Spinner />
+            <div className="text-lg">Loading restaurant data...</div>
+            <div className="text-sm text-gray-600">Please wait while we fetch your restaurant information.</div>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">No restaurant data found.</div>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="text-lg">No restaurant access found.</div>
+          <div className="text-sm text-gray-600">
+            {isOwner 
+              ? "This page is for restaurant owners to manage their restaurant profiles."
+              : "You don't have access to any restaurants. Please contact your restaurant administrator."
+            }
+          </div>
+        </div>
       </div>
     );
   }
@@ -358,9 +349,9 @@ export default function RestaurantProfile() {
           handleInputChange={handleInputChange}
         />
 
-         <DeliveryLinks
+        <DeliveryLinks
           isEditing={isEditing}
-          restaurantId={restaurantId || displayData?._id || ""}
+          restaurantId={restaurantData?._id || ""}
           links={deliveryLinks}
           isLoading={deliveryLinksLoading}
           onAdd={handleAddDeliveryLink}
@@ -368,28 +359,17 @@ export default function RestaurantProfile() {
         />
 
         {/* Status Messages for Screen Readers */}
-        <div className="sr-only" aria-live="polite">
-          {isEditing
-            ? "You are in edit mode. Make your changes and click the save button to save them."
-            : "View mode. Click the edit button to make changes."}
-        </div>
+        {isLoading && (
+          <div className="sr-only" aria-live="polite">
+            Loading restaurant data...
+          </div>
+        )}
+        {isEditing && (
+          <div className="sr-only" aria-live="polite">
+            Editing restaurant profile
+          </div>
+        )}
       </div>
-
-      {/* Floating Mode Indicator */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm ${
-          isEditing 
-            ? "bg-primary/90 text-white" 
-            : "bg-gray-100/80 text-gray-600"
-        }`}>
-          <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-            isEditing ? "bg-white" : "bg-gray-500"
-          }`}></div>
-          {isEditing ? "Edit" : "View"}
-        </div>
-      </div>
-
-    
     </main>
   );
 }

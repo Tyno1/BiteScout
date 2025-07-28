@@ -1,6 +1,6 @@
-// Re-export types from the centralized enums file
-export type { AccessRoles } from './api/enums';
-export { AccessRoleEnum, AccessStatusEnum } from './api/enums';
+// Re-export types from the centralized schemas file
+export type { AccessRoles } from './api/schemas';
+export { AccessRoleEnum, AccessStatusEnum } from './api/schemas';
 
 // For backward compatibility, re-export the enum values with different names
 export const AccessStatusValues = {

@@ -1,10 +1,10 @@
 "use client";
 
 import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
-import type { RestaurantAccess } from "shared/types/api/schemas";
 import { Ban, CheckCircle, Trash2, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
   const { data: session } = useSession();
@@ -153,6 +153,7 @@ export default function TeamManagement() {
                         <div className="flex space-x-2">
                           {access.status !== "approved" && (
                             <button
+                              type="button"
                               onClick={() =>
                                 handleStatusChange(
                                   access?._id ?? "",
@@ -167,6 +168,7 @@ export default function TeamManagement() {
                           )}
                           {access.status !== "suspended" && (
                             <button
+                              type="button"
                               onClick={() =>
                                 handleStatusChange(
                                   access._id ?? "",
@@ -180,6 +182,7 @@ export default function TeamManagement() {
                             </button>
                           )}
                           <button
+                            type="button"
                             onClick={() =>
                               handleStatusChange(access._id ?? "", "innactive")
                             }

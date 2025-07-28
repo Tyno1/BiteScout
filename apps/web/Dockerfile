@@ -5,13 +5,10 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package*.json turbo.json ./
-COPY apps/web/package*.json ./apps/web/
-COPY packages/shared/package*.json ./packages/shared/
+COPY . .
 
 RUN yarn install
 
-COPY . .
 
 # Build the shared package first
 WORKDIR /app/packages/shared

@@ -10,19 +10,18 @@
       "cache": false,
       "persistent": true
     },
+    "start": {
+      "dependsOn": ["build"]
+    },
     "lint": {
-      "dependsOn": ["^lint"]
+      "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "outputs": ["coverage/**"]
     },
     "clean": {
       "cache": false
-    },
-    "generate-types": {
-      "dependsOn": ["^generate-types"],
-      "outputs": ["types/**", "src/docs/openapi/types.d.ts"]
     }
   }
 } 

@@ -1,3 +1,4 @@
+import type { NextFunction, Request, Response } from "express";
 import type { ApiError } from "shared/types/common/errors";
 import type {
   CreateRestaurantRequest,
@@ -30,12 +31,18 @@ import type {
   SearchRestaurantsRequest,
   SearchRestaurantsResponse,
 } from "shared/types/restaurant/search";
-import type { NextFunction, Request, Response } from "express";
 import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import RestaurantData from "../models/RestaurantData.js";
 
-// Extract delivery link type from generated types
-import type { DeliveryLink } from "shared/types/api/schemas";
+// Define DeliveryLink type locally to avoid module resolution issues
+type DeliveryLink = {
+  _id?: string;
+  name: string;
+  url: string;
+  type: string;
+  platform: string;
+  // Add other properties as needed
+};
 import mongoose from "mongoose";
 
 // Feature categories mapping for filtering

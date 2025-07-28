@@ -1,3 +1,6 @@
+import axios from "axios";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import type { UserType } from "shared/types/api/schemas";
 import type {
 	LoginPostRequest,
@@ -5,11 +8,35 @@ import type {
 } from "shared/types/auth/login";
 import type { ApiError } from "shared/types/common/errors";
 import type { GetOwnerRestaurantsResponse } from "shared/types/restaurant/get";
-import axios from "axios";
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import refreshAccessToken from "./utils/refreshAccessToken";
 import config from "./utils/config";
+
+// Server-side refresh function that uses BACKEND_SERVER
+async function refreshAccessTokenServer(token: { refreshToken: string }) {
+  try {
+    const response = await axios.post(`${BACKEND_SERVER}/api/auth/refresh`, {
+      refreshToken: token.refreshToken
+    });
+
+    const refreshed = response.data;
+    
+    if (!refreshed.accessToken) {
+      throw new Error("No access token returned");
+    }
+
+    return {
+      ...token,
+      accessToken: refreshed.accessToken,
+      expiresIn: refreshed.expiresIn,
+      refreshToken: refreshed.refreshToken ?? token.refreshToken, // fallback
+    };
+  } catch (error) {
+    console.error("Error refreshing access token (server):", error);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 // Use server-side URL for server-side requests, client-side URL for client-side requests
 const BACKEND_SERVER = config.backend.server;
@@ -17,7 +44,7 @@ const BACKEND_SERVER = config.backend.server;
 async function getUserTypeDetails(userType: UserType["name"]) {
 	try {
 		const response = await axios.get(
-			`${BACKEND_SERVER}/user-types/${userType}`,
+			`${BACKEND_SERVER}/api/user-types/${userType}`,
 		);
 
 		if (response.data) {
@@ -55,6 +82,8 @@ async function getUserTypeDetails(userType: UserType["name"]) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	session: {
 		strategy: "jwt",
+		maxAge: 30 * 24 * 60 * 60, // 30 days
+		updateAge: 24 * 60 * 60, // 24 hours - only update session once per day
 	},
 	secret: process.env.NEXTAUTH_SECRET,
 	providers: [
@@ -72,7 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 				try {
 					const response = await axios.post<LoginPostResponse>(
-						`${BACKEND_SERVER}/auth/login`,
+						`${BACKEND_SERVER}/api/auth/login`,
 						{
 							email: credentials.email,
 							password: credentials.password,
@@ -156,8 +185,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					token.userType = session.user.userType;
 				}
 
-				// If the token is expired, try to refresh it
-				const refreshedToken = await refreshAccessToken({ refreshToken: token.refreshToken as string });
+				// If the token is expired, try to refresh it (server-side)
+				const refreshedToken = await refreshAccessTokenServer({ refreshToken: token.refreshToken as string });
 				return {
 					...token,
 					...refreshedToken,
@@ -192,19 +221,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					session.user.userTypeDetails = { name: "guest", level: 4 };
 				}
 
-				if (token._id) {
-					const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
-						`${BACKEND_SERVER}/restaurants/owner-restaurants/${token._id}`,
-						{
-							headers: {
-								Authorization: `Bearer ${token.accessToken}`,
+				if (token._id && !token.restaurantCount) {
+					// Only fetch restaurant count if not already cached in token
+					try {
+						const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
+							`${BACKEND_SERVER}/api/restaurants/owner-restaurants/${token._id}`,
+							{
+								headers: {
+									Authorization: `Bearer ${token.accessToken}`,
+								},
 							},
-						},
-					);
+						);
 
-					const restaurantCount = restaurant.data.length;
-
-					session.user.restaurantCount = restaurantCount;
+						const restaurantCount = restaurant.data.length;
+						token.restaurantCount = restaurantCount; // Cache in token
+						session.user.restaurantCount = restaurantCount;
+					} catch (error) {
+						console.error("Error fetching restaurant count:", error);
+						session.user.restaurantCount = 0;
+					}
+				} else if (token.restaurantCount) {
+					// Use cached restaurant count
+					session.user.restaurantCount = token.restaurantCount;
 				}
 
 				return session;

@@ -18,9 +18,9 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "baseUrl": ".",
     "paths": {
-      "shared/*": ["../../packages/shared/types/*"],
-      "@shared/*": ["../../packages/shared/types/*"]
-    }
+      "shared/*": ["../../packages/shared/types/*"]
+    },
+    "composite": true
   },
   "ts-node": {
     "esm": true,
@@ -29,12 +29,14 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
-    "src/types/**/*.d.ts",
-    "../shared/**/*.ts"
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules", 
     "dist",
     "../frontend/**/*"  // Exclude frontend files
+  ],
+  "references": [
+    { "path": "../../packages/shared" }
   ]
 }

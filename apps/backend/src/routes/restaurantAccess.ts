@@ -3,8 +3,6 @@ import * as controller from "../controllers/restaurantAccess.js";
 
 const router = express.Router();
 
-//  set up middleware to make sure the request is made by owner
-
 router.post("/:restaurantId", controller.RequestAuthorization);
 router.get("/user/:userId", controller.GetRestaurantAccessByUserId);
 router.get("/owner/:ownerId", controller.GetRestaurantAccessByOwnerId);

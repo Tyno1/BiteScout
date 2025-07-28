@@ -5,36 +5,22 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package*.json turbo.json ./
-COPY packages/shared/package*.json ./packages/shared/
-COPY apps/backend/package*.json ./apps/backend/
+# Copy package files first for better caching
+COPY package.json yarn.lock ./
+COPY apps/backend/package.json ./apps/backend/
+COPY packages/shared/package.json ./packages/shared/
 
-RUN yarn install
+# Install dependencies from root (resolves workspace dependencies)
+RUN yarn install --ignore-engines --network-timeout 100000 --retry 3
 
+# Copy source code
 COPY . .
 
-# Build the shared package first
-WORKDIR /app/packages/shared
-RUN yarn build
+# Build all packages using Turbo (handles workspace dependencies automatically)
+RUN yarn turbo run build --filter=shared --filter=backend
 
-# Build the TypeScript backend
-WORKDIR /app/apps/backend
-RUN yarn build
-
-# Install dependencies again to ensure shared package is linked
-RUN yarn install
-
-# Copy shared types to backend for runtime access
-RUN mkdir -p dist/shared/types
-RUN cp -r ../../packages/shared/types/* dist/shared/types/
-
-# Debug: Show what was built
-RUN echo "=== Build Output ==="
-RUN ls -la
-RUN echo "=== Dist Directory ==="
-RUN ls -la dist/
-RUN echo "=== Shared Types Directory ==="
-RUN ls -la dist/shared/types/ || echo "No shared types directory"
+# Ensure workspace linking is working by reinstalling dependencies
+RUN yarn install --ignore-engines --network-timeout 100000 --retry 3
 
 # Backend-specific environment variables
 ENV NODE_ENV=production
@@ -43,4 +29,4 @@ ENV PORT=5001
 EXPOSE 5001
 
 # Run backend production command
-CMD ["yarn", "start"] 
+CMD ["yarn", "workspace", "backend", "start"] 

@@ -1,6 +1,7 @@
 "use server";
 
 import { signIn, signOut } from "@/auth";
+import config from "@/utils/config";
 import type {
   RegisterPostRequest,
   RegisterPostResponse,
@@ -8,24 +9,9 @@ import type {
 import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import { z } from "zod";
+import type { RegisterFormState, SignInResponse } from "./types";
 
-export type SignInResponse = {
-  error?: string;
-  url?: string;
-  ok: boolean;
-};
-export type RegisterFormState = {
-  success?: boolean;
-  errors?: {
-    firstName?: string[];
-    lastName?: string[];
-    email?: string[];
-    password?: string[];
-  };
-  systemError?: string;
-};
-
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_URL = config.backend.server ;
 
 // Enhanced password validation with better security
 const passwordSchema = z
@@ -127,7 +113,7 @@ export async function credentialRegister(
 
     const { firstName, lastName, email, password } = result.data;
     try {
-      await axios.post<RegisterPostResponse>(`${API_URL}/auth/register`, {
+      await axios.post<RegisterPostResponse>(`${API_URL}/api/auth/register`, {
         firstName,
         lastName,
         email,
@@ -153,6 +139,7 @@ export async function credentialRegister(
           errorMessages[apiError.code] ||
           apiError.message ||
           "Registration failed. Please try again.";
+
 
         return {
           errors: {

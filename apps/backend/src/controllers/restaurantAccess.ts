@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
+import type { AccessRoles } from "shared/types";
+import { AccessRoleEnum, AccessStatusEnum } from "shared/types";
 import type {
   DeleteRestaurantAccessRequest,
   DeleteRestaurantAccessResponse,
@@ -16,9 +18,6 @@ import type {
   UpdateRestaurantAccessRequest,
   UpdateRestaurantAccessResponse,
 } from "shared/types/access";
-import * as enums from "shared/types/api/enums";
-const { AccessRoleEnum, AccessStatusEnum } = enums;
-import type { AccessRoles } from "shared/types/api/enums";
 import type {
   RestaurantAccess as RestaurantAccessType,
 } from "shared/types/api/schemas";

@@ -28,8 +28,7 @@ export * from "./refreshAccessToken";
 export * from "./getMatchingRoute";
 export * from "./getRoleFromSession";
 
-// Restaurant access utilities
-export * from "./getApprovedAccessList";
+
 
 // Socket utilities
 export * from "./socketService";

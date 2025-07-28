@@ -35,7 +35,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await apiClient.post<CreateCourseResponse>(`/courses`, course);
+      const response = await apiClient.post<CreateCourseResponse>("/courses", course);
 
       // Update the courses list with the new course
       set((state) => ({
@@ -58,7 +58,7 @@ const useCourseStore = create<CourseStore>((set) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await apiClient.get<GetAllCoursesResponse>(`/courses`);
+      const response = await apiClient.get<GetAllCoursesResponse>("/courses");
 
       set({ courses: response.data, isLoading: false });
       onSuccess?.(response.data);

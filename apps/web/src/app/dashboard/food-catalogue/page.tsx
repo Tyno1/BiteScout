@@ -8,12 +8,12 @@ import useCourseStore from "@/stores/courseStore";
 import useCuisineStore from "@/stores/cuisineStore";
 import useFoodDataStore, { DEFAULT_FOOD_DATA } from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 // import useRestaurantStore from "@/stores/restaurantStore";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import { useRouter } from "next/navigation";
-import type React from "react";
-import { useEffect, useState } from "react";
 
 export type formErrorType = Partial<{
   name: string;
@@ -169,13 +169,31 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     router.push(`food-catalogue/${id}`);
   };
 
-  useEffect(() => {
+  // Stabilize the functions to prevent unnecessary re-renders
+  const stableGetCuisines = useCallback(() => {
     getCuisines();
+  }, [getCuisines]);
+
+  const stableGetCourses = useCallback(() => {
     getCourses();
+  }, [getCourses]);
+
+  const stableGetAllergens = useCallback(() => {
     getAllergens();
-  }, [getCuisines, getCourses, getAllergens]);
+  }, [getAllergens]);
+
+  useEffect(() => {
+    stableGetCuisines();
+    stableGetCourses();
+    stableGetAllergens();
+  }, [stableGetCuisines, stableGetCourses, stableGetAllergens]);
 
 
+
+  // Stabilize the getFoodDatas function
+  const stableGetFoodDatas = useCallback((restaurantId: string) => {
+    getFoodDatas(restaurantId);
+  }, [getFoodDatas]);
 
   useEffect(() => {
     if (restaurantData?._id) {
@@ -185,9 +203,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         ...prev,
         restaurant: restaurantData._id as string,
       }));
-      getFoodDatas(restaurantData?._id);
+      stableGetFoodDatas(restaurantData._id);
     }
-  }, [restaurantData, getFoodDatas]);
+  }, [restaurantData?._id, stableGetFoodDatas]); // Only depend on restaurantData._id, not the entire object
 
   return (
     <div className="container mx-auto p-4 w-full">

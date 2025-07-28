@@ -1,6 +1,6 @@
-import * as enums from "shared/types/api/enums";
+import * as enums from "shared/types/api/schemas";
 const { AccessRoleEnum } = enums;
-import type { AccessRoles } from "shared/types/api/enums";
+import type { AccessRoles } from "shared/types/api/schemas";
 
 import { Routes } from "./routes";
 

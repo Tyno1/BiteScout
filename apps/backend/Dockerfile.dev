@@ -5,13 +5,15 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package*.json turbo.json ./
-COPY packages/shared/package*.json ./packages/shared/
-COPY apps/backend/package*.json ./apps/backend/
+# Copy all files first
+COPY . .
 
+# Install dependencies
 RUN yarn install
 
-COPY . .
+# Build the shared package
+WORKDIR /app/packages/shared
+RUN yarn build
 
 # Backend-specific environment variables
 ENV NODE_ENV=development

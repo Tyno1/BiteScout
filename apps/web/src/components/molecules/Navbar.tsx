@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useState } from "react";
 import "animate.css";
 import ProfileImg from "@/assets/images/profile.png";
-import { MobileNav } from "./MobileNav";
 import { Button } from "../atoms";
+import { MobileNav } from "./MobileNav";
 
 type NavTheme = {
   theme: "dark" | "light";
@@ -29,7 +29,6 @@ export function Navbar({ theme }: NavTheme) {
     router.push(path);
   };
   const { data: session } = useSession();
-  console.log(session);
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
@@ -94,6 +93,7 @@ export function Navbar({ theme }: NavTheme) {
                   variant="solid"
                   size="sm"
                   text="Logout"
+                  type="button"
                   onClick={async () => await signOut({ callbackUrl: "/" })}
                 />
               </li>
@@ -113,6 +113,7 @@ export function Navbar({ theme }: NavTheme) {
                   variant="solid"
                   size="sm"
                   text="Login"
+                  type="button"
                   onClick={() => handleRoute("/login")}
                 />
               </li>
@@ -121,6 +122,7 @@ export function Navbar({ theme }: NavTheme) {
                   variant="plain"
                   size="sm"
                   text="Register"
+                  type="button"
                   onClick={() => handleRoute("/register")}
                 />
               </li>
@@ -129,6 +131,7 @@ export function Navbar({ theme }: NavTheme) {
         </li>
       </ul>
       <button
+        type="button"
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
         aria-label={isOpen ? "Close menu" : "Open menu"}

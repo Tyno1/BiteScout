@@ -36,7 +36,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await apiClient.post<CreateCuisineResponse>(`/cuisines`, cuisine);
+			const response = await apiClient.post<CreateCuisineResponse>("/cuisines", cuisine);
 
 			// Update the cuisines list with the new cuisine
 			set((state) => ({
@@ -56,7 +56,7 @@ const useCuisineStore = create<CuisineStore>((set) => ({
 		try {
 			set({ error: null, isLoading: true });
 
-			const response = await apiClient.get<GetAllCuisinesResponse>(`/cuisines`);
+			const response = await apiClient.get<GetAllCuisinesResponse>("/cuisines");
 
 			set({ cuisines: response.data, isLoading: false });
 			if (onSuccess) {
