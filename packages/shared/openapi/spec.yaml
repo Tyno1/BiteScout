@@ -1727,8 +1727,8 @@ paths:
 
   /api/media:
     post:
-      summary: Create new media
-      description: Upload and create a new media item
+      summary: Create new media (JSON metadata)
+      description: Create a new media item with metadata (for external URLs)
       security:
         - bearerAuth: []
       requestBody:
@@ -1823,6 +1823,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
+  /api/media/upload:
+    post:
+      summary: Upload media file (Hybrid Architecture)
+      description: |
+        Upload a media file using the hybrid architecture. 
+        This endpoint delegates file processing to the media service while managing metadata in the main backend.
+        Supports images and videos up to 100MB.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Media file to upload (image or video)"
+                title:
+                  type: string
+                  description: "Title or caption for the media"
+                  example: "Restaurant Interior"
+                description:
+                  type: string
+                  description: "Description of the media content"
+                  example: "Beautiful interior view of the restaurant"
+                tags:
+                  type: string
+                  description: "JSON array of tags"
+                  example: '["food", "restaurant", "interior"]'
+                folder:
+                  type: string
+                  description: "Folder path for organizing media"
+                  example: "restaurants/interior"
+                associatedWith:
+                  type: string
+                  description: "JSON object with type and id"
+                  example: '{"type": "post", "id": "507f1f77bcf86cd799439016"}'
+      responses:
+        201:
+          description: Media uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaUploadResponse"
+        400:
+          description: Invalid file or request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "File type not supported or file too large"
+        401:
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        413:
+          description: File too large
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "File size exceeds maximum limit of 104857600 bytes"
+        500:
+          description: Upload failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Media service upload failed"
 
   /api/media/{id}:
     get:
@@ -3282,9 +3368,25 @@ components:
           description: "Description of the media content"
           example: "Beautiful interior view of the restaurant"
         uploadedBy:
-          type: string
-          description: "ID of the user who uploaded the media"
-          example: "507f1f77bcf86cd799439011"
+          type: object
+          properties:
+            id:
+              type: string
+              description: "ID of the user who uploaded the media"
+              example: "507f1f77bcf86cd799439011"
+            name:
+              type: string
+              description: "Name of the user who uploaded the media"
+              example: "John Doe"
+            username:
+              type: string
+              description: "Username of the user who uploaded the media"
+              example: "johndoe"
+            imageUrl:
+              type: string
+              description: "Profile image URL of the user who uploaded the media"
+              example: "https://example.com/profile.jpg"
+          description: "User who uploaded the media"
         associatedWith:
           type: object
           properties:
@@ -3336,6 +3438,46 @@ components:
           format: date-time
           description: "When the media was last updated"
           example: "2025-04-20T15:30:00Z"
+
+    MediaVariant:
+      type: object
+      required:
+        - size
+        - url
+      properties:
+        size:
+          type: string
+          enum: ["thumbnail", "small", "medium", "large", "original"]
+          description: "Size variant name"
+          example: "medium"
+        url:
+          type: string
+          format: uri
+          description: "URL to the optimized variant"
+          example: "https://cloudinary.com/.../medium.jpg"
+        width:
+          type: number
+          description: "Width of the variant in pixels"
+          example: 800
+        height:
+          type: number
+          description: "Height of the variant in pixels"
+          example: 600
+
+    MediaUploadResponse:
+      type: object
+      required:
+        - media
+        - variants
+      properties:
+        media:
+          $ref: "#/components/schemas/Media"
+          description: "The created media record"
+        variants:
+          type: array
+          description: "Optimized variants of the uploaded media"
+          items:
+            $ref: "#/components/schemas/MediaVariant"
 
     RestaurantAccess:
       type: object

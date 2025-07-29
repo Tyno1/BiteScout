@@ -1614,8 +1614,8 @@ export interface paths {
   };
   "/api/media": {
     /**
-     * Create new media
-     * @description Upload and create a new media item
+     * Create new media (JSON metadata)
+     * @description Create a new media item with metadata (for external URLs)
      */
     post: {
       requestBody: {
@@ -1706,6 +1706,93 @@ export interface paths {
         500: {
           content: {
             "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/media/upload": {
+    /**
+     * Upload media file (Hybrid Architecture)
+     * @description Upload a media file using the hybrid architecture.
+     * This endpoint delegates file processing to the media service while managing metadata in the main backend.
+     * Supports images and videos up to 100MB.
+     */
+    post: {
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            /**
+             * Format: binary
+             * @description Media file to upload (image or video)
+             */
+            file: string;
+            /**
+             * @description Title or caption for the media
+             * @example Restaurant Interior
+             */
+            title?: string;
+            /**
+             * @description Description of the media content
+             * @example Beautiful interior view of the restaurant
+             */
+            description?: string;
+            /**
+             * @description JSON array of tags
+             * @example ["food", "restaurant", "interior"]
+             */
+            tags?: string;
+            /**
+             * @description Folder path for organizing media
+             * @example restaurants/interior
+             */
+            folder?: string;
+            /**
+             * @description JSON object with type and id
+             * @example {"type": "post", "id": "507f1f77bcf86cd799439016"}
+             */
+            associatedWith?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Media uploaded successfully */
+        201: {
+          content: {
+            "application/json": components["schemas"]["MediaUploadResponse"];
+          };
+        };
+        /** @description Invalid file or request */
+        400: {
+          content: {
+            "application/json": {
+              /** @example File type not supported or file too large */
+              error?: string;
+            };
+          };
+        };
+        /** @description User not authenticated */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description File too large */
+        413: {
+          content: {
+            "application/json": {
+              /** @example File size exceeds maximum limit of 104857600 bytes */
+              error?: string;
+            };
+          };
+        };
+        /** @description Upload failed */
+        500: {
+          content: {
+            "application/json": {
+              /** @example Media service upload failed */
+              error?: string;
+            };
           };
         };
       };
@@ -2992,11 +3079,29 @@ export interface components {
        * @example Beautiful interior view of the restaurant
        */
       description?: string;
-      /**
-       * @description ID of the user who uploaded the media
-       * @example 507f1f77bcf86cd799439011
-       */
-      uploadedBy: string;
+      /** @description User who uploaded the media */
+      uploadedBy: {
+        /**
+         * @description ID of the user who uploaded the media
+         * @example 507f1f77bcf86cd799439011
+         */
+        id?: string;
+        /**
+         * @description Name of the user who uploaded the media
+         * @example John Doe
+         */
+        name?: string;
+        /**
+         * @description Username of the user who uploaded the media
+         * @example johndoe
+         */
+        username?: string;
+        /**
+         * @description Profile image URL of the user who uploaded the media
+         * @example https://example.com/profile.jpg
+         */
+        imageUrl?: string;
+      };
       /** @description Information about what this media is associated with */
       associatedWith?: {
         /**
@@ -3052,6 +3157,36 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
+    };
+    MediaVariant: {
+      /**
+       * @description Size variant name
+       * @example medium
+       * @enum {string}
+       */
+      size: "thumbnail" | "small" | "medium" | "large" | "original";
+      /**
+       * Format: uri
+       * @description URL to the optimized variant
+       * @example https://cloudinary.com/.../medium.jpg
+       */
+      url: string;
+      /**
+       * @description Width of the variant in pixels
+       * @example 800
+       */
+      width?: number;
+      /**
+       * @description Height of the variant in pixels
+       * @example 600
+       */
+      height?: number;
+    };
+    MediaUploadResponse: {
+      /** @description The created media record */
+      media: components["schemas"]["Media"];
+      /** @description Optimized variants of the uploaded media */
+      variants: components["schemas"]["MediaVariant"][];
     };
     RestaurantAccess: {
       /**
