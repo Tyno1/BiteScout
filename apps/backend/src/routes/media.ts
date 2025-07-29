@@ -1,30 +1,40 @@
-import express from "express";
-import * as controller from "../controllers/mediaController.js";
+import express from 'express';
+import multer from 'multer';
+import * as mediaController from '../controllers/mediaController.js';
+import authMiddleware from '../middleware/authmiddleware.js';
 
 const router = express.Router();
 
-// Create new media
-router.post("/", controller.createMedia);
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow images and videos
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image and video files are allowed'));
+    }
+  },
+});
 
-// Get media by ID
-router.get("/:id", controller.getMediaById);
+// Apply authentication middleware to all routes
+router.use(authMiddleware);
 
-// Get media by associated item (post or dish)
-router.get("/associated/:type/:id", controller.getMediaByAssociatedItem);
+// Media metadata management
+router.post('/', mediaController.createMedia);
+router.get('/:id', mediaController.getMediaById);
+router.put('/:id', mediaController.updateMedia);
+router.delete('/:id', mediaController.deleteMedia);
+router.get('/associated/:type/:id', mediaController.getMediaByAssociatedItem);
+router.get('/user/:userId', mediaController.getUserMedia);
+router.patch('/:id/verify', mediaController.verifyMedia);
+router.get('/verified', mediaController.getVerifiedMedia);
 
-// Get user's media
-router.get("/user/:userId", controller.getUserMedia);
-
-// Get verified media
-router.get("/verified", controller.getVerifiedMedia);
-
-// Update media
-router.put("/:id", controller.updateMedia);
-
-// Delete media
-router.delete("/:id", controller.deleteMedia);
-
-// Verify/unverify media (admin/moderator only)
-router.patch("/:id/verify", controller.verifyMedia);
+// File upload (delegates to media service)
+router.post('/upload', upload.single('file'), mediaController.uploadFile);
 
 export default router; 

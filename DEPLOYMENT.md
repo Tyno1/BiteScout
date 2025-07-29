@@ -50,6 +50,19 @@ git push origin main
 - `JWT_REFRESH_SECRET` = Your production JWT refresh secret
 - `ALLOWED_ORIGINS` = `https://bitescout-web.onrender.com,https://yourdomain.com`
 
+**Media Service:**
+- `NODE_ENV` = `production`
+- `PORT` = `3002`
+- `MONGODB_CONNECTION_STRING` = Your MongoDB Atlas connection string for media service
+- `CLOUDINARY_CLOUD_NAME` = Your Cloudinary cloud name
+- `CLOUDINARY_API_KEY` = Your Cloudinary API key
+- `CLOUDINARY_API_SECRET` = Your Cloudinary API secret
+- `AWS_ACCESS_KEY_ID` = Your AWS access key (optional)
+- `AWS_SECRET_ACCESS_KEY` = Your AWS secret key (optional)
+- `AWS_REGION` = `us-east-1` (or your preferred region)
+- `AWS_S3_BUCKET_NAME` = Your S3 bucket name (optional)
+- `ALLOWED_ORIGINS` = `https://bitescout-web.onrender.com,https://yourdomain.com`
+
 **Frontend Service:**
 - `NODE_ENV` = `production`
 - `NEXT_PUBLIC_BACKEND_URL` = `https://bitescout-backend.onrender.com`
@@ -77,6 +90,9 @@ git push origin main
 ├── docker-compose.prod.yml     # Production reference
 ├── apps/
 │   ├── backend/
+│   │   ├── Dockerfile          # Production
+│   │   └── Dockerfile.dev      # Development
+│   ├── media-service/
 │   │   ├── Dockerfile          # Production
 │   │   └── Dockerfile.dev      # Development
 │   └── web/

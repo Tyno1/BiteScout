@@ -1,3 +1,5 @@
+/// <reference path="../types/express.d.ts" />
+import type { NextFunction, Request, Response } from "express";
 import type { 
 	ApiError,
 	CreateMediaRequest,
@@ -18,8 +20,7 @@ import type {
 	VerifyMediaRequest,
 	VerifyMediaResponse
 } from "shared/types";
-/// <reference path="../types/express.d.ts" />
-import type { NextFunction, Request, Response } from "express";
+import { mediaServiceClient } from "../clients/mediaServiceClient.js";
 import { createError } from "../middleware/errorHandler.js";
 import Media from "../models/Media.js";
 
@@ -292,5 +293,60 @@ export const getVerifiedMedia = async (
 		});
 	} catch (error) {
 		next(error);
+	}
+};
+
+export const uploadFile = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+): Promise<void> => {
+	try {
+		if (!req.file) {
+			throw createError(400, "No file uploaded");
+		}
+
+		if (!req.user?.id) {
+			throw createError(401, "User not authenticated");
+		}
+
+		// Upload file to media service
+		const uploadResult = await mediaServiceClient.uploadFile(req.file, {
+			userId: req.user.id,
+			tags: req.body.tags ? JSON.parse(req.body.tags) : undefined,
+			folder: req.body.folder,
+		});
+
+		// Create media record in main backend
+		const mediaRecord = {
+			url: uploadResult.media.url,
+			type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
+			title: req.body.title || uploadResult.media.originalName,
+			description: req.body.description || "",
+			uploadedBy: req.user.id,
+			verified: false,
+			fileSize: uploadResult.media.fileSize,
+			mimeType: uploadResult.media.mimeType,
+			dimensions: uploadResult.media.width && uploadResult.media.height ? {
+				width: uploadResult.media.width,
+				height: uploadResult.media.height,
+			} : undefined,
+			associatedWith: req.body.associatedWith ? JSON.parse(req.body.associatedWith) : undefined,
+		};
+
+		const newMedia = await Media.create(mediaRecord);
+
+		// Populate uploadedBy user data
+		await newMedia.populate([
+			{ path: "uploadedBy", select: "name username imageUrl" },
+		]);
+
+		// Return response with populated user data and variants from media service
+		res.status(201).json({
+			media: newMedia,
+			variants: uploadResult.variants,
+		});
+	} catch (error) {
+		return next(error);
 	}
 };

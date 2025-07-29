@@ -16,7 +16,7 @@ import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
   const { createRestaurant } = useRestaurantStore();
-  const {isOwner, isLoading, getRestaurantListAccess,getFirstApprovedRestaurantId, getRestaurantById } = useRestaurantAccess()
+  const {isOwner, getRestaurantListAccess,getFirstApprovedRestaurantId } = useRestaurantAccess()
 
   const session = useSession();
   const router = useRouter();
