@@ -12,27 +12,16 @@ import type {
 	GetMediaResponse,
 	GetUserMediaRequest,
 	GetUserMediaResponse,
-	GetVerifiedMediaRequest,
 	GetVerifiedMediaResponse,
-	Media as MediaType,
 	UpdateMediaRequest,
 	UpdateMediaResponse,
+	UploadMediaResponse,
 	VerifyMediaRequest,
 	VerifyMediaResponse
 } from "shared/types";
 import { mediaServiceClient } from "../clients/mediaServiceClient.js";
 import { createError } from "../middleware/errorHandler.js";
 import Media from "../models/Media.js";
-
-// Combined response types for each endpoint
-type CreateMediaApiResponse = CreateMediaResponse | ApiError;
-type GetMediaApiResponse = GetMediaResponse | ApiError;
-type UpdateMediaApiResponse = UpdateMediaResponse | ApiError;
-type DeleteMediaApiResponse = DeleteMediaResponse | ApiError;
-type GetMediaByAssociatedApiResponse = GetMediaByAssociatedResponse | ApiError;
-type GetUserMediaApiResponse = GetUserMediaResponse | ApiError;
-type VerifyMediaApiResponse = VerifyMediaResponse | ApiError;
-type GetVerifiedMediaApiResponse = GetVerifiedMediaResponse | ApiError;
 
 // Helper function to validate request ID
 const validateId = (req: Request) => {
@@ -43,20 +32,50 @@ const validateId = (req: Request) => {
 	return id;
 };
 
+// Helper function to validate and transform request body
+const validateCreateMediaRequest = (body: unknown): CreateMediaRequest => {
+	if (!body || typeof body !== 'object') {
+		throw createError(400, "Invalid request body");
+	}
+	
+	const bodyObj = body as Record<string, unknown>;
+	
+	if (!bodyObj.url || !bodyObj.type) {
+		throw createError(400, "URL and type are required");
+	}
+	
+	if (!["image", "video", "audio"].includes(bodyObj.type as string)) {
+		throw createError(400, "Invalid media type");
+	}
+	
+	return body as CreateMediaRequest;
+};
+
+// Helper function to validate and transform update request
+const validateUpdateMediaRequest = (body: unknown): UpdateMediaRequest => {
+	// Only allow specific fields to be updated
+	const allowedFields = ['title', 'description', 'associatedWith'];
+	const filteredBody = Object.keys(body as Record<string, unknown>)
+		.filter(key => allowedFields.includes(key))
+		.reduce((obj, key) => {
+			(obj as Record<string, unknown>)[key] = (body as Record<string, unknown>)[key];
+			return obj;
+		}, {} as Record<string, unknown>);
+	
+	return filteredBody as UpdateMediaRequest;
+};
+
 export const createMedia = async (
-	req: Request<Record<string, never>, CreateMediaApiResponse, CreateMediaRequest>,
-	res: Response<CreateMediaApiResponse>,
+	req: Request<Record<string, never>, CreateMediaResponse | ApiError, CreateMediaRequest>,
+	res: Response<CreateMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
-		const body = req.body;
-
-		if (!body) {
-			throw createError(400, "Invalid request body");
-		}
+		// Validate request body using shared type
+		const validatedBody = validateCreateMediaRequest(req.body);
 
 		// Add uploadedBy from authenticated user
-		const mediaData = { ...body, uploadedBy: req.user?.id };
+		const mediaData = { ...validatedBody, uploadedBy: req.user?.id };
 
 		if (!mediaData.uploadedBy) {
 			throw createError(401, "User not authenticated");
@@ -73,15 +92,39 @@ export const createMedia = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
-		res.status(201).json(newMedia);
+		// Transform to match CreateMediaResponse type
+		const response: CreateMediaResponse = {
+			_id: newMedia._id.toString(),
+			url: newMedia.url,
+			type: newMedia.type,
+			title: newMedia.title,
+			description: newMedia.description,
+			uploadedBy: {
+				id: newMedia.uploadedBy._id.toString(),
+				name: newMedia.uploadedBy.name,
+				username: newMedia.uploadedBy.username,
+				imageUrl: newMedia.uploadedBy.imageUrl,
+			},
+			associatedWith: newMedia.associatedWith,
+			verified: newMedia.verified,
+			fileSize: newMedia.fileSize,
+			mimeType: newMedia.mimeType,
+			dimensions: newMedia.dimensions,
+			providerId: newMedia.providerId,
+			provider: newMedia.provider,
+			createdAt: newMedia.createdAt.toISOString(),
+			updatedAt: newMedia.updatedAt.toISOString(),
+		};
+
+		res.status(201).json(response);
 	} catch (error) {
 		return next(error);
 	}
 };
 
 export const getMediaById = async (
-	req: Request<GetMediaRequest, GetMediaApiResponse>,
-	res: Response<GetMediaApiResponse>,
+	req: Request<GetMediaRequest, GetMediaResponse | ApiError>,
+	res: Response<GetMediaResponse | ApiError>,
 	next: NextFunction,
 ) => {
 	try {
@@ -95,15 +138,39 @@ export const getMediaById = async (
 			throw createError(404, "Media not found");
 		}
 
-		res.json(media);
+		// Transform to match GetMediaResponse type
+		const response: GetMediaResponse = {
+			_id: media._id.toString(),
+			url: media.url,
+			type: media.type,
+			title: media.title,
+			description: media.description,
+			uploadedBy: {
+				id: media.uploadedBy._id.toString(),
+				name: media.uploadedBy.name,
+				username: media.uploadedBy.username,
+				imageUrl: media.uploadedBy.imageUrl,
+			},
+			associatedWith: media.associatedWith,
+			verified: media.verified,
+			fileSize: media.fileSize,
+			mimeType: media.mimeType,
+			dimensions: media.dimensions,
+			providerId: media.providerId,
+			provider: media.provider,
+			createdAt: media.createdAt.toISOString(),
+			updatedAt: media.updatedAt.toISOString(),
+		};
+
+		res.json(response);
 	} catch (error) {
 		return next(error);
 	}
 };
 
 export const getMediaByAssociatedItem = async (
-	req: Request<GetMediaByAssociatedRequest, GetMediaByAssociatedApiResponse>,
-	res: Response<GetMediaByAssociatedApiResponse>,
+	req: Request<GetMediaByAssociatedRequest, GetMediaByAssociatedResponse | ApiError>,
+	res: Response<GetMediaByAssociatedResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -122,15 +189,39 @@ export const getMediaByAssociatedItem = async (
 			"associatedWith.id": id,
 		}).populate([{ path: "uploadedBy", select: "name username imageUrl" }]);
 
-		res.json(media);
+		// Transform to match GetMediaByAssociatedResponse type
+		const response: GetMediaByAssociatedResponse = media.map(item => ({
+			_id: item._id.toString(),
+			url: item.url,
+			type: item.type,
+			title: item.title,
+			description: item.description,
+			uploadedBy: {
+				id: item.uploadedBy._id.toString(),
+				name: item.uploadedBy.name,
+				username: item.uploadedBy.username,
+				imageUrl: item.uploadedBy.imageUrl,
+			},
+			associatedWith: item.associatedWith,
+			verified: item.verified,
+			fileSize: item.fileSize,
+			mimeType: item.mimeType,
+			dimensions: item.dimensions,
+			providerId: item.providerId,
+			provider: item.provider,
+			createdAt: item.createdAt.toISOString(),
+			updatedAt: item.updatedAt.toISOString(),
+		}));
+
+		res.json(response);
 	} catch (error) {
 		next(error);
 	}
 };
 
 export const getUserMedia = async (
-	req: Request<{ userId: string }, GetUserMediaApiResponse, Record<string, never>, { page?: string; limit?: string }>,
-	res: Response<GetUserMediaApiResponse>,
+	req: Request<GetUserMediaRequest, GetUserMediaResponse | ApiError, Record<string, never>, { page?: string; limit?: string }>,
+	res: Response<GetUserMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -147,8 +238,30 @@ export const getUserMedia = async (
 
 		const total = await Media.countDocuments({ uploadedBy: userId });
 
-		res.json({
-			media,
+		// Transform to match GetUserMediaResponse type
+		const response: GetUserMediaResponse = {
+			media: media.map(item => ({
+				_id: item._id.toString(),
+				url: item.url,
+				type: item.type,
+				title: item.title,
+				description: item.description,
+				uploadedBy: {
+					id: item.uploadedBy._id.toString(),
+					name: item.uploadedBy.name,
+					username: item.uploadedBy.username,
+					imageUrl: item.uploadedBy.imageUrl,
+				},
+				associatedWith: item.associatedWith,
+				verified: item.verified,
+				fileSize: item.fileSize,
+				mimeType: item.mimeType,
+				dimensions: item.dimensions,
+				providerId: item.providerId,
+				provider: item.provider,
+				createdAt: item.createdAt.toISOString(),
+				updatedAt: item.updatedAt.toISOString(),
+			})),
 			pagination: {
 				currentPage: Number(page),
 				totalPages: Math.ceil(total / Number(limit)),
@@ -156,20 +269,24 @@ export const getUserMedia = async (
 				hasNextPage: skip + media.length < total,
 				hasPrevPage: Number(page) > 1,
 			},
-		});
+		};
+
+		res.json(response);
 	} catch (error) {
 		next(error);
 	}
 };
 
 export const updateMedia = async (
-	req: Request<{ id: string }, UpdateMediaApiResponse, UpdateMediaRequest>,
-	res: Response<UpdateMediaApiResponse>,
+	req: Request<{ id: string }, UpdateMediaResponse | ApiError, UpdateMediaRequest>,
+	res: Response<UpdateMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const body = req.body;
+		
+		// Validate request body using shared type
+		const validatedBody = validateUpdateMediaRequest(req.body);
 
 		// Check if media exists and user owns it
 		const existingMedia = await Media.findById(id);
@@ -183,7 +300,7 @@ export const updateMedia = async (
 
 		const updatedMedia = await Media.findByIdAndUpdate(
 			id,
-			{ $set: body },
+			{ $set: validatedBody },
 			{ new: true },
 		).populate([{ path: "uploadedBy", select: "name username imageUrl" }]);
 
@@ -191,15 +308,39 @@ export const updateMedia = async (
 			throw createError(404, "Media could not be updated");
 		}
 
-		res.json(updatedMedia);
+		// Transform to match UpdateMediaResponse type
+		const response: UpdateMediaResponse = {
+			_id: updatedMedia._id.toString(),
+			url: updatedMedia.url,
+			type: updatedMedia.type,
+			title: updatedMedia.title,
+			description: updatedMedia.description,
+			uploadedBy: {
+				id: updatedMedia.uploadedBy._id.toString(),
+				name: updatedMedia.uploadedBy.name,
+				username: updatedMedia.uploadedBy.username,
+				imageUrl: updatedMedia.uploadedBy.imageUrl,
+			},
+			associatedWith: updatedMedia.associatedWith,
+			verified: updatedMedia.verified,
+			fileSize: updatedMedia.fileSize,
+			mimeType: updatedMedia.mimeType,
+			dimensions: updatedMedia.dimensions,
+			providerId: updatedMedia.providerId,
+			provider: updatedMedia.provider,
+			createdAt: updatedMedia.createdAt.toISOString(),
+			updatedAt: updatedMedia.updatedAt.toISOString(),
+		};
+
+		res.json(response);
 	} catch (error) {
 		return next(error);
 	}
 };
 
 export const deleteMedia = async (
-	req: Request<DeleteMediaRequest, DeleteMediaApiResponse>,
-	res: Response<DeleteMediaApiResponse>,
+	req: Request<DeleteMediaRequest, DeleteMediaResponse | ApiError>,
+	res: Response<DeleteMediaResponse | ApiError>,
 	next: NextFunction,
 ) => {
 	try {
@@ -215,19 +356,34 @@ export const deleteMedia = async (
 			throw createError(403, "Not authorized to delete this media");
 		}
 
+		// Delete from media service first (if it has a provider ID)
+		if (existingMedia.providerId) {
+			try {
+				await mediaServiceClient.deleteMedia(existingMedia.providerId, req.user?.id);
+			} catch (mediaServiceError) {
+				console.error("[MediaService] Delete failed:", mediaServiceError);
+				// Continue with database deletion even if media service fails
+				// This prevents orphaned database records
+			}
+		}
+
+		// Delete from database
 		await Media.findByIdAndDelete(id);
 
-		res.status(200).json({
+		// Return DeleteMediaResponse type
+		const response: DeleteMediaResponse = {
 			message: "Media deleted successfully",
-		});
+		};
+
+		res.status(200).json(response);
 	} catch (error) {
 		return next(error);
 	}
 };
 
 export const verifyMedia = async (
-	req: Request<{ id: string }, VerifyMediaApiResponse>,
-	res: Response<VerifyMediaApiResponse>,
+	req: Request<VerifyMediaRequest, VerifyMediaResponse | ApiError>,
+	res: Response<VerifyMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -251,15 +407,39 @@ export const verifyMedia = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
-		res.json(media);
+		// Transform to match VerifyMediaResponse type
+		const response: VerifyMediaResponse = {
+			_id: media._id.toString(),
+			url: media.url,
+			type: media.type,
+			title: media.title,
+			description: media.description,
+			uploadedBy: {
+				id: media.uploadedBy._id.toString(),
+				name: media.uploadedBy.name,
+				username: media.uploadedBy.username,
+				imageUrl: media.uploadedBy.imageUrl,
+			},
+			associatedWith: media.associatedWith,
+			verified: media.verified,
+			fileSize: media.fileSize,
+			mimeType: media.mimeType,
+			dimensions: media.dimensions,
+			providerId: media.providerId,
+			provider: media.provider,
+			createdAt: media.createdAt.toISOString(),
+			updatedAt: media.updatedAt.toISOString(),
+		};
+
+		res.json(response);
 	} catch (error) {
 		return next(error);
 	}
 };
 
 export const getVerifiedMedia = async (
-	req: Request<Record<string, never>, GetVerifiedMediaApiResponse, Record<string, never>, { page?: string; limit?: string; type?: string }>,
-	res: Response<GetVerifiedMediaApiResponse>,
+	req: Request<Record<string, never>, GetVerifiedMediaResponse | ApiError, Record<string, never>, { page?: string; limit?: string; type?: string }>,
+	res: Response<GetVerifiedMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -281,8 +461,30 @@ export const getVerifiedMedia = async (
 
 		const total = await Media.countDocuments(filter);
 
-		res.json({
-			media,
+		// Transform to match GetVerifiedMediaResponse type
+		const response: GetVerifiedMediaResponse = {
+			media: media.map(item => ({
+				_id: item._id.toString(),
+				url: item.url,
+				type: item.type,
+				title: item.title,
+				description: item.description,
+				uploadedBy: {
+					id: item.uploadedBy._id.toString(),
+					name: item.uploadedBy.name,
+					username: item.uploadedBy.username,
+					imageUrl: item.uploadedBy.imageUrl,
+				},
+				associatedWith: item.associatedWith,
+				verified: item.verified,
+				fileSize: item.fileSize,
+				mimeType: item.mimeType,
+				dimensions: item.dimensions,
+				providerId: item.providerId,
+				provider: item.provider,
+				createdAt: item.createdAt.toISOString(),
+				updatedAt: item.updatedAt.toISOString(),
+			})),
 			pagination: {
 				currentPage: Number(page),
 				totalPages: Math.ceil(total / Number(limit)),
@@ -290,7 +492,9 @@ export const getVerifiedMedia = async (
 				hasNextPage: skip + media.length < total,
 				hasPrevPage: Number(page) > 1,
 			},
-		});
+		};
+
+		res.json(response);
 	} catch (error) {
 		next(error);
 	}
@@ -298,7 +502,7 @@ export const getVerifiedMedia = async (
 
 export const uploadFile = async (
 	req: Request,
-	res: Response,
+	res: Response<UploadMediaResponse | ApiError>,
 	next: NextFunction,
 ): Promise<void> => {
 	try {
@@ -332,6 +536,8 @@ export const uploadFile = async (
 				height: uploadResult.media.height,
 			} : undefined,
 			associatedWith: req.body.associatedWith ? JSON.parse(req.body.associatedWith) : undefined,
+			providerId: uploadResult.media.providerId,
+			provider: uploadResult.media.provider,
 		};
 
 		const newMedia = await Media.create(mediaRecord);
@@ -341,11 +547,39 @@ export const uploadFile = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
-		// Return response with populated user data and variants from media service
-		res.status(201).json({
-			media: newMedia,
-			variants: uploadResult.variants,
-		});
+		// Transform to match UploadMediaResponse type
+		const response: UploadMediaResponse = {
+			media: {
+				_id: newMedia._id.toString(),
+				url: newMedia.url,
+				type: newMedia.type,
+				title: newMedia.title,
+				description: newMedia.description,
+				uploadedBy: {
+					id: newMedia.uploadedBy._id.toString(),
+					name: newMedia.uploadedBy.name,
+					username: newMedia.uploadedBy.username,
+					imageUrl: newMedia.uploadedBy.imageUrl,
+				},
+				associatedWith: newMedia.associatedWith,
+				verified: newMedia.verified,
+				fileSize: newMedia.fileSize,
+				mimeType: newMedia.mimeType,
+				dimensions: newMedia.dimensions,
+				providerId: newMedia.providerId,
+				provider: newMedia.provider,
+				createdAt: newMedia.createdAt.toISOString(),
+				updatedAt: newMedia.updatedAt.toISOString(),
+			},
+			variants: uploadResult.variants.map(variant => ({
+				size: variant.size as "small" | "thumbnail" | "medium" | "large" | "original",
+				url: variant.url,
+				width: variant.width,
+				height: variant.height
+			})),
+		};
+
+		res.status(201).json(response);
 	} catch (error) {
 		return next(error);
 	}

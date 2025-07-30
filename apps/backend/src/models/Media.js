@@ -55,6 +55,15 @@ const mediaSchema = new mongoose.Schema(
         type: Number,
       },
     },
+    providerId: {
+      type: String,
+      description: "ID of the media in the cloud storage provider (Cloudinary/AWS S3)",
+    },
+    provider: {
+      type: String,
+      enum: ["cloudinary", "aws-s3"],
+      description: "Cloud storage provider used for this media",
+    },
   },
   { timestamps: true }
 );

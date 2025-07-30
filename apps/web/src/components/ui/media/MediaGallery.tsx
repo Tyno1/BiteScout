@@ -1,9 +1,11 @@
 "use client";
 
 import type { GetMediaResponse, PaginatedResponse } from "@shared/types";
+import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getUserMedia, getVerifiedMedia } from "../../../utils/mediaApi";
 import { MediaDisplay } from "./MediaDisplay";
+import { MediaSkeletonPresets } from "./MediaSkeleton";
 
 interface MediaGalleryProps {
 	userId?: string;
@@ -68,21 +70,7 @@ export const MediaGallery = ({
 	}, [userId, type, verified, page, limit]);
 
 	if (loading) {
-		return (
-			<div
-				className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ${className}`}
-			>
-				{Array.from({ length: limit }, (_, index) => (
-					<div key={`loading-skeleton-${index}-${Date.now()}`} className="animate-pulse">
-						<div className="bg-gray-200 rounded-lg h-48 w-full" />
-						<div className="mt-2 space-y-2">
-							<div className="bg-gray-200 h-4 w-3/4 rounded" />
-							<div className="bg-gray-200 h-3 w-1/2 rounded" />
-						</div>
-					</div>
-				))}
-			</div>
-		);
+		return <MediaSkeletonPresets.Gallery count={limit} className={className} />;
 	}
 
 	if (error) {
@@ -97,26 +85,13 @@ export const MediaGallery = ({
 		);
 	}
 
-	if (media.length === 0) {
+	if (!media || media?.length === 0) {
 		return (
 			<div
 				className={`bg-gray-50 border border-gray-200 rounded-lg p-8 text-center ${className}`}
 			>
 				<div className="text-gray-400 mb-4">
-					<svg
-						className="mx-auto h-12 w-12"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-						/>
-					</svg>
+					<ImageIcon className="mx-auto h-12 w-12" />
 				</div>
 				<h3 className="text-lg font-medium text-gray-900 mb-2">
 					No media found
@@ -134,7 +109,7 @@ export const MediaGallery = ({
 		<div className={className}>
 			{/* Media Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-				{media.map((item) => (
+				{media?.map((item) => (
 					<div key={item._id || `media-${item.url}`} className="space-y-2">
 						<MediaDisplay mediaId={item._id || ''} />
 						{/* Media Info */}
@@ -175,8 +150,9 @@ export const MediaGallery = ({
 							}
 						}}
 						disabled={!pagination.hasPrevPage}
-						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 flex items-center gap-1"
 					>
+						<ChevronLeft className="h-4 w-4" />
 						Previous
 					</button>
 
@@ -194,16 +170,17 @@ export const MediaGallery = ({
 							}
 						}}
 						disabled={!pagination.hasNextPage}
-						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 flex items-center gap-1"
 					>
 						Next
+						<ChevronRight className="h-4 w-4" />
 					</button>
 				</div>
 			)}
 
 			{/* Media Count */}
 			<div className="mt-4 text-center text-sm text-gray-500">
-				Showing {media.length} of {pagination.totalMedia} media items
+				Showing {media?.length} of {pagination.totalMedia} media items
 			</div>
 		</div>
 	);

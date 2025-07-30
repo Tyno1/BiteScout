@@ -26,13 +26,13 @@ router.use(authMiddleware);
 
 // Media metadata management
 router.post('/', mediaController.createMedia);
+router.get('/verified', mediaController.getVerifiedMedia);
 router.get('/:id', mediaController.getMediaById);
 router.put('/:id', mediaController.updateMedia);
 router.delete('/:id', mediaController.deleteMedia);
 router.get('/associated/:type/:id', mediaController.getMediaByAssociatedItem);
 router.get('/user/:userId', mediaController.getUserMedia);
 router.patch('/:id/verify', mediaController.verifyMedia);
-router.get('/verified', mediaController.getVerifiedMedia);
 
 // File upload (delegates to media service)
 router.post('/upload', upload.single('file'), mediaController.uploadFile);

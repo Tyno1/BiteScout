@@ -3146,6 +3146,17 @@ export interface components {
         height?: number;
       };
       /**
+       * @description ID of the media in the cloud storage provider (Cloudinary/AWS S3)
+       * @example cloudinary_abc123
+       */
+      providerId?: string;
+      /**
+       * @description Cloud storage provider used for this media
+       * @example cloudinary
+       * @enum {string}
+       */
+      provider?: "cloudinary" | "aws-s3";
+      /**
        * Format: date-time
        * @description When the media was uploaded
        * @example 2025-04-20T15:30:00Z

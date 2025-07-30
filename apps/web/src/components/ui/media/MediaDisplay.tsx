@@ -1,6 +1,7 @@
 "use client";
 
 import type { GetMediaResponse } from "@shared/types";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getMedia, getOptimizedUrl } from "../../../utils/mediaApi";
 
@@ -11,6 +12,8 @@ interface MediaDisplayProps {
 	showTitle?: boolean;
 	showDescription?: boolean;
 	className?: string;
+	imageHeight?: string;
+	priority?: boolean;
 }
 
 export const MediaDisplay = ({
@@ -20,6 +23,8 @@ export const MediaDisplay = ({
 	showTitle = true,
 	showDescription = true,
 	className = "",
+	imageHeight = "h-64",
+	priority = false,
 }: MediaDisplayProps) => {
 	const [media, setMedia] = useState<GetMediaResponse | null>(null);
 	const [optimizedUrl, setOptimizedUrl] = useState<string>("");
@@ -66,7 +71,7 @@ export const MediaDisplay = ({
 	if (loading) {
 		return (
 			<div className={`animate-pulse ${className}`}>
-				        <div className="bg-gray-200 rounded-lg h-64 w-full" />
+				<div className={`bg-gray-200 rounded-lg ${imageHeight} w-full`} />
 			</div>
 		);
 	}
@@ -98,12 +103,17 @@ export const MediaDisplay = ({
 			{/* Media Content */}
 			<div className="relative">
 				{media.type === "image" ? (
-					<img
-						src={displayUrl}
-						alt={media.title || "Media content"}
-						className="w-full h-auto rounded-lg"
-						loading="lazy"
-					/>
+					<div className={`relative w-full ${imageHeight} rounded-lg overflow-hidden`}>
+						<Image
+							src={displayUrl}
+							alt={media.title || "Media content"}
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+							className="object-cover rounded-lg"
+							priority={priority}
+							quality={85}
+						/>
+					</div>
 				) : (
 					<video
 						src={displayUrl}

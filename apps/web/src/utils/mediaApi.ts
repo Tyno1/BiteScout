@@ -2,8 +2,8 @@ import type {
 	GetMediaResponse,
 	UploadMediaResponse,
 	components 
-} from '../../../../packages/shared/types';
-import type { PaginatedResponse } from '../../../../packages/shared/types/common';
+} from '@shared/types';
+import type { PaginatedResponse } from '@shared/types/common';
 import apiClient from './authClient';
 
 // Type aliases for convenience (only where needed)
