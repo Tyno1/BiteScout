@@ -22,77 +22,101 @@ BiteScout/
 ### Prerequisites
 
 - Node.js 18.18.0 or higher (required for Next.js)
-- npm 9.0.0 or higher
+- Yarn 1.22.21 or higher
 
 ### Installation
 
 ```bash
 # Install all dependencies
-npm install
+yarn install
 ```
 
 ### Development
 
 ```bash
 # Start all applications in development mode
-npm run dev
+yarn dev
 
 # Start specific applications
-npx turbo dev --filter=web
-npx turbo dev --filter=backend
-npx turbo dev --filter=mobile
-npx turbo dev --filter=media-service
+yarn turbo dev --filter=web
+yarn turbo dev --filter=backend
+yarn turbo dev --filter=mobile
+yarn turbo dev --filter=media-service
 ```
 
 ### Building
 
 ```bash
 # Build all applications
-npm run build
+yarn build
 
 # Build specific applications
-npx turbo build --filter=web
-npx turbo build --filter=backend
-npx turbo build --filter=media-service
+yarn turbo build --filter=web
+yarn turbo build --filter=backend
+yarn turbo build --filter=media-service
 ```
 
 ### Type Generation
 
 ```bash
 # Generate types from OpenAPI specs
-npm run generate-types
+yarn generate-types
 ```
 
 ### Testing
 
 ```bash
 # Run tests for all packages
-npm run test
+yarn test
 
 # Run tests for specific packages
-npx turbo test --filter=web
-npx turbo test --filter=media-service
+yarn turbo test --filter=web
+yarn turbo test --filter=media-service
 ```
 
 ### Linting
 
 ```bash
 # Lint all packages
-npm run lint
+yarn lint
 
 # Lint specific packages
-npx turbo lint --filter=web
-npx turbo lint --filter=media-service
+yarn turbo lint --filter=web
+yarn turbo lint --filter=media-service
 ```
 
 ## Available Scripts
 
-- `npm run dev` - Start all applications in development mode
-- `npm run build` - Build all applications
-- `npm run test` - Run tests for all packages
-- `npm run lint` - Lint all packages
-- `npm run clean` - Clean build artifacts
-- `npm run generate-types` - Generate TypeScript types from OpenAPI specs
+### Main Application
+- `yarn dev` - Start all applications in development mode
+- `yarn build` - Build all applications
+- `yarn test` - Run tests for all packages
+- `yarn lint` - Lint all packages
+- `yarn clean` - Clean build artifacts
+- `yarn generate-types` - Generate TypeScript types from OpenAPI specs
+
+### Docker Commands
+- `yarn docker:dev` - Start main app with Docker
+- `yarn docker:dev:build` - Build and start main app with Docker
+- `yarn docker:prod` - Start main app in production mode
+- `yarn docker:down` - Stop all Docker containers
+- `yarn docker:logs` - View Docker logs
+
+### Media Service (Standalone)
+- `yarn media:dev` - Start media service with Docker
+- `yarn media:dev:build` - Build and start media service
+- `yarn media:down` - Stop media service
+- `yarn media:logs` - View media service logs
+
+> **Note**: The Media Service is a standalone microservice. See [docs/MEDIA_SERVICE.md](./docs/MEDIA_SERVICE.md) for detailed documentation.
+
+## 📚 Documentation
+
+For comprehensive documentation about the architecture and implementation, see the [docs/](./docs/) folder:
+
+- **[docs/README.md](./docs/README.md)** - Documentation index and overview
+- **[docs/HYBRID_MEDIA_ARCHITECTURE.md](./docs/HYBRID_MEDIA_ARCHITECTURE.md)** - Complete architecture documentation
+- **[docs/MEDIA_SERVICE.md](./docs/MEDIA_SERVICE.md)** - Standalone media service guide
 
 ## Package Dependencies
 
@@ -133,11 +157,11 @@ npx turbo lint --filter=media-service
 
 ## Development Workflow
 
-1. **Start Development**: `npm run dev` to start all services
+1. **Start Development**: `yarn dev` to start all services
 2. **Make Changes**: Edit code in any package
-3. **Type Generation**: `npm run generate-types` when API changes
-4. **Build**: `npm run build` to build all packages
-5. **Test**: `npm run test` to run all tests
+3. **Type Generation**: `yarn generate-types` when API changes
+4. **Build**: `yarn build` to build all packages
+5. **Test**: `yarn test` to run all tests
 
 ## Troubleshooting
 

@@ -1,4 +1,4 @@
-# version: '3.8'
+version: '3.8'
 
 services:
   # Backend API (Development)
@@ -17,7 +17,6 @@ services:
       - ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
       - MEDIA_SERVICE_URL=http://localhost:3002/api/v1
       - MEDIA_SERVICE_TIMEOUT=30000
-
 
   # Web App (Development)
   web:
@@ -38,26 +37,3 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-
-  # Media Service (Development)
-  media-service:
-    build:
-      context: .
-      dockerfile: apps/media-service/Dockerfile.dev
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-      - MONGODB_CONNECTION_STRING=mongodb+srv://tynoukus:Tyno4real@foodapp.xvp0l.mongodb.net/?retryWrites=true&w=majority&appName=FoodApp
-      - CLOUDINARY_CLOUD_NAME=your_cloud_name
-      - CLOUDINARY_API_KEY=your_api_key
-      - CLOUDINARY_API_SECRET=your_api_secret
-      - ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
-    volumes:
-      - ./apps/media-service:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-
- 

@@ -45,22 +45,22 @@ import type { User, Restaurant, LoginRequest, LoginResponse } from '@bitescout/s
 
 1. **Install dependencies:**
    ```bash
-   npm install
+   yarn install
    ```
 
 2. **Generate types from OpenAPI spec:**
    ```bash
-   npm run generate-types
+   yarn generate-types
    ```
 
 3. **Build the package:**
    ```bash
-   npm run build
+   yarn build
    ```
 
 4. **Watch for changes:**
    ```bash
-   npm run watch
+   yarn watch
    ```
 
 ## Adding New Types
@@ -77,4 +77,4 @@ The OpenAPI specification in `openapi/spec.yaml` is used to:
 - Generate API clients for different platforms
 - Ensure type safety across all applications
 
-Run `npm run generate-types` after updating the OpenAPI spec to regenerate the types. 
+Run `yarn generate-types` after updating the OpenAPI spec to regenerate the types. 
