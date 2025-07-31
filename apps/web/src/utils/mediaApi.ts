@@ -1,5 +1,6 @@
 import type { 
 	GetMediaResponse,
+	Media,
 	UploadMediaResponse,
 	components 
 } from '@shared/types';
@@ -25,7 +26,7 @@ const createUploadFormData = (
 		description?: string;
 		tags?: string[];
 		folder?: string;
-		associatedWith?: { type: string; id: string };
+		associatedWith?: Media["associatedWith"];
 	} = {}
 ): FormData => {
 	const formData = new FormData();
@@ -63,7 +64,7 @@ export const uploadFile = async (
 		description?: string;
 		tags?: string[];
 		folder?: string;
-		associatedWith?: { type: string; id: string };
+		associatedWith?: Media["associatedWith"];
 	} = {},
 ): Promise<UploadMediaResponse> => {
 	const formData = createUploadFormData(file, metadata);
@@ -132,6 +133,12 @@ export const getVerifiedMedia = async (
 // Pure function for updating media
 export const updateMedia = async (mediaId: string, updates: Partial<GetMediaResponse>): Promise<GetMediaResponse> => {
 	const response = await apiClient.put<GetMediaResponse>(`/media/${mediaId}`, updates);
+	return response.data;
+};
+
+// Pure function for updating media association
+export const updateMediaAssociation = async (mediaId: string, associatedWith: { type: string; id: string }): Promise<GetMediaResponse> => {
+	const response = await apiClient.patch<GetMediaResponse>(`/media/${mediaId}/association`, { associatedWith });
 	return response.data;
 };
 

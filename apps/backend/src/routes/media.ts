@@ -1,7 +1,6 @@
 import express from 'express';
 import multer from 'multer';
 import * as mediaController from '../controllers/mediaController.js';
-import authMiddleware from '../middleware/authmiddleware.js';
 
 const router = express.Router();
 
@@ -20,9 +19,6 @@ const upload = multer({
     }
   },
 });
-
-// Apply authentication middleware to all routes
-router.use(authMiddleware);
 
 // Media metadata management
 router.post('/', mediaController.createMedia);

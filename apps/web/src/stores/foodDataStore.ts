@@ -1,7 +1,7 @@
 import type{ FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import apiClient from "../utils/authClient";
 import { create } from "zustand";
+import apiClient from "../utils/authClient";
 
 type FoodDataStore = {
   // State
@@ -13,7 +13,7 @@ type FoodDataStore = {
   // Actions
   createFoodData: (
     FoodData: FoodCatalogue
-  ) => Promise<{ success: boolean; error: string | null }>;
+  ) => Promise<{ success: boolean; error: string | null; data?: FoodCatalogue }>;
   getFoodDatas: (restaurantId: string) => Promise<void>;
   getFoodDataById: ({
     foodId,
@@ -68,14 +68,14 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
     try {
       set({ error: null, isLoading: true });
 
-      const response = await apiClient.post(`/food-catalogue`, foodData);
+      const response = await apiClient.post('/food-catalogue', foodData);
       const newFood = response.data;
       set(({
         foodDatas: get().foodDatas
           ? [...get().foodDatas, newFood]
           : [newFood],
       }));
-      return { success: true, error: null };
+      return { success: true, error: null, data: newFood };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "An error has occurred",
@@ -172,7 +172,7 @@ const useFoodDataStore = create<FoodDataStore>((set, get) => ({
       set({ error: null, isLoading: true });
 
       await apiClient.delete(
-        `/restaurant/${restaurantId}/catalogue/${foodId}`
+        `/food-catalogue/restaurant/${restaurantId}/catalogue/${foodId}`
       );
 
       set((state) => ({

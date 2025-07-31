@@ -13,6 +13,7 @@ import type {
 	GetUserMediaRequest,
 	GetUserMediaResponse,
 	GetVerifiedMediaResponse,
+	Media as MediaType,
 	UpdateMediaRequest,
 	UpdateMediaResponse,
 	UploadMediaResponse,
@@ -75,7 +76,7 @@ export const createMedia = async (
 		const validatedBody = validateCreateMediaRequest(req.body);
 
 		// Add uploadedBy from authenticated user
-		const mediaData = { ...validatedBody, uploadedBy: req.user?.id };
+		const mediaData = { ...validatedBody, uploadedBy: req.user?.userId };
 
 		if (!mediaData.uploadedBy) {
 			throw createError(401, "User not authenticated");
@@ -100,10 +101,10 @@ export const createMedia = async (
 			title: newMedia.title,
 			description: newMedia.description,
 			uploadedBy: {
-				id: newMedia.uploadedBy._id.toString(),
-				name: newMedia.uploadedBy.name,
-				username: newMedia.uploadedBy.username,
-				imageUrl: newMedia.uploadedBy.imageUrl,
+				id: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string })._id.toString(),
+				name: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).name,
+				username: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).username,
+				imageUrl: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).imageUrl,
 			},
 			associatedWith: newMedia.associatedWith,
 			verified: newMedia.verified,
@@ -294,7 +295,7 @@ export const updateMedia = async (
 			throw createError(404, "Media not found");
 		}
 
-		if (existingMedia.uploadedBy.toString() !== req.user?.id) {
+		if (existingMedia.uploadedBy.toString() !== req.user?.userId) {
 			throw createError(403, "Not authorized to update this media");
 		}
 
@@ -352,14 +353,14 @@ export const deleteMedia = async (
 			throw createError(404, "Media not found");
 		}
 
-		if (existingMedia.uploadedBy.toString() !== req.user?.id) {
+		if (existingMedia.uploadedBy.toString() !== req.user?.userId) {
 			throw createError(403, "Not authorized to delete this media");
 		}
 
 		// Delete from media service first (if it has a provider ID)
 		if (existingMedia.providerId) {
 			try {
-				await mediaServiceClient.deleteMedia(existingMedia.providerId, req.user?.id);
+				await mediaServiceClient.deleteMedia(existingMedia.providerId, req.user?.userId);
 			} catch (mediaServiceError) {
 				console.error("[MediaService] Delete failed:", mediaServiceError);
 				// Continue with database deletion even if media service fails
@@ -510,24 +511,26 @@ export const uploadFile = async (
 			throw createError(400, "No file uploaded");
 		}
 
-		if (!req.user?.id) {
+		if (!req.user?.userId) {
 			throw createError(401, "User not authenticated");
 		}
 
 		// Upload file to media service
 		const uploadResult = await mediaServiceClient.uploadFile(req.file, {
-			userId: req.user.id,
+			userId: req.user.userId,
 			tags: req.body.tags ? JSON.parse(req.body.tags) : undefined,
 			folder: req.body.folder,
 		});
 
-		// Create media record in main backend
-		const mediaRecord = {
-			url: uploadResult.media.url,
+
+
+		// Build base media record
+		const baseRecord = {
+			url: uploadResult.media.url || uploadResult.media.variants?.[0]?.url,
 			type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
 			title: req.body.title || uploadResult.media.originalName,
 			description: req.body.description || "",
-			uploadedBy: req.user.id,
+			uploadedBy: req.user.userId,
 			verified: false,
 			fileSize: uploadResult.media.fileSize,
 			mimeType: uploadResult.media.mimeType,
@@ -535,13 +538,36 @@ export const uploadFile = async (
 				width: uploadResult.media.width,
 				height: uploadResult.media.height,
 			} : undefined,
-			associatedWith: req.body.associatedWith ? JSON.parse(req.body.associatedWith) : undefined,
 			providerId: uploadResult.media.providerId,
 			provider: uploadResult.media.provider,
 		};
 
-		const newMedia = await Media.create(mediaRecord);
+		// Handle associatedWith only if it's provided and valid
+		let associatedWith: MediaType["associatedWith"] | undefined = undefined;
+		if (req.body.associatedWith) {
+			try {
+				const parsedAssociatedWith = JSON.parse(req.body.associatedWith);
+				// Only include associatedWith if both type and id are valid
+				if (parsedAssociatedWith?.type && 
+					parsedAssociatedWith?.id && 
+					parsedAssociatedWith.id.trim() !== "" && 
+					["post", "dish", "restaurant"].includes(parsedAssociatedWith.type)) {
+					associatedWith = parsedAssociatedWith;
+				} else {
+					console.warn("Invalid associatedWith data:", parsedAssociatedWith);
+				}
+			} catch (error) {
+				console.warn("Invalid associatedWith JSON:", req.body.associatedWith);
+			}
+		}
 
+		// Always create media record in main backend to get a proper MongoDB ObjectId
+		const mediaRecord: Record<string, unknown> = {
+			...baseRecord,
+			...(associatedWith && { associatedWith }),
+		};
+		const newMedia = await Media.create(mediaRecord);
+		
 		// Populate uploadedBy user data
 		await newMedia.populate([
 			{ path: "uploadedBy", select: "name username imageUrl" },
@@ -551,25 +577,28 @@ export const uploadFile = async (
 		const response: UploadMediaResponse = {
 			media: {
 				_id: newMedia._id.toString(),
-				url: newMedia.url,
-				type: newMedia.type,
-				title: newMedia.title,
-				description: newMedia.description,
+				url: uploadResult.media.url || uploadResult.media.variants?.[0]?.url,
+				type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
+				title: req.body.title || uploadResult.media.originalName,
+				description: req.body.description || "",
 				uploadedBy: {
-					id: newMedia.uploadedBy._id.toString(),
-					name: newMedia.uploadedBy.name,
-					username: newMedia.uploadedBy.username,
-					imageUrl: newMedia.uploadedBy.imageUrl,
+					id: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string })._id.toString(),
+					name: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).name,
+					username: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).username,
+					imageUrl: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).imageUrl,
 				},
-				associatedWith: newMedia.associatedWith,
-				verified: newMedia.verified,
-				fileSize: newMedia.fileSize,
-				mimeType: newMedia.mimeType,
-				dimensions: newMedia.dimensions,
-				providerId: newMedia.providerId,
-				provider: newMedia.provider,
-				createdAt: newMedia.createdAt.toISOString(),
-				updatedAt: newMedia.updatedAt.toISOString(),
+				associatedWith: associatedWith || undefined,
+				verified: false,
+				fileSize: uploadResult.media.fileSize,
+				mimeType: uploadResult.media.mimeType,
+				dimensions: uploadResult.media.width && uploadResult.media.height ? {
+					width: uploadResult.media.width,
+					height: uploadResult.media.height,
+				} : undefined,
+				providerId: uploadResult.media.providerId,
+				provider: uploadResult.media.provider as "cloudinary" | "aws-s3",
+				createdAt: uploadResult.media.createdAt,
+				updatedAt: uploadResult.media.updatedAt,
 			},
 			variants: uploadResult.variants.map(variant => ({
 				size: variant.size as "small" | "thumbnail" | "medium" | "large" | "original",

@@ -1,6 +1,6 @@
 "use client";
 
-import type { UploadMediaResponse } from "@shared/types";
+import type { Media, UploadMediaResponse } from "@shared/types";
 import { useRef, useState } from "react";
 import { uploadFile } from "../../../utils/mediaApi";
 import { Button } from "../../atoms/buttons/Button";
@@ -10,7 +10,7 @@ import { Textarea } from "../../atoms/inputs/TextArea";
 interface MediaUploadProps {
 	onUploadSuccess?: (result: UploadMediaResponse) => void;
 	onUploadError?: (error: string) => void;
-	associatedWith?: { type: string; id: string };
+	associatedWith?: Media["associatedWith"];
 	folder?: string;
 	className?: string;
 }
@@ -78,7 +78,7 @@ export const MediaUpload = ({
 				folder,
 				associatedWith,
 			});
-
+ 
 			clearInterval(progressInterval);
 			setProgress(100);
 

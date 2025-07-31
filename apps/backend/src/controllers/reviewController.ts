@@ -24,7 +24,7 @@ export const createReview = async (
 		}
 
 		// Add userId from authenticated user
-		body.userId = req.user?.id;
+		body.userId = req.user?.userId;
 
 		if (!body.userId) {
 			res.status(401).json({ error: "User not authenticated" });
@@ -257,7 +257,7 @@ export const updateReview = async (
 			return;
 		}
 
-		if (existingReview.userId.toString() !== req.user?.id) {
+		if (existingReview.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to update this review" });
 			return;
 		}
@@ -298,7 +298,7 @@ export const deleteReview = async (
 			return;
 		}
 
-		if (existingReview.userId.toString() !== req.user?.id) {
+		if (existingReview.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to delete this review" });
 			return;
 		}
@@ -413,7 +413,7 @@ export const getUserReviewForItem = async (
 ): Promise<void> => {
 	try {
 		const { restaurantId, foodCatalogueId } = req.params;
-		const userId = req.user?.id;
+		const userId = req.user?.userId;
 
 		if (!userId) {
 			res.status(401).json({ error: "User not authenticated" });

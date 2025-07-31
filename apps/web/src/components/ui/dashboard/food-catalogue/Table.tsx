@@ -1,5 +1,4 @@
 import { IconButton } from "@/components/atoms";
-import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import {
   flexRender,
   getCoreRowModel,
@@ -16,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import { TableFilter } from "./TableFilter";
 
 type TableProps = {
@@ -24,93 +24,92 @@ type TableProps = {
 };
 export type ColumnType = ColumnDef<FoodCatalogue>;
 
-const column: ColumnType[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-    id: "name",
-    cell: (props) => <p>{props.getValue<string>()}</p>,
-  },
-  {
-    accessorKey: "ingredients",
-    header: "Ingredients",
-    id: "ingredients",
-    enableSorting: false,
-
-    cell: (props) => (
-      <p className="line-clamp-2">{props.getValue<string[]>().join(", ")}</p>
-    ),
-  },
-  {
-    accessorKey: "cuisineType",
-    header: "Cuisine",
-    id: "cuisine",
-    accessorFn: (row) => row.cuisineType?.name || "N/A",
-    cell: (props) => <p>{props.getValue<string>()}</p>,
-  },
-  {
-    accessorKey: "course",
-    header: "Course",
-    id: "course",
-    accessorFn: (row) => row.course?.name || "N/A",
-    cell: (props) => <p>{props.getValue<string>()}</p>,
-  },
-  {
-    accessorKey: "price",
-    header: "Price",
-    id: "price",
-    accessorFn: (row) => `${row.price.currency}${row.price.amount}`,
-    cell: (props) => <p>{props.getValue<string>()}</p>,
-  },
-  {
-    accessorKey: "allergens",
-    header: "Allergens",
-    enableSorting: false,
-    id: "allergens",
-    cell: (props) => {
-      const allergens = props.getValue<Allergen[]>();
-      return (
-        <p className="line-clamp-2">
-          {allergens && allergens.length > 0
-            ? allergens.map((val: Allergen) => val.name).join(", ")
-            : "None"}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: "images",
-    header: "Images Count",
-    id: "images",
-    enableSorting: false,
-    accessorFn: (row) => row.images?.length || 0,
-    cell: (props) => <p>{props.getValue<number>()}</p>,
-  },
-  {
-    accessorKey: "_id",
-    header: "",
-    enableSorting: false,
-    cell: (props) => (
-      <div className="flex justify-end space-x-2">
-        <IconButton
-          variant="plain"
-          icon={<Pen size={20} />}
-          size="sm"
-          onClick={() => props.row.original._id && props.row.original._id}
-        />
-        <IconButton
-          color="danger"
-          variant="plain"
-          size="sm"
-          icon={<Trash2 size={20} />}
-          onClick={() => props.row.original._id && props.row.original._id}
-        />
-      </div>
-    ),
-  },
-];
-
 export function Table({ foodDatas, handleRowClick }: TableProps) {
+  const column: ColumnType[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      id: "name",
+      cell: (props) => <p>{props.getValue<string>()}</p>,
+    },
+    {
+      accessorKey: "ingredients",
+      header: "Ingredients",
+      id: "ingredients",
+      enableSorting: false,
+
+      cell: (props) => (
+        <p className="line-clamp-2">{props.getValue<string[]>().join(", ")}</p>
+      ),
+    },
+    {
+      accessorKey: "cuisineType",
+      header: "Cuisine",
+      id: "cuisine",
+      accessorFn: (row) => row.cuisineType?.name || "N/A",
+      cell: (props) => <p>{props.getValue<string>()}</p>,
+    },
+    {
+      accessorKey: "course",
+      header: "Course",
+      id: "course",
+      accessorFn: (row) => row.course?.name || "N/A",
+      cell: (props) => <p>{props.getValue<string>()}</p>,
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      id: "price",
+      accessorFn: (row) => `${row.price.currency}${row.price.amount}`,
+      cell: (props) => <p>{props.getValue<string>()}</p>,
+    },
+    {
+      accessorKey: "allergens",
+      header: "Allergens",
+      enableSorting: false,
+      id: "allergens",
+      cell: (props) => {
+        const allergens = props.getValue<Allergen[]>();
+        return (
+          <p className="line-clamp-2">
+            {allergens && allergens.length > 0
+              ? allergens.map((val: Allergen) => val.name).join(", ")
+              : "None"}
+          </p>
+        );
+      },
+    },
+    {
+      accessorKey: "images",
+      header: "Images Count",
+      id: "images",
+      enableSorting: false,
+      accessorFn: (row) => row.images?.length || 0,
+      cell: (props) => <p>{props.getValue<number>()}</p>,
+    },
+    {
+      accessorKey: "_id",
+      header: "",
+      enableSorting: false,
+      cell: (props) => (
+        <div className="flex justify-end space-x-2">
+          <IconButton
+            variant="plain"
+            icon={<Pen size={20} />}
+            size="sm"
+            onClick={() => props.row.original._id && handleRowClick(props.row.original._id)}
+          />
+          <IconButton
+            color="danger"
+            variant="plain"
+            size="sm"
+            icon={<Trash2 size={20} />}
+            onClick={() => props.row.original._id && handleRowClick(props.row.original._id)}
+          />
+        </div>
+      ),
+    },
+  ];
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [filterName, setFilterName] = useState<string>("name");
 

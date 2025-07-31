@@ -2890,8 +2890,8 @@ export interface components {
       course: components["schemas"]["Course"];
       /** @description Price details for the food item */
       price: components["schemas"]["Price"];
-      /** @description Media items for the food item */
-      images: components["schemas"]["Media"][];
+      /** @description Array of Media ObjectIds for the food item */
+      images: string[];
       /**
        * @description ID of the restaurant offering the food item
        * @example restaurant12345

@@ -8,6 +8,7 @@ import useCourseStore from "@/stores/courseStore";
 import useCuisineStore from "@/stores/cuisineStore";
 import useFoodDataStore, { DEFAULT_FOOD_DATA } from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
+import { updateMediaAssociation } from "@/utils/mediaApi";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -78,12 +79,21 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
-  const [newFood, setNewFood] = useState<FoodCatalogue>(DEFAULT_FOOD_DATA);
+  const [newFood, setNewFood] = useState<FoodCatalogue>({
+    ...DEFAULT_FOOD_DATA,
+    restaurant: restaurantData?._id || ""
+  });
+
 
   // functions for modal
   const handleAddFood = async () => {
+    if (isSubmitting) return; // Prevent double submission
+    
+    setIsSubmitting(true);
+    
     const errors: formErrorType = {
       name: !newFood.name ? "Name is required" : "",
       ingredients:
@@ -94,8 +104,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         !newFood.price.amount || !newFood.price.currency
           ? "Price is required"
           : "",
-    
-      images: !newFood.images ? "At least one image is required" : "",
+      // Remove images validation since we'll handle media after creation
       restaurant: !newFood.restaurant ? "Restaurant is required" : "",
     };
 
@@ -104,15 +113,54 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
     if (hasErrors) {
       setFormError(errors);
-      console.log(errors);
+      setIsSubmitting(false);
       return;
     }
 
-    // If no errors, proceed with form submission
-    createFoodData(newFood);
-    setIsModalOpen(false);
-    setNewFood(DEFAULT_FOOD_DATA);
-    setFormError(DEFAULT_FORM_ERROR);
+    try {
+      // Prepare food data for backend
+      const foodDataForBackend = {
+        ...newFood,
+        images: newFood.images || []
+      };
+      
+      // Create the food first
+      const result = await createFoodData(foodDataForBackend);
+      
+      if (result.success && result.data) {
+        // Associate uploaded media with the created food
+        if (foodDataForBackend.images && foodDataForBackend.images.length > 0) {
+          try {
+            // Update each media item with the food association
+            for (const mediaId of foodDataForBackend.images) {
+              if (mediaId && result.data._id) {
+                await updateMediaAssociation(mediaId, {
+                  type: "dish",
+                  id: result.data._id
+                });
+              }
+            }
+          } catch (mediaError) {
+            console.error("Failed to associate media:", mediaError);
+            // Continue anyway - food was created successfully
+          }
+        }
+        
+        // Close modal and reset form
+        setIsModalOpen(false);
+        setNewFood(DEFAULT_FOOD_DATA);
+        setFormError(DEFAULT_FORM_ERROR);
+      } else {
+        console.error("Failed to create food:", result.error);
+        // Handle error appropriately
+      }
+      
+    } catch (error) {
+      console.error("Failed to create food:", error);
+      // Handle error appropriately
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const closeModal = () => {
@@ -166,7 +214,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   // functions for table
 
   const handleRowClick = (id: string) => {
-    router.push(`food-catalogue/${id}`);
+    if (restaurantData?._id) {
+      router.push(`food-catalogue/${restaurantData._id}/${id}`);
+    }
   };
 
   // Stabilize the functions to prevent unnecessary re-renders
@@ -310,9 +360,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <Modal
           setIsModalOpen={setIsModalOpen}
           modalTitle="Add New Food Item"
-          modalActionText="Add Food"
+          modalActionText={isSubmitting ? "Creating..." : "Add Food"}
           modalActionOnClick={handleAddFood}
           closeModal={closeModal}
+          isSubmitting={isSubmitting}
         >
           <AddNewFood
             setNewFood={setNewFood}
@@ -329,6 +380,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             ingredient={ingredient}
             formError={formError}
             FormWarning={FormWarning}
+
           />
         </Modal>
       )}

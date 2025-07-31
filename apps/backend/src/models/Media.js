@@ -29,11 +29,11 @@ const mediaSchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ["post", "dish", "restaurant"],
-        required: true,
+        required: false,
       },
       id: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         refPath: "associatedWith.type",
       },
     },

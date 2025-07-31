@@ -3184,8 +3184,8 @@ components:
         images:
           type: array
           items:
-            $ref: "#/components/schemas/Media"
-          description: "Media items for the food item"
+            type: string
+          description: "Array of Media ObjectIds for the food item"
         restaurant:
           type: string
           description: "ID of the restaurant offering the food item"

@@ -1,15 +1,17 @@
 import type { formErrorType } from "@/app/dashboard/food-catalogue/page";
 import { Button, IconButton, Input, Select } from "@/components/atoms";
+import { X } from "lucide-react";
+import type React from "react";
+import type { ReactNode } from "react";
 import type {
   Allergen,
   Course,
   Cuisine,
   FoodCatalogue,
+  Media,
 } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import { X } from "lucide-react";
-import type React from "react";
-import type { ReactNode } from "react";
+import { MediaUpload } from "../../media";
 
 type FoodCatalogueModalType = {
   setNewFood: React.Dispatch<React.SetStateAction<FoodCatalogue>>;
@@ -33,7 +35,6 @@ export function AddNewFood({
   cuisineData,
   courseData,
   allergenData,
-  handleImageUpload,
   toggleAllergen,
   currencies,
   handleAddIngredients,
@@ -250,16 +251,19 @@ export function AddNewFood({
           </div>
         </div>
 
-        <Input
-          label="Image"
-          name="image"
-          useLabel
-          outlineType="round"
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageUpload}
-		  errorMessage={formError.images && FormWarning(formError.images)}
+        <MediaUpload
+          onUploadSuccess={(result) => {
+            // Store only the media ID in the food form
+            if (result.media._id) {
+              setNewFood((prev) => ({
+                ...prev,
+                images: [...(prev.images || []), result.media._id] as string[]
+              }));
+            }
+          }}
+          onUploadError={(error) => {
+            console.error("Media upload failed:", error);
+          }}
         />
       </div>
 
