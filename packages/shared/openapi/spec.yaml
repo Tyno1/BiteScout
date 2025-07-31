@@ -2973,7 +2973,6 @@ components:
           example: "2025-04-20T15:30:00Z"
       required:
         - name
-        - description
 
     Cuisine:
       type: object
@@ -2998,7 +2997,6 @@ components:
           example: "2025-04-20T15:30:00Z"
       required:
         - name
-        - description
 
     BusinessHour:
       type: object
@@ -3147,7 +3145,6 @@ components:
         - cuisineType
         - course
         - price
-        - images
         - restaurant
       properties:
         _id:
@@ -3430,13 +3427,26 @@ components:
           description: "Dimensions of the media (for images/videos)"
         providerId:
           type: string
-          description: "ID of the media in the cloud storage provider (Cloudinary/AWS S3)"
-          example: "cloudinary_abc123"
+          description: "ID of the media in the cloud storage provider"
+          example: "social-media/1753952680855_original"
         provider:
           type: string
-          enum: ["cloudinary", "aws-s3"]
+          enum:
+            - "cloudinary"
+            - "aws-s3"
           description: "Cloud storage provider used for this media"
           example: "cloudinary"
+        variants:
+          type: array
+          description: "Optimized variants of the media (different sizes/qualities)"
+          items:
+            $ref: "#/components/schemas/MediaVariant"
+        tags:
+          type: array
+          description: "Tags associated with the media"
+          items:
+            type: string
+          example: ["food", "restaurant", "interior"]
         createdAt:
           type: string
           format: date-time
@@ -3453,6 +3463,9 @@ components:
       required:
         - size
         - url
+        - fileSize
+        - format
+        - createdAt
       properties:
         size:
           type: string
@@ -3472,21 +3485,31 @@ components:
           type: number
           description: "Height of the variant in pixels"
           example: 600
+        bitrate:
+          type: string
+          description: "Video bitrate (for video variants)"
+          example: "1000k"
+        resolution:
+          type: string
+          description: "Video resolution (for video variants)"
+          example: "720p"
+        fileSize:
+          type: number
+          description: "Size of the variant file in bytes"
+          example: 1024000
+        format:
+          type: string
+          description: "File format of the variant"
+          example: "jpg"
+        createdAt:
+          type: string
+          format: date-time
+          description: "When the variant was created"
+          example: "2025-04-20T15:30:00Z"
 
     MediaUploadResponse:
-      type: object
-      required:
-        - media
-        - variants
-      properties:
-        media:
-          $ref: "#/components/schemas/Media"
-          description: "The created media record"
-        variants:
-          type: array
-          description: "Optimized variants of the uploaded media"
-          items:
-            $ref: "#/components/schemas/MediaVariant"
+      $ref: "#/components/schemas/Media"
+      description: "The created media record with all variants included"
 
     RestaurantAccess:
       type: object

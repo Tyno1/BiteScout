@@ -2745,7 +2745,7 @@ export interface components {
       /** @example main */
       name: string;
       /** @example Main course in a meal */
-      description: string;
+      description?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -2766,7 +2766,7 @@ export interface components {
       /** @example Nigerian */
       name: string;
       /** @example A Type of meal based on region of origin */
-      description: string;
+      description?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -2891,7 +2891,7 @@ export interface components {
       /** @description Price details for the food item */
       price: components["schemas"]["Price"];
       /** @description Array of Media ObjectIds for the food item */
-      images: string[];
+      images?: string[];
       /**
        * @description ID of the restaurant offering the food item
        * @example restaurant12345
@@ -3146,8 +3146,8 @@ export interface components {
         height?: number;
       };
       /**
-       * @description ID of the media in the cloud storage provider (Cloudinary/AWS S3)
-       * @example cloudinary_abc123
+       * @description ID of the media in the cloud storage provider
+       * @example social-media/1753952680855_original
        */
       providerId?: string;
       /**
@@ -3156,6 +3156,17 @@ export interface components {
        * @enum {string}
        */
       provider?: "cloudinary" | "aws-s3";
+      /** @description Optimized variants of the media (different sizes/qualities) */
+      variants?: components["schemas"]["MediaVariant"][];
+      /**
+       * @description Tags associated with the media
+       * @example [
+       *   "food",
+       *   "restaurant",
+       *   "interior"
+       * ]
+       */
+      tags?: string[];
       /**
        * Format: date-time
        * @description When the media was uploaded
@@ -3192,13 +3203,35 @@ export interface components {
        * @example 600
        */
       height?: number;
+      /**
+       * @description Video bitrate (for video variants)
+       * @example 1000k
+       */
+      bitrate?: string;
+      /**
+       * @description Video resolution (for video variants)
+       * @example 720p
+       */
+      resolution?: string;
+      /**
+       * @description Size of the variant file in bytes
+       * @example 1024000
+       */
+      fileSize: number;
+      /**
+       * @description File format of the variant
+       * @example jpg
+       */
+      format: string;
+      /**
+       * Format: date-time
+       * @description When the variant was created
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt: string;
     };
-    MediaUploadResponse: {
-      /** @description The created media record */
-      media: components["schemas"]["Media"];
-      /** @description Optimized variants of the uploaded media */
-      variants: components["schemas"]["MediaVariant"][];
-    };
+    /** @description The created media record with all variants included */
+    MediaUploadResponse: components["schemas"]["Media"];
     RestaurantAccess: {
       /**
        * @description Unique identifier for the access record

@@ -8,10 +8,8 @@ import type {
   Course,
   Cuisine,
   FoodCatalogue,
-  Media,
 } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import { MediaUpload } from "../../media";
 
 type FoodCatalogueModalType = {
   setNewFood: React.Dispatch<React.SetStateAction<FoodCatalogue>>;
@@ -19,7 +17,6 @@ type FoodCatalogueModalType = {
   cuisineData: Cuisine[];
   courseData: Course[];
   allergenData: Allergen[];
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleAllergen: (allergen: Allergen) => void;
   currencies: string[];
   handleAddIngredients: (ingredient: string) => void;
@@ -159,7 +156,7 @@ export function AddNewFood({
               ) as Course,
             }))
           }
-          errorMessage={formError.course && FormWarning(formError.course)}
+          errorMessage={formError?.course && FormWarning(formError.course)}
         />
 
         <div className="flex gap-2 items-end">
@@ -251,20 +248,7 @@ export function AddNewFood({
           </div>
         </div>
 
-        <MediaUpload
-          onUploadSuccess={(result) => {
-            // Store only the media ID in the food form
-            if (result.media._id) {
-              setNewFood((prev) => ({
-                ...prev,
-                images: [...(prev.images || []), result.media._id] as string[]
-              }));
-            }
-          }}
-          onUploadError={(error) => {
-            console.error("Media upload failed:", error);
-          }}
-        />
+
       </div>
 
       <div className="mt-4">

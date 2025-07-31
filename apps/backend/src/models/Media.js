@@ -64,6 +64,37 @@ const mediaSchema = new mongoose.Schema(
       enum: ["cloudinary", "aws-s3"],
       description: "Cloud storage provider used for this media",
     },
+    // Advanced features from media service
+    variants: [{
+      size: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      width: Number,
+      height: Number,
+      bitrate: String,
+      resolution: String,
+      fileSize: {
+        type: Number,
+        required: true,
+      },
+      format: {
+        type: String,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
+    tags: [{
+      type: String,
+      default: [],
+    }],
   },
   { timestamps: true }
 );

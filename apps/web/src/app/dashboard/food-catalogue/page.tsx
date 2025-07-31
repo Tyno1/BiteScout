@@ -1,8 +1,10 @@
 "use client";
 
-import { Button } from "@/components/atoms";
+import { Alert, Button } from "@/components/atoms";
+import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms";
 import { AddNewFood, Table } from "@/components/ui";
+import { MediaUpload } from "@/components/ui/media";
 import useAllergenStore from "@/stores/allergenStore";
 import useCourseStore from "@/stores/courseStore";
 import useCuisineStore from "@/stores/cuisineStore";
@@ -15,6 +17,31 @@ import { useCallback, useEffect, useState } from "react";
 // import useRestaurantStore from "@/stores/restaurantStore";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
+import { z } from "zod";
+
+// Zod validation schema
+const foodCatalogueSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
+  cuisineType: z.object({
+    name: z.string().min(1, "Cuisine type is required"),
+    description: z.string().optional(),
+    _id: z.string().optional(),
+  }),
+  course: z.object({
+    name: z.string().min(1, "Course is required"),
+    description: z.string().optional(),
+    _id: z.string().optional(),
+  }),
+  price: z.object({
+    amount: z.number().positive("Price amount must be positive"),
+    currency: z.enum(["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "KRW", "MYR", "TWD", "VND", "THB", "ZAR"]),
+  }),
+  restaurant: z.string().min(1, "Restaurant is required"),
+  allergens: z.array(z.any()).optional(),
+  images: z.array(z.string()).optional(),
+}) satisfies z.ZodType<FoodCatalogue>;
+
 
 export type formErrorType = Partial<{
   name: string;
@@ -57,6 +84,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const { foodDatas, createFoodData, getFoodDatas, error, isLoading } =
     useFoodDataStore();
   const { restaurantData } = useRestaurantStore();
+  const [activeTab, setActiveTab] = useState<string>("food-data");
   const {
     allergens,
     getAllergens,
@@ -84,49 +112,53 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
   const [newFood, setNewFood] = useState<FoodCatalogue>({
     ...DEFAULT_FOOD_DATA,
-    restaurant: restaurantData?._id || ""
+    restaurant: restaurantData?._id || "",
   });
 
+  const validateForm = (): boolean => {
+    // Validate form data using Zod
+    const validationResult = foodCatalogueSchema.safeParse(newFood);
+    console.log(validationResult.error?.errors);
+    
+    if (!validationResult.success) {
+      // Convert Zod errors to form error format
+      const errors: formErrorType = {};
+      for (const error of validationResult.error.errors) {
+        const field = error.path[0] as keyof formErrorType;
+        errors[field] = error.message;
+      }
+      console.log(errors);
+      
+      setFormError(errors);
+      setIsSubmitting(false);
+      return false; // Validation failed
+    }
 
+    // Clear errors if validation passes
+    setFormError(DEFAULT_FORM_ERROR);
+    return true; // Validation passed
+  };
   // functions for modal
   const handleAddFood = async () => {
     if (isSubmitting) return; // Prevent double submission
-    
+
     setIsSubmitting(true);
-    
-    const errors: formErrorType = {
-      name: !newFood.name ? "Name is required" : "",
-      ingredients:
-        newFood.ingredients.length < 1 ? "Ingredients are required" : "",
-      cuisineType: !newFood.cuisineType.name ? "Cuisine type is required" : "",
-      course: !newFood.course.name  ? "Course is required" : "",
-      price:
-        !newFood.price.amount || !newFood.price.currency
-          ? "Price is required"
-          : "",
-      // Remove images validation since we'll handle media after creation
-      restaurant: !newFood.restaurant ? "Restaurant is required" : "",
-    };
-
-    // Check if there are any errors
-    const hasErrors = Object.values(errors).some((error) => error !== "");
-
-    if (hasErrors) {
-      setFormError(errors);
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
+      // Validate form first
+      if (!validateForm()) {
+        return; // Validation failed, errors are already set
+      }
+
       // Prepare food data for backend
       const foodDataForBackend = {
         ...newFood,
-        images: newFood.images || []
+        images: newFood.images || [],
       };
-      
+
       // Create the food first
       const result = await createFoodData(foodDataForBackend);
-      
+
       if (result.success && result.data) {
         // Associate uploaded media with the created food
         if (foodDataForBackend.images && foodDataForBackend.images.length > 0) {
@@ -136,7 +168,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               if (mediaId && result.data._id) {
                 await updateMediaAssociation(mediaId, {
                   type: "dish",
-                  id: result.data._id
+                  id: result.data._id,
                 });
               }
             }
@@ -145,7 +177,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             // Continue anyway - food was created successfully
           }
         }
-        
+
         // Close modal and reset form
         setIsModalOpen(false);
         setNewFood(DEFAULT_FOOD_DATA);
@@ -154,7 +186,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         console.error("Failed to create food:", result.error);
         // Handle error appropriately
       }
-      
     } catch (error) {
       console.error("Failed to create food:", error);
       // Handle error appropriately
@@ -165,8 +196,12 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setNewFood(DEFAULT_FOOD_DATA);
+    setNewFood({
+      ...DEFAULT_FOOD_DATA,
+      restaurant: restaurantData?._id || "",
+    });
     setFormError(DEFAULT_FORM_ERROR);
+    setActiveTab("food-data"); // Reset to first tab
   };
 
   // create a component for form warning
@@ -207,9 +242,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }));
   };
 
-  const handleImageUpload = (): void => {
-    // Handle image upload logic here
-  };
+
 
   // functions for table
 
@@ -218,6 +251,35 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       router.push(`food-catalogue/${restaurantData._id}/${id}`);
     }
   };
+
+  const tabs: TabItem[] = [
+    {
+      key: "food-data",
+      label: "Food Data",
+      content: (
+        <AddNewFood
+          setNewFood={setNewFood}
+          newFood={newFood}
+          cuisineData={cuisines}
+          courseData={courses}
+          allergenData={allergens}
+          toggleAllergen={toggleAllergen}
+          currencies={CURRENCIES}
+          handleAddIngredients={handleAddIngredients}
+          handleRemoveIngredients={handleRemoveIngredients}
+          setIngredient={setIngredient}
+          ingredient={ingredient}
+          formError={formError}
+          FormWarning={FormWarning}
+        />
+      ),
+    },
+    {
+      key: "media-upload",
+      label: "Media Upload",
+      content: <MediaUpload />,
+    },
+  ];
 
   // Stabilize the functions to prevent unnecessary re-renders
   const stableGetCuisines = useCallback(() => {
@@ -238,12 +300,14 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     stableGetAllergens();
   }, [stableGetCuisines, stableGetCourses, stableGetAllergens]);
 
-
-
   // Stabilize the getFoodDatas function
-  const stableGetFoodDatas = useCallback((restaurantId: string) => {
-    getFoodDatas(restaurantId);
-  }, [getFoodDatas]);
+  const stableGetFoodDatas = useCallback(
+    (restaurantId: string) => {
+
+      getFoodDatas(restaurantId);
+    },
+    [getFoodDatas]
+  );
 
   useEffect(() => {
     if (restaurantData?._id) {
@@ -253,6 +317,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         ...prev,
         restaurant: restaurantData._id as string,
       }));
+      
       stableGetFoodDatas(restaurantData._id);
     }
   }, [restaurantData?._id, stableGetFoodDatas]); // Only depend on restaurantData._id, not the entire object
@@ -356,34 +421,41 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       ) : null}
 
       {/* Modal */}
-      {isModalOpen && (
+      {
         <Modal
+          modalDescription={
+            Object.values(formError).some(error => error && error.length > 0) ? (
+              <Alert status="error">
+                Please fill in all the fields
+              </Alert>
+            ) : undefined
+          }
+          size="lg"
+          isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           modalTitle="Add New Food Item"
-          modalActionText={isSubmitting ? "Creating..." : "Add Food"}
-          modalActionOnClick={handleAddFood}
+          modalActionText={activeTab === tabs[tabs.length - 1].key ?(isSubmitting ? "Creating..." : "Add Food"): "Next Step"}
+          modalActionOnClick={()=>{
+            if(activeTab === tabs[tabs.length - 1].key){
+              handleAddFood();
+            }else{
+              if(validateForm()){
+                const currentIndex = tabs.findIndex(tab => tab.key === activeTab);
+                setActiveTab(tabs[currentIndex + 1].key);
+              }
+            }
+          }}
           closeModal={closeModal}
           isSubmitting={isSubmitting}
         >
-          <AddNewFood
-            setNewFood={setNewFood}
-            newFood={newFood}
-            cuisineData={cuisines}
-            courseData={courses}
-            allergenData={allergens}
-            handleImageUpload={handleImageUpload}
-            toggleAllergen={toggleAllergen}
-            currencies={CURRENCIES}
-            handleAddIngredients={handleAddIngredients}
-            handleRemoveIngredients={handleRemoveIngredients}
-            setIngredient={setIngredient}
-            ingredient={ingredient}
-            formError={formError}
-            FormWarning={FormWarning}
-
+          <Tabs 
+            tabs={tabs} 
+            defaultTab="food-data" 
+            selectedTab={activeTab}
+            onTabChange={(tabKey) => setActiveTab(tabKey)} 
           />
         </Modal>
-      )}
+      }
     </div>
   );
 }

@@ -16,10 +16,10 @@ import type {
 	Media as MediaType,
 	UpdateMediaRequest,
 	UpdateMediaResponse,
-	UploadMediaResponse,
 	VerifyMediaRequest,
 	VerifyMediaResponse
 } from "shared/types";
+import type { Media as UploadMediaResponse } from "../../../../packages/shared/types/api/schemas";
 import { mediaServiceClient } from "../clients/mediaServiceClient.js";
 import { createError } from "../middleware/errorHandler.js";
 import Media from "../models/Media.js";
@@ -526,7 +526,7 @@ export const uploadFile = async (
 
 		// Build base media record
 		const baseRecord = {
-			url: uploadResult.media.url || uploadResult.media.variants?.[0]?.url,
+			url: uploadResult.media.variants?.[0]?.url || uploadResult.media.url,
 			type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
 			title: req.body.title || uploadResult.media.originalName,
 			description: req.body.description || "",
@@ -540,6 +540,9 @@ export const uploadFile = async (
 			} : undefined,
 			providerId: uploadResult.media.providerId,
 			provider: uploadResult.media.provider,
+			// Include advanced features from media service
+			variants: uploadResult.variants || [],
+			tags: uploadResult.media.tags || [],
 		};
 
 		// Handle associatedWith only if it's provided and valid
@@ -573,39 +576,42 @@ export const uploadFile = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
-		// Transform to match UploadMediaResponse type
+		// Transform to match UploadMediaResponse type (now just a Media object)
 		const response: UploadMediaResponse = {
-			media: {
-				_id: newMedia._id.toString(),
-				url: uploadResult.media.url || uploadResult.media.variants?.[0]?.url,
-				type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
-				title: req.body.title || uploadResult.media.originalName,
-				description: req.body.description || "",
-				uploadedBy: {
-					id: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string })._id.toString(),
-					name: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).name,
-					username: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).username,
-					imageUrl: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).imageUrl,
-				},
-				associatedWith: associatedWith || undefined,
-				verified: false,
-				fileSize: uploadResult.media.fileSize,
-				mimeType: uploadResult.media.mimeType,
-				dimensions: uploadResult.media.width && uploadResult.media.height ? {
-					width: uploadResult.media.width,
-					height: uploadResult.media.height,
-				} : undefined,
-				providerId: uploadResult.media.providerId,
-				provider: uploadResult.media.provider as "cloudinary" | "aws-s3",
-				createdAt: uploadResult.media.createdAt,
-				updatedAt: uploadResult.media.updatedAt,
+			_id: newMedia._id.toString(),
+			url: uploadResult.media.variants?.[0]?.url || uploadResult.media.url,
+			type: uploadResult.media.mimeType.startsWith("image/") ? "image" : "video",
+			title: req.body.title || uploadResult.media.originalName,
+			description: req.body.description || "",
+			uploadedBy: {
+				id: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string })._id.toString(),
+				name: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).name,
+				username: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).username,
+				imageUrl: (newMedia.uploadedBy as { _id: string; name: string; username: string; imageUrl: string }).imageUrl,
 			},
+			associatedWith: associatedWith || undefined,
+			verified: false,
+			fileSize: uploadResult.media.fileSize,
+			mimeType: uploadResult.media.mimeType,
+			dimensions: uploadResult.media.width && uploadResult.media.height ? {
+				width: uploadResult.media.width,
+				height: uploadResult.media.height,
+			} : undefined,
+			providerId: uploadResult.media.providerId,
+			provider: uploadResult.media.provider as "cloudinary" | "aws-s3",
+			// Include advanced features
 			variants: uploadResult.variants.map(variant => ({
 				size: variant.size as "small" | "thumbnail" | "medium" | "large" | "original",
 				url: variant.url,
 				width: variant.width,
-				height: variant.height
+				height: variant.height,
+				fileSize: variant.fileSize,
+				format: variant.format,
+				createdAt: new Date().toISOString()
 			})),
+			tags: uploadResult.media.tags || [],
+			createdAt: uploadResult.media.createdAt,
+			updatedAt: uploadResult.media.updatedAt,
 		};
 
 		res.status(201).json(response);
