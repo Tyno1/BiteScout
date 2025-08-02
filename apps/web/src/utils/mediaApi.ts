@@ -5,18 +5,38 @@ import type {
 	components 
 } from '@shared/types';
 import type { PaginatedResponse } from '@shared/types/common';
+import axios from 'axios';
 import apiClient from './authClient';
+import config from './config';
 
 // Type aliases for convenience (only where needed)
 export type MediaVariant = components['schemas']['MediaVariant'];
 
+// Media service response type
+interface MediaServiceResponse {
+	media: {
+		_id: string; // MongoDB ObjectId from media service
+		providerId: string;
+		provider: string;
+		originalName: string;
+		format: string;
+		fileSize: number;
+		mimeType: string;
+		width?: number;
+		height?: number;
+		variants: MediaVariant[];
+		userId?: string;
+		tags?: string[];
+		title?: string;
+		description?: string;
+		createdAt: Date;
+		updatedAt: Date;
+	};
+	variants: MediaVariant[];
+}
+
 // Re-export types for components to use
 export type { GetMediaResponse, UploadMediaResponse, PaginatedResponse };
-
-// Configuration object
-const config = {
-	mediaServiceUrl: process.env.NEXT_PUBLIC_MEDIA_SERVICE_URL || "http://localhost:3002/api/v1",
-} as const;
 
 // Pure function for creating form data
 const createUploadFormData = (
@@ -69,17 +89,58 @@ export const uploadFile = async (
 ): Promise<UploadMediaResponse> => {
 	const formData = createUploadFormData(file, metadata);
 
-	const response = await apiClient.post<UploadMediaResponse>("/media/upload", formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
-
-	return response.data;
+	// Upload all media through media service for consistent processing
+	const mediaServiceResponse = await axios.post<MediaServiceResponse>(
+		`${config.mediaService.url}/media/upload`,
+		formData,
+		{
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		}
+	);
+	
+			// Sync to backend database
+		try {
+			const backendResponse = await apiClient.post<UploadMediaResponse>("/media", {
+				url: mediaServiceResponse.data.media.variants[0]?.url || '',
+				title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
+				description: mediaServiceResponse.data.media.description || '',
+				type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
+				mimeType: mediaServiceResponse.data.media.mimeType,
+				fileSize: mediaServiceResponse.data.media.fileSize,
+				provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
+				providerId: mediaServiceResponse.data.media.providerId,
+				mediaServiceId: mediaServiceResponse.data.media._id,
+				variants: mediaServiceResponse.data.variants,
+				tags: mediaServiceResponse.data.media.tags || [],
+			});
+			
+			return backendResponse.data;
+		} catch (error: unknown) {
+			console.error('Failed to sync to backend:', error);
+			// Convert media service response to UploadMediaResponse format for fallback
+			const fallbackResponse: UploadMediaResponse = {
+				_id: '',
+				url: mediaServiceResponse.data.media.variants[0]?.url || '',
+				type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
+				title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
+				description: mediaServiceResponse.data.media.description || '',
+				uploadedBy: { id: '', name: '', username: '', imageUrl: '' },
+				providerId: mediaServiceResponse.data.media.providerId,
+				provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
+				variants: mediaServiceResponse.data.variants,
+				tags: mediaServiceResponse.data.media.tags || [],
+				createdAt: mediaServiceResponse.data.media.createdAt.toISOString(),
+				updatedAt: mediaServiceResponse.data.media.updatedAt.toISOString(),
+			};
+			return fallbackResponse;
+		}
 };
 
 // Pure function for getting media by ID
 export const getMedia = async (mediaId: string): Promise<GetMediaResponse> => {
+	// Get media from backend database (where references are stored)
 	const response = await apiClient.get<GetMediaResponse>(`/media/${mediaId}`);
 	return response.data;
 };
@@ -90,16 +151,38 @@ export const getOptimizedUrl = async (
 	size = "medium",
 	networkSpeed?: "slow" | "medium" | "fast",
 ): Promise<{ url: string }> => {
-	const params = buildQueryParams({ size, ...(networkSpeed && { networkSpeed }) });
-
-	const response = await apiClient.get<{ url: string }>(
-		`${config.mediaServiceUrl}/media/${mediaId}/optimized?${params}`,
-		{
-			baseURL: config.mediaServiceUrl,
+	try {
+		// First get the media from backend to get the mediaServiceId
+		const mediaData = await getMedia(mediaId);
+		
+		// Use the mediaServiceId to call media service (not backend _id)
+		const mediaServiceId = (mediaData as { mediaServiceId?: string }).mediaServiceId;
+		if (!mediaServiceId) {
+			throw new Error(`No mediaServiceId found for media ${mediaId}`);
 		}
-	);
 
-	return response.data;
+		const params = buildQueryParams({ size, ...(networkSpeed && { networkSpeed }) });
+
+		const response = await axios.get<{ url: string }>(
+			`${config.mediaService.url}/media/${mediaServiceId}/optimized?${params}`,
+			{
+				timeout: 5000, // 5 second timeout
+				headers: {
+					'Accept': 'application/json',
+				}
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		// Fallback: get the original media URL
+		try {
+			const mediaData = await getMedia(mediaId);
+			return { url: mediaData.url };
+		} catch (fallbackError) {
+			throw new Error(`Unable to retrieve media URL for ${mediaId}`);
+		}
+	}
 };
 
 // Pure function for getting user's media
@@ -138,7 +221,7 @@ export const updateMedia = async (mediaId: string, updates: Partial<GetMediaResp
 
 // Pure function for updating media association
 export const updateMediaAssociation = async (mediaId: string, associatedWith: { type: string; id: string }): Promise<GetMediaResponse> => {
-	const response = await apiClient.patch<GetMediaResponse>(`/media/${mediaId}/association`, { associatedWith });
+	const response = await apiClient.put<GetMediaResponse>(`/media/${mediaId}`, { associatedWith });
 	return response.data;
 };
 

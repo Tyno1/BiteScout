@@ -3151,6 +3151,11 @@ export interface components {
        */
       providerId?: string;
       /**
+       * @description ID of the media in the media service database
+       * @example 507f1f77bcf86cd799439018
+       */
+      mediaServiceId?: string;
+      /**
        * @description Cloud storage provider used for this media
        * @example cloudinary
        * @enum {string}

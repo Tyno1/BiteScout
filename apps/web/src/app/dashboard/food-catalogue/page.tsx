@@ -5,16 +5,17 @@ import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms";
 import { AddNewFood, Table } from "@/components/ui";
 import { MediaUpload } from "@/components/ui/media";
+import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
 import useAllergenStore from "@/stores/allergenStore";
 import useCourseStore from "@/stores/courseStore";
 import useCuisineStore from "@/stores/cuisineStore";
 import useFoodDataStore, { DEFAULT_FOOD_DATA } from "@/stores/foodDataStore";
 import useRestaurantStore from "@/stores/restaurantStore";
-import { updateMediaAssociation } from "@/utils/mediaApi";
+import {  uploadFile } from "@/utils/mediaApi";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-// import useRestaurantStore from "@/stores/restaurantStore";
+import type { UploadMediaResponse } from "shared/types";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
 import { z } from "zod";
@@ -108,8 +109,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
+  const [selectedMediaFiles, setSelectedMediaFiles] = useState<FileWithPreview[]>([]);
   const [newFood, setNewFood] = useState<FoodCatalogue>({
     ...DEFAULT_FOOD_DATA,
     restaurant: restaurantData?._id || "",
@@ -139,10 +143,12 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     return true; // Validation passed
   };
   // functions for modal
-  const handleAddFood = async () => {
+    const handleAddFood = async () => {
     if (isSubmitting) return; // Prevent double submission
 
     setIsSubmitting(true);
+    setIsUploadingImages(false);
+    setUploadProgress(0);
 
     try {
       // Validate form first
@@ -150,38 +156,60 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         return; // Validation failed, errors are already set
       }
 
-      // Prepare food data for backend
+      // Upload selected images first
+      const uploadedImageIds: string[] = [];
+      if (selectedMediaFiles.length > 0) {
+        setIsUploadingImages(true);
+        try {
+          let completedUploads = 0;
+          const totalUploads = selectedMediaFiles.length;
+
+          const uploadPromises = selectedMediaFiles.map(async (fileWithPreview, index) => {
+            const metadata = {
+              title: fileWithPreview.title || undefined,
+              description: fileWithPreview.description || undefined,
+              tags: fileWithPreview.tags ? fileWithPreview.tags.split(',').map(tag => tag.trim()) : undefined,
+              folder: "food-images",
+            };
+
+            const result = await uploadFile(fileWithPreview.file, metadata);
+            completedUploads++;
+            setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
+            return result._id;
+          });
+
+          const results = await Promise.all(uploadPromises);
+          uploadedImageIds.push(...results.filter((id: string | undefined) => id) as string[]);
+        } catch (uploadError) {
+          console.error("Failed to upload images:", uploadError);
+          // Continue with food creation even if image upload fails
+        } finally {
+          setIsUploadingImages(false);
+        }
+      }
+
+      // Prepare food data for backend with uploaded image IDs
       const foodDataForBackend = {
         ...newFood,
-        images: newFood.images || [],
+        restaurant: restaurantData?._id || "",
+        images: uploadedImageIds,
       };
 
-      // Create the food first
+      // Create the food
       const result = await createFoodData(foodDataForBackend);
 
       if (result.success && result.data) {
-        // Associate uploaded media with the created food
-        if (foodDataForBackend.images && foodDataForBackend.images.length > 0) {
-          try {
-            // Update each media item with the food association
-            for (const mediaId of foodDataForBackend.images) {
-              if (mediaId && result.data._id) {
-                await updateMediaAssociation(mediaId, {
-                  type: "dish",
-                  id: result.data._id,
-                });
-              }
-            }
-          } catch (mediaError) {
-            console.error("Failed to associate media:", mediaError);
-            // Continue anyway - food was created successfully
-          }
-        }
+        // Note: Media association is handled automatically by the backend during upload
+        // The uploadedImageIds are already included in the food data
 
         // Close modal and reset form
         setIsModalOpen(false);
-        setNewFood(DEFAULT_FOOD_DATA);
+        setNewFood({
+          ...DEFAULT_FOOD_DATA,
+          restaurant: restaurantData?._id || "",
+        });
         setFormError(DEFAULT_FORM_ERROR);
+        setSelectedMediaFiles([]);
       } else {
         console.error("Failed to create food:", result.error);
         // Handle error appropriately
@@ -191,6 +219,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       // Handle error appropriately
     } finally {
       setIsSubmitting(false);
+      setIsUploadingImages(false);
+      setUploadProgress(0);
     }
   };
 
@@ -201,6 +231,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       restaurant: restaurantData?._id || "",
     });
     setFormError(DEFAULT_FORM_ERROR);
+    setSelectedMediaFiles([]);
+    setIsUploadingImages(false);
+    setUploadProgress(0);
     setActiveTab("food-data"); // Reset to first tab
   };
 
@@ -242,6 +275,16 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }));
   };
 
+  const handleMediaUploadSuccess = (result: UploadMediaResponse) => {
+    // Also add the media ID to the food data
+    if (result._id) {
+      setNewFood(prev => ({
+        ...prev,
+        images: [...(prev.images || []), result._id as string]
+      }));
+    }
+  };
+
 
 
   // functions for table
@@ -277,7 +320,14 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     {
       key: "media-upload",
       label: "Media Upload",
-      content: <MediaUpload />,
+      content: (
+        <MediaUpload 
+          uploadMode="auto"
+          selectedFiles={selectedMediaFiles}
+          onSelectedFilesChange={setSelectedMediaFiles}
+          onUploadError={(error) => console.error("Upload error:", error)}
+        />
+      ),
     },
   ];
 
@@ -428,13 +478,37 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               <Alert status="error">
                 Please fill in all the fields
               </Alert>
+            ) : isUploadingImages ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-600">Uploading images...</span>
+                  <span className="text-blue-600 font-medium">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-600">
+                  {selectedMediaFiles.length} image{selectedMediaFiles.length > 1 ? 's' : ''} being uploaded
+                </p>
+              </div>
             ) : undefined
           }
           size="lg"
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           modalTitle="Add New Food Item"
-          modalActionText={activeTab === tabs[tabs.length - 1].key ?(isSubmitting ? "Creating..." : "Add Food"): "Next Step"}
+          modalActionText={
+            activeTab === tabs[tabs.length - 1].key 
+              ? isUploadingImages 
+                ? "Uploading Images..." 
+                : isSubmitting 
+                  ? "Creating Food..." 
+                  : "Add Food"
+              : "Next Step"
+          }
           modalActionOnClick={()=>{
             if(activeTab === tabs[tabs.length - 1].key){
               handleAddFood();
@@ -446,7 +520,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             }
           }}
           closeModal={closeModal}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || isUploadingImages}
         >
           <Tabs 
             tabs={tabs} 

@@ -51,8 +51,7 @@ export const getFoodCatalogueById = async (
 		const result = await FoodCatalogue.findById(foodId)
 			.populate("course")
 			.populate("cuisineType")
-			.populate("allergens")
-			.populate("images");
+			.populate("allergens");
 
 		if (!result) {
 			return next(
@@ -83,8 +82,7 @@ export const getFoodCatalogueByRestaurantId = async (
 		const result = await FoodCatalogue.find({ restaurant: restaurantId })
 			.populate("course")
 			.populate("cuisineType")
-			.populate("allergens")
-			.populate("images");
+			.populate("allergens");
 
 		res.status(200).json(result || []);
 	} catch (error) {
@@ -118,8 +116,7 @@ export const createFoodCatalogue = async (
 		const populatedFoodItem = await FoodCatalogue.findById(newFoodItem._id)
 			.populate("course")
 			.populate("cuisineType")
-			.populate("allergens")
-			.populate("images");
+			.populate("allergens");
 
 		if (!populatedFoodItem) {
 			return next(

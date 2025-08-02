@@ -130,7 +130,7 @@ export function Modal({
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto">{children}</div>
+            <div className="p-6 overflow-y-auto max-h-[60vh]">{children}</div>
 
             {/* Modal Footer */}
             <div className="p-6 flex justify-end gap-2">

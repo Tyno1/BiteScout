@@ -59,6 +59,10 @@ const mediaSchema = new mongoose.Schema(
       type: String,
       description: "ID of the media in the cloud storage provider (Cloudinary/AWS S3)",
     },
+    mediaServiceId: {
+      type: String,
+      description: "ID of the media in the media service database",
+    },
     provider: {
       type: String,
       enum: ["cloudinary", "aws-s3"],

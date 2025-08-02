@@ -21,6 +21,7 @@ export function UserModal({ isOpen, onClose, children }: ModalProps) {
         className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
       >
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
         >

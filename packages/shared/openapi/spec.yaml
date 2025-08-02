@@ -3429,6 +3429,10 @@ components:
           type: string
           description: "ID of the media in the cloud storage provider"
           example: "social-media/1753952680855_original"
+        mediaServiceId:
+          type: string
+          description: "ID of the media in the media service database"
+          example: "507f1f77bcf86cd799439018"
         provider:
           type: string
           enum:
