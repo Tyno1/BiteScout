@@ -1,8 +1,8 @@
 import { Button, IconButton, Select, Textarea } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type { Cuisine, Restaurant } from "shared/types/api/schemas";
-import { X, Info, ChefHat, DollarSign } from "lucide-react";
+import { ChefHat, DollarSign, Info, X } from "lucide-react";
 import { useState } from "react";
+import type { Cuisine, Restaurant } from "shared/types/api/schemas";
 
 type BasicInformation = {
   isEditing: boolean;
@@ -10,7 +10,7 @@ type BasicInformation = {
   addCuisine: (cuisine: Cuisine) => void;
   editableData: Restaurant | null;
   setEditableData: (value: Restaurant) => void;
-  displayData: Restaurant | null;
+  displayData: Restaurant | undefined;
   handleInputChange: (
     field: keyof Restaurant,
     value: Restaurant[keyof Restaurant]

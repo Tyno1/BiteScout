@@ -1,6 +1,5 @@
 "use client";
 
-import { useRestaurantAccess } from "@/app/hooks/useRestaurantAccess";
 import { DEFAULT_BUSINESS_HOURS } from "@/app/onboarding/constants";
 import { Spinner } from "@/components/atoms";
 import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/BasicInformation";
@@ -9,24 +8,22 @@ import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile
 import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { getMediaUrl } from "@/utils/mediaUtils";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 import type { BusinessHour, Cuisine, DeliveryLink, Restaurant, RestaurantFeature } from "shared/types/api/schemas";
 
 export default function RestaurantProfile() {
   const {
     restaurantData,
-    session,
     cuisines,
     restaurantAccessList,
+    deliveryLinks,
     isLoading,
     deliveryLinksLoading,
+    
     isOwner,
-    loadRestaurantData,
-    getRestaurantListAccess,
     updateRestaurant,
-    getDeliveryLinks,
     addDeliveryLink,
     deleteDeliveryLink,
     getCuisines,
@@ -35,14 +32,13 @@ export default function RestaurantProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
-  const [deliveryLinks, setDeliveryLinks] = useState<DeliveryLink[]>([]);
 
   // Get the display data (either editable or current)
   const displayData = editableData || restaurantData;
 
   // Get the hero image from restaurant media
   const heroImage = getMediaUrl(
-    restaurantData?.logo || restaurantData?.gallery,
+    restaurantData?.logo?.url || restaurantData?.gallery?.[0]?.url,
     "/api/placeholder/1200/800"
   );
 
@@ -89,17 +85,17 @@ export default function RestaurantProfile() {
       console.error("No editable data or ID found");
       return;
     }
-    try {
-      await updateRestaurant({
-        data: editableData,
-        id: editableData._id,
-      });
+    		try {
+			updateRestaurant({
+				data: editableData,
+				id: editableData._id,
+			});
 
-      setIsEditing(false);
-      setEditableData(null);
-    } catch (error) {
-      console.error("Error updating restaurant:", error);
-    }
+			setIsEditing(false);
+			setEditableData(null);
+		} catch (error) {
+			console.error("Error updating restaurant:", error);
+		}
   }, [editableData, updateRestaurant]);
 
   const handleEdit = useCallback(() => {
@@ -157,41 +153,19 @@ export default function RestaurantProfile() {
     });
   }, []);
 
-  // Delivery links handlers
-  const loadDeliveryLinks = useCallback(async () => {
-    const currentRestaurantId = restaurantData?._id || "";
-    if (!currentRestaurantId) return;
-    try {
-      const links = await getDeliveryLinks(currentRestaurantId);
-      setDeliveryLinks(links);
-    } catch {
-      toast.error("Failed to load delivery links");
-    }
-  }, [restaurantData?._id, getDeliveryLinks]);
 
-  const handleAddDeliveryLink = useCallback(async (data: Partial<DeliveryLink>) => {
-    const currentRestaurantId = restaurantData?._id || "";
-    if (!currentRestaurantId) return;
-    try {
-      await addDeliveryLink(currentRestaurantId, data);
-      await loadDeliveryLinks();
-      toast.success("Delivery link added");
-    } catch {
-      toast.error("Failed to add delivery link");
-    }
-  }, [restaurantData?._id, addDeliveryLink, loadDeliveryLinks]);
 
-  const handleDeleteDeliveryLink = useCallback(async (linkId: string) => {
+  const handleAddDeliveryLink = useCallback((data: Partial<DeliveryLink>) => {
     const currentRestaurantId = restaurantData?._id || "";
     if (!currentRestaurantId) return;
-    try {
-      await deleteDeliveryLink(currentRestaurantId, linkId);
-      await loadDeliveryLinks();
-      toast.success("Delivery link deleted");
-    } catch {
-      toast.error("Failed to delete delivery link");
-    }
-  }, [restaurantData?._id, deleteDeliveryLink, loadDeliveryLinks]);
+    addDeliveryLink({ restaurantId: currentRestaurantId, data });
+  }, [restaurantData?._id, addDeliveryLink]);
+
+  const handleDeleteDeliveryLink = useCallback((linkId: string) => {
+    const currentRestaurantId = restaurantData?._id || "";
+    if (!currentRestaurantId) return;
+    deleteDeliveryLink({ restaurantId: currentRestaurantId, linkId });
+  }, [restaurantData?._id, deleteDeliveryLink]);
 
   const handleBusinessHoursChange = useCallback(
     (
@@ -216,31 +190,12 @@ export default function RestaurantProfile() {
     []
   );
 
-  // Load delivery links when restaurant changes
-  useEffect(() => {
-    if (restaurantData?._id) {
-      loadDeliveryLinks();
-    }
-  }, [restaurantData?._id, loadDeliveryLinks]);
+
 
   // Load cuisines
   useEffect(() => {
     getCuisines();
   }, [getCuisines]);
-
-  // Load restaurant access list for non-owners
-  useEffect(() => {
-    if (!session?.user?._id) return;
-    getRestaurantListAccess(session.user._id);
-  }, [session?.user?._id, getRestaurantListAccess]);
-
-  // Load restaurant data using the flexible approach
-  useEffect(() => {
-    if (!session?.user?._id) return;
-    if (restaurantData?._id) return; // Don't refetch if we have valid data
-
-    loadRestaurantData();
-  }, [session?.user?._id, loadRestaurantData, restaurantData?._id]);
 
   // Loading state
   if (isLoading) {

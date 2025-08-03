@@ -1,6 +1,9 @@
 import type { Media } from "shared/types/api/schemas";
 import { getMedia } from "./mediaApi";
 
+// Simple cache to prevent duplicate API calls
+const mediaCache = new Map<string, { url: string; title?: string; description?: string; type: string }>();
+
 // Utility function to get media URL with fallback
 export const getMediaUrl = async (
   mediaId?: string | string[],
@@ -8,18 +11,18 @@ export const getMediaUrl = async (
 ): Promise<string> => {
   if (!mediaId) return fallback || "/api/placeholder/400/300";
 
-  if (Array.isArray(mediaId)) {
-    if (mediaId.length === 0) return fallback || "/api/placeholder/400/300";
-    try {
-      const media = await getMedia(mediaId[0]);
-      return media.url || fallback || "/api/placeholder/400/300";
-    } catch (error) {
-      return fallback || "/api/placeholder/400/300";
-    }
-  }
+  const id = Array.isArray(mediaId) ? mediaId[0] : mediaId;
+  if (!id) return fallback || "/api/placeholder/400/300";
 
   try {
-    const media = await getMedia(mediaId);
+    // Check cache first
+    if (mediaCache.has(id)) {
+      const cached = mediaCache.get(id);
+      return cached.url || fallback || "/api/placeholder/400/300";
+    }
+
+    const media = await getMedia(id);
+    mediaCache.set(id, media);
     return media.url || fallback || "/api/placeholder/400/300";
   } catch (error) {
     return fallback || "/api/placeholder/400/300";

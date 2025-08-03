@@ -1,62 +1,37 @@
 "use client";
 
-import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Ban, CheckCircle, Trash2, User } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
-  const { data: session } = useSession();
-  const {
-    restaurantAccessList,
-    getRestaurantAccessListByOwnerId,
-    resetAccess,
-    deleteAccess,
-    grantAccess,
-    suspendAccess,
-  } = useRestaurantAccessStore();
+  	const {
+		restaurantAccessList,
+		deleteAccess,
+		grantAccess,
+		suspendAccess,
+	} = useRestaurantAccess();
 
-  useEffect(() => {
-    const userId = session?.user?._id;
-    const isOwner =
-      session?.user?.restaurantCount && session.user.restaurantCount >= 1;
-    if (userId && isOwner) {
-      const fetchRestaurantAccessList = async () => {
-        await getRestaurantAccessListByOwnerId(userId);
-      };
-      fetchRestaurantAccessList();
-    }
 
-    // Reset access only when the component unmounts
-    return () => {
-      resetAccess();
-    };
-  }, [
-    resetAccess,
-    session?.user?._id,
-    session?.user?.restaurantCount,
-    getRestaurantAccessListByOwnerId,
-  ]);
 
   const handleStatusChange = async (accessId: string, status: RestaurantAccess["status"]) => {
     try {
       switch (status) {
         // case where button is clicked to approve access
         case "approved":
-          await grantAccess(accessId);
+          grantAccess(accessId);
           break;
         // case where button is clicked to suspend access
         case "suspended":
-          await suspendAccess(accessId);
+          suspendAccess(accessId);
           break;
         // case where button is clicked to delete access
         case "innactive":
-          await deleteAccess(accessId);
+          deleteAccess(accessId);
           break;
       }
 
-      await getRestaurantAccessListByOwnerId(session?.user?._id ?? "");
+      // React Query handles cache invalidation automatically
     } catch (error) {
       console.error("Failed to update access status", error);
     }

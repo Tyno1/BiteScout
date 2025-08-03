@@ -1,11 +1,10 @@
 "use client";
 
 import { Button, IconButton } from "@/components/atoms";
-import { getMedia, getOptimizedUrl } from "@/utils/mediaApi";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import type { Media } from "shared/types";
 
 interface MediaGalleryProps {
   mediaIds: string[];
@@ -14,15 +13,6 @@ interface MediaGalleryProps {
   showThumbnails?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
-}
-
-interface CachedMedia {
-  [mediaId: string]: {
-    url: string;
-    alt: string;
-    isLoading: boolean;
-    error?: string;
-  };
 }
 
 export const MediaGallery = ({
@@ -35,76 +25,14 @@ export const MediaGallery = ({
 }: MediaGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [cachedMedia, setCachedMedia] = useState<CachedMedia>({});
-  const [isLoadingAll, setIsLoadingAll] = useState(true);
 
-  // Fetch all media data upfront
-  useEffect(() => {
-    const fetchAllMedia = async () => {
-      if (!mediaIds || mediaIds.length === 0) {
-        setIsLoadingAll(false);
-        return;
-      }
-
-      setIsLoadingAll(true);
-      const newCachedMedia: CachedMedia = {};
-
-      // Initialize cache with loading state
-      for (const mediaId of mediaIds) {
-        newCachedMedia[mediaId] = {
-          url: "/api/placeholder/400/300",
-          alt: `${altText}`,
-          isLoading: true,
-        };
-      }
-
-      setCachedMedia(newCachedMedia);
-
-      // Fetch all media in parallel
-      const fetchPromises = mediaIds.map(async (mediaId) => {
-        try {
-          // Get optimized URL for better performance
-          const optimizedResponse = await getOptimizedUrl(mediaId, "medium");
-          const mediaData = await getMedia(mediaId);
-          
-          return {
-            mediaId,
-            url: optimizedResponse.url, // Use optimized URL instead of original
-            alt: mediaData.title || mediaData.description || altText,
-            error: undefined,
-          };
-        } catch (error) {
-          console.error(`Failed to load media ${mediaId}:`, error);
-          return {
-            mediaId,
-            url: "/api/placeholder/400/300",
-            alt: `${altText} (Failed to load)`,
-            error: "Failed to load",
-          };
-        }
-      });
-
-      const results = await Promise.all(fetchPromises);
-
-      // Update cache with results
-      setCachedMedia((prev) => {
-        const updated = { ...prev };
-        for (const result of results) {
-          updated[result.mediaId] = {
-            url: result.url,
-            alt: result.alt,
-            isLoading: false,
-            error: result.error,
-          };
-        }
-        return updated;
-      });
-
-      setIsLoadingAll(false);
-    };
-
-    fetchAllMedia();
-  }, [mediaIds, altText]);
+  // Use React Query hooks for each media item
+  const currentMediaId = mediaIds[currentIndex];
+  const { 
+    data: currentMediaData, 
+    isLoading: currentLoading, 
+    error: currentError 
+  } = useMediaWithOptimizedUrl(currentMediaId, "medium");
 
   // Auto-play functionality
   useEffect(() => {
@@ -157,49 +85,25 @@ export const MediaGallery = ({
     );
   }
 
-  const currentImageId = mediaIds[currentIndex];
-  const currentMedia = cachedMedia[currentImageId];
-
-  // Show loading state while fetching all media
-  if (isLoadingAll) {
-    return (
-      <div className={`relative ${className}`}>
-        <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden border shadow-sm bg-gray-200 animate-pulse">
-          <div className="w-full h-full bg-gray-300" />
-        </div>
-        {showThumbnails && (
-          <div className="mt-4">
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {mediaIds.map((mediaId) => (
-                <div
-                  key={mediaId}
-                  className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border bg-gray-200 animate-pulse"
-                >
-                  <div className="w-full h-full bg-gray-300" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+  const currentUrl = currentMediaData?.optimizedUrl || currentMediaData?.media?.url || "/api/placeholder/400/300";
+  const currentAlt = currentMediaData?.media?.title || currentMediaData?.media?.description || altText;
 
   return (
     <div className={`relative ${className}`}>
       {/* Main Image Display */}
       <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden shadow-sm">
-        {currentMedia?.isLoading ? (
+        {currentLoading ? (
           <div className="w-full h-full bg-gray-200 animate-pulse">
             <div className="w-full h-full bg-gray-300" />
           </div>
+        ) : currentError ? (
+          <div className="w-full h-full bg-red-50 flex items-center justify-center">
+            <p className="text-red-600 text-sm">Failed to load image</p>
+          </div>
         ) : (
           <Image
-            src={currentMedia?.url || "/api/placeholder/400/300"}
-            alt={
-              currentMedia?.alt ||
-              `${altText} ${currentIndex + 1} of ${mediaIds.length}`
-            }
+            src={currentUrl}
+            alt={currentAlt}
             fill
             className="object-cover"
           />
@@ -250,42 +154,16 @@ export const MediaGallery = ({
       {showThumbnails && mediaIds.length > 1 && (
         <div className="mt-4">
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {mediaIds.map((mediaId, index) => {
-              const thumbnailMedia = cachedMedia[mediaId];
-              return (
-                <button
-                  key={mediaId}
-                  type="button"
-                  className={`relative flex-shrink-0 cursor-pointer transition-all duration-200 ${
-                    index === currentIndex
-                      ? "ring-2 ring-blue-500 ring-offset-2"
-                      : "hover:opacity-80"
-                  }`}
-                  onClick={() => goToImage(index)}
-                >
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden border">
-                    {thumbnailMedia?.isLoading ? (
-                      <div className="w-full h-full bg-gray-200 animate-pulse">
-                        <div className="w-full h-full bg-gray-300" />
-                      </div>
-                    ) : (
-                      <Image
-                        src={thumbnailMedia?.url || "/api/placeholder/400/300"}
-                        alt={
-                          thumbnailMedia?.alt ||
-                          `${altText} thumbnail ${index + 1}`
-                        }
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                  </div>
-                  {index === currentIndex && (
-                    <div className="absolute inset-0 bg-blue-500/20 rounded-lg" />
-                  )}
-                </button>
-              );
-            })}
+            {mediaIds.map((mediaId, index) => (
+              <ThumbnailItem
+                key={mediaId}
+                mediaId={mediaId}
+                index={index}
+                currentIndex={currentIndex}
+                altText={altText}
+                onClick={() => goToImage(index)}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -297,7 +175,7 @@ export const MediaGallery = ({
           style={{ top: "0", left: "0", right: "0", bottom: "0" }}
         >
           <div className="relative w-full h-[90%] flex items-center justify-center p-4 pt-16">
-            {/* Alternative Close Button - More Visible */}
+            {/* Close Button */}
             <IconButton
               variant="glass"
               color="white"
@@ -309,17 +187,18 @@ export const MediaGallery = ({
 
             {/* Fullscreen Image */}
             <div className="relative w-full h-full flex items-center justify-center max-h-[calc(100vh-8rem)]">
-              {currentMedia?.isLoading ? (
+              {currentLoading ? (
                 <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
                   <div className="text-white">Loading...</div>
                 </div>
+              ) : currentError ? (
+                <div className="w-full h-full bg-red-50 flex items-center justify-center">
+                  <p className="text-red-600">Failed to load image</p>
+                </div>
               ) : (
                 <Image
-                  src={currentMedia?.url || "/api/placeholder/400/300"}
-                  alt={
-                    currentMedia?.alt ||
-                    `${altText} ${currentIndex + 1} of ${mediaIds.length}`
-                  }
+                  src={currentUrl}
+                  alt={currentAlt}
                   fill
                   className="object-contain"
                 />
@@ -357,5 +236,63 @@ export const MediaGallery = ({
         </div>
       )}
     </div>
+  );
+};
+
+// Separate component for thumbnails to use React Query hooks
+const ThumbnailItem = ({ 
+  mediaId, 
+  index, 
+  currentIndex, 
+  altText, 
+  onClick 
+}: {
+  mediaId: string;
+  index: number;
+  currentIndex: number;
+  altText: string;
+  onClick: () => void;
+}) => {
+  const { 
+    data: mediaData, 
+    isLoading, 
+    error 
+  } = useMediaWithOptimizedUrl(mediaId, "small");
+
+  const thumbnailUrl = mediaData?.optimizedUrl || mediaData?.media?.url || "/api/placeholder/400/300";
+  const thumbnailAlt = mediaData?.media?.title || mediaData?.media?.description || `${altText} thumbnail ${index + 1}`;
+
+  return (
+    <button
+      type="button"
+      className={`relative flex-shrink-0 cursor-pointer transition-all duration-200 ${
+        index === currentIndex
+          ? "ring-2 ring-blue-500 ring-offset-2"
+          : "hover:opacity-80"
+      }`}
+      onClick={onClick}
+    >
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden border">
+        {isLoading ? (
+          <div className="w-full h-full bg-gray-200 animate-pulse">
+            <div className="w-full h-full bg-gray-300" />
+          </div>
+        ) : error ? (
+          <div className="w-full h-full bg-red-50 flex items-center justify-center">
+            <div className="w-4 h-4 bg-red-300 rounded" />
+          </div>
+        ) : (
+          <Image
+            src={thumbnailUrl}
+            alt={thumbnailAlt}
+            fill
+            className="object-cover"
+          />
+        )}
+      </div>
+      {index === currentIndex && (
+        <div className="absolute inset-0 bg-blue-500/20 rounded-lg" />
+      )}
+    </button>
   );
 };

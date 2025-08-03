@@ -1,12 +1,12 @@
 import { IconButton, Select } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type { Restaurant, RestaurantFeature } from "shared/types/api/schemas";
-import { ChevronDown, ChevronRight, Plus, Sparkles, Info, CheckCircle, Tag } from "lucide-react";
+import { CheckCircle, ChevronDown, ChevronRight, Info, Plus, Sparkles, Tag } from "lucide-react";
 import { useState } from "react";
+import type { Restaurant, RestaurantFeature } from "shared/types/api/schemas";
 import {
   ALL_FEATURES,
-  FEATURE_CATEGORIES,
   type CategorizedFeature,
+  FEATURE_CATEGORIES,
   categorizeFeatures,
 } from "../../../../utils";
 
@@ -15,9 +15,7 @@ type RestaurantProfileFeaturesProps = {
   newFeature: RestaurantFeature | null;
   setNewFeature: (value: RestaurantFeature) => void;
   addFeature: (feature: RestaurantFeature) => void;
-  displayData: { 
-    features?: RestaurantFeature[];
-  };
+  displayData: Restaurant | undefined;
   handleInputChange?: (
     field: keyof Restaurant,
     value: Restaurant[keyof Restaurant]
@@ -41,11 +39,11 @@ export function RestaurantProfileFeatures({
 
   // Get features from flat array
   const getFeatures = (): RestaurantFeature[] => {
-    return displayData.features || [];
+    return displayData?.features || [];
   };
 
   const getCategorizedFeatures = (): CategorizedFeature[] => {
-    return categorizeFeatures(displayData.features || []);
+    return categorizeFeatures(displayData?.features || []);
   };
 
   const toggleCategory = (category: string) => {

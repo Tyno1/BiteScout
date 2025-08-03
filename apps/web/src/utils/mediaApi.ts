@@ -150,13 +150,14 @@ export const getOptimizedUrl = async (
 	mediaId: string,
 	size = "medium",
 	networkSpeed?: "slow" | "medium" | "fast",
+	mediaData?: GetMediaResponse, // Optional: pass existing media data
 ): Promise<{ url: string }> => {
+	// Use provided media data or fetch it
+	const media = mediaData || await getMedia(mediaId);
+	
 	try {
-		// First get the media from backend to get the mediaServiceId
-		const mediaData = await getMedia(mediaId);
-		
 		// Use the mediaServiceId to call media service (not backend _id)
-		const mediaServiceId = (mediaData as { mediaServiceId?: string }).mediaServiceId;
+		const mediaServiceId = (media as { mediaServiceId?: string }).mediaServiceId;
 		if (!mediaServiceId) {
 			throw new Error(`No mediaServiceId found for media ${mediaId}`);
 		}
@@ -175,14 +176,24 @@ export const getOptimizedUrl = async (
 
 		return response.data;
 	} catch (error) {
-		// Fallback: get the original media URL
-		try {
-			const mediaData = await getMedia(mediaId);
-			return { url: mediaData.url };
-		} catch (fallbackError) {
-			throw new Error(`Unable to retrieve media URL for ${mediaId}`);
-		}
+		// Fallback: use the already fetched media data
+		return { url: media.url };
 	}
+};
+
+// Combined function to get media data and optimized URL in one call
+export const getMediaWithOptimizedUrl = async (
+	mediaId: string,
+	size = "medium",
+	networkSpeed?: "slow" | "medium" | "fast",
+): Promise<{ media: GetMediaResponse; optimizedUrl: string }> => {
+	const media = await getMedia(mediaId);
+	const optimizedData = await getOptimizedUrl(mediaId, size, networkSpeed, media);
+	
+	return {
+		media,
+		optimizedUrl: optimizedData.url,
+	};
 };
 
 // Pure function for getting user's media

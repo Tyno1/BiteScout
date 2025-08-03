@@ -2,8 +2,8 @@
 
 import { Button, Input } from "@/components/atoms";
 import { SearchResultCard } from "@/components/ui";
-import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
-import useRestaurantStore from "@/stores/restaurantStore";
+import { useRestaurantsByName } from "@/hooks/restaurant";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -16,23 +16,21 @@ const RestaurantSearch = () => {
 	const userId = session?.user?._id;
 	const router = useRouter();
 
+	// Local state
+	const [searchTerm, setSearchTerm] = useState("");
+
 	const {
-		getRestaurantsByName,
-		resetRestaurant,
-		restaurantDatas,
-		error: searchError,
+		data: searchResults,
 		isLoading: isSearchLoading,
-	} = useRestaurantStore();
+		refetch: searchRestaurants,
+		error: searchError,
+	} = useRestaurantsByName(searchTerm);
 
 	const {
 		restaurantAccessList,
-		getRestaurantListAccess,
-		createRestaurantAccess,
 		isLoading: isAccessLoading,
-	} = useRestaurantAccessStore();
-
-	// Local state
-	const [searchTerm, setSearchTerm] = useState("");
+		createRestaurantAccess,
+	} = useRestaurantAccess();
 	const [formError, setFormError] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [hasSearched, setHasSearched] = useState(false);
@@ -43,7 +41,6 @@ const RestaurantSearch = () => {
 		setFormError("");
 
 		if (e.target.value === "") {
-			resetRestaurant();
 			setHasSearched(false);
 		}
 	};
@@ -63,7 +60,7 @@ const RestaurantSearch = () => {
 		setIsSubmitting(true);
 
 		try {
-			await getRestaurantsByName(searchTerm);
+			await searchRestaurants();
 		} catch {
 			setFormError("Error searching for restaurants");
 		} finally {
@@ -79,51 +76,32 @@ const RestaurantSearch = () => {
 		}
 
 		try {
-			await createRestaurantAccess({ restaurantId, userId });
+			createRestaurantAccess({ restaurantId, userId });
 		} catch (error) {
 			setFormError("Failed to request access to this restaurant");
 			console.error(error);
 		}
 	};
 
-	// Fetch restaurant access on component mount only
-	useEffect(() => {
-		const fetchRestaurantAccess = async () => {
-			if (userId) {
-				try {
-					await getRestaurantListAccess(userId);
-				} catch (error) {
-					console.error("Failed to fetch restaurant access:", error);
-					// Don't show error to user, just log it
-				}
-			}
-		};
 
-		fetchRestaurantAccess();
-	}, [userId, getRestaurantListAccess]);
 
 	// Redirect to dashboard if user has access to any restaurant
 	useEffect(() => {
 		if (restaurantAccessList.length > 0) {
-			const isMatched = restaurantAccessList.find((access) =>
-				restaurantDatas.find(
-					(restaurant) =>
-						restaurant?._id && access.restaurantId === restaurant?._id,
-				),
+			const hasApprovedAccess = restaurantAccessList.some(
+				(access) => access.status === "approved"
 			);
-			const hasAccess = isMatched?.status === "approved";
 
-			if (hasAccess) {
+			if (hasApprovedAccess) {
 				router.push("/dashboard");
 			}
 		}
-	}, [restaurantAccessList, restaurantDatas, router]);
+	}, [restaurantAccessList, router]);
 
 	// Clear results when component mounts
 	useEffect(() => {
-		resetRestaurant();
 		setHasSearched(false);
-	}, [resetRestaurant]);
+	}, []);
 
 	// Render search results or appropriate message
 	const renderSearchResults = () => {
@@ -140,12 +118,12 @@ const RestaurantSearch = () => {
 		if (searchError) {
 			return (
 				<div className="p-4 bg-red-50 border border-red-100 rounded-md">
-					<p className="text-center text-red-700">Error: {searchError}</p>
+					<p className="text-center text-red-700">Error: {searchError.message}</p>
 				</div>
 			);
 		}
 
-		if (hasSearched && restaurantDatas.length === 0) {
+		if (hasSearched && (!searchResults || searchResults.length === 0)) {
 			return (
 				<div className="p-4 bg-yellow-50 border border-yellow-100 rounded-md">
 					<p className="text-center text-yellow-700">
@@ -156,8 +134,8 @@ const RestaurantSearch = () => {
 			);
 		}
 
-		if (hasSearched && restaurantDatas.length > 0) {
-			return restaurantDatas.map((restaurant) => (
+		if (hasSearched && searchResults && searchResults.length > 0) {
+			return searchResults.map((restaurant) => (
 				<SearchResultCard
 					key={restaurant?._id}
 					handleRestaurantSelect={handleRestaurantSelect}

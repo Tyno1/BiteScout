@@ -2,7 +2,7 @@
 
 import { Spinner } from "@/components/atoms";
 import { SideNav, TopNav } from "@/components/ui";
-import useRestaurantAccessStore from "@/stores/restaurantAccessStore";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [accessChecked, setAccessChecked] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
-  const { restaurantAccessList } = useRestaurantAccessStore();
+  	const { restaurantAccessList } = useRestaurantAccess();
   const router = useRouter();
 
   // Stabilize the access check function to prevent unnecessary re-renders
@@ -53,7 +53,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Create a function to check hydration status
     const checkHydration = () => {
-      const isHydrated = useRestaurantAccessStore?.persist?.hasHydrated();
+      	const isHydrated = true; // React Query handles hydration automatically
       if (isHydrated) {
         // Once hydrated, we can proceed with permission checks
         setIsLoading(false);

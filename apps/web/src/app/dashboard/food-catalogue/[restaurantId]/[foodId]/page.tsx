@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/atoms";
 import { MediaGallery } from "@/components/ui/media";
-import useFoodDataStore from "@/stores/foodDataStore";
+import { useFoodCatalogueById } from "@/hooks/food-catalogue";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -15,25 +15,13 @@ const CapitalizeFirstCharacter = (str: string): string => {
 export default function FoodDetailPage() {
   const params = useParams();
   const { foodId, restaurantId } = params;
-  const { foodData, getFoodDataById, isLoading, error } = useFoodDataStore();
+  	const { data: foodData, isLoading, error } = useFoodCatalogueById(
+		restaurantId as string, 
+		foodId as string
+	);
   const router = useRouter();
 
-  const fetchFoodData = useCallback(async () => {
-    if (foodId && restaurantId) {
-      try {
-        await getFoodDataById({
-          foodId: foodId as string,
-          restaurantId: restaurantId as string,
-        });
-      } catch (error) {
-        console.error("Error fetching food data:", error);
-      }
-    }
-  }, [foodId, restaurantId, getFoodDataById]);
 
-  useEffect(() => {
-    fetchFoodData();
-  }, [fetchFoodData]);
 
   if (isLoading) {
     return (
@@ -53,7 +41,7 @@ export default function FoodDetailPage() {
           <h1 className="text-2xl font-bold text-red-600">
             Error loading food data
           </h1>
-          <p className="text-gray-600">{error}</p>
+          <p className="text-gray-600">{error.message}</p>
         </div>
       </div>
     );

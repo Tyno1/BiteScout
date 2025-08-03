@@ -1,8 +1,8 @@
+import { getCurrentSession } from "@/app/actions/getSessionAction";
 import { getRoleFromToken } from "@/utils/getRoleFromSession";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import type { AccessRoles } from "shared/types/api/schemas";
-import { getCurrentSession } from "../actions/getSessionAction";
 
 type ReturnType = {
   isLoading: boolean;
@@ -85,4 +85,4 @@ export const useRole = (): ReturnType => {
     userRole,
     refreshRole: fetchUserRole,
   };
-};
+}; 

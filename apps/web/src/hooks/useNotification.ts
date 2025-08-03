@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { initializeSocket, disconnectSocket } from "@/utils/socketService";
 import useNotificationStore from "@/stores/notificationStore";
+import { disconnectSocket, initializeSocket } from "@/utils/socketService";
+import { useEffect } from "react";
 import type { Notification } from "shared/types/api/schemas";
 
 type useNotificationProps = {
@@ -35,4 +35,4 @@ export const useNotifications = ({
   }, [userId, addNotification, fetchNotifications]);
 
   return { notifications, unreadCount, isLoading };
-};
+}; 

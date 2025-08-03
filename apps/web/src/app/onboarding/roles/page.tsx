@@ -2,11 +2,11 @@
 
 import type React from "react";
 
-import { useRestaurantAccess } from "@/app/hooks/useRestaurantAccess";
-import { useUpdateUser } from "@/app/hooks/useUpdateUser";
 import { Spinner } from "@/components/atoms/loaders/Spinners";
 import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
-import useRestaurantStore from "@/stores/restaurantStore";
+import { useCreateRestaurant } from "@/hooks/restaurant";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -15,7 +15,7 @@ import type { Restaurant } from "shared/types/api/schemas";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
-  const { createRestaurant } = useRestaurantStore();
+  	const createRestaurantMutation = useCreateRestaurant();
   const {isOwner, getRestaurantListAccess,getFirstApprovedRestaurantId } = useRestaurantAccess()
 
   const session = useSession();
@@ -101,7 +101,7 @@ export default function Onboarding() {
 
     // Create restaurant
     try {
-       await createRestaurant(preparedData);
+       await createRestaurantMutation.mutateAsync(preparedData);
       await handleSuccessfulCreation();
     } catch (error) {
       const errorMessage =

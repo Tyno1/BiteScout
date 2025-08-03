@@ -1,9 +1,8 @@
 "use client";
 
-import type { GetMediaResponse } from "@shared/types";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { getMedia, getOptimizedUrl } from "../../../utils/mediaApi";
+import { memo, useMemo } from "react";
 
 interface MediaDisplayProps {
 	mediaId: string;
@@ -16,7 +15,7 @@ interface MediaDisplayProps {
 	priority?: boolean;
 }
 
-export const MediaDisplay = ({
+export const MediaDisplay = memo(({
 	mediaId,
 	size = "medium",
 	networkSpeed,
@@ -26,87 +25,62 @@ export const MediaDisplay = ({
 	imageHeight = "h-64",
 	priority = false,
 }: MediaDisplayProps) => {
-	const [media, setMedia] = useState<GetMediaResponse | null>(null);
-	const [optimizedUrl, setOptimizedUrl] = useState<string>("");
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const { 
+		data, 
+		isLoading, 
+		error, 
+		isError 
+	} = useMediaWithOptimizedUrl(mediaId, size as "small" | "medium" | "large", networkSpeed);
 
-	useEffect(() => {
-		const loadMedia = async () => {
-			try {
-				setLoading(true);
-				setError(null);
+	// Memoize display URL to prevent unnecessary re-renders
+	const displayUrl = useMemo(() => data?.optimizedUrl || data?.media?.url || '', [data?.optimizedUrl, data?.media?.url]);
 
-				// Get media metadata from main backend
-				const mediaData = await getMedia(mediaId);
-				setMedia(mediaData);
+	// Memoize loading state
+	const loadingState = useMemo(() => (
+		<div className={`animate-pulse ${className}`}>
+			<div className={`bg-gray-200 rounded-lg ${imageHeight} w-full`} />
+		</div>
+	), [className, imageHeight]);
 
-				// Get optimized URL from media service
-				try {
-					const optimizedData = await getOptimizedUrl(
-						mediaId,
-						size,
-						networkSpeed,
-					);
-					setOptimizedUrl(optimizedData.url);
-				} catch (optimizeError) {
-					console.warn(
-						"Failed to get optimized URL, using original:",
-						optimizeError,
-					);
-					setOptimizedUrl(mediaData.url);
-				}
-			} catch (err) {
-				setError(err instanceof Error ? err.message : "Failed to load media");
-			} finally {
-				setLoading(false);
-			}
-		};
+	// Memoize error state
+	const errorState = useMemo(() => (
+		<div
+			className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}
+		>
+			<p className="text-red-600 text-sm">Error loading media: {error?.message}</p>
+		</div>
+	), [className, error]);
 
-		if (mediaId) {
-			loadMedia();
-		}
-	}, [mediaId, size, networkSpeed]);
+	// Memoize not found state
+	const notFoundState = useMemo(() => (
+		<div
+			className={`bg-gray-50 border border-gray-200 rounded-lg p-4 ${className}`}
+		>
+			<p className="text-gray-500 text-sm">Media not found</p>
+		</div>
+	), [className]);
 
-	if (loading) {
-		return (
-			<div className={`animate-pulse ${className}`}>
-				<div className={`bg-gray-200 rounded-lg ${imageHeight} w-full`} />
-			</div>
-		);
+	if (isLoading) {
+		return loadingState;
 	}
 
-	if (error) {
-		return (
-			<div
-				className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}
-			>
-				<p className="text-red-600 text-sm">Error loading media: {error}</p>
-			</div>
-		);
+	if (isError || error) {
+		return errorState;
 	}
 
-	if (!media) {
-		return (
-			<div
-				className={`bg-gray-50 border border-gray-200 rounded-lg p-4 ${className}`}
-			>
-				<p className="text-gray-500 text-sm">Media not found</p>
-			</div>
-		);
+	if (!data?.media) {
+		return notFoundState;
 	}
-
-	const displayUrl = optimizedUrl || media.url;
 
 	return (
 		<div className={`space-y-2 ${className}`}>
 			{/* Media Content */}
 			<div className="relative">
-				{media.type === "image" ? (
+				{data.media.type === "image" ? (
 					<div className={`relative w-full ${imageHeight} rounded-lg overflow-hidden`}>
 						<Image
 							src={displayUrl}
-							alt={media.title || "Media content"}
+							alt={data.media.title || "Media content"}
 							fill
 							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 							className="object-cover rounded-lg"
@@ -121,14 +95,14 @@ export const MediaDisplay = ({
 						className="w-full h-auto rounded-lg"
 						preload="metadata"
 					>
-						<source src={displayUrl} type={media.mimeType} />
+						<source src={displayUrl} type={data.media.mimeType} />
 						<track kind="captions" src="" label="English" />
 						Your browser does not support the video tag.
 					</video>
 				)}
 
 				{/* Verification Badge */}
-				{media.verified && (
+				{data.media.verified && (
 					<div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
 						✓ Verified
 					</div>
@@ -138,11 +112,11 @@ export const MediaDisplay = ({
 			{/* Media Info */}
 			{(showTitle || showDescription) && (
 				<div className="space-y-1">
-					{showTitle && media.title && (
-						<h3 className="font-medium text-gray-900">{media.title}</h3>
+					{showTitle && data.media.title && (
+						<h3 className="font-medium text-gray-900">{data.media.title}</h3>
 					)}
-					{showDescription && media.description && (
-						<p className="text-sm text-gray-600">{media.description}</p>
+					{showDescription && data.media.description && (
+						<p className="text-sm text-gray-600">{data.media.description}</p>
 					)}
 				</div>
 			)}
@@ -150,15 +124,15 @@ export const MediaDisplay = ({
 			{/* Media Metadata */}
 			<div className="text-xs text-gray-500 space-y-1">
 				<div className="flex justify-between">
-					<span>Type: {media.type}</span>
-					{media.fileSize && (
-						<span>{(media.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+					<span>Type: {data.media.type}</span>
+					{data.media.fileSize && (
+						<span>{(data.media.fileSize / 1024 / 1024).toFixed(2)} MB</span>
 					)}
 				</div>
-				{media.dimensions && (
+				{data.media.dimensions && (
 					<div className="flex justify-between">
 						<span>
-							Dimensions: {media.dimensions.width} × {media.dimensions.height}
+							Dimensions: {data.media.dimensions.width} × {data.media.dimensions.height}
 						</span>
 						<span>Size: {size}</span>
 					</div>
@@ -166,4 +140,6 @@ export const MediaDisplay = ({
 			</div>
 		</div>
 	);
-};
+});
+
+MediaDisplay.displayName = 'MediaDisplay';

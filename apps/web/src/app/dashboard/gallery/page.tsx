@@ -1,12 +1,12 @@
 "use client";
 
 import { Gallery } from "@/components/ui/dashboard";
-import useRestaurantStore from "@/stores/restaurantStore";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useEffect, useState } from "react";
 import type { Media } from "shared/types/api/schemas";
 
 export default function GalleryPage() {
-	const { restaurantData } = useRestaurantStore();
+	const { restaurantData } = useRestaurantAccess();
 	const [galleryImages, setGalleryImages] = useState<Media[]>([]);
 	const [isEditing, setIsEditing] = useState(false);
 

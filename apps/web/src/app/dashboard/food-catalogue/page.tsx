@@ -6,16 +6,16 @@ import { Modal } from "@/components/organisms";
 import { AddNewFood, Table } from "@/components/ui";
 import { MediaUpload } from "@/components/ui/media";
 import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
-import useAllergenStore from "@/stores/allergenStore";
-import useCourseStore from "@/stores/courseStore";
-import useCuisineStore from "@/stores/cuisineStore";
-import useFoodDataStore, { DEFAULT_FOOD_DATA } from "@/stores/foodDataStore";
-import useRestaurantStore from "@/stores/restaurantStore";
-import {  uploadFile } from "@/utils/mediaApi";
+import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
+import { useAllergens } from "@/hooks/allergens";
+import { useCourses } from "@/hooks/courses";
+import { useCuisines } from "@/hooks/cuisines";
+import { useCreateFoodCatalogue, useFoodCatalogueByRestaurant } from "@/hooks/food-catalogue";
+import { useMediaUpload } from "@/hooks/media";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import type { UploadMediaResponse } from "shared/types";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
 import { z } from "zod";
@@ -82,29 +82,31 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     restaurant: "",
   };
 
-  const { foodDatas, createFoodData, getFoodDatas, error, isLoading } =
-    useFoodDataStore();
-  const { restaurantData } = useRestaurantStore();
+  		const { restaurantData } = useRestaurantAccess();
+	const { data: foodDatas, error, isLoading } =
+		useFoodCatalogueByRestaurant(restaurantData?._id || "");
+	const createFoodDataMutation = useCreateFoodCatalogue();
+  const uploadMutation = useMediaUpload();
   const [activeTab, setActiveTab] = useState<string>("food-data");
-  const {
-    allergens,
-    getAllergens,
-    error: allergenError,
-    isLoading: allergenLoading,
-  } = useAllergenStore();
+  	const {
+		data: allergens,
+		refetch: getAllergens,
+		error: allergenError,
+		isLoading: allergenLoading,
+	} = useAllergens();
 
-  const {
-    cuisines,
-    getCuisines,
-    error: cuisineError,
-    isLoading: cuisineLoading,
-  } = useCuisineStore();
-  const {
-    courses,
-    getCourses,
-    error: courseError,
-    isLoading: courseLoading,
-  } = useCourseStore();
+	const {
+		data: cuisines,
+		refetch: getCuisines,
+		error: cuisineError,
+		isLoading: cuisineLoading,
+	} = useCuisines();
+	const {
+		data: courses,
+		refetch: getCourses,
+		error: courseError,
+		isLoading: courseLoading,
+	} = useCourses();
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -172,7 +174,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               folder: "food-images",
             };
 
-            const result = await uploadFile(fileWithPreview.file, metadata);
+            const result = await uploadMutation.mutateAsync({
+              file: fileWithPreview.file,
+              metadata,
+            });
             completedUploads++;
             setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
             return result._id;
@@ -196,9 +201,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       };
 
       // Create the food
-      const result = await createFoodData(foodDataForBackend);
+      				const result = await createFoodDataMutation.mutateAsync(foodDataForBackend);
 
-      if (result.success && result.data) {
+		if (result) {
         // Note: Media association is handled automatically by the backend during upload
         // The uploadedImageIds are already included in the food data
 
@@ -211,7 +216,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         setFormError(DEFAULT_FORM_ERROR);
         setSelectedMediaFiles([]);
       } else {
-        console.error("Failed to create food:", result.error);
+        console.error("Failed to create food");
         // Handle error appropriately
       }
     } catch (error) {
@@ -275,15 +280,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }));
   };
 
-  const handleMediaUploadSuccess = (result: UploadMediaResponse) => {
-    // Also add the media ID to the food data
-    if (result._id) {
-      setNewFood(prev => ({
-        ...prev,
-        images: [...(prev.images || []), result._id as string]
-      }));
-    }
-  };
+
 
 
 
@@ -303,9 +300,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <AddNewFood
           setNewFood={setNewFood}
           newFood={newFood}
-          cuisineData={cuisines}
-          courseData={courses}
-          allergenData={allergens}
+          cuisineData={cuisines || []}
+          courseData={courses || []}
+          allergenData={allergens || []}
           toggleAllergen={toggleAllergen}
           currencies={CURRENCIES}
           handleAddIngredients={handleAddIngredients}
@@ -350,15 +347,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     stableGetAllergens();
   }, [stableGetCuisines, stableGetCourses, stableGetAllergens]);
 
-  // Stabilize the getFoodDatas function
-  const stableGetFoodDatas = useCallback(
-    (restaurantId: string) => {
-
-      getFoodDatas(restaurantId);
-    },
-    [getFoodDatas]
-  );
-
   useEffect(() => {
     if (restaurantData?._id) {
       console.log("Fetching food data for restaurant:", restaurantData._id);
@@ -367,10 +355,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         ...prev,
         restaurant: restaurantData._id as string,
       }));
-      
-      stableGetFoodDatas(restaurantData._id);
     }
-  }, [restaurantData?._id, stableGetFoodDatas]); // Only depend on restaurantData._id, not the entire object
+  }, [restaurantData?._id]); // Only depend on restaurantData._id, not the entire object
 
   return (
     <div className="container mx-auto p-4 w-full">
@@ -386,16 +372,15 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         ) : null}
       </div>
 
-      {/* Initial Loading State - Show only one loading message */}
-      {(isLoading || allergenLoading || cuisineLoading || courseLoading) &&
-        !foodDatas && (
-          <div className="text-center py-8">
-            <div className="inline-flex items-center space-x-2 text-blue-600">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-              <span>Setting up your food catalogue...</span>
-            </div>
+      {/* Loading State - Show only when any data is loading */}
+      {(isLoading || allergenLoading || cuisineLoading || courseLoading) && (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center space-x-2 text-blue-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+            <span>Setting up your food catalogue...</span>
           </div>
-        )}
+        </div>
+      )}
 
       {/* Error State - Only show critical errors */}
       {(error || allergenError || cuisineError || courseError) && (
@@ -418,57 +403,56 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">Setup Issue</h3>
               <div className="mt-2 text-sm text-red-700">
-                {error && <p>Food data: {error}</p>}
-                {allergenError && <p>Allergens: {allergenError}</p>}
-                {cuisineError && <p>Cuisines: {cuisineError}</p>}
-                {courseError && <p>Courses: {courseError}</p>}
+                {error && <p>Food data: {error.message}</p>}
+                		{allergenError && <p>Allergens: {allergenError.message}</p>}
+                		{cuisineError && <p>Cuisines: {cuisineError.message}</p>}
+		{courseError && <p>Courses: {courseError.message}</p>}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Food Catalogue Table */}
-      {foodDatas && foodDatas.length > 0 ? (
-        <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
-      ) : !isLoading &&
-        !allergenLoading &&
-        !cuisineLoading &&
-        !courseLoading ? (
-        <div className="text-center py-12">
-          <div className="max-w-md mx-auto">
-            <div className="mb-6">
-              <svg
-                className="mx-auto h-16 w-16 text-gray-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
+      {/* Food Catalogue Table or Empty State - Only show when not loading */}
+      {!isLoading && !allergenLoading && !cuisineLoading && !courseLoading && (
+        foodDatas && foodDatas.length > 0 ? (
+          <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
+        ) : foodDatas && foodDatas.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="max-w-md mx-auto">
+              <div className="mb-6">
+                <svg
+                  className="mx-auto h-16 w-16 text-gray-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Welcome to your Food Catalogue!
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Start building your menu by adding your first food item. You can
+                include ingredients, allergens, pricing, and images.
+              </p>
+              <Button
+                variant="solid"
+                text="Add Your First Food Item"
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center"
+              />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Welcome to your Food Catalogue!
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Start building your menu by adding your first food item. You can
-              include ingredients, allergens, pricing, and images.
-            </p>
-            <Button
-              variant="solid"
-              text="Add Your First Food Item"
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center"
-            />
           </div>
-        </div>
-      ) : null}
+        ) : null
+      )}
 
       {/* Modal */}
       {

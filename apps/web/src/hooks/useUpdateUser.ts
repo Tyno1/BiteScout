@@ -1,6 +1,6 @@
-import { useState } from "react";
-import apiClient from "../../utils/authClient";
+import apiClient from "@/utils/authClient";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 
 export function useUpdateUser() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -51,4 +51,4 @@ export function useUpdateUser() {
   };
 
   return { updateUser, isLoading, error };
-}
+} 

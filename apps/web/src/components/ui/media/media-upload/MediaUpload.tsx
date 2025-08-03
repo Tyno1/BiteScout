@@ -1,7 +1,7 @@
 "use client";
 
+import { useMediaUpload } from "@/hooks/media";
 import { useRef, useState } from "react";
-import { uploadFile } from "../../../../utils/mediaApi";
 import { FileDropZone } from "./FileDropZone";
 import { MediaPreview } from "./MediaPreview";
 import { UploadedFilesList } from "./UploadedFilesList";
@@ -24,6 +24,8 @@ export const MediaUpload = ({
   const [files, setFiles] = useState<FileWithPreview[]>(selectedFiles || []);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const uploadMutation = useMediaUpload();
 
   const validateFile = (file: File): boolean => {
     // Validate file type
@@ -95,7 +97,10 @@ export const MediaUpload = ({
             associatedWith: associatedWith?.type && associatedWith?.id ? associatedWith : undefined,
           };
 
-          const result = await uploadFile(fileWithPreview.file, metadata);
+          const result = await uploadMutation.mutateAsync({
+            file: fileWithPreview.file,
+            metadata,
+          });
 
           // Update progress to 100%
           setFiles(prev => prev.map((f, i) => 
