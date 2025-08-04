@@ -1,33 +1,11 @@
 import apiClient from '@/utils/authClient';
 import config from '@/utils/config';
+import { buildQueryParams } from '@/utils/mediaUtils';
 import type { 
   GetMediaResponse,
   PaginatedResponse, 
 } from '@shared/types';
 import axios from 'axios';
-
-// Type aliases for convenience
-export type MediaVariant = {
-  url: string;
-  width?: number;
-  height?: number;
-  format?: string;
-  quality?: string;
-};
-
-
-// Pure function for building query parameters
-const buildQueryParams = (params: Record<string, string | number | boolean>): string => {
-  const searchParams = new URLSearchParams();
-  
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null) {
-      searchParams.append(key, String(value));
-    }
-  }
-
-  return searchParams.toString();
-};
 
 // Get media by ID
 export const getMedia = async (mediaId: string): Promise<GetMediaResponse> => {

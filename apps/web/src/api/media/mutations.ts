@@ -1,14 +1,7 @@
-import apiClient from '@/utils/authClient';
-import config from '@/utils/config';
-import type { 
-  GetMediaResponse,
-  UploadMediaResponse 
-} from '@shared/types';
-import type { Media } from '@shared/types';
-import axios from 'axios';
+import type { components } from '@shared/types';
 
-// Media service response type
-interface MediaServiceResponse {
+// Media service response type (used by mutations)
+type MediaServiceResponse = {
   media: {
     _id: string;
     providerId: string;
@@ -19,13 +12,7 @@ interface MediaServiceResponse {
     mimeType: string;
     width?: number;
     height?: number;
-    variants: Array<{
-      url: string;
-      width?: number;
-      height?: number;
-      format?: string;
-      quality?: string;
-    }>;
+    variants: components['schemas']['MediaVariant'][];
     userId?: string;
     tags?: string[];
     title?: string;
@@ -33,39 +20,17 @@ interface MediaServiceResponse {
     createdAt: Date;
     updatedAt: Date;
   };
-  variants: Array<{
-    url: string;
-    width?: number;
-    height?: number;
-    format?: string;
-    quality?: string;
-  }>;
-}
-
-// Pure function for creating form data
-const createUploadFormData = (
-  file: File,
-  metadata: {
-    title?: string;
-    description?: string;
-    tags?: string[];
-    folder?: string;
-    associatedWith?: Media["associatedWith"];
-  } = {}
-): FormData => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  if (metadata.title) formData.append("title", metadata.title);
-  if (metadata.description) formData.append("description", metadata.description);
-  if (metadata.tags) formData.append("tags", JSON.stringify(metadata.tags));
-  if (metadata.folder) formData.append("folder", metadata.folder);
-  if (metadata.associatedWith) {
-    formData.append("associatedWith", JSON.stringify(metadata.associatedWith));
-  }
-
-  return formData;
+  variants: components['schemas']['MediaVariant'][];
 };
+import apiClient from '@/utils/authClient';
+import config from '@/utils/config';
+import { createUploadFormData } from '@/utils/mediaUtils';
+import type { 
+  GetMediaResponse,
+  UploadMediaResponse 
+} from '@shared/types';
+import type { Media } from '@shared/types';
+import axios from 'axios';
 
 // Upload file
 export const uploadFile = async (

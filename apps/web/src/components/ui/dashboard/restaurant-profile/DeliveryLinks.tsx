@@ -1,16 +1,16 @@
 import { Button } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type { DeliveryLink } from "shared/types/api/schemas";
-import { ExternalLink, Plus, Trash2, Truck, Sparkles, Info } from "lucide-react";
+import { ExternalLink, Info, Plus, Sparkles, Trash2, Truck } from "lucide-react";
 import { useState } from "react";
+import type { DeliveryLink } from "shared/types/api/schemas";
 
 type DeliveryLinksProps = {
   isEditing: boolean;
   restaurantId: string;
   links: DeliveryLink[];
   isLoading: boolean;
-  onAdd: (data: Partial<DeliveryLink>) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
+  onAdd: (data: Partial<DeliveryLink>) => void;
+  onDelete: (id: string) => void;
 };
 
 const DELIVERY_PLATFORMS = [

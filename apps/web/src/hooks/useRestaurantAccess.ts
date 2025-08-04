@@ -21,15 +21,22 @@ import { useRole } from "@/hooks/useRole";
 import { useCallback, useMemo } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
-export const useRestaurantAccess = () => {
+interface UseRestaurantAccessOptions {
+  includeDeliveryLinks?: boolean;
+}
+
+export const useRestaurantAccess = (
+  options: UseRestaurantAccessOptions = {}
+) => {
+  const { includeDeliveryLinks = false } = options;
   const { session, isLoading: roleLoading } = useRole();
-  
+
   // Helper function to determine if user is an owner
   const isOwner = useCallback(() => {
-    return Boolean(session?.user?.restaurantCount && session.user.restaurantCount > 0);
+    return Boolean(
+      session?.user?.restaurantCount && session.user.restaurantCount > 0
+    );
   }, [session?.user?.restaurantCount]);
-
-
 
   // Restaurant mutations
   const updateRestaurantMutation = useUpdateRestaurant();
@@ -66,12 +73,15 @@ export const useRestaurantAccess = () => {
   const updateRoleMutation = useUpdateRestaurantAccessRole();
 
   // Helper function to get restaurant list access (for backward compatibility)
-  const getRestaurantListAccess = useCallback(async (userId: string) => {
-    if (isOwner()) {
-      return refetchOwnerAccess();
-    }
-    return refetchUserAccess();
-  }, [isOwner, refetchOwnerAccess, refetchUserAccess]);
+  const getRestaurantListAccess = useCallback(
+    async (userId: string) => {
+      if (isOwner()) {
+        return refetchOwnerAccess();
+      }
+      return refetchUserAccess();
+    },
+    [isOwner, refetchOwnerAccess, refetchUserAccess]
+  );
 
   // Get the appropriate access data based on user role
   const restaurantAccessList = useMemo(() => {
@@ -108,35 +118,47 @@ export const useRestaurantAccess = () => {
   } = useRestaurant(approvedRestaurantId || "");
 
   // Combine restaurant data based on user role
-  const restaurantData = isOwner() ? ownerRestaurantData : approvedRestaurantData;
-  const restaurantLoading = isOwner() ? ownerRestaurantLoading : approvedRestaurantLoading;
-  const refetchRestaurant = isOwner() ? refetchOwnerRestaurant : refetchApprovedRestaurant;
+  const restaurantData = isOwner()
+    ? ownerRestaurantData
+    : approvedRestaurantData;
+  const restaurantLoading = isOwner()
+    ? ownerRestaurantLoading
+    : approvedRestaurantLoading;
+  const refetchRestaurant = isOwner()
+    ? refetchOwnerRestaurant
+    : refetchApprovedRestaurant;
 
-  // Delivery links query
+  // Delivery links query - only if requested
   const {
     data: deliveryLinksData,
     isLoading: deliveryLinksLoading,
     refetch: refetchDeliveryLinks,
-  } = useDeliveryLinks(restaurantData?._id || "");
-  
+  } = useDeliveryLinks(restaurantData?._id || "", includeDeliveryLinks);
+
   const { data: cuisines, refetch: getCuisines } = useCuisines();
 
   // More precise loading state logic
   const isLoading = useMemo(() => {
     // If we're loading role data, show loading
     if (roleLoading) return true;
-    
+
     // If we have restaurant data, we're not loading
     if (restaurantData?._id) return false;
-    
+
     // If we're loading restaurant data, show loading
     if (restaurantLoading) return true;
-    
+
     // If we're loading access data and user is not an owner, show loading
     if (accessLoading && !session?.user?.restaurantCount) return true;
-    
+
     return false;
-  }, [roleLoading, restaurantLoading, accessLoading, restaurantData?._id, session?.user?.restaurantCount]);
+  }, [
+    roleLoading,
+    restaurantLoading,
+    accessLoading,
+    restaurantData?._id,
+    session?.user?.restaurantCount,
+  ]);
 
   // Helper function to get the first approved restaurant access
   const getFirstApprovedRestaurantId = useCallback(() => {
@@ -165,32 +187,50 @@ export const useRestaurantAccess = () => {
     } catch (error) {
       console.error("Failed to load restaurant data:", error);
     }
-  }, [session?.user?._id, isOwner, refetchRestaurant, refetchApprovedRestaurant, getFirstApprovedRestaurantId]);
+  }, [
+    session?.user?._id,
+    isOwner,
+    refetchRestaurant,
+    refetchApprovedRestaurant,
+    getFirstApprovedRestaurantId,
+  ]);
 
   // Helper function to load restaurant data by specific ID
-  const loadRestaurantDataById = useCallback(async (restaurantId: string) => {
-    if (!restaurantId) return;
+  const loadRestaurantDataById = useCallback(
+    async (restaurantId: string) => {
+      if (!restaurantId) return;
 
-    try {
-      // This would need a different query hook for specific restaurant by ID
-      // For now, we'll use the existing refetch
-      await refetchRestaurant();
-    } catch (error) {
-      console.error("Failed to load restaurant data by ID:", error);
-    }
-  }, [refetchRestaurant]);
+      try {
+        // This would need a different query hook for specific restaurant by ID
+        // For now, we'll use the existing refetch
+        await refetchRestaurant();
+      } catch (error) {
+        console.error("Failed to load restaurant data by ID:", error);
+      }
+    },
+    [refetchRestaurant]
+  );
 
   // Helper function to get restaurant access by status
-  const getRestaurantAccessByStatus = useCallback((status: string) => {
-    return restaurantAccessList.filter((access: RestaurantAccess) => access.status === status);
-  }, [restaurantAccessList]);
+  const getRestaurantAccessByStatus = useCallback(
+    (status: string) => {
+      return restaurantAccessList.filter(
+        (access: RestaurantAccess) => access.status === status
+      );
+    },
+    [restaurantAccessList]
+  );
 
   // Helper function to check if user has access to a specific restaurant
-  const hasAccessToRestaurant = useCallback((restaurantId: string) => {
-    return restaurantAccessList.some(
-      (access: RestaurantAccess) => access.restaurantId === restaurantId && access.status === "approved"
-    );
-  }, [restaurantAccessList]);
+  const hasAccessToRestaurant = useCallback(
+    (restaurantId: string) => {
+      return restaurantAccessList.some(
+        (access: RestaurantAccess) =>
+          access.restaurantId === restaurantId && access.status === "approved"
+      );
+    },
+    [restaurantAccessList]
+  );
 
   // Helper function to get pending access requests
   const getPendingAccessRequests = useCallback(() => {
@@ -210,14 +250,14 @@ export const useRestaurantAccess = () => {
     restaurantAccessList,
     deliveryLinks: deliveryLinksData || [],
     accessError,
-    
+
     // Loading states
     isLoading,
     roleLoading,
     restaurantLoading,
     deliveryLinksLoading,
     accessLoading,
-    
+
     // Helper functions
     isOwner: isOwner(),
     getFirstApprovedRestaurantId,
@@ -227,7 +267,7 @@ export const useRestaurantAccess = () => {
     hasAccessToRestaurant,
     getPendingAccessRequests,
     getApprovedAccess,
-    
+
     // Restaurant Actions
     updateRestaurant: updateRestaurantMutation.mutate,
     createRestaurant: createRestaurantMutation.mutate,
@@ -235,7 +275,7 @@ export const useRestaurantAccess = () => {
     deleteDeliveryLink: deleteDeliveryLinkMutation.mutate,
     getDeliveryLinks: refetchDeliveryLinks,
     getCuisines,
-    
+
     // Restaurant Access Actions
     getRestaurantListAccess,
     createRestaurantAccess: createAccessMutation.mutate,
@@ -246,4 +286,4 @@ export const useRestaurantAccess = () => {
     refetchUserAccess,
     refetchOwnerAccess,
   };
-}; 
+};

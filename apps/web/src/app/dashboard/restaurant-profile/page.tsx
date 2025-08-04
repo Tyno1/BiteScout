@@ -8,10 +8,16 @@ import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile
 import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
+import { useBatchMediaUpload, useMediaWithOptimizedUrl } from "@/hooks/media";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { getMediaUrl } from "@/utils/mediaUtils";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { BusinessHour, Cuisine, DeliveryLink, Restaurant, RestaurantFeature } from "shared/types/api/schemas";
+import type {
+  BusinessHour,
+  Cuisine,
+  DeliveryLink,
+  Restaurant,
+  RestaurantFeature,
+} from "shared/types/api/schemas";
 
 export default function RestaurantProfile() {
   const {
@@ -21,14 +27,12 @@ export default function RestaurantProfile() {
     deliveryLinks,
     isLoading,
     deliveryLinksLoading,
-    
     isOwner,
     updateRestaurant,
     addDeliveryLink,
     deleteDeliveryLink,
     getCuisines,
-  } = useRestaurantAccess();
-
+  } = useRestaurantAccess({ includeDeliveryLinks: true });
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
@@ -36,11 +40,18 @@ export default function RestaurantProfile() {
   // Get the display data (either editable or current)
   const displayData = editableData || restaurantData;
 
-  // Get the hero image from restaurant media
-  const heroImage = getMediaUrl(
-    restaurantData?.logo?.url || restaurantData?.gallery?.[0]?.url,
-    "/api/placeholder/1200/800"
+  // Get the hero image from restaurant media using React Query
+  const mediaId =
+    restaurantData?.logo?.url || restaurantData?.gallery?.[0]?.url;
+  const { data: mediaData, isLoading: mediaLoading } = useMediaWithOptimizedUrl(
+    mediaId || "",
+    "large"
   );
+
+  const heroImage =
+    mediaData?.optimizedUrl ||
+    mediaData?.media?.url ||
+    "/api/placeholder/1200/800";
 
   // Merge business hours from restaurant data with defaults
   const mergedBusinessHours = useMemo(() => {
@@ -85,17 +96,17 @@ export default function RestaurantProfile() {
       console.error("No editable data or ID found");
       return;
     }
-    		try {
-			updateRestaurant({
-				data: editableData,
-				id: editableData._id,
-			});
+    try {
+      updateRestaurant({
+        data: editableData,
+        id: editableData._id,
+      });
 
-			setIsEditing(false);
-			setEditableData(null);
-		} catch (error) {
-			console.error("Error updating restaurant:", error);
-		}
+      setIsEditing(false);
+      setEditableData(null);
+    } catch (error) {
+      console.error("Error updating restaurant:", error);
+    }
   }, [editableData, updateRestaurant]);
 
   const handleEdit = useCallback(() => {
@@ -153,19 +164,23 @@ export default function RestaurantProfile() {
     });
   }, []);
 
+  const handleAddDeliveryLink = useCallback(
+    (data: Partial<DeliveryLink>) => {
+      const currentRestaurantId = restaurantData?._id || "";
+      if (!currentRestaurantId) return;
+      addDeliveryLink({ restaurantId: currentRestaurantId, data });
+    },
+    [restaurantData?._id, addDeliveryLink]
+  );
 
-
-  const handleAddDeliveryLink = useCallback((data: Partial<DeliveryLink>) => {
-    const currentRestaurantId = restaurantData?._id || "";
-    if (!currentRestaurantId) return;
-    addDeliveryLink({ restaurantId: currentRestaurantId, data });
-  }, [restaurantData?._id, addDeliveryLink]);
-
-  const handleDeleteDeliveryLink = useCallback((linkId: string) => {
-    const currentRestaurantId = restaurantData?._id || "";
-    if (!currentRestaurantId) return;
-    deleteDeliveryLink({ restaurantId: currentRestaurantId, linkId });
-  }, [restaurantData?._id, deleteDeliveryLink]);
+  const handleDeleteDeliveryLink = useCallback(
+    (linkId: string) => {
+      const currentRestaurantId = restaurantData?._id || "";
+      if (!currentRestaurantId) return;
+      deleteDeliveryLink({ restaurantId: currentRestaurantId, linkId });
+    },
+    [restaurantData?._id, deleteDeliveryLink]
+  );
 
   const handleBusinessHoursChange = useCallback(
     (
@@ -189,8 +204,6 @@ export default function RestaurantProfile() {
     },
     []
   );
-
-
 
   // Load cuisines
   useEffect(() => {
@@ -221,33 +234,36 @@ export default function RestaurantProfile() {
         <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <div className="text-lg">No restaurant data found.</div>
-            <div className="text-sm text-gray-600">Please contact support if you believe this is an error.</div>
+            <div className="text-sm text-gray-600">
+              Please contact support if you believe this is an error.
+            </div>
           </div>
         </div>
       );
     }
-    
+
     if (hasApprovedAccess) {
       return (
         <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <Spinner />
             <div className="text-lg">Loading restaurant data...</div>
-            <div className="text-sm text-gray-600">Please wait while we fetch your restaurant information.</div>
+            <div className="text-sm text-gray-600">
+              Please wait while we fetch your restaurant information.
+            </div>
           </div>
         </div>
       );
     }
-    
+
     return (
       <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="text-lg">No restaurant access found.</div>
           <div className="text-sm text-gray-600">
-            {isOwner 
+            {isOwner
               ? "This page is for restaurant owners to manage their restaurant profiles."
-              : "You don't have access to any restaurants. Please contact your restaurant administrator."
-            }
+              : "You don't have access to any restaurants. Please contact your restaurant administrator."}
           </div>
         </div>
       </div>
@@ -272,7 +288,7 @@ export default function RestaurantProfile() {
           removeCuisine={removeCuisine}
           isEditing={isEditing}
           addCuisine={addCuisine}
-          cuisines={cuisines}
+          cuisines={cuisines || []}
           editableData={editableData}
           setEditableData={setEditableData}
           displayData={displayData}

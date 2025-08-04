@@ -49,6 +49,7 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
       
       return uploadWithProgress();
     },
+    
     onSuccess: (data, variables) => {
       // Invalidate and refetch relevant queries
       queryClient.invalidateQueries({ queryKey: ["media"] });
