@@ -25,7 +25,7 @@ export default function GalleryPage() {
 	};
 
 	return (
-		<div className="p-6">
+		<div className="w-full mx-auto px-10 py-10 space-y-6">
 			<div className="mb-3 flex justify-between items-center">
 				<div>
 					<h1 className="text-2xl font-bold text-gray-900">Gallery</h1>

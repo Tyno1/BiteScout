@@ -104,7 +104,7 @@ const reviews = [
   // };
 
   return (
-    <div className="container mx-auto p-6">
+    <main className="w-full mx-auto px-10 py-10 space-y-6">
       <div className="grid grid-cols-3 gap-6">
         {/* Reviews List */}
         <div className="col-span-1 bg-white shadow-md rounded-lg">
@@ -218,6 +218,6 @@ const reviews = [
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

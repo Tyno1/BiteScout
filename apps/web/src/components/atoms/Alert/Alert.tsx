@@ -51,6 +51,7 @@ export const Alert = ({
 }: AlertProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const config = statusConfig[status];
+  const Icon = config.icon;
 
   const handleClose = () => {
     setIsVisible(false);
@@ -61,10 +62,11 @@ export const Alert = ({
 
   return (
     <div
-      className={`rounded-lg border p-4 ${config.bgColor} ${config.borderColor} ${className}`}
+      className={`rounded-lg border p-2 ${config.bgColor} ${config.borderColor} ${className}`}
       role="alert"
     >
       <div className={`flex items-start text-sm ${config.textColor}`}>
+        <Icon className={`h-5 w-5 flex-shrink-0 ${config.iconColor} mr-2`} />
         <p className="break-words">{children}</p>
 
         {dismissible && (

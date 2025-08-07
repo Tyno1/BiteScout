@@ -74,9 +74,7 @@ export default function TeamManagement() {
   };
 
   return (
-    <div>
-      <main className="w-full min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <main className="w-full mx-auto px-10 py-10 space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Team Management</h1>
           </div>
@@ -174,8 +172,6 @@ export default function TeamManagement() {
               </ul>
             </div>
           )}
-        </div>
       </main>
-    </div>
   );
 }

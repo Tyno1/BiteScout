@@ -282,10 +282,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
 
 
-
-
-  // functions for table
-
   const handleRowClick = (id: string) => {
     if (restaurantData?._id) {
       router.push(`food-catalogue/${restaurantData._id}/${id}`);
@@ -359,7 +355,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   }, [restaurantData?._id]); // Only depend on restaurantData._id, not the entire object
 
   return (
-    <div className="container mx-auto p-4 w-full">
+    <div className="w-full mx-auto px-10 py-10 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 

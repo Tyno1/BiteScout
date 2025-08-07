@@ -60,17 +60,17 @@ export function Input({
   } as const;
 
   const outlineMap = {
-    round: "border border-gray-500 rounded-sm",
-    bottom: "border-b border-gray-500",
+    round: "border border-foreground/10 rounded-sm",
+    bottom: "border-b border-foreground/10",
     none: "border-none",
   } as const;
 
   const inputTheme =
     theme === "dark"
-      ? "bg-black text-white"
+      ? "bg-background text-foreground"
       : theme === "transparent"
         ? "bg-transparent text-gray-700"
-        : "bg-white text-black";
+        : "bg-input text-input-foreground";
 
   const paddingLeft = icon ? "pl-10" : "";
   const paddingRight = rightButton ? "pr-12" : "";
@@ -83,7 +83,7 @@ export function Input({
         <label
           htmlFor={uniqueId}
           className={clsx(
-            `block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+            `block ${!labelRow && "mb-3"} font-medium text-foreground`,
             labelStyle
           )}
         >
@@ -105,7 +105,7 @@ export function Input({
         {icon && (
           <div
             className={clsx(
-              "absolute top-1/2 left-3 transform -translate-y-1/2 ",
+              "absolute top-1/2 left-3 transform -translate-y-1/2 text-foreground",
               iconStyle
             )}
           >

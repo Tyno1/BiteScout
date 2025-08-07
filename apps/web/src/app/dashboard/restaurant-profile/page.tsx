@@ -43,10 +43,7 @@ export default function RestaurantProfile() {
   // Get the hero image from restaurant media using React Query
   const mediaId =
     restaurantData?.logo?.url || restaurantData?.gallery?.[0]?.url;
-  const { data: mediaData, isLoading: mediaLoading } = useMediaWithOptimizedUrl(
-    mediaId || "",
-    "large"
-  );
+  const { data: mediaData } = useMediaWithOptimizedUrl(mediaId || "", "large");
 
   const heroImage =
     mediaData?.optimizedUrl ||
@@ -271,7 +268,7 @@ export default function RestaurantProfile() {
   }
 
   return (
-    <main className="w-full min-h-screen bg-gray-50">
+    <main className="w-full min-h-screen bg-background">
       <RestaurantProfileHero
         image1={heroImage}
         isEditing={isEditing}
@@ -283,7 +280,7 @@ export default function RestaurantProfile() {
         handleImageUpload={handleImageUpload}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <div className="w-full mx-auto px-10 py-10 space-y-6">
         <BasicInformation
           removeCuisine={removeCuisine}
           isEditing={isEditing}

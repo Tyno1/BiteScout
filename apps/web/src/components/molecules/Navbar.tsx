@@ -9,6 +9,7 @@ import React, { useCallback, useState } from "react";
 import "animate.css";
 import ProfileImg from "@/assets/images/profile.png";
 import { Button } from "../atoms";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { MobileNav } from "./MobileNav";
 
 type NavTheme = {
@@ -61,10 +62,10 @@ export function Navbar({ theme }: NavTheme) {
   return (
     <nav
       className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
-        theme === "dark" ? "bg-[#030811] text-white" : "bg-white text-black"
+        theme === "dark" ? "bg-background  text-white" : "bg-white text-black"
       }`}
     >
-      <Link href="/" className="flex-shrink-0">
+      <Link href="/" className="flex-shrink-0 text-primary">
         <Image src="/logo.png" alt="Bite Scout" width={120} height={40} />
       </Link>
       {/* web view */}
@@ -128,6 +129,9 @@ export function Navbar({ theme }: NavTheme) {
               </li>
             </ul>
           )}
+        </li>
+        <li>
+          <ThemeToggle />
         </li>
       </ul>
       <button

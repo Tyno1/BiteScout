@@ -70,8 +70,8 @@ export function Select({
   };
 
   const outlineMap = {
-    round: "border border-gray-500 rounded-lg",
-    bottom: "border-b border-gray-500",
+    round: "border border-foreground/10 rounded-sm",
+    bottom: "border-b border-foreground/10",
     none: "border-none",
   };
 
@@ -80,7 +80,7 @@ export function Select({
       ? "bg-black text-white"
       : theme === "transparent"
         ? "bg-transparent text-gray-700"
-        : "bg-white text-black";
+        : "bg-input text-input-foreground";
 
   const paddingLeft = icon ? "pl-10" : "";
   const paddingRight = rightButton ? "pr-12" : "";
