@@ -280,7 +280,7 @@ export default function RestaurantProfile() {
         handleImageUpload={handleImageUpload}
       />
 
-      <div className="w-full mx-auto px-10 py-10 space-y-6">
+      <div className="w-full mx-auto px-4 md:px-10 py-10 space-y-4">
         <BasicInformation
           removeCuisine={removeCuisine}
           isEditing={isEditing}

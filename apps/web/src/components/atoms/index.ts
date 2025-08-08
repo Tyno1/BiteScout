@@ -1,5 +1,6 @@
 // export * from "./badges"  un comment this when notification is fixed
 export * from "./Alert"
+export * from "./Badge"
 export * from "./Button"
 export * from "./IconButton"
 export * from "./inputs"

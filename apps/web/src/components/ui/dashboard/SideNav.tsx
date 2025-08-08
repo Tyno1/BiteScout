@@ -36,8 +36,8 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
 
   return (
     <div className="h-[100vh] w-full bg-background border-r border-foreground/10 flex flex-col">
-      <div className="p-4 flex items-center h-full mb-8">
-        <ChefHat size={40} className="mr-2 text-primary" />
+      <div className="p-6 items-center h-full mb-2 hidden md:flex">
+        <ChefHat size={30} className="mr-2 text-primary" />
         <h2 className="text-xl font-bold text-primary">BiteScout</h2>
       </div>
       <nav className="flex-1 p-4 w-full h-full">

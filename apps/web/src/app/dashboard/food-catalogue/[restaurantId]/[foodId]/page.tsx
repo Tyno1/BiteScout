@@ -5,7 +5,6 @@ import { MediaGallery } from "@/components/ui/media";
 import { useFoodCatalogueById } from "@/hooks/food-catalogue";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
 
 // Utility function to capitalize first character
 const CapitalizeFirstCharacter = (str: string): string => {
@@ -15,19 +14,18 @@ const CapitalizeFirstCharacter = (str: string): string => {
 export default function FoodDetailPage() {
   const params = useParams();
   const { foodId, restaurantId } = params;
-  	const { data: foodData, isLoading, error } = useFoodCatalogueById(
-		restaurantId as string, 
-		foodId as string
-	);
+  const {
+    data: foodData,
+    isLoading,
+    error,
+  } = useFoodCatalogueById(restaurantId as string, foodId as string);
   const router = useRouter();
-
-
 
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-600">Loading...</h1>
+          <h1 className="text-2xl font-bold text-foreground">Loading...</h1>
         </div>
       </div>
     );
@@ -41,7 +39,7 @@ export default function FoodDetailPage() {
           <h1 className="text-2xl font-bold text-red-600">
             Error loading food data
           </h1>
-          <p className="text-gray-600">{error.message}</p>
+          <p className="text-foreground">{error.message}</p>
         </div>
       </div>
     );
@@ -51,44 +49,45 @@ export default function FoodDetailPage() {
   if (!foodData || foodData._id === "") {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-600">
-            Food item not found
-          </h1>
-          <p className="text-gray-500 mt-2">
+        <div className="text-center text-foreground">
+          <h1 className="text-2xl font-bold ">Food item not found</h1>
+          <p className="mt-2">
             The food item you&apos;re looking for doesn&apos;t exist or has been
             removed.
           </p>
-          <div className="mt-6">
-            <a
-              href="/dashboard/food-catalogue"
-              className="text-blue-600 hover:text-blue-800 underline"
-            >
-              ← Back to Food Catalogue
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full mx-auto px-6 py-6">
-      {/* Page Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-4 mb-2">
           <Button
+            text="Back to Food Catalogue"
             onClick={() => router.back()}
             variant="plain"
             size="sm"
             className="text-gray-600 hover:text-gray-900 p-2"
             IconBefore={<ArrowLeft className="h-4 w-4" />}
           />
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
+      {/* Page Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-2">
+          <Button
+            onClick={() => router.back()}
+            color="primary"
+            variant="plain"
+            size="sm"
+            className="text-gray-600 hover:text-gray-900 p-2"
+            IconBefore={<ArrowLeft className="h-4 w-4" />}
+          />
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
             {CapitalizeFirstCharacter(foodData?.name || "")}
           </h1>
         </div>
-        <p className="text-xs text-gray-500 mt-1 font-mono">ID: {foodData?._id}</p>
+        <p className="text-xs text-foreground/30 mt-1 font-mono">
+          ID: {foodData?._id}
+        </p>
       </div>
 
       <div className="grid md:grid-cols-5 gap-4 items-start">
@@ -103,7 +102,7 @@ export default function FoodDetailPage() {
               className="max-w-sm"
             />
           ) : (
-            <div className="aspect-[3/4] bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-base border shadow-inner max-w-sm">
+            <div className="aspect-[3/4] bg-foreground/20 rounded-xl flex items-center justify-center text-foreground/50 text-base border border-foreground/20 shadow-inner max-w-sm">
               No image available
             </div>
           )}
@@ -117,37 +116,45 @@ export default function FoodDetailPage() {
               <span className="text-2xl font-bold text-primary">
                 {foodData.price.currency} {foodData.price.amount}
               </span>
-              <span className="text-xs text-gray-600">per serving</span>
+              <span className="text-xs text-foreground">per serving</span>
             </div>
           </div>
 
           {/* Basic Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-1 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-foreground mb-4 pb-1 border-b border-foreground/50">
               Basic Information
             </h2>
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="font-medium text-gray-700 text-sm">Cuisine Type</span>
-                <span className="text-gray-900 font-semibold text-sm">{foodData.cuisineType.name}</span>
+              <div className="flex items-center justify-between py-2 border-b border-foreground/50">
+                <span className="font-medium text-foreground text-sm">
+                  Cuisine Type
+                </span>
+                <span className="text-foreground font-semibold text-sm">
+                  {foodData.cuisineType.name}
+                </span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="font-medium text-gray-700 text-sm">Course</span>
-                <span className="text-gray-900 font-semibold text-sm">{foodData.course.name}</span>
+              <div className="flex items-center justify-between py-2 border-b border-foreground/50">
+                <span className="font-medium text-foreground text-sm">
+                  Course
+                </span>
+                <span className="text-foreground font-semibold text-sm">
+                  {foodData.course.name}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Ingredients */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-1 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-foreground mb-4 pb-1 border-b border-foreground/50">
               Ingredients
             </h2>
             <div className="flex flex-wrap gap-2">
               {foodData.ingredients.map((ingredient: string, index: number) => (
                 <span
                   key={`ingredient-${index}-${ingredient}`}
-                  className="px-3 py-1 bg-blue-50 text-blue-900 rounded-full text-xs font-medium border border-blue-200 hover:bg-blue-100 transition-colors"
+                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20 hover:bg-primary/20 transition-colors"
                 >
                   {ingredient}
                 </span>
@@ -158,14 +165,14 @@ export default function FoodDetailPage() {
           {/* Allergens */}
           {foodData.allergens && foodData.allergens.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-1 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-foreground mb-4 pb-1 border-b border-foreground/50">
                 Allergens
               </h2>
               <div className="flex flex-wrap gap-2">
                 {foodData.allergens.map((allergen, index: number) => (
                   <span
                     key={`allergen-${index}-${allergen._id || allergen.name}`}
-                    className="px-3 py-1 bg-red-50 text-red-900 rounded-full text-xs font-medium border border-red-200 hover:bg-red-100 transition-colors"
+                    className="px-3 py-1 bg-red-50 text-danger rounded-full text-xs font-medium border border-danger/20 hover:bg-danger/10 transition-colors"
                   >
                     {allergen.name}
                   </span>
@@ -177,19 +184,23 @@ export default function FoodDetailPage() {
           {/* Restaurant Information */}
           {foodData.restaurant && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-1 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-foreground mb-4 pb-1 border-b border-foreground/50">
                 Restaurant
               </h2>
               <div className="space-y-2">
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700 text-sm">Restaurant ID</span>
-                  <span className="text-gray-900 font-mono text-xs">{foodData.restaurant}</span>
+                <div className="flex items-center justify-between py-2 border-b border-foreground/50">
+                  <span className="font-medium text-foreground text-sm">
+                    Restaurant ID
+                  </span>
+                  <span className="text-foreground font-mono text-xs">
+                    {foodData.restaurant}
+                  </span>
                 </div>
               </div>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

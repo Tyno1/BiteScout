@@ -1,0 +1,25 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as BadgeStories from "./Badge.stories"
+
+<Meta of={BadgeStories}/>
+
+# Badge
+
+A small, compact component used to display status, categories, or labels. The Badge component follows the same design system as the Button component with colors, variants, and sizing options.
+
+## Usage
+
+Import the Badge component from your atoms folder. Use it to display status information, categories, or labels. The component supports different colors, variants, and sizes that match your design system.
+
+## Interactive Example
+
+<Canvas of={BadgeStories.Default}/>
+
+## Props
+
+- **children** (React.ReactNode) - The content to display inside the badge
+- **color** (primary, secondary, danger, success, neutral, default: neutral) - The color theme of the badge
+- **variant** (solid, outline, plain, glass, default: solid) - The visual style variant
+- **size** (xs, sm, md, default: sm) - The size of the badge
+- **className** (string, default: "") - Additional CSS classes
+
