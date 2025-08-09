@@ -1,5 +1,5 @@
-import type { formErrorType } from "@/app/dashboard/food-catalogue/page";
 import { Button, IconButton, Input, Select } from "@/components/atoms";
+import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm";
 import { X } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
@@ -23,7 +23,7 @@ type FoodCatalogueModalType = {
   handleRemoveIngredients: (ingredient: string) => void;
   setIngredient: (ingredient: string) => void;
   ingredient: string;
-  formError: formErrorType;
+  formError: FormErrorType;
   FormWarning: (message: string) => ReactNode;
 };
 export function AddNewFood({
@@ -122,14 +122,16 @@ export function AddNewFood({
             })) || [])
           ]}
           value={newFood?.cuisineType?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCuisine = e.target.value 
+              ? cuisineData.find((cuisine) => cuisine._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+            
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              cuisineType: cuisineData.find(
-                (cuisine) => cuisine._id === e.target.value
-              ) as Cuisine,
-            }))
-          }
+              cuisineType: selectedCuisine as Cuisine,
+            }));
+          }}
           errorMessage={
             formError.cuisineType && FormWarning(formError.cuisineType)
           }
@@ -148,14 +150,16 @@ export function AddNewFood({
             })) || [])
           ]}
           value={newFood?.course?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCourse = e.target.value 
+              ? courseData.find((course) => course._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+            
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              course: courseData.find(
-                (course) => course._id === e.target.value
-              ) as Course,
-            }))
-          }
+              course: selectedCourse as Course,
+            }));
+          }}
           errorMessage={formError?.course && FormWarning(formError.course)}
         />
 
@@ -173,16 +177,19 @@ export function AddNewFood({
             inputMode="decimal"
             placeholder="0.00"
             value={newFood.price.amount}
-            onChange={(e) =>
+            onChange={(e) => {
+              const value = e.target.value;
+              const amount = value === "" ? 0 : Number.parseFloat(value) || 0;
+              
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,
                 price: {
                   ...prev.price,
-                  amount: Number.parseFloat(e.target.value),
+                  amount: amount,
                 },
-              }))
-            }
-            errorMessage={formError.name && FormWarning(formError.price ?? "Price is required")}
+              }));
+            }}
+            errorMessage={formError.price && FormWarning(formError.price)}
           />
 
           <Select
@@ -261,7 +268,7 @@ export function AddNewFood({
           {allergenData.map((allergen: Allergen) => (
             <Button
               size="sm"
-              color="black"
+              color="neutral"
               variant={
                 newFood.allergens?.some((a) => a._id === allergen._id)
                   ? "solid"

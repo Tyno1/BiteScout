@@ -1,0 +1,163 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as AlertModalStories from './AlertModal.stories';
+
+<Meta of={AlertModalStories} />
+
+# AlertModal
+
+A confirmation modal component for critical user actions. The AlertModal provides a clear interface for confirming or canceling destructive operations like deletion, form submission, or other important decisions.
+
+## Usage
+
+```tsx
+import { AlertModal } from '@/components/molecules';
+
+function MyComponent() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleDelete = () => {
+    // Perform delete action
+    console.log('Item deleted');
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(true)}>
+        Delete Item
+      </button>
+      
+      <AlertModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Delete Item"
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        onConfirm={handleDelete}
+      >
+        Are you sure you want to delete this item? This action cannot be undone.
+      </AlertModal>
+    </>
+  );
+}
+```
+
+## Examples
+
+### Default Confirmation
+
+<Canvas of={AlertModalStories.Default} />
+
+### Delete Confirmation
+
+<Canvas of={AlertModalStories.DeleteConfirmation} />
+
+### Loading State
+
+<Canvas of={AlertModalStories.LoadingState} />
+
+## Props
+
+### Required Props
+- **isOpen** - Whether the modal is visible
+- **onClose** - Function called when the modal should close
+- **title** - Title displayed at the top of the modal
+- **children** - Content/message to display in the modal body
+- **onConfirm** - Function called when the confirm button is clicked
+
+### Optional Props
+- **confirmText** - Text for the primary action button (default: "Confirm")
+- **cancelText** - Text for the secondary action button (default: "Cancel")
+- **onCancel** - Custom function for cancel action (defaults to onClose)
+- **confirmVariant** - Color variant for confirm button: "primary", "danger", "success", "neutral"
+- **cancelVariant** - Color variant for cancel button: "primary", "secondary", "danger", "success", "neutral"
+- **isLoading** - Shows loading state on confirm button
+- **className** - Additional CSS classes for the modal
+- **disableBackdropClose** - Prevents closing when clicking outside
+- **disableEscapeClose** - Prevents closing when pressing Escape key
+
+## Features
+
+### Accessibility
+- Uses semantic `<dialog>` element
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- Focus management
+
+### User Experience
+- Backdrop blur effect
+- Smooth animations
+- Loading states
+- Escape key support
+- Click outside to close
+
+### Safety Features
+- Prevent accidental closure options
+- Clear visual hierarchy
+- Consistent button styling
+- Loading state protection
+
+## Best Practices
+
+### When to Use
+- **Destructive actions** - Deleting items, clearing data
+- **Form submissions** - Confirming important form data
+- **Navigation** - Leaving unsaved changes
+- **Critical decisions** - Actions that can't be easily undone
+
+### Content Guidelines
+- Keep titles short and descriptive
+- Explain the consequences clearly
+- Use action-oriented button text
+- Highlight irreversible actions
+
+### Visual Design
+- Use danger variant for destructive actions
+- Use primary variant for positive confirmations
+- Provide loading states for async operations
+- Consider the user's mental model
+
+## Variants
+
+### Destructive Actions
+```tsx
+<AlertModal
+  title="Delete Account"
+  confirmText="Delete Forever"
+  confirmVariant="danger"
+  onConfirm={handleDeleteAccount}
+>
+  <p>This will permanently delete your account and all associated data.</p>
+  <p className="font-medium text-red-600">This action cannot be undone.</p>
+</AlertModal>
+```
+
+### Save Confirmations
+```tsx
+<AlertModal
+  title="Save Changes"
+  confirmText="Save"
+  confirmVariant="success"
+  onConfirm={handleSave}
+>
+  You have unsaved changes. Would you like to save before continuing?
+</AlertModal>
+```
+
+### Critical Operations
+```tsx
+<AlertModal
+  title="Critical Action"
+  confirmText="I Understand"
+  disableBackdropClose
+  disableEscapeClose
+  onConfirm={handleCriticalAction}
+>
+  This action will affect system-wide settings and cannot be reversed.
+</AlertModal>
+```
+
+## Integration Notes
+
+The AlertModal integrates seamlessly with your existing modal system and follows the same design patterns as other components in your design system. It uses the same Button component for consistency and supports all the standard color variants. 

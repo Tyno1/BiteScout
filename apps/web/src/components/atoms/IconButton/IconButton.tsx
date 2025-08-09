@@ -10,7 +10,6 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	type?: "button" | "submit" | "reset";
 	name?: string;
 	value?: string;
-	onClick: () => void;
 	className?: string;
 	variant: "solid" | "outline" | "plain" | "glass";
 	ariaLabel?: string;
@@ -113,7 +112,7 @@ export function IconButton({
 			name={name}
 			value={value}
 			className={combinedClassName}
-			aria-label={ariaLabel}
+			aria-label={ariaLabel || name}
 			aria-disabled={disabled}
 			aria-pressed={isPressed}
 			aria-expanded={isExpanded}

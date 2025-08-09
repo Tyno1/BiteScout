@@ -1,77 +1,28 @@
 "use client";
 
 import { Alert, Button } from "@/components/atoms";
+import { AlertModal } from "@/components/molecules";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
-import { Modal } from "@/components/organisms";
-import { AddNewFood, Table } from "@/components/ui";
+import { Card, Modal } from "@/components/organisms";
+import { AddNewFood } from "@/components/ui";
+import { FoodCatalogueList } from "@/components/ui/dashboard/food-catalogue/FoodCatalogueList";
 import { MediaUpload } from "@/components/ui/media";
-import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
-import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
+
 import { useAllergens } from "@/hooks/allergens";
 import { useCourses } from "@/hooks/courses";
 import { useCuisines } from "@/hooks/cuisines";
 import {
-  useCreateFoodCatalogue,
+  useDeleteFoodCatalogue,
   useFoodCatalogueByRestaurant,
+  useFoodCatalogueForm,
 } from "@/hooks/food-catalogue";
-import { useMediaUpload } from "@/hooks/media";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
+
+import type { FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import { z } from "zod";
-
-// Zod validation schema
-const foodCatalogueSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  ingredients: z
-    .array(z.string())
-    .min(1, "At least one ingredient is required"),
-  cuisineType: z.object({
-    name: z.string().min(1, "Cuisine type is required"),
-    description: z.string().optional(),
-    _id: z.string().optional(),
-  }),
-  course: z.object({
-    name: z.string().min(1, "Course is required"),
-    description: z.string().optional(),
-    _id: z.string().optional(),
-  }),
-  price: z.object({
-    amount: z.number().positive("Price amount must be positive"),
-    currency: z.enum([
-      "USD",
-      "EUR",
-      "GBP",
-      "CAD",
-      "AUD",
-      "JPY",
-      "CNY",
-      "KRW",
-      "MYR",
-      "TWD",
-      "VND",
-      "THB",
-      "ZAR",
-    ]),
-  }),
-  restaurant: z.string().min(1, "Restaurant is required"),
-  allergens: z.array(z.any()).optional(),
-  images: z.array(z.string()).optional(),
-}) satisfies z.ZodType<FoodCatalogue>;
-
-export type formErrorType = Partial<{
-  name: string;
-  ingredients: string;
-  cuisineType: string;
-  course: string;
-  price: string;
-  allergens: string;
-  images: string;
-  restaurant: string;
-}>;
 
 export default function FoodCatalogueManagement(): React.ReactElement {
   const CURRENCIES: Currency[] = [
@@ -89,16 +40,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     "THB",
     "ZAR",
   ];
-  const DEFAULT_FORM_ERROR = {
-    name: "",
-    ingredients: "",
-    cuisineType: "",
-    course: "",
-    price: "",
-    allergens: "",
-    images: "",
-    restaurant: "",
-  };
 
   const { restaurantData } = useRestaurantAccess();
   const {
@@ -106,9 +47,55 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     error,
     isLoading,
   } = useFoodCatalogueByRestaurant(restaurantData?._id || "");
-  const createFoodDataMutation = useCreateFoodCatalogue();
-  const uploadMutation = useMediaUpload();
+
+  // Modal state
   const [activeTab, setActiveTab] = useState<string>("food-data");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [formMode, setFormMode] = useState<"create" | "update">("create");
+  const [editingFood, setEditingFood] = useState<FoodCatalogue | undefined>(
+    undefined
+  );
+
+  // Delete confirmation modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
+  // Form hook with business logic
+  const {
+    newFood,
+    formError,
+    ingredient,
+    selectedMediaFiles,
+    existingImages,
+    isLoadingExistingImages,
+    isSubmitting,
+    isUploadingImages,
+    uploadProgress,
+    hasFormErrors,
+    modalTitle,
+    submitButtonText,
+    setNewFood,
+    setIngredient,
+    setSelectedMediaFiles,
+    handleRemoveExistingImage,
+    handleSubmitFood,
+    toggleAllergen,
+    handleAddIngredients,
+    handleRemoveIngredients,
+    resetForm,
+    validateForm,
+  } = useFoodCatalogueForm({
+    restaurantId: restaurantData?._id || "",
+    mode: formMode,
+    initialData: editingFood,
+    foodId: editingFood?._id,
+    onSuccess: () => {
+      setIsModalOpen(false);
+      setActiveTab("food-data");
+      setFormMode("create");
+      setEditingFood(undefined);
+    },
+  });
   const {
     data: allergens,
     refetch: getAllergens,
@@ -130,193 +117,68 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   } = useCourses();
 
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [ingredient, setIngredient] = useState<string>("");
-  const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
-  const [selectedMediaFiles, setSelectedMediaFiles] = useState<
-    FileWithPreview[]
-  >([]);
-  const [newFood, setNewFood] = useState<FoodCatalogue>({
-    ...DEFAULT_FOOD_DATA,
-    restaurant: restaurantData?._id || "",
-  });
 
-  const validateForm = (): boolean => {
-    // Validate form data using Zod
-    const validationResult = foodCatalogueSchema.safeParse(newFood);
-    console.log(validationResult.error?.errors);
-
-    if (!validationResult.success) {
-      // Convert Zod errors to form error format
-      const errors: formErrorType = {};
-      for (const error of validationResult.error.errors) {
-        const field = error.path[0] as keyof formErrorType;
-        errors[field] = error.message;
-      }
-      console.log(errors);
-
-      setFormError(errors);
-      setIsSubmitting(false);
-      return false; // Validation failed
-    }
-
-    // Clear errors if validation passes
-    setFormError(DEFAULT_FORM_ERROR);
-    return true; // Validation passed
-  };
-  // functions for modal
-  const handleAddFood = async () => {
-    if (isSubmitting) return; // Prevent double submission
-
-    setIsSubmitting(true);
-    setIsUploadingImages(false);
-    setUploadProgress(0);
-
-    try {
-      // Validate form first
-      if (!validateForm()) {
-        return; // Validation failed, errors are already set
-      }
-
-      // Upload selected images first
-      const uploadedImageIds: string[] = [];
-      if (selectedMediaFiles.length > 0) {
-        setIsUploadingImages(true);
-        try {
-          let completedUploads = 0;
-          const totalUploads = selectedMediaFiles.length;
-
-          const uploadPromises = selectedMediaFiles.map(
-            async (fileWithPreview, index) => {
-              const metadata = {
-                title: fileWithPreview.title || undefined,
-                description: fileWithPreview.description || undefined,
-                tags: fileWithPreview.tags
-                  ? fileWithPreview.tags.split(",").map((tag) => tag.trim())
-                  : undefined,
-                folder: "food-images",
-              };
-
-              const result = await uploadMutation.mutateAsync({
-                file: fileWithPreview.file,
-                metadata,
-              });
-              completedUploads++;
-              setUploadProgress(
-                Math.round((completedUploads / totalUploads) * 100)
-              );
-              return result._id;
-            }
-          );
-
-          const results = await Promise.all(uploadPromises);
-          uploadedImageIds.push(
-            ...(results.filter((id: string | undefined) => id) as string[])
-          );
-        } catch (uploadError) {
-          console.error("Failed to upload images:", uploadError);
-          // Continue with food creation even if image upload fails
-        } finally {
-          setIsUploadingImages(false);
-        }
-      }
-
-      // Prepare food data for backend with uploaded image IDs
-      const foodDataForBackend = {
-        ...newFood,
-        restaurant: restaurantData?._id || "",
-        images: uploadedImageIds,
-      };
-
-      // Create the food
-      const result =
-        await createFoodDataMutation.mutateAsync(foodDataForBackend);
-
-      if (result) {
-        // Note: Media association is handled automatically by the backend during upload
-        // The uploadedImageIds are already included in the food data
-
-        // Close modal and reset form
-        setIsModalOpen(false);
-        setNewFood({
-          ...DEFAULT_FOOD_DATA,
-          restaurant: restaurantData?._id || "",
-        });
-        setFormError(DEFAULT_FORM_ERROR);
-        setSelectedMediaFiles([]);
-      } else {
-        console.error("Failed to create food");
-        // Handle error appropriately
-      }
-    } catch (error) {
-      console.error("Failed to create food:", error);
-      // Handle error appropriately
-    } finally {
-      setIsSubmitting(false);
-      setIsUploadingImages(false);
-      setUploadProgress(0);
-    }
-  };
-
-  const closeModal = () => {
+  // Modal handlers
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
-    setNewFood({
-      ...DEFAULT_FOOD_DATA,
-      restaurant: restaurantData?._id || "",
-    });
-    setFormError(DEFAULT_FORM_ERROR);
-    setSelectedMediaFiles([]);
-    setIsUploadingImages(false);
-    setUploadProgress(0);
-    setActiveTab("food-data"); // Reset to first tab
-  };
+    resetForm();
+    setActiveTab("food-data");
+  }, [resetForm]);
 
-  // create a component for form warning
-  const FormWarning = (message: string) => {
+  // Form warning component
+  const FormWarning = useCallback((message: string) => {
     return <div className="text-xs text-destructive">{message}</div>;
-  };
+  }, []);
 
-  const toggleAllergen = (allergen: Allergen): void => {
-    setNewFood((prev) => ({
-      ...prev,
-      allergens: (prev.allergens || []).some((a) => a._id === allergen._id)
-        ? (prev.allergens || []).filter((a) => a._id !== allergen._id)
-        : [...(prev.allergens || []), allergen],
-    }));
-  };
+  // Handler for opening modal in create mode
+  const handleAddFood = useCallback(() => {
+    setFormMode("create");
+    setEditingFood(undefined);
+    setIsModalOpen(true);
+    setActiveTab("food-data");
+  }, []);
 
-  const handleAddIngredients = (ingredient: string) => {
-    if (!ingredient) {
-      return;
-    }
-    if (newFood.ingredients.includes(ingredient)) {
-      setFormError({ ingredients: "ingredient already included" });
-      return;
-    }
-
-    setNewFood((prev) => ({
-      ...prev,
-      ingredients: [...prev.ingredients, ingredient],
-    }));
-    setIngredient("");
-    setFormError((prev) => ({ ...prev, ingredients: "" }));
-  };
-
-  const handleRemoveIngredients = (ingredient: string): void => {
-    setNewFood((prev) => ({
-      ...prev,
-      ingredients: prev.ingredients.filter((i) => i !== ingredient),
-    }));
-  };
+  // Handler for opening modal in edit mode
+  const handleEditFood = useCallback(
+    (id: string) => {
+      const foodToEdit = foodDatas?.find((food) => food._id === id);
+      if (foodToEdit) {
+        setFormMode("update");
+        setEditingFood(foodToEdit);
+        setIsModalOpen(true);
+        setActiveTab("food-data");
+      } else {
+        console.error("Food item not found for editing:", id);
+      }
+    },
+    [foodDatas]
+  );
 
   const handleRowClick = (id: string) => {
     if (restaurantData?._id) {
       router.push(`food-catalogue/${restaurantData._id}/${id}`);
     }
   };
+
+  const deleteFoodMutation = useDeleteFoodCatalogue();
+
+  const handleDeleteFood = useCallback((id: string) => {
+    setItemToDelete(id);
+    setDeleteModalOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (itemToDelete && restaurantData?._id) {
+      deleteFoodMutation.mutate({
+        restaurantId: restaurantData._id,
+        foodId: itemToDelete,
+      });
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  }, [itemToDelete, restaurantData?._id, deleteFoodMutation]);
+
+  
 
   const tabs: TabItem[] = [
     {
@@ -344,12 +206,22 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       key: "media-upload",
       label: "Media Upload",
       content: (
-        <MediaUpload
-          uploadMode="auto"
-          selectedFiles={selectedMediaFiles}
-          onSelectedFilesChange={setSelectedMediaFiles}
-          onUploadError={(error) => console.error("Upload error:", error)}
-        />
+        <div className="space-y-4">
+          {isLoadingExistingImages && (
+            <div className="flex items-center gap-2 text-blue-600 text-sm">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+              <span>Loading existing images...</span>
+            </div>
+          )}
+          <MediaUpload
+            uploadMode="auto"
+            selectedFiles={selectedMediaFiles}
+            uploadedFiles={existingImages}
+            onSelectedFilesChange={setSelectedMediaFiles}
+            onRemoveUploadedFile={handleRemoveExistingImage}
+            onUploadError={(error) => console.error("Upload error:", error)}
+          />
+        </div>
       ),
     },
   ];
@@ -373,28 +245,13 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     stableGetAllergens();
   }, [stableGetCuisines, stableGetCourses, stableGetAllergens]);
 
-  useEffect(() => {
-    if (restaurantData?._id) {
-      console.log("Fetching food data for restaurant:", restaurantData._id);
-
-      setNewFood((prev) => ({
-        ...prev,
-        restaurant: restaurantData._id as string,
-      }));
-    }
-  }, [restaurantData?._id]); // Only depend on restaurantData._id, not the entire object
-
   return (
     <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
         {foodDatas && foodDatas.length > 0 ? (
-          <Button
-            variant="solid"
-            text="Add New Item"
-            onClick={() => setIsModalOpen(true)}
-          />
+          <Button variant="solid" text="Add New Item" onClick={handleAddFood} />
         ) : null}
       </div>
 
@@ -439,13 +296,18 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         </div>
       )}
 
-      {/* Food Catalogue Table or Empty State - Only show when not loading */}
+      {/* Food Catalogue Display - Only show when not loading */}
       {!isLoading &&
         !allergenLoading &&
         !cuisineLoading &&
         !courseLoading &&
         (foodDatas && foodDatas.length > 0 ? (
-          <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
+          <FoodCatalogueList
+            foodDatas={foodDatas}
+            handleRowClick={handleRowClick}
+            handleDelete={handleDeleteFood}
+            handleEdit={handleEditFood}
+          />
         ) : foodDatas && foodDatas.length === 0 ? (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
@@ -475,78 +337,99 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               <Button
                 variant="solid"
                 text="Add Your First Food Item"
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleAddFood}
                 className="inline-flex items-center"
               />
             </div>
           </div>
         ) : null)}
 
+      {/* Delete Confirmation Modal */}
+      <AlertModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        }}
+        title="Delete Food Item"
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        onConfirm={confirmDelete}
+        isLoading={deleteFoodMutation.isPending}
+      >
+        <div>
+          <p className="mb-2">
+            Are you sure you want to delete this food item?
+          </p>
+          <p className="text-sm text-red-600">
+            This action cannot be undone and will remove the item from your
+            menu.
+          </p>
+        </div>
+      </AlertModal>
+
       {/* Modal */}
-      {
-        <Modal
-          modalDescription={
-            Object.values(formError).some(
-              (error) => error && error.length > 0
-            ) ? (
-              <Alert status="error">Please fill in all the fields</Alert>
-            ) : isUploadingImages ? (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-600">Uploading images...</span>
-                  <span className="text-blue-600 font-medium">
-                    {uploadProgress}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-gray-600">
-                  {selectedMediaFiles.length} image
-                  {selectedMediaFiles.length > 1 ? "s" : ""} being uploaded
-                </p>
+      <Modal
+        modalDescription={
+          hasFormErrors ? (
+            <Alert status="error">Please fill in all the fields</Alert>
+          ) : isUploadingImages ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-blue-600">Uploading images...</span>
+                <span className="text-blue-600 font-medium">
+                  {uploadProgress}%
+                </span>
               </div>
-            ) : undefined
-          }
-          size="lg"
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          modalTitle="Add New Food Item"
-          modalActionText={
-            activeTab === tabs[tabs.length - 1].key
-              ? isUploadingImages
-                ? "Uploading Images..."
-                : isSubmitting
-                  ? "Creating Food..."
-                  : "Add Food"
-              : "Next Step"
-          }
-          modalActionOnClick={() => {
-            if (activeTab === tabs[tabs.length - 1].key) {
-              handleAddFood();
-            } else {
-              if (validateForm()) {
-                const currentIndex = tabs.findIndex(
-                  (tab) => tab.key === activeTab
-                );
-                setActiveTab(tabs[currentIndex + 1].key);
-              }
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-600">
+                {selectedMediaFiles.length} image
+                {selectedMediaFiles.length > 1 ? "s" : ""} being uploaded
+              </p>
+            </div>
+          ) : undefined
+        }
+        size="lg"
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        modalTitle={modalTitle}
+        modalActionText={
+          activeTab === tabs[tabs.length - 1].key
+            ? isUploadingImages
+              ? "Uploading Images..."
+              : isSubmitting
+                ? "Creating Food..."
+                : submitButtonText
+            : "Next Step"
+        }
+        modalActionOnClick={() => {
+          if (activeTab === tabs[tabs.length - 1].key) {
+            handleSubmitFood();
+          } else {
+            if (validateForm()) {
+              const currentIndex = tabs.findIndex(
+                (tab) => tab.key === activeTab
+              );
+              setActiveTab(tabs[currentIndex + 1].key);
             }
-          }}
-          closeModal={closeModal}
-          isSubmitting={isSubmitting || isUploadingImages}
-        >
-          <Tabs
-            tabs={tabs}
-            defaultTab="food-data"
-            selectedTab={activeTab}
-            onTabChange={(tabKey) => setActiveTab(tabKey)}
-          />
-        </Modal>
-      }
+          }
+        }}
+        closeModal={closeModal}
+        isSubmitting={isSubmitting || isUploadingImages}
+      >
+        <Tabs
+          tabs={tabs}
+          defaultTab="food-data"
+          selectedTab={activeTab}
+          onTabChange={(tabKey) => setActiveTab(tabKey)}
+        />
+      </Modal>
     </main>
   );
 }
