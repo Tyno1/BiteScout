@@ -1,0 +1,83 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as AlertStories from "./Alert.stories"
+
+<Meta of={AlertStories}/>
+
+# Alert
+
+Alert components are used to communicate important messages to users. They provide contextual feedback and can display different types of information with appropriate styling and icons.
+
+## Features
+
+- **Multiple status types**: warning, information, error, and success
+- **Icon integration**: Automatically displays relevant icons for each status
+- **Dismissible**: Optional close functionality
+- **Accessible**: Full ARIA support and keyboard navigation
+- **Customizable**: Support for custom content and styling
+- **Responsive**: Works across all device sizes
+
+## Alert Types
+
+### Warning Alert
+Use warning alerts to highlight important information that requires user attention.
+
+<Canvas of={AlertStories.Warning}/>
+
+### Information Alert
+Information alerts provide helpful context or neutral information to users.
+
+<Canvas of={AlertStories.Information}/>
+
+### Error Alert
+Error alerts communicate problems, failures, or critical issues that need immediate attention.
+
+<Canvas of={AlertStories.ErrorAlert}/>
+
+### Success Alert
+Success alerts confirm that an action has been completed successfully.
+
+<Canvas of={AlertStories.Success}/>
+
+
+## Usage
+
+```tsx
+import { Alert } from "@/components/atoms";
+
+// Basic alert
+<Alert status="warning">
+  This is a warning message
+</Alert>
+
+// Dismissible alert
+<Alert 
+  status="error" 
+  dismissible={true}
+  onClose={() => console.log('Alert closed')}
+>
+  This alert can be dismissed
+</Alert>
+
+// Custom styling
+<Alert 
+  status="success" 
+  className="mb-4"
+>
+  Custom styled alert with margin
+</Alert>
+```
+
+## Props
+
+- **status**: `"warning" | "information" | "error" | "success"` - Determines the alert type and styling
+- **children**: `React.ReactNode` - The content to display in the alert
+- **dismissible**: `boolean` - Whether the alert can be closed (optional)
+- **onClose**: `() => void` - Callback function when alert is dismissed (optional)
+- **className**: `string` - Additional CSS classes (optional)
+
+## Accessibility
+
+- Uses proper ARIA `role="alert"` for screen readers
+- Keyboard navigable dismiss button
+- Color and icon combinations meet WCAG contrast requirements
+- Clear visual hierarchy with appropriate spacing

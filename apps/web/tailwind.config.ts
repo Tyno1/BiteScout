@@ -15,7 +15,7 @@ const config: Config = {
   },
   plugins: [
     require('tw-animate-css'),
-    plugin(function({ addVariant }) {
+    plugin(({ addVariant }) => {
       addVariant('dark', '&:is(.dark *)');
     }),
   ],

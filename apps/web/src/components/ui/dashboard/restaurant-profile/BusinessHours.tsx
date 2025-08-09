@@ -1,12 +1,16 @@
-import { Input } from "@/components/atoms";
+import { Alert, Input } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type{ BusinessHour } from "shared/types/api/schemas";
-import { Clock, Info, Sparkles } from "lucide-react";
+import { Clock } from "lucide-react";
+import type { BusinessHour } from "shared/types/api/schemas";
 
 type BusinessHourPops = {
   businessHours: BusinessHour[];
   isEditing: boolean;
-  handleBusinessHoursChange: (index: number, field: keyof BusinessHour, value: BusinessHour[keyof BusinessHour]) => void;
+  handleBusinessHoursChange: (
+    index: number,
+    field: keyof BusinessHour,
+    value: BusinessHour[keyof BusinessHour]
+  ) => void;
 };
 
 export function BusinessHours({
@@ -16,50 +20,56 @@ export function BusinessHours({
 }: BusinessHourPops) {
   return (
     <Card
-      Component="section"
+      component="section"
       padding="lg"
       header={
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-gray-600" />
+            <Clock className="w-5 h-5 text-secondary" />
             <h2 id="hours-heading" className="text-lg font-semibold">
               Business Hours
             </h2>
           </div>
           {isEditing && (
-            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
-              <Sparkles className="w-4 h-4" />
-              <span>
-                <strong>Important:</strong> Set accurate business hours so customers know when you&apos;re open and can plan their visits!
-              </span>
-            </div>
+            <Alert status="warning" className="mb-2">
+              Important: Set accurate business hours so customers know when
+              you&apos;re open and can plan their visits!
+            </Alert>
           )}
         </div>
       }
       aria-labelledby="hours-heading"
     >
       {isEditing && (
-        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
-          <Info className="w-4 h-4" />
-          <span>Set your opening and closing times for each day. Check &quot;Closed&quot; if you don&apos;t operate on that day.</span>
-        </div>
+        <Alert status="information" className="mb-4">
+          Set your opening and closing times for each day. Check
+          &quot;Closed&quot; if you don&apos;t operate on that day.
+        </Alert>
       )}
       <table className="w-full border-collapse" aria-label="Business hours">
         <thead>
-          <tr className="border-b border-gray-200">
-            <th className="text-left py-3 px-4 font-medium text-gray-900">Day</th>
-            <th className="text-left py-3 px-4 font-medium text-gray-900">Opening Time</th>
-            <th className="text-left py-3 px-4 font-medium text-gray-900">Closing Time</th>
-            <th className="text-left py-3 px-4 font-medium text-gray-900">Closed</th>
+          <tr className="border-b border-foreground text-secondary">
+            <th className="text-left py-3 px-4 font-medium ">
+              Day
+            </th>
+            <th className="text-left py-3 px-4 font-medium ">
+              Opening Time
+            </th>
+            <th className="text-left py-3 px-4 font-medium ">
+              Closing Time
+            </th>
+            <th className="text-left py-3 px-4 font-medium ">
+              Closed
+            </th>
           </tr>
         </thead>
         <tbody>
           {businessHours.map((hours: BusinessHour, index: number) => (
             <tr
               key={hours.day}
-              className="border-b border-gray-100 hover:bg-gray-50"
+              className="border-b border-secondary/10"
             >
-              <td className="py-3 px-4 font-medium text-gray-900">
+              <td className="py-3 px-4 font-medium ">
                 {hours.day}
               </td>
 
@@ -68,7 +78,7 @@ export function BusinessHours({
                   outlineType={isEditing ? "round" : "none"}
                   type="time"
                   name={`${hours.day} opening time`}
-                  label=""
+                  label="Opening Time"
                   disabled={!isEditing || hours.closed}
                   value={hours.open}
                   onChange={(e) =>
@@ -82,7 +92,7 @@ export function BusinessHours({
                   outlineType={isEditing ? "round" : "none"}
                   type="time"
                   name={`${hours.day} closing time`}
-                  label=""
+                  label="Closing Time"
                   disabled={!isEditing || hours.closed}
                   value={hours.close}
                   onChange={(e) =>
@@ -97,7 +107,11 @@ export function BusinessHours({
                     type="checkbox"
                     checked={hours.closed}
                     onChange={(e) =>
-                      handleBusinessHoursChange(index, "closed", e.target.checked)
+                      handleBusinessHoursChange(
+                        index,
+                        "closed",
+                        e.target.checked
+                      )
                     }
                     disabled={!isEditing}
                     className="mr-2"
@@ -106,7 +120,7 @@ export function BusinessHours({
                   />
                   <label
                     htmlFor={`closed-${hours.day}`}
-                    className="text-sm text-gray-700"
+                    className="text-sm"
                   >
                     Closed
                   </label>

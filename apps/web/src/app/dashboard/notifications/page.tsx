@@ -2,11 +2,11 @@
 import { Button } from "@/components/atoms";
 import { NotificationCard } from "@/components/ui";
 import useNotificationStore from "@/stores/notificationStore";
-import type { Notification  } from "shared/types/api/schemas";
 import { AlertCircle, Bell, Shield, UserCheck, UserX } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { Notification  } from "shared/types/api/schemas";
 
 // Define notification categories based on the API spec types
 type FilteredNotificationType = {
@@ -89,7 +89,7 @@ export default function Notifications() {
       return (
         <div className="flex space-x-2 items-center">
           <Button
-            color="black"
+            color="neutral"
             variant="outline"
             size="sm"
             text="Manage Request"
@@ -176,8 +176,7 @@ export default function Notifications() {
   }, [session?.user?._id, fetchNotifications]);
 
   return (
-    <main className="w-full min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <main className="w-full mx-auto px-10 py-10 space-y-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold mb-6">Notifications</h1>
           <Button
@@ -254,7 +253,6 @@ export default function Notifications() {
             </div>
           </>
         )}
-      </div>
     </main>
   );
 }

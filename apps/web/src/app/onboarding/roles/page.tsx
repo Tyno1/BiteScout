@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { Spinner } from "@/components/atoms/loaders/Spinners";
+import { Spinner } from "@/components/atoms/loaders/Spinner/Spinners";
 import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
 import { useCreateRestaurant } from "@/hooks/restaurant";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";

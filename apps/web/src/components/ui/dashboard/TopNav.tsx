@@ -1,10 +1,11 @@
 "use client";
 
-import { IconButton, Input } from "@/components/atoms";
-import { Bell, ChefHat, Menu } from "lucide-react";
-import { NotificationBadge } from "@/components/atoms/badges";
-import { User } from "@/types";
+import { IconButton } from "@/components/atoms";
+import { NotificationBadge } from "@/components/atoms/Badges";
+import type { User } from "@/types";
+import { Bell, Menu } from "lucide-react";
 import Image from "next/image";
+import { ThemeToggle } from "../ThemeToggle";
 
 type TopNavProps = {
   onMenuClick: () => void;
@@ -13,81 +14,54 @@ type TopNavProps = {
 
 export function TopNav({ onMenuClick, user }: TopNavProps) {
   return (
-    <div className="fixed top-0 z-30 flex h-16 w-full items-center border-b border-gray-300 bg-white px-4 shadow-sm">
-      {/* Conditionally rendered hamburger Menu */}
-      <IconButton
-        icon={<Menu />}
-        variant="plain"
-        onClick={onMenuClick}
-        className="md:hidden"
-      />
-
+    <div className="fixed top-0 left-0 md:left-72 right-0 z-30 flex h-14 items-center border-b border-foreground/10 bg-background backdrop-blur-sm px-4">
       <div className="flex w-full items-center justify-between">
-        {/* Left side - Logo and brand name */}
-        <div className="p-4 border-b border-gray-200 flex items-center">
-          <ChefHat size={40} className="mr-2 text-orange-900" />
-          <h2 className="text-xl font-bold text-black">BiteScout</h2>
-        </div>
-
-        {/* Middle - Search bar */}
-        <div className="hidden md:block max-w-md w-full mx-4">
-          <Input
-            name="navSearch"
-            placeholder="search"
-            type="text"
-            id="navbar-search"
-            label="Navbar Search"
-            fullWidth
-            outlineType="round"
+        {/* Left - Menu and Logo */}
+        <div className="flex items-center gap-4">
+          <IconButton
+            icon={<Menu size={18} />}
+            variant="plain"
+            onClick={onMenuClick}
+            className="md:hidden"
+            ariaLabel="Toggle menu"
           />
+          
+          {/* Logo - only on mobile */}
+          <div className="md:hidden">
+            <Image 
+              src="/logo.png" 
+              alt="Bite Scout" 
+              width={70} 
+              height={20} 
+              className="h-5 w-auto"
+            />
+          </div>
         </div>
 
-        {/* Right side - Notifications and profile */}
-        <div className="flex items-center gap-2">
+        {/* Right - Essential actions only */}
+        <div className="flex items-center gap-3">
           {/* Notifications */}
           <button
-            className="p-2 relative rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+            type="button"
+            className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors"
             aria-label="Notifications"
           >
-            <Bell />
+            <Bell size={18} className="text-gray-600" />
             <NotificationBadge userId={user?._id} />
           </button>
 
-          {/* User profile */}
-          <div className="flex items-center gap-2 cursor-pointer">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* User Avatar */}
+          <div className="flex items-center gap-2">
             <Image
               src={user?.image || "/placeholder.svg"}
               alt={user?.name || "User"}
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
+              width={28}
+              height={28}
+              className="h-7 w-7 rounded-full object-cover ring-2 ring-gray-100"
             />
-            <div className="hidden md:flex flex-col items-start">
-              <span className="hidden md:inline-block text-sm">
-                {user?.name}
-              </span>
-              
-               <span className="hidden md:inline-block text-xs text-primary font-bold rounded-full">
-              {user?.restaurantCount && user.restaurantCount >= 1
-                ? "Owner"
-                : "User"}
-            </span>
-            </div>
-           
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-gray-500 dark:text-gray-400"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
           </div>
         </div>
       </div>

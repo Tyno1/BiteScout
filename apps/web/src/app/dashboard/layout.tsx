@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [accessChecked, setAccessChecked] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
-  	const { restaurantAccessList } = useRestaurantAccess();
+  const { restaurantAccessList } = useRestaurantAccess();
   const router = useRouter();
 
   // Stabilize the access check function to prevent unnecessary re-renders
@@ -53,7 +53,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Create a function to check hydration status
     const checkHydration = () => {
-      	const isHydrated = true; // React Query handles hydration automatically
+      const isHydrated = true; // React Query handles hydration automatically
       if (isHydrated) {
         // Once hydrated, we can proceed with permission checks
         setIsLoading(false);
@@ -83,10 +83,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="flex flex-col h-screen w-screen relative">
-      {session?.user && (
-        <TopNav onMenuClick={handleMenuClick} user={session.user} />
-      )}
-
       {/* Mobile navigation overlay */}
       {isMenuOpen && (
         <div className="w-screen h-screen md:hidden fixed top-14 z-20">
@@ -95,15 +91,18 @@ const Layout = ({ children }: { children: ReactNode }) => {
       )}
 
       {/* Main content layout */}
-      <div className="flex h-[90vh] w-full fixed top-16">
+      <div className="flex h-full w-full">
         {/* Desktop sidebar - hidden on mobile */}
-        <div className="w-64 shrink-0 md:block hidden overflow-hidden">
+        <div className="w-72 shrink-0 md:block hidden overflow-hidden">
           <SideNav />
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          {children}
+        <div className="flex-1 relative overflow-y-auto overflow-x-hidden">
+          {session?.user && (
+            <TopNav onMenuClick={handleMenuClick} user={session.user} />
+          )}
+          <div className="mt-14">{children}</div>
         </div>
       </div>
     </div>

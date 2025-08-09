@@ -10,7 +10,10 @@ import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
 import { useAllergens } from "@/hooks/allergens";
 import { useCourses } from "@/hooks/courses";
 import { useCuisines } from "@/hooks/cuisines";
-import { useCreateFoodCatalogue, useFoodCatalogueByRestaurant } from "@/hooks/food-catalogue";
+import {
+  useCreateFoodCatalogue,
+  useFoodCatalogueByRestaurant,
+} from "@/hooks/food-catalogue";
 import { useMediaUpload } from "@/hooks/media";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useRouter } from "next/navigation";
@@ -23,7 +26,9 @@ import { z } from "zod";
 // Zod validation schema
 const foodCatalogueSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
+  ingredients: z
+    .array(z.string())
+    .min(1, "At least one ingredient is required"),
   cuisineType: z.object({
     name: z.string().min(1, "Cuisine type is required"),
     description: z.string().optional(),
@@ -36,13 +41,26 @@ const foodCatalogueSchema = z.object({
   }),
   price: z.object({
     amount: z.number().positive("Price amount must be positive"),
-    currency: z.enum(["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "KRW", "MYR", "TWD", "VND", "THB", "ZAR"]),
+    currency: z.enum([
+      "USD",
+      "EUR",
+      "GBP",
+      "CAD",
+      "AUD",
+      "JPY",
+      "CNY",
+      "KRW",
+      "MYR",
+      "TWD",
+      "VND",
+      "THB",
+      "ZAR",
+    ]),
   }),
   restaurant: z.string().min(1, "Restaurant is required"),
   allergens: z.array(z.any()).optional(),
   images: z.array(z.string()).optional(),
 }) satisfies z.ZodType<FoodCatalogue>;
-
 
 export type formErrorType = Partial<{
   name: string;
@@ -82,31 +100,34 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     restaurant: "",
   };
 
-  		const { restaurantData } = useRestaurantAccess();
-	const { data: foodDatas, error, isLoading } =
-		useFoodCatalogueByRestaurant(restaurantData?._id || "");
-	const createFoodDataMutation = useCreateFoodCatalogue();
+  const { restaurantData } = useRestaurantAccess();
+  const {
+    data: foodDatas,
+    error,
+    isLoading,
+  } = useFoodCatalogueByRestaurant(restaurantData?._id || "");
+  const createFoodDataMutation = useCreateFoodCatalogue();
   const uploadMutation = useMediaUpload();
   const [activeTab, setActiveTab] = useState<string>("food-data");
-  	const {
-		data: allergens,
-		refetch: getAllergens,
-		error: allergenError,
-		isLoading: allergenLoading,
-	} = useAllergens();
+  const {
+    data: allergens,
+    refetch: getAllergens,
+    error: allergenError,
+    isLoading: allergenLoading,
+  } = useAllergens();
 
-	const {
-		data: cuisines,
-		refetch: getCuisines,
-		error: cuisineError,
-		isLoading: cuisineLoading,
-	} = useCuisines();
-	const {
-		data: courses,
-		refetch: getCourses,
-		error: courseError,
-		isLoading: courseLoading,
-	} = useCourses();
+  const {
+    data: cuisines,
+    refetch: getCuisines,
+    error: cuisineError,
+    isLoading: cuisineLoading,
+  } = useCuisines();
+  const {
+    data: courses,
+    refetch: getCourses,
+    error: courseError,
+    isLoading: courseLoading,
+  } = useCourses();
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -115,7 +136,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [ingredient, setIngredient] = useState<string>("");
   const [formError, setFormError] = useState<formErrorType>(DEFAULT_FORM_ERROR);
-  const [selectedMediaFiles, setSelectedMediaFiles] = useState<FileWithPreview[]>([]);
+  const [selectedMediaFiles, setSelectedMediaFiles] = useState<
+    FileWithPreview[]
+  >([]);
   const [newFood, setNewFood] = useState<FoodCatalogue>({
     ...DEFAULT_FOOD_DATA,
     restaurant: restaurantData?._id || "",
@@ -125,7 +148,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     // Validate form data using Zod
     const validationResult = foodCatalogueSchema.safeParse(newFood);
     console.log(validationResult.error?.errors);
-    
+
     if (!validationResult.success) {
       // Convert Zod errors to form error format
       const errors: formErrorType = {};
@@ -134,7 +157,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         errors[field] = error.message;
       }
       console.log(errors);
-      
+
       setFormError(errors);
       setIsSubmitting(false);
       return false; // Validation failed
@@ -145,7 +168,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     return true; // Validation passed
   };
   // functions for modal
-    const handleAddFood = async () => {
+  const handleAddFood = async () => {
     if (isSubmitting) return; // Prevent double submission
 
     setIsSubmitting(true);
@@ -166,25 +189,33 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           let completedUploads = 0;
           const totalUploads = selectedMediaFiles.length;
 
-          const uploadPromises = selectedMediaFiles.map(async (fileWithPreview, index) => {
-            const metadata = {
-              title: fileWithPreview.title || undefined,
-              description: fileWithPreview.description || undefined,
-              tags: fileWithPreview.tags ? fileWithPreview.tags.split(',').map(tag => tag.trim()) : undefined,
-              folder: "food-images",
-            };
+          const uploadPromises = selectedMediaFiles.map(
+            async (fileWithPreview, index) => {
+              const metadata = {
+                title: fileWithPreview.title || undefined,
+                description: fileWithPreview.description || undefined,
+                tags: fileWithPreview.tags
+                  ? fileWithPreview.tags.split(",").map((tag) => tag.trim())
+                  : undefined,
+                folder: "food-images",
+              };
 
-            const result = await uploadMutation.mutateAsync({
-              file: fileWithPreview.file,
-              metadata,
-            });
-            completedUploads++;
-            setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
-            return result._id;
-          });
+              const result = await uploadMutation.mutateAsync({
+                file: fileWithPreview.file,
+                metadata,
+              });
+              completedUploads++;
+              setUploadProgress(
+                Math.round((completedUploads / totalUploads) * 100)
+              );
+              return result._id;
+            }
+          );
 
           const results = await Promise.all(uploadPromises);
-          uploadedImageIds.push(...results.filter((id: string | undefined) => id) as string[]);
+          uploadedImageIds.push(
+            ...(results.filter((id: string | undefined) => id) as string[])
+          );
         } catch (uploadError) {
           console.error("Failed to upload images:", uploadError);
           // Continue with food creation even if image upload fails
@@ -201,9 +232,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       };
 
       // Create the food
-      				const result = await createFoodDataMutation.mutateAsync(foodDataForBackend);
+      const result =
+        await createFoodDataMutation.mutateAsync(foodDataForBackend);
 
-		if (result) {
+      if (result) {
         // Note: Media association is handled automatically by the backend during upload
         // The uploadedImageIds are already included in the food data
 
@@ -280,12 +312,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }));
   };
 
-
-
-
-
-  // functions for table
-
   const handleRowClick = (id: string) => {
     if (restaurantData?._id) {
       router.push(`food-catalogue/${restaurantData._id}/${id}`);
@@ -318,7 +344,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       key: "media-upload",
       label: "Media Upload",
       content: (
-        <MediaUpload 
+        <MediaUpload
           uploadMode="auto"
           selectedFiles={selectedMediaFiles}
           onSelectedFilesChange={setSelectedMediaFiles}
@@ -359,7 +385,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   }, [restaurantData?._id]); // Only depend on restaurantData._id, not the entire object
 
   return (
-    <div className="container mx-auto p-4 w-full">
+    <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
@@ -404,9 +430,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               <h3 className="text-sm font-medium text-red-800">Setup Issue</h3>
               <div className="mt-2 text-sm text-red-700">
                 {error && <p>Food data: {error.message}</p>}
-                		{allergenError && <p>Allergens: {allergenError.message}</p>}
-                		{cuisineError && <p>Cuisines: {cuisineError.message}</p>}
-		{courseError && <p>Courses: {courseError.message}</p>}
+                {allergenError && <p>Allergens: {allergenError.message}</p>}
+                {cuisineError && <p>Cuisines: {cuisineError.message}</p>}
+                {courseError && <p>Courses: {courseError.message}</p>}
               </div>
             </div>
           </div>
@@ -414,8 +440,11 @@ export default function FoodCatalogueManagement(): React.ReactElement {
       )}
 
       {/* Food Catalogue Table or Empty State - Only show when not loading */}
-      {!isLoading && !allergenLoading && !cuisineLoading && !courseLoading && (
-        foodDatas && foodDatas.length > 0 ? (
+      {!isLoading &&
+        !allergenLoading &&
+        !cuisineLoading &&
+        !courseLoading &&
+        (foodDatas && foodDatas.length > 0 ? (
           <Table foodDatas={foodDatas} handleRowClick={handleRowClick} />
         ) : foodDatas && foodDatas.length === 0 ? (
           <div className="text-center py-12">
@@ -451,31 +480,33 @@ export default function FoodCatalogueManagement(): React.ReactElement {
               />
             </div>
           </div>
-        ) : null
-      )}
+        ) : null)}
 
       {/* Modal */}
       {
         <Modal
           modalDescription={
-            Object.values(formError).some(error => error && error.length > 0) ? (
-              <Alert status="error">
-                Please fill in all the fields
-              </Alert>
+            Object.values(formError).some(
+              (error) => error && error.length > 0
+            ) ? (
+              <Alert status="error">Please fill in all the fields</Alert>
             ) : isUploadingImages ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-blue-600">Uploading images...</span>
-                  <span className="text-blue-600 font-medium">{uploadProgress}%</span>
+                  <span className="text-blue-600 font-medium">
+                    {uploadProgress}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
                 <p className="text-xs text-gray-600">
-                  {selectedMediaFiles.length} image{selectedMediaFiles.length > 1 ? 's' : ''} being uploaded
+                  {selectedMediaFiles.length} image
+                  {selectedMediaFiles.length > 1 ? "s" : ""} being uploaded
                 </p>
               </div>
             ) : undefined
@@ -485,20 +516,22 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           setIsModalOpen={setIsModalOpen}
           modalTitle="Add New Food Item"
           modalActionText={
-            activeTab === tabs[tabs.length - 1].key 
-              ? isUploadingImages 
-                ? "Uploading Images..." 
-                : isSubmitting 
-                  ? "Creating Food..." 
+            activeTab === tabs[tabs.length - 1].key
+              ? isUploadingImages
+                ? "Uploading Images..."
+                : isSubmitting
+                  ? "Creating Food..."
                   : "Add Food"
               : "Next Step"
           }
-          modalActionOnClick={()=>{
-            if(activeTab === tabs[tabs.length - 1].key){
+          modalActionOnClick={() => {
+            if (activeTab === tabs[tabs.length - 1].key) {
               handleAddFood();
-            }else{
-              if(validateForm()){
-                const currentIndex = tabs.findIndex(tab => tab.key === activeTab);
+            } else {
+              if (validateForm()) {
+                const currentIndex = tabs.findIndex(
+                  (tab) => tab.key === activeTab
+                );
                 setActiveTab(tabs[currentIndex + 1].key);
               }
             }
@@ -506,14 +539,14 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           closeModal={closeModal}
           isSubmitting={isSubmitting || isUploadingImages}
         >
-          <Tabs 
-            tabs={tabs} 
-            defaultTab="food-data" 
+          <Tabs
+            tabs={tabs}
+            defaultTab="food-data"
             selectedTab={activeTab}
-            onTabChange={(tabKey) => setActiveTab(tabKey)} 
+            onTabChange={(tabKey) => setActiveTab(tabKey)}
           />
         </Modal>
       }
-    </div>
+    </main>
   );
 }

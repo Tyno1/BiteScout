@@ -6,7 +6,7 @@ type ButtonProps = ComponentProps<"button"> & {
 	IconAfter?: React.ReactNode;
 	IconBefore?: React.ReactNode;
 
-	color?: "primary" | "secondary" | "danger" | "success" | "black" | "white";
+	color?: "primary" | "secondary" | "danger" | "success" | "neutral";
 	size?: "xs" | "sm" | "md" | "lg";
 	disabled?: boolean;
 	fullWidth?: boolean;
@@ -20,6 +20,7 @@ type ButtonProps = ComponentProps<"button"> & {
 	ariaLabel?: string;
 	isPressed?: boolean;
 	isExpanded?: boolean;
+	
 };
 
 export function Button({
@@ -46,69 +47,51 @@ export function Button({
 		"rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer flex items-center justify-center gap-2";
 
 	const colorStyles = {
-		primary: `hover:bg-primary/99 hover:text-white hover:border-primary focus:ring-primary focus:bg-primary/20 focus:border-none focus:text-primary ${
+		primary: `focus:ring-primary focus:bg-primary/20 focus:border-none focus:text-primary ${
 			variant === "plain"
-				? "text-primary"
+				? "text-primary hover:bg-primary/20 hover:border-primary"
 				: variant === "glass"
-					? "bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary hover:bg-primary/30"
+					? "bg-primary/5 backdrop-blur-lg border-2 border-primary text-orange-800 hover:bg-primary/20"
 					: variant === "solid"
-						? "border-1 bg-primary border-primary/70 text-white"
-						: "border border-1 border-primary bg-transparent text-primary"
+						? "border-1 bg-primary border-primary/70 text-primary-foreground hover:bg-primary/90 hover:border-primary"
+						: "border border-1 border-primary bg-transparent text-primary hover:text-primary/60 hover:bg-primary/20 hover:border-primary"
 		}`,
-		secondary: `hover:bg-gray-700 focus:ring-gray-500 ${
+		secondary: `focus:ring-secondary focus:bg-secondary/20 focus:border-none focus:text-secondary ${
 			variant === "plain"
-				? "text-secondary"
+				? "text-secondary hover:bg-secondary/20 hover:border-secondary"
 				: variant === "glass"
-					? "bg-yellow/20 backdrop-blur-sm border border-yellow/30 text-yellow hover:bg-yellow/30"
+					? "bg-secondary/10 backdrop-blur-lg border-2 border-secondary text-secondary hover:bg-secondary/30"
 					: variant === "solid"
-						? "bg-yellow text-white"
-						: "border border-1 border-yellow bg-none text-yellow"
+						? "border-1 bg-secondary border-secondary/70 text-secondary-foreground hover:bg-secondary/90 hover:border-secondary"
+						: "border border-1 border-secondary bg-transparent text-secondary hover:bg-secondary/20 hover:border-secondary"
 		}`,
-		danger: `hover:bg-destructive focus:ring-destructive ${
+		danger: `focus:ring-danger focus:bg-danger/20 focus:border-none focus:text-danger ${
 			variant === "plain"
-				? "text-destructive hover:text-white"
+				? "text-danger hover:bg-danger/20 hover:border-danger"
 				: variant === "glass"
-					? "bg-destructive/20 backdrop-blur-sm border border-destructive/30 text-destructive hover:bg-destructive/30"
+					? "bg-danger/10 backdrop-blur-lg border-2 border-danger text-danger hover:bg-danger/30"
 					: variant === "solid"
-						? "text-white bg-destructive"
-						: "border border-1 border-destructive bg-none text-destructive hover:text-white"
+						? "border-1 bg-danger border-danger/70 text-danger-foreground hover:bg-danger/90 hover:border-danger"
+						: "border border-1 border-danger bg-transparent text-danger hover:bg-danger/20 hover:border-danger"
 		}`,
-		success: `hover:bg-success focus:ring-success ${
+		success: `hover:bg-success/20 focus:ring-success ${
 			variant === "plain"
-				? "text-success hover:text-white"
+				? "text-success"
 				: variant === "glass"
-					? "bg-success/20 backdrop-blur-sm border border-success/30 text-success hover:bg-success/30"
+					? "bg-success/5 backdrop-blur-sm border border-success/30 text-success hover:bg-success/30"
 					: variant === "solid"
-						? "bg-success text-white"
+						? "bg-success text-success-foreground hover:text-success"
 						: "border border-1 border-success bg-none text-success"
 		} `,
-		black: `hover:bg-black focus:ring-black ${
+		neutral: `focus:ring-neutral focus:bg-neutral/20 focus:border-none focus:text-neutral ${
 			variant === "plain"
-				? "text-black"
+				? "text-neutral hover:bg-neutral/10 hover:text-neutral/80 transition-all duration-200"
 				: variant === "glass"
-					? "bg-black/20 backdrop-blur-sm border border-black/30 text-black hover:bg-black/30"
+					? "bg-neutral/5 backdrop-blur-lg border border-neutral/20 text-neutral hover:bg-neutral/15 hover:border-neutral/30 transition-all duration-200"
 					: variant === "solid"
-						? "bg-black text-white"
-						: "border border-1 border-black bg-none text-black hover:text-white"
-		} `,
-		white: `hover:bg-gray-400 focus:ring-white ${
-			variant === "plain"
-				? "text-white"
-				: variant === "glass"
-					? "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30"
-					: variant === "solid"
-						? "bg-white text-black"
-						: "border border-1 border-white bg-none text-white"
-		} `,
-		transparent: `hover:text-primary focus:text-primary ${
-			variant === "plain"
-				? "text-black"
-				: variant === "glass"
-					? "bg-transparent/20 backdrop-blur-sm border border-transparent/30 text-transparent hover:bg-transparent/30"
-					: variant === "solid"
-						? "bg-transparent text-transparent"
-						: "border border-1 border-transparent bg-none text-transparent"
-		} `,
+						? "border bg-neutral border-neutral/70 text-neutral-foreground hover:bg-neutral/90 hover:border-neutral hover:shadow-sm transition-all duration-200"
+						: "border border-neutral/40 bg-transparent text-neutral hover:bg-neutral/10 hover:border-neutral hover:text-neutral/80 transition-all duration-200"
+		}`,
 	};
 
 	const sizeStyles = {
@@ -117,6 +100,7 @@ export function Button({
 		md: "px-5 py-3 text-base",
 		lg: "px-7 py-3 text-lg",
 	};
+
 
 	const widthStyle = fullWidth ? "w-full" : "";
 

@@ -1,0 +1,57 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as InputStories from "./Input.stories"
+
+<Meta of={InputStories}/>
+
+# Input
+
+A versatile input component that supports various types, themes, and configurations. The Input component follows the same design system as other form components with consistent styling and accessibility features.
+
+## Usage
+
+Import the Input component from your atoms folder. Use it to create form inputs with labels, icons, and validation states. The component supports different themes, outline types, and sizes that match your design system.
+
+## Interactive Example
+
+<Canvas of={InputStories.Default}/>
+
+## Props
+
+### Required Props
+
+- **label** (string) - The label text for the input
+- **name** (string) - The name attribute for the input  
+- **type** (string) - The input type (text, email, password, etc.)
+
+### Display Props
+
+- **useLabel** (boolean, default: false) - Whether to display the label
+- **outlineType** (round, bottom, none, default: none) - The outline style of the input
+- **icon** (ReactNode) - Optional icon to display on the left
+- **rightButton** (ReactNode) - Optional button to display on the right
+- **fullWidth** (boolean, default: false) - Whether the input should take full width
+- **labelRow** (boolean, default: false) - Whether to display label in a row layout
+
+### Behavior Props
+
+- **required** (boolean, default: false) - Whether the input is required
+- **onChange** (function) - Change event handler
+- **value** (string, number) - The input value
+- **placeholder** (string) - Placeholder text
+
+### Styling Props
+
+- **theme** (light, dark, transparent, default: light) - The theme of the input
+- **inputSize** (sm, md, lg, default: sm) - The size of the input
+- **iconStyle** (string, default: "") - Custom styles for the icon
+- **rightButtonStyle** (string, default: "") - Custom styles for the right button
+- **labelStyle** (string, default: "") - Custom styles for the label
+
+### Validation Props
+
+- **errorMessage** (string, ReactNode) - Error message to display
+- **helperText** (string) - Helper text to display below input
+
+### Optional Props
+
+- **id** (string) - Optional custom ID for the input 

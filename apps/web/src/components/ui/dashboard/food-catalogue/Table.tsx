@@ -1,4 +1,5 @@
 import { IconButton } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 import {
   flexRender,
   getCoreRowModel,
@@ -95,16 +96,21 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
         <div className="flex justify-end space-x-2">
           <IconButton
             variant="plain"
+            color="secondary"
             icon={<Pen size={20} />}
             size="sm"
-            onClick={() => props.row.original._id && handleRowClick(props.row.original._id)}
+            onClick={() =>
+              props.row.original._id && handleRowClick(props.row.original._id)
+            }
           />
           <IconButton
             color="danger"
             variant="plain"
             size="sm"
             icon={<Trash2 size={20} />}
-            onClick={() => props.row.original._id && handleRowClick(props.row.original._id)}
+            onClick={() =>
+              props.row.original._id && handleRowClick(props.row.original._id)
+            }
           />
         </div>
       ),
@@ -128,7 +134,7 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <Card className="shadow overflow-hidden">
       <TableFilter
         columnFilters={columnFilters}
         setColumnFilters={setColumnFilters}
@@ -139,82 +145,85 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
 
       <div className="max-h-[60vh] overflow-y-auto">
         {foodDatas.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-card-foreground">
             No food items found. Add some food items to get started.
           </div>
         ) : (
           <table className="w-full table-fixed border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="px-4 py-5 text-left text-sm font-semibold text-gray-700"
-                  >
-                    <div className="flex items-center gap-1">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getCanSort() && (
-                        <button
-                          type="button"
-                          className="ml-1"
-                          onClick={header.column.getToggleSortingHandler()}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              header.column.getToggleSortingHandler()?.(e);
-                            }
-                          }}
-                        >
-                          <ArrowDownUp size={17} />
-                        </button>
-                      )}
-                      {header.column.getIsSorted() === "asc" ? (
-                        <ArrowUpNarrowWide
-                          className="text-primary/40"
-                          size={17}
-                        />
-                      ) : header.column.getIsSorted() === "desc" ? (
-                        <ArrowDownWideNarrow
-                          className="text-primary/40"
-                          size={17}
-                        />
-                      ) : null}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+            <thead className="bg-card sticky top-0 z-10">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className="px-4 py-5 text-left text-sm font-semibold text-secondary"
+                    >
+                      <div className="flex items-center gap-1">
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getCanSort() && (
+                          <button
+                            type="button"
+                            className="ml-1"
+                            onClick={header.column.getToggleSortingHandler()}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                header.column.getToggleSortingHandler()?.(e);
+                              }
+                            }}
+                          >
+                            <ArrowDownUp size={17} className="text-secondary" />
+                          </button>
+                        )}
+                        {header.column.getIsSorted() === "asc" ? (
+                          <ArrowUpNarrowWide
+                            className="text-foreground"
+                            size={17}
+                          />
+                        ) : header.column.getIsSorted() === "desc" ? (
+                          <ArrowDownWideNarrow
+                            className="text-foreground"
+                            size={17}
+                          />
+                        ) : null}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
 
-          <tbody className="divide-y divide-gray-200">
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-gray-100 cursor-pointer"
-                onClick={() =>
-                  row.original._id && handleRowClick(row.original._id)
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    if (row.original._id) handleRowClick(row.original._id);
+            <tbody className="divide-y divide-gray-200">
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="hover:bg-secondary/10 cursor-pointer"
+                  onClick={() =>
+                    row.original._id && handleRowClick(row.original._id)
                   }
-                }}
-                tabIndex={0}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-4 text-sm text-gray-700">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      if (row.original._id) handleRowClick(row.original._id);
+                    }
+                  }}
+                  tabIndex={0}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="p-4 text-sm text-card-foreground">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

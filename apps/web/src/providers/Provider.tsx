@@ -1,5 +1,6 @@
 import type React from "react";
 
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { QueryProvider } from "./QueryProvider";
@@ -12,7 +13,11 @@ type ProviderProps = {
 const Provider = ({ children, session }: ProviderProps) => {
   return (
     <QueryProvider>
-      <SessionProvider session={session}>{children}</SessionProvider>
+      <SessionProvider session={session}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </SessionProvider>
     </QueryProvider>
   );
 };
