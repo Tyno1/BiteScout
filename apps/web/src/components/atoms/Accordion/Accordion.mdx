@@ -52,7 +52,7 @@ Compact design for space-constrained layouts.
 ### Medium Size
 Default size with balanced spacing and typography.
 
-<Canvas of={AccordionStories.Medium} />
+<Canvas of={AccordionStories.Default} />
 
 ### Large Size
 Spacious design for prominent content sections.
@@ -118,4 +118,28 @@ The Accordion component is built with accessibility in mind:
 
 ## Props Reference
 
-<ArgsTable of={Accordion} /> 
+The Accordion component accepts the following props:
+
+### Core Props
+- **`items`** (required): Array of `AccordionItem` objects
+- **`variant`**: Visual style variant (`"default"`, `"bordered"`, `"elevated"`)
+- **`size`**: Size variant (`"sm"`, `"md"`, `"lg"`)
+- **`allowMultiple`**: Whether multiple items can be open simultaneously
+- **`defaultOpen`**: Array of item IDs to open by default
+
+### Styling Props
+- **`className`**: Additional CSS classes for content styling
+- **`containerClassName`**: Additional CSS classes for container styling
+
+### Event Props
+- **`onItemToggle`**: Callback function when items are opened/closed
+
+### AccordionItem Interface
+```typescript
+interface AccordionItem {
+  id: string;
+  title: string;
+  content: string | React.ReactNode;
+  disabled?: boolean;
+}
+``` 

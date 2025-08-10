@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Accordion } from './Accordion';
 
 const meta: Meta<typeof Accordion> = {
-  title: 'Components/Atoms/Accordion',
+  title: 'Atoms/Accordion',
   component: Accordion,
   argTypes: {
     variant: {
