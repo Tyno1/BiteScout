@@ -251,7 +251,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
         {foodDatas && foodDatas.length > 0 ? (
-          <Button variant="solid" text="Add New Item" onClick={handleAddFood} />
+          <Button size="sm" className="font-bold" variant="solid" text="Create New" onClick={handleAddFood} />
         ) : null}
       </div>
 
@@ -377,18 +377,18 @@ export default function FoodCatalogueManagement(): React.ReactElement {
           ) : isUploadingImages ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-blue-600">Uploading images...</span>
-                <span className="text-blue-600 font-medium">
+                <span className="text-secondary">Uploading images...</span>
+                <span className="text-secondary font-medium">
                   {uploadProgress}%
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-secondary/20 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-secondary h-2 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-foreground">
                 {selectedMediaFiles.length} image
                 {selectedMediaFiles.length > 1 ? "s" : ""} being uploaded
               </p>

@@ -13,14 +13,20 @@ import { ThemeToggle } from "../ui/ThemeToggle";
 import { MobileNav } from "./MobileNav";
 
 type NavTheme = {
-  theme: "dark" | "light";
+  theme?: "dark" | "light";
 };
 
 type MobileLinkProp = {
   path: string;
   text: string;
+  theme?: "dark" | "light";
 };
 
+type WebLinkProps = {
+  path: string;
+  text: string;
+  theme?: "dark" | "light";
+};
 
 export function Navbar({ theme }: NavTheme) {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,24 +41,85 @@ export function Navbar({ theme }: NavTheme) {
     setIsOpen((prev) => !prev);
   }, []);
 
-  const MobileLinkItem = ({ path, text }: MobileLinkProp) => {
+  const MobileLinkItem = ({ path, text, theme: linkTheme }: MobileLinkProp) => {
+    // Conditional theme-based styling
+    const getThemeStyles = () => {
+      if (linkTheme) {
+        // Use provided theme
+        return linkTheme === "dark" ? "text-white" : "text-black";
+      }
+      // Use parent theme as fallback
+      return theme === "dark"
+        ? "text-white"
+        : theme === "light"
+          ? "text-black"
+          : "text-foreground";
+    };
+
+    const getHoverStyles = () => {
+      if (linkTheme) {
+        // Theme-specific hover styles
+        return linkTheme === "dark"
+          ? "hover:bg-white hover:text-black"
+          : "hover:bg-black hover:text-white";
+      }
+      // Default hover styles
+      return "hover:bg-black hover:text-white";
+    };
+
     return (
       <Link
         href={path}
         onClick={toggleMenu}
-        className="block px-3 py-6 text-base font-medium hover:bg-black hover:text-white"
+        className={`block px-3 py-6 text-base font-medium transition-colors duration-200 ${getThemeStyles()} ${getHoverStyles()}`}
       >
         {text}
       </Link>
     );
   };
 
-  const WebLinkItem = ({ path, text }: MobileLinkProp) => {
+  const WebLinkItem = ({ path, text, theme: linkTheme }: WebLinkProps) => {
+    // Conditional theme-based styling
+    const getThemeStyles = () => {
+      if (linkTheme) {
+        // Use provided theme
+        return linkTheme === "dark" ? "text-white" : "text-black";
+      }
+      // Use parent theme as fallback
+      return theme === "dark"
+        ? "text-white"
+        : theme === "light"
+          ? "text-black"
+          : "text-foreground";
+    };
+
+    const getHoverStyles = () => {
+      if (linkTheme) {
+        // Theme-specific hover styles
+        return linkTheme === "dark"
+          ? "hover:text-white hover:border-primary"
+          : "hover:text-black hover:border-primary";
+      }
+      // Default hover styles
+      return "hover:text-foreground hover:border-primary";
+    };
+
+    const getFocusStyles = () => {
+      if (linkTheme) {
+        // Theme-specific focus styles
+        return linkTheme === "dark"
+          ? "focus:text-white focus:bg-primary/20 focus:ring-primary"
+          : "focus:text-black focus:bg-primary/20 focus:ring-primary";
+      }
+      // Default focus styles
+      return "focus:text-primary focus:bg-primary/20 focus:ring-primary";
+    };
+
     return (
       <Link
         href={path}
         onClick={toggleMenu}
-        className="px-4 py-2 text-sm hover:text-white hover:border-b hover:border-orange-500 focus:rounded-lg focus:ring-orange-500 focus:bg-orange-500/20 focus:border-none focus:text-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-0 "
+        className={`px-4 py-2 text-sm border-b border-transparent transition-colors duration-200 ${getThemeStyles()} ${getHoverStyles()} ${getFocusStyles()} focus:rounded-lg focus:border-none focus:outline-none focus:ring-2 focus:ring-offset-0`}
       >
         {text}
       </Link>
@@ -62,32 +129,36 @@ export function Navbar({ theme }: NavTheme) {
   return (
     <nav
       className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
-        theme === "dark" ? "bg-background  text-white" : "bg-white text-black"
+        theme === "dark"
+          ? "bg-black text-white"
+          : theme === "light"
+            ? "bg-white text-black"
+            : "bg-background text-foreground"
       }`}
     >
-      <Link href="/" className="flex-shrink-0 text-primary">
+      <Link href="/" className="flex-shrink-0 text-primary-foreground">
         <Image src="/logo.png" alt="Bite Scout" width={120} height={40} />
       </Link>
       {/* web view */}
       <ul className="hidden md:flex ml-10 flex items-center">
         <li>
-          <WebLinkItem text="Home" path="/" />
+          <WebLinkItem text="Home" path="/" theme={theme} />
         </li>
         <li>
-          <WebLinkItem text="About" path="/about" />
+          <WebLinkItem text="About" path="/about" theme={theme} />
         </li>
         <li>
-          <WebLinkItem text="Services" path="/services" />
+          <WebLinkItem text="Services" path="/services" theme={theme} />
         </li>
         <li>
-          <WebLinkItem text="Contact" path="/contact" />
+          <WebLinkItem text="Contact" path="/contact" theme={theme} />
         </li>
 
         <li>
           {session ? (
             <ul className="auth flex ml-20 items-center gap-2">
               <li>
-                <WebLinkItem text="Dashboard" path="/dashboard" />
+                <WebLinkItem text="Dashboard" path="/dashboard" theme="dark" />
               </li>
               <li>
                 <Button

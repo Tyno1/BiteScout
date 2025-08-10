@@ -106,16 +106,16 @@ export function Modal({
         <div className="flex min-h-full items-center justify-center p-4">
           <div
             ref={modalRef}
-            className={`bg-white rounded-lg shadow-2xl w-full ${sizeMap[size]} border border-gray-200`}
+            className={`bg-card rounded-lg shadow-2xl w-full ${sizeMap[size]} border border-foreground/10`}
             tabIndex={-1}
             onKeyDown={handleKeyDown}
           >
             {/* Modal Header */}
             <div className="flex justify-between items-start p-6">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 text-card-foreground">
                 <h2 className="text-xl font-bold">{modalTitle}</h2>
                 {modalDescription && (
-                  <div className="mt-2 text-sm text-gray-600 break-words">
+                  <div className="mt-2 text-sm break-words">
                     {modalDescription}
                   </div>
                 )}
@@ -136,7 +136,7 @@ export function Modal({
             <div className="p-6 flex justify-end gap-2">
               <Button
                 variant="outline"
-                color="black"
+                color="neutral"
                 text="Cancel"
                 size="sm"
                 onClick={closeModal}

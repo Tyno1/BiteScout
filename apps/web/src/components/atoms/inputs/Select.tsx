@@ -93,7 +93,7 @@ export function Select({
         <label
           htmlFor={uniqueId}
           className={clsx(
-            `block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+            `block ${!labelRow && "mb-3"} font-medium text-input-foreground`,
             labelStyle
           )}
         >
@@ -103,7 +103,7 @@ export function Select({
     {errorMessage && (
         <p
           id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
+          className="text-sm text-danger mt-1"
           role="alert"
         >
           {errorMessage}
@@ -137,7 +137,7 @@ export function Select({
             paddingLeft,
             paddingRight,
             "rounded-lg",
-            errorMessage && "border-red-500",
+            errorMessage && "border-danger",
             selectClassName
           )}
           {...props}

@@ -1,13 +1,16 @@
 "use client";
 
+import { ArrowUp } from "lucide-react";
+import { Button } from "../atoms";
+
 export function Footer() {
   return (
-    <div className="bg-white w-full flex flex-col items-center justify-center py-16 relative">
-      <div className="news-letter bg-black w-full h-40 p-10 px-4 lg:px-32 xl:px-48 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-20">
-        <h3 className="text-white text-2xl">Subscribe Newsletters</h3>
-        <div className="flex bg-white p-2 rounded-lg w-full justify-between">
+    <div className="bg-background w-full flex flex-col items-center justify-center pb-16 relative">
+      <div className="news-letter bg-foreground w-full h-40 p-10 px-4 lg:px-32 xl:px-48 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-20">
+        <h3 className="text-background text-2xl">Subscribe Newsletters</h3>
+        <div className="flex bg-input p-2 rounded-lg w-full justify-between">
           <input
-            className="text-black w-full h-14 p-4 focus:outline-none"
+            className="text-input-foreground w-full h-14 p-4 focus:outline-none"
             type="text"
             placeholder="Enter your Email"
           />
@@ -41,10 +44,15 @@ export function Footer() {
             © 2024 Anthony Ukutegbe. All rights reserved.
           </p>
         </div>
-        <button
-          className="absolute bottom-8 right-8"
+        <Button
+          text="Back to Top"
+          size="sm"
+          IconBefore={<ArrowUp />}
+          variant="solid"
+          color="neutral"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        ></button>
+          className="absolute bottom-8 right-8"
+        />
       </div>
     </div>
   );

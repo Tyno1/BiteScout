@@ -85,7 +85,7 @@ export function Textarea({
 				<label
 					htmlFor={uniqueId}
 					className={clsx(
-						`block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+						`block ${!labelRow && "mb-3"} font-medium text-input-foreground`,
 						labelStyle,
 					)}
 				>

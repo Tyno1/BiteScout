@@ -62,7 +62,7 @@ export function AddNewFood({
         />
 
         <div className="w-[100%] overflow-hidden px-2">
-           <Input
+          <Input
             label="Ingredients"
             useLabel
             outlineType="round"
@@ -119,14 +119,14 @@ export function AddNewFood({
             ...(cuisineData?.map((cuisine: Cuisine) => ({
               value: cuisine?._id ?? "",
               label: cuisine?.name,
-            })) || [])
+            })) || []),
           ]}
           value={newFood?.cuisineType?._id}
           onChange={(e) => {
-            const selectedCuisine = e.target.value 
+            const selectedCuisine = e.target.value
               ? cuisineData.find((cuisine) => cuisine._id === e.target.value)
               : { _id: "", name: "", description: "" };
-            
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
               cuisineType: selectedCuisine as Cuisine,
@@ -147,14 +147,14 @@ export function AddNewFood({
             ...(courseData?.map((course: Course) => ({
               value: course?._id ?? "",
               label: course?.name,
-            })) || [])
+            })) || []),
           ]}
           value={newFood?.course?._id}
           onChange={(e) => {
-            const selectedCourse = e.target.value 
+            const selectedCourse = e.target.value
               ? courseData.find((course) => course._id === e.target.value)
               : { _id: "", name: "", description: "" };
-            
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
               course: selectedCourse as Course,
@@ -180,7 +180,7 @@ export function AddNewFood({
             onChange={(e) => {
               const value = e.target.value;
               const amount = value === "" ? 0 : Number.parseFloat(value) || 0;
-              
+
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,
                 price: {
@@ -217,45 +217,31 @@ export function AddNewFood({
           />
         </div>
 
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isAvailable"
-              checked={newFood.isAvailable ?? true}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isAvailable: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
-              Available for ordering
-            </label>
-          </div>
+        <div className="flex flex-col gap-4 items-start">
+          <Input
+            labelRow
+            label="Available for ordering"
+            useLabel
+            name="isAvailable"
+            type="checkbox"
+            checked={newFood.isAvailable ?? true}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isAvailable: e.target.checked }))
+            }
+          />
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isFeatured"
-              checked={newFood.isFeatured ?? false}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isFeatured: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
-              Featured item
-            </label>
-          </div>
+          <Input
+            useLabel
+            labelRow
+            label="Featured item"
+            name="isFeatured"
+            type="checkbox"
+            checked={newFood.isFeatured ?? false}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isFeatured: e.target.checked }))
+            }
+          />
         </div>
-
-
       </div>
 
       <div className="mt-4">
