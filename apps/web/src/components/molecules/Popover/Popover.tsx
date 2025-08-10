@@ -81,7 +81,9 @@ export function Popover({
 
   return (
     <ShadcnPopover>
-      <PopoverTrigger className={triggerClassName}>{trigger}</PopoverTrigger>
+      <PopoverTrigger asChild className={triggerClassName}>
+        {trigger}
+      </PopoverTrigger>
       <PopoverContent 
         className={cn(
           baseStyles,

@@ -51,7 +51,7 @@ export function Input({
   labelRow = false,
   ...props
 }: InputProps) {
-  const uniqueId = id || `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  const uniqueId = id || `input-${label?.toLowerCase()?.replace(/\s+/g, "-")}`;
 
   const sizeMap = {
     sm: "text-sm px-2 py-3",

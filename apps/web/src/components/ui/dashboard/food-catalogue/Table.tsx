@@ -3,11 +3,10 @@ import { Card } from "@/components/organisms";
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef, ColumnFiltersState } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowDownUp,
   ArrowDownWideNarrow,
@@ -15,17 +14,19 @@ import {
   Pen,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
-import { TableFilter } from "./TableFilter";
+
 
 type TableProps = {
   foodDatas: FoodCatalogue[];
   handleRowClick: (id: string) => void;
+  handleDelete: (id: string) => void;
+  handleEdit: (id: string) => void;
 };
 export type ColumnType = ColumnDef<FoodCatalogue>;
 
-export function Table({ foodDatas, handleRowClick }: TableProps) {
+export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: TableProps) {
   const column: ColumnType[] = [
     {
       accessorKey: "name",
@@ -33,16 +34,7 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
       id: "name",
       cell: (props) => <p>{props.getValue<string>()}</p>,
     },
-    {
-      accessorKey: "ingredients",
-      header: "Ingredients",
-      id: "ingredients",
-      enableSorting: false,
 
-      cell: (props) => (
-        <p className="line-clamp-2">{props.getValue<string[]>().join(", ")}</p>
-      ),
-    },
     {
       accessorKey: "cuisineType",
       header: "Cuisine",
@@ -82,7 +74,11 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
     },
     {
       accessorKey: "images",
-      header: "Images Count",
+      header: ({ column }) => (
+        <div className="hidden xl:flex items-center gap-2">
+          Images Count
+        </div>
+      ),
       id: "images",
       enableSorting: false,
       accessorFn: (row) => row.images?.length || 0,
@@ -95,54 +91,41 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
       cell: (props) => (
         <div className="flex justify-end space-x-2">
           <IconButton
+            name="edit-food-item"
             variant="plain"
             color="secondary"
             icon={<Pen size={20} />}
             size="sm"
-            onClick={() =>
-              props.row.original._id && handleRowClick(props.row.original._id)
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              props.row.original._id && handleEdit(props.row.original._id);
+            }}
           />
           <IconButton
+            name="delete-food-item"
             color="danger"
             variant="plain"
             size="sm"
             icon={<Trash2 size={20} />}
-            onClick={() =>
-              props.row.original._id && handleRowClick(props.row.original._id)
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              props.row.original._id && handleDelete(props.row.original._id);
+            }}
           />
         </div>
       ),
     },
   ];
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [filterName, setFilterName] = useState<string>("name");
-
-  // Debug logging
-  console.log("Table received foodDatas:", foodDatas);
 
   const table = useReactTable({
     data: foodDatas,
     columns: column,
-    state: {
-      columnFilters: columnFilters,
-    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
     <Card className="shadow overflow-hidden">
-      <TableFilter
-        columnFilters={columnFilters}
-        setColumnFilters={setColumnFilters}
-        filterName={filterName}
-        setFilterName={setFilterName}
-        column={column}
-      />
-
       <div className="max-h-[60vh] overflow-y-auto">
         {foodDatas.length === 0 ? (
           <div className="p-8 text-center text-card-foreground">
@@ -156,7 +139,9 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="px-4 py-5 text-left text-sm font-semibold text-secondary"
+                      className={`px-4 py-5 text-left text-sm font-semibold text-secondary ${
+                        header.id === "images" ? "hidden xl:table-cell" : ""
+                      }`}
                     >
                       <div className="flex items-center gap-1">
                         {flexRender(
@@ -164,18 +149,20 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
                           header.getContext()
                         )}
                         {header.column.getCanSort() && (
-                          <button
-                            type="button"
-                            className="ml-1"
+
+                          <IconButton
+                            name="sort-food-item"
+                            variant="plain"
+                            color="secondary"
+                            icon={<ArrowDownUp size={17} />}
+                            size="sm"
                             onClick={header.column.getToggleSortingHandler()}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" || e.key === " ") {
                                 header.column.getToggleSortingHandler()?.(e);
                               }
                             }}
-                          >
-                            <ArrowDownUp size={17} className="text-secondary" />
-                          </button>
+                          />
                         )}
                         {header.column.getIsSorted() === "asc" ? (
                           <ArrowUpNarrowWide
@@ -199,7 +186,7 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-secondary/10 cursor-pointer"
+                  className="hover:bg-secondary/10 focus:bg-secondary/10 focus:outline-none focus:ring-0 cursor-pointer"
                   onClick={() =>
                     row.original._id && handleRowClick(row.original._id)
                   }
@@ -211,7 +198,12 @@ export function Table({ foodDatas, handleRowClick }: TableProps) {
                   tabIndex={0}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-4 text-sm text-card-foreground">
+                    <td 
+                      key={cell.id} 
+                      className={`p-4 text-sm text-card-foreground ${
+                        cell.column.id === "images" ? "hidden xl:table-cell" : ""
+                      }`}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

@@ -1,6 +1,8 @@
+import { Card } from "@/components/organisms";
+
 export function Testimonials() {
   return (
-    <section className="w-full py-20 px-4 flex justify-center bg-gray-50">
+    <section className="w-full py-20 px-4 flex justify-center">
       <div className="w-[90%] flex flex-col items-center">
         <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
           What Our Users Say
@@ -25,14 +27,14 @@ export function Testimonials() {
               author: "Emma Davis",
               role: "Regular User",
             },
-          ].map((testimonial, index) => (
-            <div key={index} className="bg-white p-8 rounded-xl shadow-sm">
-              <p className="text-gray-600 mb-6 italic">&quot;{testimonial.quote}&quot;</p>
+          ].map((testimonial,) => (
+            <Card padding="lg" key={testimonial.author} containerClassName="shadow-sm" className="flex flex-col justify-between h-full">
+              <p className="mb-6 italic text-card-foreground text-sm">&quot;{testimonial.quote}&quot;</p>
               <div>
                 <p className="font-bold">{testimonial.author}</p>
-                <p className="text-sm text-gray-500">{testimonial.role}</p>
+                <p className="text-sm text-secondary">{testimonial.role}</p>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

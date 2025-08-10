@@ -34,7 +34,7 @@ export function Textarea({
 	useLabel = false,
 	outlineType,
 	icon,
-	theme = "light",
+	theme ,
 	rightButton,
 	fullWidth = false,
 	required = false,
@@ -85,7 +85,7 @@ export function Textarea({
 				<label
 					htmlFor={uniqueId}
 					className={clsx(
-						`block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+						`block ${!labelRow && "mb-3"} font-medium text-input-foreground`,
 						labelStyle,
 					)}
 				>

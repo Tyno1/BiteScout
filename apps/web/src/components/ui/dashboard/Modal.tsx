@@ -1,5 +1,7 @@
 "use client"
 
+import { IconButton } from "@/components/atoms";
+import { X } from "lucide-react";
 import { useRef } from "react";
 import ReactDOM from "react-dom";
 
@@ -20,13 +22,14 @@ export function UserModal({ isOpen, onClose, children }: ModalProps) {
         ref={modalRef}
         className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
       >
-        <button
-          type="button"
+        <IconButton 
+          icon={<X />}
+          variant="plain"
+          color="danger"
+          size="sm"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-        >
-          ×
-        </button>
+        />
+
         {children}
       </div>
     </div>,

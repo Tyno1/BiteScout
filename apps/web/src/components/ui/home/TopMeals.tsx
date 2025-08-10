@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { Star, MapPin, Volume2 } from "lucide-react";
+import { Card } from "@/components/organisms";
+import { MapPin, Star, Volume2 } from "lucide-react";
 import Image from "next/image";
+import React, { useState } from "react";
 
 export function TopMeals() {
   const [selectedType, setSelectedType] = useState<string>("Fine Dinning");
@@ -91,21 +92,22 @@ export function TopMeals() {
     "Bar",
   ];
   return (
-    <section className="py-10 md:py-20 bg-gray-50 w-full">
+    <section className="py-10 md:py-20 bg-background w-full">
       <div className="flex flex-col items-center px-2 md:px-20 w-full">
         <h2 className="text-3xl md:text-6xl font-bold mb-16 text-center">
           Top-Rated Dishes Near You
         </h2>
 
-        <div className="p-2 mb-4 border rounded-2xl md:rounded-3xl w-full  md:w-[90%] lg:w-[60%] flex justify-between overflow-x-auto">
-          {restaurantType.map((type, index) => (
+        <div className="p-2 mb-4 border rounded-2xl md:rounded-3xl w-full md:w-[90%] lg:w-[60%] flex justify-between overflow-x-auto">
+          {restaurantType.map((type) => (
             <button
+              type="button"
               onClick={() => handleTypeChange(type)}
-              key={index}
+              key={type}
               className={`px-3 py-2 text-xs md:text-sm font-medium text-medium rounded-xl md:rounded-2xl ${
                 selectedType === type
-                  ? "bg-orange-600 text-white transition duration-600 ease-in-out"
-                  : "text-gray-800"
+                  ? "bg-primary text-primary-foreground transition duration-600 ease-in-out"
+                  : "text-foreground"
               }`}
             >
               {type}
@@ -115,9 +117,10 @@ export function TopMeals() {
 
         <div className="grid grid-cols-1 gap-4 w-full">
           {topMeals.map((meal) => (
-            <div
+            <Card
               key={meal.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden flex gap-2"
+              containerClassName="hover:shadow-md transition-shadow overflow-hidden"
+              className="flex gap-2"
             >
               <Image
                 src={meal.image}
@@ -126,40 +129,40 @@ export function TopMeals() {
                 height={96}
                 className="w-24 h-24 object-cover"
               />
-              <div className="py-4 px-4 flex-1 flex justify-between">
-                <div>
+              <div className=" px-4 flex-1 flex justify-between">
+                <div className="flex flex-col justify-between">
                   <div className="flex items-start">
                     <div>
-                      <h3 className="font-semibold text-sm">{meal.name}</h3>
-                      <p className="text-xs text-gray-900">{meal.restaurant}</p>
+                      <h3 className="font-semibold text-sm text-card-foreground">{meal.name}</h3>
+                      <p className="text-xs text-primary">{meal.restaurant}</p>
                     </div>
                   </div>
 
                   <div className="mt-2">
-                    <p className="text-xs italic text-gray-900 line-clamp-2">
+                    <p className="text-xs italic text-foreground line-clamp-2">
                       {meal.topReview}
                     </p>
-                    <div className="flex items-center mt-1 text-xs text-gray-800">
+                    <div className="flex items-center mt-1 text-xs text-secondary">
                       <MapPin className="w-3 h-3 mr-1" />
                       {meal.location}
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col justify-between">
-                  <div className="flex items-center bg-yellow-50 px-1.5 py-0.5 rounded">
+                  <div className="flex items-center bg-primary/10 px-1.5 py-0.5 rounded">
                     <Star
-                      className="w-3 h-3 text-yellow-500 mr-0.5"
+                      className="w-3 h-3 text-primary mr-0.5"
                       fill="currentColor"
                     />
                     <span className="text-xs font-semibold">{meal.rating}</span>
                   </div>
-                  <button className="flex items-center gap-2">
+                  <button type="button" className="flex items-center gap-2">
                     <span className="text-xs font-medium">Listen</span>
-                    <Volume2 size={30} className="text-red" />
+                    <Volume2 size={30} className="text-secondary" />
                   </button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

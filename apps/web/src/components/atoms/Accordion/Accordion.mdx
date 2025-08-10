@@ -1,0 +1,121 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+
+import * as AccordionStories from "./Accordion.stories"
+
+<Meta of={AccordionStories}/>
+
+# Accordion Component
+
+The Accordion component is a flexible and accessible way to display collapsible content. It's perfect for FAQ sections, feature lists, and any content that benefits from organized, expandable sections.
+
+## Overview
+
+The Accordion component provides:
+- **Multiple visual variants** to match different design contexts
+- **Flexible sizing** for various layout requirements
+- **Accessibility features** including ARIA support and keyboard navigation
+- **Customizable content** supporting both text and React components
+- **State management** with callback support for external state tracking
+
+## Basic Usage
+
+<Canvas of={AccordionStories.Default} />
+
+## Variants
+
+The Accordion component supports three visual variants to match different design contexts:
+
+### Default Variant
+Clean and minimal with subtle border separators.
+
+<Canvas of={AccordionStories.Default} />
+
+### Bordered Variant
+Each item has its own border and rounded corners for a card-like appearance.
+
+<Canvas of={AccordionStories.Bordered} />
+
+### Elevated Variant
+Items have subtle shadows and background colors for prominent content sections.
+
+<Canvas of={AccordionStories.Elevated} />
+
+## Sizes
+
+Choose from three size options to match your layout requirements:
+
+### Small Size
+Compact design for space-constrained layouts.
+
+<Canvas of={AccordionStories.Small} />
+
+### Medium Size
+Default size with balanced spacing and typography.
+
+<Canvas of={AccordionStories.Medium} />
+
+### Large Size
+Spacious design for prominent content sections.
+
+<Canvas of={AccordionStories.Large} />
+
+## Behavior Options
+
+### Single vs Multiple Open Items
+
+By default, only one item can be open at a time. You can enable multiple open items:
+
+<Canvas of={AccordionStories.MultipleOpen} />
+
+### Default Open Items
+
+You can specify which items should be open by default:
+
+<Canvas of={AccordionStories.WithDefaultOpen} />
+
+## Advanced Features
+
+### Custom React Content
+
+The Accordion supports both string content and custom React components:
+
+<Canvas of={AccordionStories.CustomContent} />
+
+### Disabled Items
+
+You can disable specific accordion items:
+
+<Canvas of={AccordionStories.WithDisabledItems} />
+
+## Real-World Examples
+
+### FAQ Section
+Perfect for organizing frequently asked questions:
+
+<Canvas of={AccordionStories.FAQStyle} />
+
+### Feature List
+Great for showcasing product features:
+
+<Canvas of={AccordionStories.FeatureList} />
+
+## Accessibility
+
+The Accordion component is built with accessibility in mind:
+
+- **ARIA Support**: Full `aria-expanded` and `aria-disabled` attributes
+- **Keyboard Navigation**: Tab navigation and Enter/Space key support
+- **Focus Management**: Proper focus indicators and ring styles
+- **Screen Reader Support**: Semantic HTML structure and ARIA labels
+
+## Best Practices
+
+1. **Use descriptive titles** that clearly indicate what content will be revealed
+2. **Keep content concise** - accordions work best with focused, digestible information
+3. **Choose appropriate variants** based on your design context and content importance
+4. **Consider user experience** - use `allowMultiple` when users might want to compare content
+5. **Provide clear visual feedback** with hover and focus states
+
+## Props Reference
+
+<ArgsTable of={Accordion} /> 

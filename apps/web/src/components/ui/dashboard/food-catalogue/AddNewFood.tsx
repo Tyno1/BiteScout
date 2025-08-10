@@ -1,5 +1,5 @@
-import type { formErrorType } from "@/app/dashboard/food-catalogue/page";
 import { Button, IconButton, Input, Select } from "@/components/atoms";
+import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm";
 import { X } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
@@ -23,7 +23,7 @@ type FoodCatalogueModalType = {
   handleRemoveIngredients: (ingredient: string) => void;
   setIngredient: (ingredient: string) => void;
   ingredient: string;
-  formError: formErrorType;
+  formError: FormErrorType;
   FormWarning: (message: string) => ReactNode;
 };
 export function AddNewFood({
@@ -62,7 +62,7 @@ export function AddNewFood({
         />
 
         <div className="w-[100%] overflow-hidden px-2">
-           <Input
+          <Input
             label="Ingredients"
             useLabel
             outlineType="round"
@@ -119,17 +119,19 @@ export function AddNewFood({
             ...(cuisineData?.map((cuisine: Cuisine) => ({
               value: cuisine?._id ?? "",
               label: cuisine?.name,
-            })) || [])
+            })) || []),
           ]}
           value={newFood?.cuisineType?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCuisine = e.target.value
+              ? cuisineData.find((cuisine) => cuisine._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              cuisineType: cuisineData.find(
-                (cuisine) => cuisine._id === e.target.value
-              ) as Cuisine,
-            }))
-          }
+              cuisineType: selectedCuisine as Cuisine,
+            }));
+          }}
           errorMessage={
             formError.cuisineType && FormWarning(formError.cuisineType)
           }
@@ -145,17 +147,19 @@ export function AddNewFood({
             ...(courseData?.map((course: Course) => ({
               value: course?._id ?? "",
               label: course?.name,
-            })) || [])
+            })) || []),
           ]}
           value={newFood?.course?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCourse = e.target.value
+              ? courseData.find((course) => course._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              course: courseData.find(
-                (course) => course._id === e.target.value
-              ) as Course,
-            }))
-          }
+              course: selectedCourse as Course,
+            }));
+          }}
           errorMessage={formError?.course && FormWarning(formError.course)}
         />
 
@@ -173,16 +177,19 @@ export function AddNewFood({
             inputMode="decimal"
             placeholder="0.00"
             value={newFood.price.amount}
-            onChange={(e) =>
+            onChange={(e) => {
+              const value = e.target.value;
+              const amount = value === "" ? 0 : Number.parseFloat(value) || 0;
+
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,
                 price: {
                   ...prev.price,
-                  amount: Number.parseFloat(e.target.value),
+                  amount: amount,
                 },
-              }))
-            }
-            errorMessage={formError.name && FormWarning(formError.price ?? "Price is required")}
+              }));
+            }}
+            errorMessage={formError.price && FormWarning(formError.price)}
           />
 
           <Select
@@ -210,45 +217,31 @@ export function AddNewFood({
           />
         </div>
 
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isAvailable"
-              checked={newFood.isAvailable ?? true}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isAvailable: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
-              Available for ordering
-            </label>
-          </div>
+        <div className="flex flex-col gap-4 items-start">
+          <Input
+            labelRow
+            label="Available for ordering"
+            useLabel
+            name="isAvailable"
+            type="checkbox"
+            checked={newFood.isAvailable ?? true}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isAvailable: e.target.checked }))
+            }
+          />
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isFeatured"
-              checked={newFood.isFeatured ?? false}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isFeatured: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
-              Featured item
-            </label>
-          </div>
+          <Input
+            useLabel
+            labelRow
+            label="Featured item"
+            name="isFeatured"
+            type="checkbox"
+            checked={newFood.isFeatured ?? false}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isFeatured: e.target.checked }))
+            }
+          />
         </div>
-
-
       </div>
 
       <div className="mt-4">
@@ -261,7 +254,7 @@ export function AddNewFood({
           {allergenData.map((allergen: Allergen) => (
             <Button
               size="sm"
-              color="black"
+              color="neutral"
               variant={
                 newFood.allergens?.some((a) => a._id === allergen._id)
                   ? "solid"

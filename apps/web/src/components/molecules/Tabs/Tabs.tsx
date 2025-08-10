@@ -14,6 +14,7 @@ export type TabsProps = {
     selectedTab?: string;
     onTabChange?: (tabKey: string) => void;
     className?: string;
+    useDivider?: boolean;
 };
 
 export const Tabs = ({ 
@@ -21,7 +22,8 @@ export const Tabs = ({
     defaultTab, 
     selectedTab,
     onTabChange,
-    className = "" 
+    className = "",
+    useDivider = false,
 }: TabsProps) => {
     // Use selectedTab if provided, otherwise use defaultTab or first tab
     const activeTab = selectedTab || defaultTab || tabs[0]?.key;
@@ -47,7 +49,7 @@ export const Tabs = ({
     return (
         <div className={className}>
             {/* Tab Headers */}
-            <div className="flex border-b border-gray-200">
+            <div className="flex">
                 {tabs.map((tab) => (
                     <TabHeader
                         key={tab.key}
@@ -59,7 +61,7 @@ export const Tabs = ({
                     />
                 ))}
             </div>
-            
+            {useDivider && <div className="border-b border-foreground/10" />}
             {/* Tab Content */}
             <div className="mt-4">
                 {selectedTabContent}
