@@ -83,7 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	session: {
 		strategy: "jwt",
 		maxAge: 30 * 24 * 60 * 60, // 30 days
-		updateAge: 24 * 60 * 60, // 24 hours - only update session once per day
+		updateAge: 0, // Allow immediate session updates for development
 	},
 	secret: process.env.NEXTAUTH_SECRET,
 	providers: [
@@ -167,6 +167,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			session?: import("next-auth").Session;
 		}) {
 			try {
+				// Handle update trigger first (before expiration check)
+				if (trigger === "update" && session) {
+					token.restaurantCount = session.user.restaurantCount;
+					token.userType = session.user.userType;
+					return token;
+				}
+
 				// Only update token when user is provided (on sign in)
 				if (user) {
 					token._id = user._id;
@@ -176,13 +183,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					token.expiresIn = user.expiresIn; // Set expiration time
 				}
 
+				// Check if token is expired
 				if (Date.now() < (token.expiresIn as number)) {
 					return token;
-				}
-
-				if (trigger === "update" && session) {
-					token.restaurantCount = session.user.restaurantCount;
-					token.userType = session.user.userType;
 				}
 
 				// If the token is expired, try to refresh it (server-side)
@@ -209,7 +212,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				// Add token data to session
 				session.user._id = token._id as string;
 
-				// assign userType and Get User Type Details
+				// Use token values for userType and restaurantCount if they exist
 				if (token.userType) {
 					session.user.userType = token.userType as string;
 					session.user.userTypeDetails = await getUserTypeDetails(
@@ -221,7 +224,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					session.user.userTypeDetails = { name: "guest", level: 4 };
 				}
 
-				if (token._id && !token.restaurantCount) {
+				// Use token restaurantCount if it exists, otherwise fetch from backend
+				if (token.restaurantCount !== undefined) {
+					session.user.restaurantCount = token.restaurantCount;
+				} else if (token._id) {
 					// Only fetch restaurant count if not already cached in token
 					try {
 						const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
@@ -240,9 +246,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						console.error("Error fetching restaurant count:", error);
 						session.user.restaurantCount = 0;
 					}
-				} else if (token.restaurantCount) {
-					// Use cached restaurant count
-					session.user.restaurantCount = token.restaurantCount;
 				}
 
 				return session;

@@ -1,3 +1,3 @@
 // Export all restaurant access hooks
-export * from './useRestaurantAccess';
+export * from './useRestaurantAccessQueries';
 export * from './mutations'; 

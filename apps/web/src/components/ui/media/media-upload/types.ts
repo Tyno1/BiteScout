@@ -1,10 +1,11 @@
 import type { Media, UploadMediaResponse } from "shared/types";
 
 export interface MediaUploadProps {
-  onUploadSuccess?: (result: UploadMediaResponse) => void;
+  onUploadSuccess?: (result: UploadMediaResponse | UploadMediaResponse[]) => void;
   onUploadError?: (error: string) => void;
   onRemoveUploadedFile?: (index: number) => void;
   onSelectedFilesChange?: (files: FileWithPreview[]) => void;
+  onUpdateUploadedFileMetadata?: (index: number, field: string, value: string) => void;
   associatedWith?: Media["associatedWith"];
   folder?: string;
   className?: string;
@@ -13,6 +14,7 @@ export interface MediaUploadProps {
   uploadedFiles?: UploadMediaResponse[];
   selectedFiles?: FileWithPreview[];
   uploadMode?: 'auto' | 'manual';
+  editMode?: boolean;
 }
 
 export interface FileWithPreview {
@@ -47,6 +49,8 @@ export interface MediaPreviewProps {
   onAddMore: () => void;
   uploading: boolean;
   multiple: boolean;
+  uploadProgress?: Record<number, number>;
+  uploadErrors?: Record<number, string>;
 }
 
 export interface MediaCardProps {

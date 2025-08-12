@@ -74,14 +74,14 @@ export function IconButton({
 						? "bg-success text-success-foreground hover:text-success"
 						: "border border-1 border-success bg-none text-success"
 		} `,
-		neutral: `focus:ring-neutral focus:bg-neutral/20 focus:border-none focus:text-neutral ${
+		neutral: `focus:ring-foreground focus:bg-foreground/20 focus:border-none focus:text-foreground ${
 			variant === "plain"
-				? "text-neutral hover:bg-neutral/10 hover:text-neutral/80 transition-all duration-200"
+				? "text-foreground hover:bg-foreground/10 hover:text-foreground/80 transition-all duration-200"
 				: variant === "glass"
-					? "bg-neutral/5 backdrop-blur-lg border border-neutral/20 text-neutral hover:bg-neutral/15 hover:border-neutral/30 transition-all duration-200"
+					? "bg-foreground/20 backdrop-blur-lg border border-foreground/30 text-foreground hover:bg-foreground/30 hover:border-foreground/50 transition-all duration-200"
 					: variant === "solid"
-						? "border bg-neutral border-neutral/70 text-neutral-foreground hover:bg-neutral/90 hover:border-neutral hover:shadow-sm transition-all duration-200"
-						: "border border-neutral/40 bg-transparent text-neutral hover:bg-neutral/10 hover:border-neutral hover:text-neutral/80 transition-all duration-200"
+						? "border bg-foreground border-foreground/70 text-background hover:bg-foreground/90 hover:border-foreground hover:shadow-sm transition-all duration-200"
+						: "border border-foreground/40 bg-transparent text-foreground hover:bg-foreground/20 hover:border-foreground hover:text-foreground/80 transition-all duration-200"
 		}`,
 	};
 

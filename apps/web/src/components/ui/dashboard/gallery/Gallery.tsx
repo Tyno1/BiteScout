@@ -1,114 +1,157 @@
-import { Button, Input, Select, Textarea } from "@/components/atoms";
+"use client";
+
+import { Button } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import { Eye, Plus, Trash2, Upload } from "lucide-react";
-import { useCallback, useState } from "react";
-import { Media } from "shared/types/api/schemas";
-import Image from "next/image";
+import { MediaUpload } from "@/components/ui/media/media-upload";
+import { useGalleryState } from "@/hooks/useGalleryState";
+import type { Media, UploadMediaResponse } from "@shared/types";
+import type { Session } from "next-auth";
+import { useCallback, useEffect, useState } from "react";
+import { GalleryCard, ImageFullscreen } from "./";
 
 type GalleryProps = {
-  isEditing: boolean;
   images?: Media[];
   onImagesChange?: (images: Media[]) => void;
+  restaurantId: string;
+  session: Session | null;
 };
 
-// Gallery categories based on associatedWith.type
+// Gallery categories - based on available associatedWith.type values
 const GALLERY_CATEGORIES = [
   { value: "restaurant", label: "Restaurant" },
-  { value: "dish", label: "Food" },
   { value: "post", label: "Posts" },
 ];
 
+// Brand asset tags for restaurant media
+const BRAND_ASSET_TAGS = [
+  { value: "brand", label: "Brand Assets" },
+  { value: "logo", label: "Logo" },
+  { value: "promotional", label: "Promotional" },
+  { value: "marketing", label: "Marketing" },
+  { value: "interior", label: "Interior" },
+  { value: "exterior", label: "Exterior" },
+  { value: "team", label: "Team" },
+  { value: "food", label: "Food" },
+];
+
 export function Gallery({
-  isEditing,
   images = [],
   onImagesChange,
+  restaurantId,
+  session,
 }: GalleryProps) {
-  const [newImage, setNewImage] = useState<Partial<Media>>({});
-  const [selectedImage, setSelectedImage] = useState<Media | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isLocalEditing, setIsLocalEditing] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState<Media | null>(null);
 
-  const addImage = useCallback(() => {
-    if (!newImage.url || !newImage.type) return;
+  // Use optimized state management hook
+  const {
+    filteredImages,
+    hasUnsavedChanges,
+    isUploading,
+    addImages,
+    removeImage,
+    updateImageMetadata,
+    filterImages,
+    setUploading,
+  } = useGalleryState({
+    initialImages: images,
+    onImagesChange: onImagesChange || (() => {}),
+  });
 
-    const image: Media = {
-      _id: Date.now().toString(),
-      url: newImage.url,
-      title: newImage.title || "",
-      description: newImage.description || "",
-      type: newImage.type as Media["type"],
-      uploadedBy: "current-user", // This should come from session
-      associatedWith: {
-        type: newImage.associatedWith?.type || "restaurant",
-        id: newImage.associatedWith?.id || "",
-      },
-    };
+  // Check if we're in restaurant view mode
+  const isRestaurantView = selectedCategory === "restaurant";
 
-    onImagesChange?.([...images, image]);
-    setNewImage({});
-  }, [newImage, images, onImagesChange]);
+  // Check if we can edit the current category - posts are NEVER editable
+  const canEditCurrentCategory = isLocalEditing && isRestaurantView;
 
-  const removeImage = useCallback(
-    (id: string) => {
-      onImagesChange?.(images.filter((image) => image._id !== id));
+  // Reset local editing when switching away from restaurant category
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+    if (!category || category === "all" || category !== "restaurant") {
+      setIsLocalEditing(false);
+    }
+  }, []);
+
+  // Handle tag filtering
+  const handleTagChange = useCallback((tags: string[]) => {
+    setSelectedTags(tags);
+  }, []);
+
+  // Update filters when they change
+  const updateFilters = useCallback(() => {
+    // Convert "all" to empty string for the hook
+    const categoryForFilter = selectedCategory === "all" ? "" : selectedCategory;
+    filterImages(categoryForFilter, selectedTags);
+  }, [filterImages, selectedCategory, selectedTags]);
+
+  // Update filters when category or tags change
+  useEffect(() => {
+    updateFilters();
+  }, [updateFilters]);
+
+  const handleUploadSuccess = useCallback(
+    (result: UploadMediaResponse | UploadMediaResponse[]) => {
+      
+      let newImages: Media[];
+      if (Array.isArray(result)) {
+        // Multiple files uploaded
+        newImages = result;
+      } else {
+        // Single file uploaded
+        newImages = [result];
+      }
+      
+      // Add new images to gallery state
+      addImages(newImages);
     },
-    [images, onImagesChange]
+    [addImages]
   );
 
-  const handleInputChange = useCallback(
-    (field: keyof Media, value: string) => {
-      setNewImage((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+  const handleRemoveUploadedFile = useCallback(
+    (index: number) => {
+      if (!canEditCurrentCategory) return;
 
-  const handleAssociatedWithChange = useCallback(
-    (field: "type" | "id", value: string) => {
-      setNewImage((prev) => ({
-        ...prev,
-        associatedWith: {
-          ...prev.associatedWith,
-          [field]: value,
-        },
-      }));
-    },
-    []
-  );
-
-  const handleFileUpload = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        // In a real app, you'd upload to Cloudinary/S3 here
-        // For now, we'll create a local URL
-        const url = URL.createObjectURL(file);
-        setNewImage((prev) => ({ ...prev, url }));
+      const imageToRemove = filteredImages[index];
+      if (imageToRemove?._id) {
+        removeImage(imageToRemove._id);
       }
     },
-    []
+    [canEditCurrentCategory, filteredImages, removeImage]
   );
 
-  const filteredImages = images.filter(
-    (image) => 
-      !selectedCategory || 
-      image.associatedWith?.type === selectedCategory
+  const handleUpdateImageMetadata = useCallback(
+    (index: number, field: string, value: string) => {
+      
+      const imageToUpdate = filteredImages[index];
+      if (!imageToUpdate?._id) return;
+
+      updateImageMetadata(imageToUpdate._id, field, value);
+    },
+    [filteredImages, updateImageMetadata]
   );
+
+  const handleFullscreen = useCallback((image: Media) => {
+    setFullscreenImage(image);
+  }, []);
+
+  const closeFullscreen = useCallback(() => {
+    setFullscreenImage(null);
+  }, []);
 
   return (
-    <Card
-      Component="section"
-      padding="lg"
-      aria-labelledby="gallery-heading"
-    >
+    <Card component="section" padding="lg" aria-labelledby="gallery-heading">
       {/* Image Category Filter */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setSelectedCategory("")}
+            onClick={() => handleCategoryChange("all")}
             className={`px-3 py-1 text-sm rounded-full border ${
-              !selectedCategory
-                ? "bg-gray text-gray-foreground border-gray/20"
-                : "bg-gray text-gray-foreground border-gray/20"
+              selectedCategory === "all"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-card-foreground border-gray/20"
             }`}
           >
             All
@@ -117,197 +160,127 @@ export function Gallery({
             <button
               key={category.value}
               type="button"
-              onClick={() => setSelectedCategory(category.value)}
+              onClick={() => handleCategoryChange(category.value)}
               className={`px-3 py-1 text-sm rounded-full border ${
                 selectedCategory === category.value
-                  ? "bg-gray text-gray-foreground border-gray/20"
-                  : "bg-gray text-gray-foreground border-gray/20"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-card-foreground border-gray/20"
               }`}
             >
               {category.label}
             </button>
           ))}
         </div>
+
+        {/* Edit Toggle - Only visible for restaurant category */}
+        {isRestaurantView && (
+          <div className="mt-3 flex justify-end">
+            <Button
+              variant="solid"
+              size="sm"
+              text={isLocalEditing ? "View Mode" : "Edit Mode"}
+              onClick={() => setIsLocalEditing(!isLocalEditing)}
+              color="primary"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            />
+          </div>
+        )}
+
+        {/* Tag Filter for All Images - Hidden in edit mode */}
+        {!isLocalEditing && (
+          <div className="mt-3">
+            <div className="text-sm font-medium text-gray-foreground mb-2">
+              Filter by tags:
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleTagChange([])}
+                className={`px-3 py-1 text-sm rounded-full border ${
+                  selectedTags.length === 0
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-card-foreground border-gray/20"
+                }`}
+              >
+                All Tags
+              </button>
+              {BRAND_ASSET_TAGS.map((tag) => (
+                <button
+                  key={tag.value}
+                  type="button"
+                  onClick={() => handleTagChange([tag.value])}
+                  className={`px-3 py-1 text-sm rounded-full border ${
+                    selectedTags.includes(tag.value)
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-card-foreground border-gray/20"
+                  }`}
+                >
+                  {tag.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Gallery Grid */}
-      {filteredImages.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+      {/* Image Grid - Only visible in view mode */}
+      {!isLocalEditing && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredImages.map((image) => (
-            <div
-              key={image._id}
-              className="relative group aspect-square bg-gray rounded-lg overflow-hidden"
-            >
-              <Image
-                src={image.url || "/api/placeholder/300/300"}
-                alt={image.title || "Restaurant image"}
-                width={300}
-                height={300}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    text=""
-                    onClick={() => setSelectedImage(image)}
-                    className="p-1 bg-white"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  {isEditing && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      text=""
-                      onClick={() => removeImage(image._id || "")}
-                      className="p-1 bg-white text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
-                <p className="text-white text-xs truncate">
-                  {image.title || "Untitled"}
-                </p>
-              </div>
-            </div>
+            <GalleryCard
+              key={image._id || `image-${image.url}`}
+              image={image}
+              onFullscreen={handleFullscreen}
+            />
           ))}
         </div>
       )}
 
-      {/* Add New Image */}
-      {isEditing && (
-        <div className="border-t pt-4">
-          <h3 className="text-md font-medium mb-3">Add New Image</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <div className="space-y-2">
-              <Input
-                label="Image Title"
-                name="title"
-                type="text"
-                placeholder="Image Title"
-                value={newImage.title || ""}
-                onChange={(e) => handleInputChange("title", e.target.value)}
-                fullWidth
-                inputSize="sm"
-                outlineType="round"
-                theme="light"
-              />
-              <Select
-                label="Category"
-                name="category"
-                placeholder="Select Category"
-                value={newImage.associatedWith?.type || ""}
-                onChange={(e) => handleAssociatedWithChange("type", e.target.value)}
-                options={GALLERY_CATEGORIES}
-                fullWidth
-                inputSize="sm"
-                outlineType="round"
-                theme="light"
-              />
-            </div>
-            <div className="space-y-2">
-              <Input
-                label="Image URL"
-                name="url"
-                type="url"
-                placeholder="Image URL or upload file"
-                value={newImage.url || ""}
-                onChange={(e) => handleInputChange("url", e.target.value)}
-                fullWidth
-                inputSize="sm"
-                outlineType="round"
-                theme="light"
-              />
-              <div className="flex items-center space-x-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label
-                  htmlFor="image-upload"
-                  className="flex items-center space-x-2 px-3 py-2 border border-gray/20 rounded-md text-sm cursor-pointer hover:bg-gray/80"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Upload File</span>
-                </label>
-              </div>
-            </div>
-          </div>
-          <Textarea
-            label="Description"
-            name="description"
-            placeholder="Image Description (optional)"
-            value={newImage.description || ""}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange("description", e.target.value)}
-            fullWidth
-            inputSize="sm"
-            outlineType="round"
-            theme="light"
-            rows={2}
-          />
-          <div className="mt-3">
-            <Button
-              variant="outline"
-              size="sm"
-              text="Add Image"
-              onClick={addImage}
-              className="flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+      {/* MediaUpload - Only visible in edit mode */}
+      {isLocalEditing && (
+        <MediaUpload
+          onUploadSuccess={handleUploadSuccess}
+          onUploadError={(error) => {
+            // Error handling is managed by the MediaUpload component internally
+          }}
+          onRemoveUploadedFile={
+            canEditCurrentCategory ? handleRemoveUploadedFile : undefined
+          }
+          onUpdateUploadedFileMetadata={
+            canEditCurrentCategory ? handleUpdateImageMetadata : undefined
+          }
+          associatedWith={{
+            type: selectedCategory === "post" ? "post" : "restaurant",
+            id: restaurantId,
+          }}
+          folder={selectedCategory === "post" ? "post-images" : "gallery-images"}
+          multiple={false}
+          uploadedFiles={filteredImages}
+          editMode={canEditCurrentCategory}
+          className={
+            canEditCurrentCategory ? "" : "pointer-events-none opacity-75"
+          }
+        />
       )}
 
-      {!isEditing && filteredImages.length === 0 && (
+      {/* Empty State */}
+      {!isLocalEditing && filteredImages.length === 0 && (
         <div className="text-center py-8 text-gray-foreground">
-          <p>No images added yet.</p>
+          <p>No images found.</p>
+          <p className="text-sm mt-2">
+            {images.length === 0 
+              ? "No images have been added to the gallery yet. Switch to edit mode to upload images."
+              : "No images match the current filters. Try adjusting your category or tag selection."
+            }
+          </p>
         </div>
       )}
 
-      {/* Image Modal */}
-      {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 max-w-2xl max-h-[90vh] overflow-auto">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold">
-                {selectedImage.title || "Image Details"}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                text=""
-                onClick={() => setSelectedImage(null)}
-                className="p-1"
-              >
-                ×
-              </Button>
-            </div>
-            <Image
-              src={selectedImage.url}
-              alt={selectedImage.title || "Selected image"}
-              className="w-full h-auto rounded-lg mb-4"
-            />
-            {selectedImage.description && (
-              <p className="text-sm text-gray-foreground mb-2">
-                {selectedImage.description}
-              </p>
-            )}
-            <div className="text-xs text-gray-foreground">
-              <p>Category: {selectedImage.associatedWith?.type || "Unknown"}</p>
-              <p>Type: {selectedImage.type}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Fullscreen Modal */}
+      <ImageFullscreen
+        image={fullscreenImage}
+        onClose={closeFullscreen}
+      />
     </Card>
   );
-} 
+}

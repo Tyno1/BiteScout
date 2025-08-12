@@ -1,5 +1,5 @@
 import apiClient from "@/utils/authClient";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useState } from "react";
 
 export function useUpdateUser() {
@@ -30,16 +30,22 @@ export function useUpdateUser() {
       }
       const data = response.data;
 
-      // 2. Update the client-side session with new data
+      console.log("Updating session with:", data);
 
+      // Update the client-side session with new data
       await update({
-        ...session,
         user: {
-          ...session?.user,
+          ...session.user,
           restaurantCount: data.restaurantCount,
           userType: data.userType,
         },
       });
+
+      console.log("Session updated successfully");
+
+      // Force a session refresh to ensure the updated data is available
+      await getSession();
+      console.log("Session refreshed");
     } catch (err: unknown) {
       const error = err as Error;
       console.error("Error updating user:", err);

@@ -7,7 +7,7 @@ import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
 import { useCreateRestaurant } from "@/hooks/restaurant";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -15,8 +15,8 @@ import type { Restaurant } from "shared/types/api/schemas";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
-  	const createRestaurantMutation = useCreateRestaurant();
-  const {isOwner, getRestaurantListAccess,getFirstApprovedRestaurantId } = useRestaurantAccess()
+  const createRestaurantMutation = useCreateRestaurant();
+  const { isOwner, getRestaurantListAccess, getFirstApprovedRestaurantId } = useRestaurantAccess();
 
   const session = useSession();
   const router = useRouter();
@@ -101,7 +101,7 @@ export default function Onboarding() {
 
     // Create restaurant
     try {
-       await createRestaurantMutation.mutateAsync(preparedData);
+      await createRestaurantMutation.mutateAsync(preparedData);
       await handleSuccessfulCreation();
     } catch (error) {
       const errorMessage =
@@ -111,8 +111,6 @@ export default function Onboarding() {
   };
 
   const prepareRestaurantData = (): Restaurant => {
-    
-
     return {
       ...restaurantData,
       ownerId: session?.data?.user?._id || "",
@@ -122,19 +120,29 @@ export default function Onboarding() {
   };
 
   const handleSuccessfulCreation = async () => {
-    setMessage("Restaurant created successfully!");
+    setMessage("Restaurant created successfully! User role updated. Please log in again to access your new permissions.");
 
     try {
       if (session?.data?.user?._id) {
+        console.log("Before updateUser - restaurantCount:", session.data.user.restaurantCount);
+        console.log("Before updateUser - userType:", session.data.user.userType);
+        
         await updateUser(session.data.user._id);
-        router.push("/dashboard");
+        console.log("After updateUser - user updated in database");
+        
+        // Force logout to get fresh session with new role
+        await signOut({ redirect: false });
+        console.log("User signed out");
+        
+        // Redirect to login page
+        router.push("/login");
       }
     } catch (updateError) {
       console.error("Failed to update user restaurant count:", updateError);
       toast.warning(
-        "Restaurant created, but profile update incomplete. This will be fixed automatically."
+        "Restaurant created, but profile update incomplete. Please log in again."
       );
-      router.push("/dashboard");
+      router.push("/login");
     }
   };
 
@@ -167,7 +175,7 @@ export default function Onboarding() {
         return false;
       }
       
-      await getRestaurantListAccess(session.data.user._id); 
+      await getRestaurantListAccess(); 
       const approvedRestaurantId = getFirstApprovedRestaurantId();
       
       if (approvedRestaurantId) {

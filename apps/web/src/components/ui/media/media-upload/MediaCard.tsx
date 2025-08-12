@@ -13,7 +13,7 @@ export const MediaCard = ({
   uploading,
 }: MediaCardProps) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
+    <div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
       {/* Cancel Button - Floating action style */}
       <IconButton
         variant="solid"
@@ -73,22 +73,22 @@ export const MediaCard = ({
         <div className="w-1/2 p-2 flex flex-col justify-between">
           <div>
             <div className="mb-1">
-              <h4 className="text-xs font-medium text-gray-900 truncate">
+              <h4 className="text-xs font-medium text-foreground truncate">
                 {fileWithPreview.file.name}
               </h4>
             </div>
             
             {/* File Info */}
-            <div className="text-xs text-gray-600 space-y-0.5">
+            <div className="text-xs text-foreground space-y-0.5">
               <div className="flex justify-between">
                 <span>Type:</span>
-                <span className="text-gray-800 font-medium">
+                <span className="text-foreground font-medium">
                   {fileWithPreview.file.type.split('/')[1]?.toUpperCase()}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Size:</span>
-                <span className="text-gray-800 font-medium">
+                <span className="text-foreground font-medium">
                   {(fileWithPreview.file.size / 1024 / 1024).toFixed(1)}MB
                 </span>
               </div>

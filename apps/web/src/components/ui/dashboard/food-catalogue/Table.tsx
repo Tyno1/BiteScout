@@ -125,7 +125,7 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
   });
 
   return (
-    <Card className="shadow overflow-hidden">
+    <Card shadow="sm" className="overflow-hidden">
       <div className="max-h-[60vh] overflow-y-auto">
         {foodDatas.length === 0 ? (
           <div className="p-8 text-center text-card-foreground">

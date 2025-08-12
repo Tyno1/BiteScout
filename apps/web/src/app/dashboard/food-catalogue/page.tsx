@@ -3,7 +3,7 @@
 import { Alert, Button } from "@/components/atoms";
 import { AlertModal } from "@/components/molecules";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
-import { Card, Modal } from "@/components/organisms";
+import {  Modal } from "@/components/organisms";
 import { AddNewFood } from "@/components/ui";
 import { FoodCatalogueList } from "@/components/ui/dashboard/food-catalogue/FoodCatalogueList";
 import { MediaUpload } from "@/components/ui/media";
@@ -267,7 +267,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
 
       {/* Error State - Only show critical errors */}
       {(error || allergenError || cuisineError || courseError) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-danger border border-danger/20 rounded-lg p-4 mb-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <svg
@@ -327,10 +327,10 @@ export default function FoodCatalogueManagement(): React.ReactElement {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 Welcome to your Food Catalogue!
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-foreground/80 mb-6">
                 Start building your menu by adding your first food item. You can
                 include ingredients, allergens, pricing, and images.
               </p>

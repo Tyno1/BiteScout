@@ -43,7 +43,15 @@ export const uploadFile = async (
     associatedWith?: Media["associatedWith"];
   } = {},
 ): Promise<UploadMediaResponse> => {
-  const formData = createUploadFormData(file, metadata);
+  // Only send media service specific fields to the media service
+  const mediaServiceMetadata = {
+    title: metadata.title,
+    description: metadata.description,
+    tags: metadata.tags,
+    folder: metadata.folder,
+  };
+  
+  const formData = createUploadFormData(file, mediaServiceMetadata);
 
   // Upload all media through media service for consistent processing
   const mediaServiceResponse = await axios.post<MediaServiceResponse>(
@@ -78,6 +86,8 @@ export const uploadFile = async (
         createdAt: new Date().toISOString(),
       })),
       tags: mediaServiceResponse.data.media.tags || [],
+      // Add associatedWith if provided
+      ...(metadata.associatedWith && { associatedWith: metadata.associatedWith }),
     });
     
     return backendResponse.data;

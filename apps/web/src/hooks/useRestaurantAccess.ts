@@ -17,7 +17,7 @@ import {
   useSuspendRestaurantAccess,
   useUpdateRestaurantAccessRole,
 } from "@/hooks/restaurant-access";
-import { useRole } from "@/hooks/useRole";
+import { useSession } from "next-auth/react";
 import { useCallback, useMemo } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
@@ -29,7 +29,7 @@ export const useRestaurantAccess = (
   options: UseRestaurantAccessOptions = {}
 ) => {
   const { includeDeliveryLinks = false } = options;
-  const { session, isLoading: roleLoading } = useRole();
+  const { data: session, status: sessionStatus } = useSession();
 
   // Helper function to determine if user is an owner
   const isOwner = useCallback(() => {
@@ -73,15 +73,12 @@ export const useRestaurantAccess = (
   const updateRoleMutation = useUpdateRestaurantAccessRole();
 
   // Helper function to get restaurant list access (for backward compatibility)
-  const getRestaurantListAccess = useCallback(
-    async (userId: string) => {
-      if (isOwner()) {
-        return refetchOwnerAccess();
-      }
-      return refetchUserAccess();
-    },
-    [isOwner, refetchOwnerAccess, refetchUserAccess]
-  );
+  const getRestaurantListAccess = useCallback(() => {
+    if (isOwner()) {
+      return refetchOwnerAccess();
+    }
+    return refetchUserAccess();
+  }, [isOwner, refetchOwnerAccess, refetchUserAccess]);
 
   // Get the appropriate access data based on user role
   const restaurantAccessList = useMemo(() => {
@@ -89,7 +86,7 @@ export const useRestaurantAccess = (
       return ownerAccessData?.restaurantAccesses || [];
     }
     return userAccessData?.restaurantAccesses || [];
-  }, [isOwner, ownerAccessData, userAccessData]);
+  }, [isOwner, ownerAccessData?.restaurantAccesses, userAccessData?.restaurantAccesses]);
 
   // Get the first approved restaurant access for non-owners
   const approvedRestaurantId = useMemo(() => {
@@ -139,8 +136,8 @@ export const useRestaurantAccess = (
 
   // More precise loading state logic
   const isLoading = useMemo(() => {
-    // If we're loading role data, show loading
-    if (roleLoading) return true;
+    // If we're loading session data, show loading
+    if (sessionStatus === "loading") return true;
 
     // If we have restaurant data, we're not loading
     if (restaurantData?._id) return false;
@@ -153,7 +150,7 @@ export const useRestaurantAccess = (
 
     return false;
   }, [
-    roleLoading,
+    sessionStatus,
     restaurantLoading,
     accessLoading,
     restaurantData?._id,
@@ -253,7 +250,6 @@ export const useRestaurantAccess = (
 
     // Loading states
     isLoading,
-    roleLoading,
     restaurantLoading,
     deliveryLinksLoading,
     accessLoading,

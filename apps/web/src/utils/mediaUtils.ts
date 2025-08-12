@@ -21,10 +21,7 @@ export const createUploadFormData = (
     description?: string;
     tags?: string[];
     folder?: string;
-    associatedWith?: {
-      type?: string;
-      id?: string;
-    };
+    // Note: associatedWith is not sent to media service, only to backend sync
   } = {}
 ): FormData => {
   const formData = new FormData();
@@ -34,9 +31,7 @@ export const createUploadFormData = (
   if (metadata.description) formData.append("description", metadata.description);
   if (metadata.tags) formData.append("tags", JSON.stringify(metadata.tags));
   if (metadata.folder) formData.append("folder", metadata.folder);
-  if (metadata.associatedWith) {
-    formData.append("associatedWith", JSON.stringify(metadata.associatedWith));
-  }
+  // associatedWith is handled separately in backend sync, not sent to media service
 
   return formData;
 }; 
