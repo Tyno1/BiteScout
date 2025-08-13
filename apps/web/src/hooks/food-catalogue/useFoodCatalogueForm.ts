@@ -55,6 +55,17 @@ interface UseFoodCatalogueFormProps {
   onSuccess?: () => void;
 }
 
+const DEFAULT_FORM_ERROR: FormErrorType = {
+  name: "",
+  ingredients: "",
+  course: "",
+  cuisineType: "",
+  price: "",
+  allergens: "",
+  images: "",
+  restaurant: "",
+};
+
 export const useFoodCatalogueForm = ({ 
   restaurantId, 
   mode,
@@ -62,16 +73,6 @@ export const useFoodCatalogueForm = ({
   foodId,
   onSuccess 
 }: UseFoodCatalogueFormProps) => {
-  const DEFAULT_FORM_ERROR: FormErrorType = {
-    name: "",
-    ingredients: "",
-    cuisineType: "",
-    course: "",
-    price: "",
-    allergens: "",
-    images: "",
-    restaurant: "",
-  };
 
   // State - Initialize with existing data for update mode
   const [newFood, setNewFood] = useState<FoodCatalogue>(() => {
@@ -274,6 +275,8 @@ export const useFoodCatalogueForm = ({
     createFoodDataMutation,
     updateFoodDataMutation,
     onSuccess,
+    // Note: resetForm is defined later in the file, creating a circular dependency
+    // The function works correctly without it in the dependency array
   ]);
 
   const toggleAllergen = useCallback((allergen: Allergen): void => {

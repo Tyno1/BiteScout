@@ -1,6 +1,6 @@
 import { Alert, Input } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import { Globe, Info, Mail, MapPin, Phone, Sparkles } from "lucide-react";
+import { Globe, Mail, MapPin, Phone, Sparkles } from "lucide-react";
 import type { Restaurant } from "shared/types/api/schemas";
 
 type ContactInformationProps = {

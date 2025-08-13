@@ -2,6 +2,7 @@
 
 import { Button, IconButton } from "@/components/atoms";
 import { X } from "lucide-react";
+import Image from "next/image";
 import { MediaMetadataForm } from "./MediaMetadataForm";
 import type { MediaCardProps } from "./types";
 
@@ -31,10 +32,12 @@ export const MediaCard = ({
         <div className="w-1/2 p-2">
           <div className="relative w-full h-full bg-gray-50 rounded-lg overflow-hidden">
             {fileWithPreview.file.type.startsWith("image/") ? (
-              <img
+              <Image
                 src={fileWithPreview.previewUrl}
                 alt={`Preview of ${fileWithPreview.file.name}`}
-                className="w-full h-full object-contain"
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             ) : fileWithPreview.file.type.startsWith("video/") ? (
               <video

@@ -5,7 +5,6 @@ import { Card } from "@/components/organisms";
 import { MediaUpload } from "@/components/ui/media/media-upload";
 import { useGalleryState } from "@/hooks/useGalleryState";
 import type { Media, UploadMediaResponse } from "@shared/types";
-import type { Session } from "next-auth";
 import { useCallback, useEffect, useState } from "react";
 import { GalleryCard, ImageFullscreen } from "./";
 
@@ -13,7 +12,6 @@ type GalleryProps = {
   images?: Media[];
   onImagesChange?: (images: Media[]) => void;
   restaurantId: string;
-  session: Session | null;
 };
 
 // Gallery categories - based on available associatedWith.type values
@@ -38,7 +36,6 @@ export function Gallery({
   images = [],
   onImagesChange,
   restaurantId,
-  session,
 }: GalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -48,13 +45,10 @@ export function Gallery({
   // Use optimized state management hook
   const {
     filteredImages,
-    hasUnsavedChanges,
-    isUploading,
     addImages,
     removeImage,
     updateImageMetadata,
     filterImages,
-    setUploading,
   } = useGalleryState({
     initialImages: images,
     onImagesChange: onImagesChange || (() => {}),
@@ -240,7 +234,7 @@ export function Gallery({
       {isLocalEditing && (
         <MediaUpload
           onUploadSuccess={handleUploadSuccess}
-          onUploadError={(error) => {
+          onUploadError={() => {
             // Error handling is managed by the MediaUpload component internally
           }}
           onRemoveUploadedFile={

@@ -10,7 +10,6 @@ export const FileDropZone = ({
   onDragOver,
   onUpload,
   onClearAll,
-  onAddMore,
   uploading,
   multiple,
   fileInputRef,
@@ -97,14 +96,12 @@ export const FileDropZone = ({
             Total size: {(files.reduce((sum, f) => sum + f.file.size, 0) / 1024 / 1024).toFixed(2)} MB
           </p>
           <div className="flex justify-center space-x-3">
-            <Button
-              variant="solid"
-              size="sm"
-              onClick={onAddMore}
-              disabled={uploading}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              text={files.length === 0 ? "Select Files" : "Select More Files"}
-            />
+            <label
+              htmlFor="file-input"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {files.length === 0 ? "Select Files" : "Select More Files"}
+            </label>
             {files.length > 0 && uploadMode === 'manual' && (
               <>
                 <Button

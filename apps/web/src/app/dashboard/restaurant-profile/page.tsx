@@ -8,7 +8,7 @@ import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile
 import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
-import { useBatchMediaUpload, useMediaWithOptimizedUrl } from "@/hooks/media";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
@@ -62,14 +62,10 @@ export default function RestaurantProfile() {
       : DEFAULT_BUSINESS_HOURS;
   }, [restaurantData?.businessHours]);
 
-  const handleImageUpload = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      // Handle image upload logic here
-      console.log("Image uploaded:", file);
-    },
-    []
-  );
+  const handleImageUpload = useCallback(() => {
+    // Handle image upload logic here
+    // TODO: Implement actual image upload functionality
+  }, []);
 
   const handleInputChange = useCallback(
     (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => {
@@ -85,12 +81,7 @@ export default function RestaurantProfile() {
   );
 
   const handleSave = useCallback(async () => {
-    console.log("🚨 SAVE TRIGGERED!");
-    console.log("Call stack:", new Error().stack);
-    console.log("editableData:", editableData?._id);
-
     if (!editableData?._id) {
-      console.error("No editable data or ID found");
       return;
     }
     try {

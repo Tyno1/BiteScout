@@ -35,7 +35,6 @@ export interface FileDropZoneProps {
   onDragOver: (event: React.DragEvent) => void;
   onUpload: () => void;
   onClearAll: () => void;
-  onAddMore: () => void;
   uploading: boolean;
   multiple: boolean;
   fileInputRef: React.RefObject<HTMLInputElement>;
@@ -46,7 +45,6 @@ export interface MediaPreviewProps {
   files: FileWithPreview[];
   onRemoveFile: (index: number) => void;
   onUpdateMetadata: (index: number, field: keyof FileWithPreview, value: string | boolean) => void;
-  onAddMore: () => void;
   uploading: boolean;
   multiple: boolean;
   uploadProgress?: Record<number, number>;

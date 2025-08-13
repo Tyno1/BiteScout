@@ -103,8 +103,6 @@ export async function middleware(request: NextRequest) {
 		// Debug logs removed for production performance
 
 		if (allowedRoles && !allowedRoles.includes(role)) {
-			console.log("Access denied: User role", role, allowedRoles);
-			
 			console.warn(
 				`Access denied: User role ${role} not allowed for route ${pathname}`,
 			);

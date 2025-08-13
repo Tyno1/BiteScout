@@ -3,6 +3,7 @@
 import { Button, IconButton } from "@/components/atoms";
 import { Input, Textarea } from "@/components/atoms";
 import { Edit3, ExternalLink, X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import type { UploadMediaResponse } from "shared/types";
 
@@ -60,10 +61,12 @@ export const UploadedFilesList = ({
               <div className="w-1/2 p-2">
                 <div className="relative w-full h-full bg-gray-50 rounded-lg overflow-hidden">
                   {file.type === "image" ? (
-                    <img
+                    <Image
                       src={file.url}
                       alt={file.title || "Uploaded image"}
-                      className="w-full h-full object-contain"
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   ) : file.type === "video" ? (
                     <video

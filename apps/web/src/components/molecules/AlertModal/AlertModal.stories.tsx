@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { AlertModal, type AlertModalProps } from "./AlertModal";
 
@@ -77,6 +77,7 @@ function AlertModalWrapper(props: Partial<AlertModalProps>) {
         Open Alert Modal
       </button>
       <AlertModal
+        title={props.title || "Default Title"}
         {...props}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -84,7 +85,9 @@ function AlertModalWrapper(props: Partial<AlertModalProps>) {
           console.log("Confirmed");
           setIsOpen(false);
         }}
-      />
+      >
+        {props.children || "Default content"}
+      </AlertModal>
     </div>
   );
 }

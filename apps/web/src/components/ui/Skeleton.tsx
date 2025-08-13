@@ -38,9 +38,7 @@ const widthClasses = {
 };
 
 export const Skeleton = ({ 
-	count = 1, 
 	className = "",
-	columns,
 	height = "md",
 	width = "full",
 	animate = true,
@@ -55,28 +53,8 @@ export const Skeleton = ({
 		className
 	);
 
-	// If no columns specified, render single skeleton
-	if (!columns) {
-		return (
-			<div className={skeletonClasses} />
-		);
-	}
-
-	// If columns specified, render grid
-	const gridClasses = cn(
-		"grid gap-4",
-		`grid-cols-${columns.sm || 1}`,
-		`md:grid-cols-${columns.md || 2}`,
-		`lg:grid-cols-${columns.lg || 3}`,
-		`xl:grid-cols-${columns.xl || 4}`
-	);
-
 	return (
-		<div className={gridClasses}>
-			{Array.from({ length: count }, (_, index) => (
-				<div key={`skeleton-${index}-${Date.now()}`} className={skeletonClasses} />
-			))}
-		</div>
+		<div className={skeletonClasses} />
 	);
 };
 
@@ -98,7 +76,7 @@ export const SkeletonPresets = {
 	),
 	
 	// Card skeleton
-	Card: (props: Partial<SkeletonProps>) => (
+	Card: () => (
 		<div className="space-y-3">
 			<Skeleton height="lg" width="full" />
 			<Skeleton height="sm" width="3/4" />

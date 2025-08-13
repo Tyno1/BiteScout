@@ -69,7 +69,7 @@ export default function Services() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Restaurant Management</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    Complete control over your restaurant's presence with powerful admin tools, 
+                    Complete control over your restaurant&apos;s presence with powerful admin tools, 
                     food catalogue management, and customer engagement features.
                   </p>
                 </div>
@@ -211,7 +211,7 @@ export default function Services() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Web Admin Dashboard</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    Complete control over your restaurant's presence on BiteScout
+                    Complete control over your restaurant&apos;s presence on BiteScout
                   </p>
                 </div>
               </div>

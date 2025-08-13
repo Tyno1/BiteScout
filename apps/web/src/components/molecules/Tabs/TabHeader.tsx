@@ -27,13 +27,12 @@ export const TabHeader = ({
     <div className="flex flex-col items-center justify-center gap-2">
       <Button
         size="sm"
-        color={isSelected ? "primary" : "transparent"}
+        color={isSelected ? "primary" : "neutral"}
         onClick={handleClick}
-        variant="plain"
+        variant={isSelected ? "glass" : "plain"}
         fullWidth
         text={label}
         disabled={disabled}
-        className="bg-transparent"
       />
 
       <div

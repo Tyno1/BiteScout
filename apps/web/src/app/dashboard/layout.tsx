@@ -30,7 +30,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
     // Check access rights
     if (!isOwner && !isAdmin) {
-      console.log("Redirecting to onboarding/roles...");
       router.push("/onboarding/roles");
     }
 

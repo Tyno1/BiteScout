@@ -32,8 +32,10 @@ export const MediaSkeleton = ({
 	showInfo = true,
 	animate = true
 }: MediaSkeletonProps) => {
+	const gridClasses = `grid gap-4 grid-cols-${columns.sm} md:grid-cols-${columns.md} lg:grid-cols-${columns.lg} xl:grid-cols-${columns.xl} ${className}`;
+	
 	return (
-		<div className={`grid gap-4 ${className}`}>
+		<div className={gridClasses}>
 			{Array.from({ length: count }, (_, index) => (
 				<div key={`media-skeleton-${index}-${Date.now()}`} className="space-y-2">
 					{/* Image skeleton */}

@@ -66,21 +66,18 @@ export const initializeSocket = (
 	});
 
 	socket.on("connect", () => {
-		console.log("Connected to notification server");
-
 		// Authenticate with user ID
 		if (socket && userId) {
 			socket.emit("authenticate", userId);
 		}
 	});
 
-	socket.on("authenticated", (data) => {
-		console.log("Socket authenticated:", data.message);
+	socket.on("authenticated", () => {
+		// Socket authenticated successfully
 	});
 
 	// Listen for notifications
 	socket.on("notification", (socketNotification) => {
-		console.log("Received notification:", socketNotification);
 
 		// Transform to API spec format and dispatch to store
 		const notification = transformSocketNotification(socketNotification);
@@ -93,8 +90,8 @@ export const initializeSocket = (
 		}
 	});
 
-	socket.on("disconnect", (reason) => {
-		console.log("Disconnected from notification server:", reason);
+	socket.on("disconnect", () => {
+		// Socket disconnected
 	});
 
 	socket.on("connect_error", (error) => {
@@ -112,12 +109,8 @@ export const initializeSocket = (
 		}
 	});
 
-	socket.on("reconnect", (attemptNumber) => {
-		console.log(
-			"Reconnected to notification server after",
-			attemptNumber,
-			"attempts",
-		);
+	socket.on("reconnect", () => {
+		// Reconnected to notification server
 		// Re-authenticate after reconnection
 		if (userId) {
 			socket?.emit("authenticate", userId);

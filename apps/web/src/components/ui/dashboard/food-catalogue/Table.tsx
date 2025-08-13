@@ -74,7 +74,7 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
     },
     {
       accessorKey: "images",
-      header: ({ column }) => (
+      header: () => (
         <div className="hidden xl:flex items-center gap-2">
           Images Count
         </div>
@@ -98,7 +98,9 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              props.row.original._id && handleEdit(props.row.original._id);
+              if (props.row.original._id) {
+                handleEdit(props.row.original._id);
+              }
             }}
           />
           <IconButton
@@ -109,7 +111,9 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
             icon={<Trash2 size={20} />}
             onClick={(e) => {
               e.stopPropagation();
-              props.row.original._id && handleDelete(props.row.original._id);
+              if (props.row.original._id) {
+                handleDelete(props.row.original._id);
+              }
             }}
           />
         </div>

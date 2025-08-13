@@ -1,22 +1,20 @@
 import { Alert, Button, IconButton, Select } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import {
-  CheckCircle,
-  ChevronDown,
-  ChevronRight,
-  Info,
-  Plus,
-  Sparkles,
-  Tag,
-} from "lucide-react";
-import { useState } from "react";
-import type { Restaurant, RestaurantFeature } from "shared/types/api/schemas";
-import {
   ALL_FEATURES,
   type CategorizedFeature,
   FEATURE_CATEGORIES,
   categorizeFeatures,
-} from "../../../../utils";
+} from "@/utils";
+import {
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Tag,
+} from "lucide-react";
+import { useState } from "react";
+import type { Restaurant, RestaurantFeature } from "shared/types/api/schemas";
 
 type RestaurantProfileFeaturesProps = {
   isEditing: boolean;

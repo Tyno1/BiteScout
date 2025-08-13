@@ -2,9 +2,10 @@
 
 import { Button, IconButton } from "@/components/atoms";
 import { useMediaWithOptimizedUrl } from "@/hooks/media";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { ImageFullscreen } from "../dashboard";
 
 interface MediaGalleryProps {
   mediaIds: string[];
@@ -115,7 +116,7 @@ export const MediaGallery = ({
             {/* Previous Button */}
             <IconButton
               variant="glass"
-              color="white"
+              color="neutral"
               size="sm"
               onClick={goToPrevious}
               className="absolute left-2 top-1/2 transform -translate-y-1/2"
@@ -124,8 +125,8 @@ export const MediaGallery = ({
             
             {/* Next Button */}
             <IconButton
-              variant="glass"
-              color="white"
+              variant="glass" 
+              color="neutral"
               size="sm"
               onClick={goToNext}
               className="absolute right-2 top-1/2 transform -translate-y-1/2"
@@ -142,7 +143,7 @@ export const MediaGallery = ({
         {/* Fullscreen Toggle */}
         <Button
           variant="glass"
-          color="black"
+          color="neutral"
           size="sm"
           onClick={toggleFullscreen}
           className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white border-0"
@@ -169,71 +170,8 @@ export const MediaGallery = ({
       )}
 
       {/* Fullscreen Modal */}
-      {isFullscreen && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
-          style={{ top: "0", left: "0", right: "0", bottom: "0" }}
-        >
-          <div className="relative w-full h-[90%] flex items-center justify-center p-4 pt-16">
-            {/* Close Button */}
-            <IconButton
-              variant="glass"
-              color="white"
-              size="sm"
-              onClick={toggleFullscreen}
-              className="absolute top-4 right-4"
-              icon={<X size={24} />}
-            />
-
-            {/* Fullscreen Image */}
-            <div className="relative w-full h-full flex items-center justify-center max-h-[calc(100vh-8rem)]">
-              {currentLoading ? (
-                <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
-                  <div className="text-white">Loading...</div>
-                </div>
-              ) : currentError ? (
-                <div className="w-full h-full bg-red-50 flex items-center justify-center">
-                  <p className="text-red-600">Failed to load image</p>
-                </div>
-              ) : (
-                <Image
-                  src={currentUrl}
-                  alt={currentAlt}
-                  fill
-                  className="object-contain"
-                />
-              )}
-            </div>
-
-            {/* Fullscreen Navigation */}
-            {mediaIds.length > 1 && (
-              <>
-                <IconButton
-                  variant="glass"
-                  color="white"
-                  size="lg"
-                  onClick={goToPrevious}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2"
-                  icon={<ChevronLeft size={24} />}
-                />
-                
-                <IconButton
-                  variant="glass"
-                  color="white"
-                  size="lg"
-                  onClick={goToNext}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                  icon={<ChevronRight size={24} />}
-                />
-
-                {/* Fullscreen Counter */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-lg">
-                  {currentIndex + 1} / {mediaIds.length}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+      {isFullscreen && currentMediaData?.media && (
+        <ImageFullscreen image={currentMediaData.media} onClose={() => setIsFullscreen(false)} />
       )}
     </div>
   );

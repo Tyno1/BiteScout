@@ -1,5 +1,6 @@
 import { useBatchMediaUpload, useMediaUpload } from "@/hooks/media";
 import type { UploadMetadata } from "@/hooks/media/mutations/useMediaUpload";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import type { FileWithPreview } from "./media-upload/types";
 
@@ -205,11 +206,15 @@ export const MediaUploadOptimized = ({
               <div key={`${fileWithPreview.file.name}-${index}`} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   {fileWithPreview.previewUrl ? (
-                    <img
-                      src={fileWithPreview.previewUrl}
-                      alt={fileWithPreview.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={fileWithPreview.previewUrl}
+                        alt={fileWithPreview.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <svg

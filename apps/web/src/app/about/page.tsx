@@ -3,7 +3,7 @@
 import { Button } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
-import { Camera, Heart, MapPin, Star, TrendingUp } from "lucide-react";
+import { Camera, Heart, MapPin, Palette, Salad, Smartphone, Star, TrendingUp, Trophy, Type, Zap } from "lucide-react";
 
 export default function About() {
   return (
@@ -50,7 +50,7 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Visual Discovery</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    We don't ask users to read reviews. We show them exactly what they could eat next — 
+                    We don&apos;t ask users to read reviews. We show them exactly what they could eat next — 
                     via vibrant, full-screen food content that makes your mouth water.
                   </p>
                 </div>
@@ -70,7 +70,7 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Real Taste</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    It's not about ratings. It's about recognition — great food, beautifully captured, 
+                    It&apos;s not about ratings. It&apos;s about recognition — great food, beautifully captured, 
                     socially shared, and effortlessly discovered by food lovers everywhere.
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default function About() {
               Built for Food Lovers
             </h2>
             <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Whether you're a visual foodie, fast explorer, or dietary seeker, BiteScout has you covered
+              Whether you&apos;re a visual foodie, fast explorer, or dietary seeker, BiteScout has you covered
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export default function About() {
               shadow="lg"
             >
               <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <span className="text-4xl">📱</span>
+                <Smartphone className="w-16 h-16 text-primary" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">The Visual Foodie</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 18-35</p>
@@ -193,7 +193,7 @@ export default function About() {
               shadow="lg"
             >
               <div className="w-24 h-24 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <span className="text-4xl">⚡</span>
+                <Zap className="w-16 h-16 text-secondary" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">The Fast Explorer</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 25-45</p>
@@ -210,7 +210,7 @@ export default function About() {
               shadow="lg"
             >
               <div className="w-24 h-24 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <span className="text-4xl">🥗</span>
+                <Salad className="w-16 h-16 text-success" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">The Dietary Seeker</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 21-50</p>
@@ -231,7 +231,7 @@ export default function About() {
               Our Brand Identity
             </h2>
             <p className="text-xl text-background/80 max-w-3xl mx-auto font-light">
-              Modern, playful, classy, and inclusive — just like the food community we're building
+              Modern, playful, classy, and inclusive — just like the food community we&apos;re building
             </p>
           </div>
 
@@ -241,12 +241,12 @@ export default function About() {
                 <span className="text-3xl font-bold text-primary-foreground">B</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Name</h3>
-              <p className="text-background/70 font-light">BiteScout – "Follow the Flavor"</p>
+              <p className="text-background/70 font-light">BiteScout – &quot;Follow the Flavor&quot;</p>
             </div>
 
             <div className="text-center">
               <div className="w-20 h-20 bg-accent rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-3xl">🎨</span>
+                <Palette className="w-16 h-16 text-accent-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Colors</h3>
               <p className="text-background/70 font-light">Deep black, toasted gold, warm red, cool cream</p>
@@ -254,7 +254,7 @@ export default function About() {
 
             <div className="text-center">
               <div className="w-20 h-20 bg-muted rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-3xl">🔤</span>
+                <Type className="w-16 h-16 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Typography</h3>
               <p className="text-background/70 font-light">Contemporary sans serif with personality</p>
@@ -262,7 +262,7 @@ export default function About() {
 
             <div className="text-center">
               <div className="w-20 h-20 bg-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-3xl">🏆</span>
+                <Trophy className="w-16 h-16 text-secondary-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Icon</h3>
               <p className="text-background/70 font-light">Stylized bite mark on a scout badge</p>
@@ -278,7 +278,7 @@ export default function About() {
             Ready to Follow the Flavor?
           </h2>
           <p className="text-xl text-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Join thousands of food lovers discovering, sharing, and exploring the world's most delicious dishes
+            Join thousands of food lovers discovering, sharing, and exploring the world&apos;s most delicious dishes
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button

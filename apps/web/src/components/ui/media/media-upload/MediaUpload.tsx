@@ -1,7 +1,6 @@
 "use client";
 
 import { useMediaUpload } from "@/hooks/media";
-import type { UploadMediaResponse } from "@shared/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FileDropZone } from "./FileDropZone";
 import { MediaPreview } from "./MediaPreview";
@@ -28,7 +27,7 @@ export const MediaUpload = ({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<Record<number, number>>({});
   const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
-  const [uploadResults, setUploadResults] = useState<UploadMediaResponse[]>([]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const uploadMutation = useMediaUpload();
@@ -38,7 +37,6 @@ export const MediaUpload = ({
     if (files.length === 0) {
       setUploadProgress({});
       setUploadErrors({});
-      setUploadResults([]);
     }
   }, [files.length]);
 
@@ -97,7 +95,6 @@ export const MediaUpload = ({
     setUploading(true);
     setUploadProgress({});
     setUploadErrors({});
-    setUploadResults([]);
 
     try {
       const uploadPromises = files.map(async (fileWithPreview, index) => {
@@ -126,7 +123,6 @@ export const MediaUpload = ({
           ));
 
           // Store successful result
-          setUploadResults(prev => [...prev, result]);
           return result;
         } catch (error) {
           // Update file to show error state
@@ -230,17 +226,12 @@ export const MediaUpload = ({
       URL.revokeObjectURL(f.previewUrl);
     }
     setFiles([]);
-    setUploadProgress({});
-    setUploadErrors({});
-    setUploadResults([]);
-    onSelectedFilesChange?.([]);
+          setUploadProgress({});
+      setUploadErrors({});
+      onSelectedFilesChange?.([]);
   }, [files, onSelectedFilesChange]);
 
-  const handleAddMore = useCallback(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  }, []);
+
 
   const handleRemoveUploadedFile = useCallback((index: number) => {
     onRemoveUploadedFile?.(index);
@@ -265,7 +256,6 @@ export const MediaUpload = ({
         onDragOver={handleDragOver}
         onUpload={handleUpload}
         onClearAll={handleClearAll}
-        onAddMore={handleAddMore}
         uploading={uploading}
         multiple={multiple}
         fileInputRef={fileInputRef}
@@ -301,7 +291,6 @@ export const MediaUpload = ({
         files={files}
         onRemoveFile={handleRemoveFile}
         onUpdateMetadata={updateFileMetadata}
-        onAddMore={handleAddMore}
         uploading={uploading}
         multiple={multiple}
         uploadProgress={uploadProgress}

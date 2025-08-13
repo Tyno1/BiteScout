@@ -97,7 +97,6 @@ export default function Onboarding() {
 
     // Prepare restaurant data
     const preparedData = prepareRestaurantData();
-    console.log("Prepared restaurant data:", preparedData);
 
     // Create restaurant
     try {
@@ -122,17 +121,12 @@ export default function Onboarding() {
   const handleSuccessfulCreation = async () => {
     setMessage("Restaurant created successfully! User role updated. Please log in again to access your new permissions.");
 
-    try {
-      if (session?.data?.user?._id) {
-        console.log("Before updateUser - restaurantCount:", session.data.user.restaurantCount);
-        console.log("Before updateUser - userType:", session.data.user.userType);
-        
-        await updateUser(session.data.user._id);
-        console.log("After updateUser - user updated in database");
-        
-        // Force logout to get fresh session with new role
-        await signOut({ redirect: false });
-        console.log("User signed out");
+          try {
+        if (session?.data?.user?._id) {
+          await updateUser(session.data.user._id);
+          
+          // Force logout to get fresh session with new role
+          await signOut({ redirect: false });
         
         // Redirect to login page
         router.push("/login");
@@ -147,7 +141,6 @@ export default function Onboarding() {
   };
 
   const handleCreationError = (error: string | undefined) => {
-    console.log("Restaurant creation error:", error);
     setApiError(error || "An error occurred");
   };
 

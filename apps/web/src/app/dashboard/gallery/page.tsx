@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import type { Media } from "shared/types/api/schemas";
 
 export default function GalleryPage() {
-  const { restaurantData, isOwner, hasAccessToRestaurant, isLoading, session } =
+  const { restaurantData, isOwner, hasAccessToRestaurant, isLoading } =
     useRestaurantAccess();
   const updateRestaurant = useUpdateRestaurant().mutateAsync;
   const [galleryImages, setGalleryImages] = useState<Media[]>([]);
@@ -183,7 +183,6 @@ export default function GalleryPage() {
         images={galleryImages}
         onImagesChange={handleImagesChange}
         restaurantId={restaurantData._id}
-        session={session}
       />
 
       {/* Save/Cancel Actions */}

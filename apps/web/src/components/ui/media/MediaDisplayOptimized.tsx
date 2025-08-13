@@ -1,4 +1,5 @@
 import { useMediaWithOptimizedUrl } from "@/hooks/media";
+import Image from "next/image";
 import { memo } from "react";
 
 interface MediaDisplayOptimizedProps {
@@ -56,11 +57,15 @@ export const MediaDisplayOptimized = memo(({
       <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
         <p className="text-red-600 text-sm">Error loading media: {errorMessage}</p>
         {fallbackUrl && (
-          <img 
-            src={fallbackUrl} 
-            alt="Fallback" 
-            className={`${imageHeight} w-full object-cover rounded-lg mt-2`}
-          />
+          <div className={`relative ${imageHeight} w-full mt-2`}>
+            <Image 
+              src={fallbackUrl} 
+              alt="Fallback" 
+              fill
+              className="object-cover rounded-lg"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          </div>
         )}
       </div>
     );
@@ -88,18 +93,22 @@ export const MediaDisplayOptimized = memo(({
 
   return (
     <div className={className}>
-      <img
-        src={displayUrl}
-        alt={media.title || "Media"}
-        className={`${imageHeight} w-full object-cover rounded-lg`}
-        loading={priority ? "eager" : "lazy"}
-        onLoad={onLoad}
-        onError={() => {
-          if (onError) {
-            onError(new Error("Failed to load image"));
-          }
-        }}
-      />
+      <div className={`relative ${imageHeight} w-full`}>
+        <Image
+          src={displayUrl}
+          alt={media.title || "Media"}
+          fill
+          className="object-cover rounded-lg"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={priority}
+          onLoad={onLoad}
+          onError={() => {
+            if (onError) {
+              onError(new Error("Failed to load image"));
+            }
+          }}
+        />
+      </div>
       
       {(showTitle && media.title) || (showDescription && media.description) ? (
         <div className="mt-2 space-y-1">

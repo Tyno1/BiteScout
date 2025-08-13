@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { Restaurant } from "shared/types/api/schemas";
 
 type RestaurantProfileHeroProps = {
-	image1: string | Promise<string>;
+	image1: string;
 	isEditing: boolean;
 	displayData: Restaurant | undefined;
 	handleInputChange: (
@@ -52,13 +52,13 @@ export function RestaurantProfileHero({
 								name="restaurant-name"
 								label="Restaurant Name"
 								disabled={!isEditing}
-								value={displayData.name}
+								value={displayData?.name}
 								onChange={(e) => handleInputChange("name", e.target.value)}
 								placeholder="Add Restaurant Name here"
 								className="text-6xl font-bold bg-transparent"
 							/>
 						) : (
-							displayData.name
+							displayData?.name
 						)}
 					</h1>
 				</div>
@@ -66,6 +66,7 @@ export function RestaurantProfileHero({
 					{isEditing ? (
 						<>
 							<button
+								type="button"
 								onClick={handleSave}
 								className="inline-flex items-center justify-center px-4 py-2 border-2  border-white rounded text-white hover:bg-white hover:text-black transition-colors"
 								aria-label="Save changes"
@@ -73,6 +74,7 @@ export function RestaurantProfileHero({
 								<Save className="w-4 h-4" />
 							</button>
 							<button
+								type="button"
 								onClick={handleCancel}
 								className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
 								aria-label="Cancel editing"
@@ -82,6 +84,7 @@ export function RestaurantProfileHero({
 						</>
 					) : (
 						<button
+							type="button"
 							onClick={handleEdit}
 							className="inline-flex items-center justify-center px-4 py-2 border-2 border-white rounded text-white hover:bg-white hover:text-black transition-colors"
 							aria-label="Edit profile"
@@ -91,6 +94,7 @@ export function RestaurantProfileHero({
 					)}
 					<label className="cursor-pointer">
 						<button
+							type="button"
 							className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
 							aria-label="Upload new cover image"
 						>

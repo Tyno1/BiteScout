@@ -64,7 +64,7 @@ export default function TeamManagement() {
 
       default:
         return (
-          <Badge color="neutral" variant="solid" size="xs ">
+          <Badge color="neutral" variant="solid" size="xs">
             {status}
           </Badge>
         );

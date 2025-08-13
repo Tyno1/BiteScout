@@ -54,9 +54,9 @@ export const GalleryCard = ({ image, onFullscreen }: GalleryCardProps) => {
 
       {/* Image Info */}
       <div className="p-3">
-        <h4 className="text-sm font-medium text-foreground truncate mb-1">
+        <p className="text-sm font-medium text-foreground truncate mb-1">
           {image.title || "Untitled"}
-        </h4>
+        </p>
         {image.description && (
           <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
             {image.description}

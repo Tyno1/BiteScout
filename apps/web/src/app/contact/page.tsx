@@ -26,7 +26,7 @@ export default function Contact() {
             Get in <span className="text-primary">Touch</span>
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            Have questions about BiteScout? We'd love to hear from you. 
+            Have questions about BiteScout? We&apos;d love to hear from you. 
             Our team is here to help with any inquiries or support you need.
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function Contact() {
               Send Us a Message
             </h2>
             <p className="text-xl text-card-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Fill out the form below and we'll get back to you as soon as possible
+              Fill out the form below and we&apos;ll get back to you as soon as possible
             </p>
           </div>
 
@@ -363,7 +363,7 @@ export default function Contact() {
             Frequently Asked Questions
           </h2>
           <p className="text-xl text-card-foreground mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            Can't find what you're looking for? Check out our comprehensive FAQ section
+            Can&apos;t find what you&apos;re looking for? Check out our comprehensive FAQ section
           </p>
           
           <div className="max-w-3xl mx-auto">

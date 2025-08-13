@@ -30,8 +30,6 @@ export function useUpdateUser() {
       }
       const data = response.data;
 
-      console.log("Updating session with:", data);
-
       // Update the client-side session with new data
       await update({
         user: {
@@ -41,11 +39,8 @@ export function useUpdateUser() {
         },
       });
 
-      console.log("Session updated successfully");
-
       // Force a session refresh to ensure the updated data is available
       await getSession();
-      console.log("Session refreshed");
     } catch (err: unknown) {
       const error = err as Error;
       console.error("Error updating user:", err);
