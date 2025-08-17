@@ -5,8 +5,9 @@ import { Card } from "@/components/organisms";
 import { MediaUpload } from "@/components/ui/media/media-upload";
 import { useGalleryState } from "@/hooks/useGalleryState";
 import type { Media, UploadMediaResponse } from "@shared/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GalleryCard, ImageFullscreen } from "./";
+import { GallerySkeleton } from "./GallerySkeleton";
 
 type GalleryProps = {
   images?: Media[];
@@ -41,6 +42,14 @@ export function Gallery({
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocalEditing, setIsLocalEditing] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<Media | null>(null);
+  
+  // Add local gallery loading state
+  const [isGalleryLoading, setIsGalleryLoading] = useState(true);
+  
+  // Virtual scrolling and lazy loading
+  const [visibleCount, setVisibleCount] = useState(8); // Reduced from 12 to 8 for faster initial load
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
 
   // Use optimized state management hook
   const {
@@ -85,20 +94,51 @@ export function Gallery({
     updateFilters();
   }, [updateFilters]);
 
+  // Check if gallery data has been loaded
+  useEffect(() => {
+    if (images !== undefined) {
+      setIsGalleryLoading(false);
+    }
+  }, [images]);
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (loadingRef.current) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              setVisibleCount((prev) => Math.min(prev + 4, filteredImages.length)); // Reduced from 8 to 4
+            }
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observerRef.current.observe(loadingRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [filteredImages.length]);
+
   const handleUploadSuccess = useCallback(
     (result: UploadMediaResponse | UploadMediaResponse[]) => {
       
-      let newImages: Media[];
-      if (Array.isArray(result)) {
-        // Multiple files uploaded
-        newImages = result;
-      } else {
-        // Single file uploaded
-        newImages = [result];
-      }
+      // Handle both single and array responses
+      const results = Array.isArray(result) ? result : [result];
       
-      // Add new images to gallery state
-      addImages(newImages);
+      // Extract media from each response and add to gallery
+      const newImages: Media[] = results
+        .map(response => response.media)
+        .filter((media): media is Media => media !== undefined);
+      
+      if (newImages.length > 0) {
+        addImages(newImages);
+      }
     },
     [addImages]
   );
@@ -220,13 +260,31 @@ export function Gallery({
       {/* Image Grid - Only visible in view mode */}
       {!isLocalEditing && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredImages.map((image) => (
+          {/* Show skeleton only while gallery data is loading */}
+          {isGalleryLoading && <GallerySkeleton count={8} />}
+          
+          {/* Show images when gallery data has loaded */}
+          {!isGalleryLoading && filteredImages.slice(0, visibleCount).map((image, index) => (
             <GalleryCard
               key={image._id || `image-${image.url}`}
               image={image}
               onFullscreen={handleFullscreen}
+              priority={index < 2} // Priority load first 2 images for better LCP
             />
           ))}
+          
+          {/* Loading indicator and intersection observer target */}
+          {!isGalleryLoading && visibleCount < filteredImages.length && (
+            <div 
+              ref={loadingRef}
+              className="col-span-full flex justify-center py-8"
+            >
+              <div className="flex items-center space-x-2 text-muted-foreground">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span>Loading more images...</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -249,7 +307,10 @@ export function Gallery({
           }}
           folder={selectedCategory === "post" ? "post-images" : "gallery-images"}
           multiple={false}
-          uploadedFiles={filteredImages}
+          uploadedFiles={filteredImages.map(image => ({
+            message: "Media loaded from gallery",
+            media: image
+          }))}
           editMode={canEditCurrentCategory}
           className={
             canEditCurrentCategory ? "" : "pointer-events-none opacity-75"
@@ -257,8 +318,8 @@ export function Gallery({
         />
       )}
 
-      {/* Empty State */}
-      {!isLocalEditing && filteredImages.length === 0 && (
+      {/* Empty State - only when gallery data has loaded and no images */}
+      {!isLocalEditing && !isGalleryLoading && filteredImages.length === 0 && (
         <div className="text-center py-8 text-gray-foreground">
           <p>No images found.</p>
           <p className="text-sm mt-2">

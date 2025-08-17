@@ -79,7 +79,7 @@ export function BusinessHours({
                   type="time"
                   name={`${hours.day} opening time`}
                   label="Opening Time"
-                  disabled={!isEditing || hours.closed}
+                  disabled={!isEditing || hours.isClosed}
                   value={hours.open}
                   onChange={(e) =>
                     handleBusinessHoursChange(index, "open", e.target.value)
@@ -93,7 +93,7 @@ export function BusinessHours({
                   type="time"
                   name={`${hours.day} closing time`}
                   label="Closing Time"
-                  disabled={!isEditing || hours.closed}
+                  disabled={!isEditing || hours.isClosed}
                   value={hours.close}
                   onChange={(e) =>
                     handleBusinessHoursChange(index, "close", e.target.value)
@@ -105,11 +105,11 @@ export function BusinessHours({
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={hours.closed}
+                    checked={hours.isClosed}
                     onChange={(e) =>
                       handleBusinessHoursChange(
                         index,
-                        "closed",
+                        "isClosed",
                         e.target.checked
                       )
                     }

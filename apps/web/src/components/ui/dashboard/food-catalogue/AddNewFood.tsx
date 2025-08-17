@@ -76,13 +76,13 @@ export function AddNewFood({
             value={ingredient}
             onChange={(e) => setIngredient(e.target.value)}
             rightButton={
-              <button
-                type="button"
+              <Button
+                text="Add"
                 onClick={() => handleAddIngredients(ingredient)}
-                className="bg-primary text-sm text-white h-full w-full px-4 py-2 rounded"
-              >
-                Add
-              </button>
+                variant="solid"
+                color="primary"
+                size="sm"
+              />
             }
             errorMessage={
               formError.ingredients && FormWarning(formError.ingredients)
@@ -90,7 +90,7 @@ export function AddNewFood({
           />
 
           <div className="flex gap-2 mt-2 overflow-x-auto">
-            {newFood.ingredients.map((ingredient: string) => (
+            {newFood.ingredients?.map((ingredient: string) => (
               <div
                 key={ingredient}
                 className="flex items-center gap-2 text-sm bg-black rounded-xl px-2 py-1"
@@ -98,6 +98,7 @@ export function AddNewFood({
                 <span className="text-white ">{ingredient}</span>
 
                 <IconButton
+                  aria-label="Remove ingredient"
                   icon={<X size={16} />}
                   size="xs"
                   variant="plain"
@@ -110,6 +111,7 @@ export function AddNewFood({
         </div>
 
         <Select
+          placeholder="Please select"
           label="Cuisine Type"
           name="cuisine-type"
           useLabel
@@ -118,7 +120,7 @@ export function AddNewFood({
             { value: "", label: "Please select" },
             ...(cuisineData?.map((cuisine: Cuisine) => ({
               value: cuisine?._id ?? "",
-              label: cuisine?.name,
+              label: cuisine?.name ?? "",
             })) || []),
           ]}
           value={newFood?.cuisineType?._id}
@@ -138,6 +140,7 @@ export function AddNewFood({
         />
 
         <Select
+          placeholder="Please select"
           label="Course"
           name="course"
           useLabel
@@ -146,7 +149,7 @@ export function AddNewFood({
             { value: "", label: "Please select" },
             ...(courseData?.map((course: Course) => ({
               value: course?._id ?? "",
-              label: course?.name,
+              label: course?.name ?? "",
             })) || []),
           ]}
           value={newFood?.course?._id}
@@ -176,7 +179,7 @@ export function AddNewFood({
             onWheel={(e) => e.currentTarget.blur()}
             inputMode="decimal"
             placeholder="0.00"
-            value={newFood.price.amount}
+            value={newFood.price?.amount ?? 0}
             onChange={(e) => {
               const value = e.target.value;
               const amount = value === "" ? 0 : Number.parseFloat(value) || 0;
@@ -193,17 +196,18 @@ export function AddNewFood({
           />
 
           <Select
+            placeholder="Please select"
             className="w-[100px]"
             label="Currencies"
             name="currencies"
             outlineType="round"
             options={
               currencies?.map((currency: string) => ({
-                value: currency ?? "",
+                value: currency,
                 label: currency,
               })) || []
             }
-            value={newFood?.course?._id}
+            value={newFood?.price?.currency}
             onChange={(e) =>
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,

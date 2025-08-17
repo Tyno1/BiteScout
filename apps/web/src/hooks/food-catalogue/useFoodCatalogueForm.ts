@@ -126,18 +126,8 @@ export const useFoodCatalogueForm = ({
       
       // Convert GetMediaResponse to UploadMediaResponse format
       const uploadResponseImages: UploadMediaResponse[] = images.map(image => ({
-        _id: image._id,
-        url: image.url,
-        type: image.type,
-        title: image.title,
-        description: image.description,
-        uploadedBy: image.uploadedBy,
-        providerId: image.providerId,
-        provider: image.provider,
-        variants: image.variants || [],
-        tags: image.tags || [],
-        createdAt: image.createdAt,
-        updatedAt: image.updatedAt,
+        message: "Existing image",
+        media: image,
       }));
       
       setExistingImages(uploadResponseImages);
@@ -214,7 +204,7 @@ export const useFoodCatalogueForm = ({
             
             completedUploads++;
             setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
-            return result._id;
+            return result.media?._id;
           });
 
           const results = await Promise.all(uploadPromises);
@@ -264,6 +254,7 @@ export const useFoodCatalogueForm = ({
       setUploadProgress(0);
     }
   }, [
+
     isSubmitting,
     validateForm,
     selectedMediaFiles,
@@ -291,14 +282,14 @@ export const useFoodCatalogueForm = ({
   const handleAddIngredients = useCallback((ingredient: string) => {
     if (!ingredient) return;
     
-    if (newFood.ingredients.includes(ingredient)) {
+    if (newFood.ingredients?.includes(ingredient)) {
       setFormError(prev => ({ ...prev, ingredients: "ingredient already included" }));
       return;
     }
 
     setNewFood((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, ingredient],
+      ingredients: [...(prev.ingredients || []), ingredient],
     }));
     setIngredient("");
     setFormError((prev) => ({ ...prev, ingredients: "" }));
@@ -307,7 +298,7 @@ export const useFoodCatalogueForm = ({
   const handleRemoveIngredients = useCallback((ingredient: string): void => {
     setNewFood((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.filter((i) => i !== ingredient),
+      ingredients: (prev.ingredients || []).filter((i) => i !== ingredient),
     }));
   }, []);
 
@@ -317,7 +308,7 @@ export const useFoodCatalogueForm = ({
       const updated = prev.filter((_, i) => i !== index);
       
       // Also update newFood.images to reflect the removal
-      const removedImageId = prev[index]?._id;
+              const removedImageId = prev[index]?.media?._id;
       if (removedImageId) {
         setNewFood(current => ({
           ...current,

@@ -29,14 +29,14 @@ export const TabHeader = ({
         size="sm"
         color={isSelected ? "primary" : "neutral"}
         onClick={handleClick}
-        variant={isSelected ? "glass" : "plain"}
+        variant="plain"
         fullWidth
         text={label}
         disabled={disabled}
       />
 
       <div
-        className={`w-full h-1 ${isSelected ? "bg-primary" : "bg-gray-200"}`}
+        className={`w-full h-0.5 ${isSelected ? "bg-primary" : "bg-gray-200"}`}
       />
     </div>
   );

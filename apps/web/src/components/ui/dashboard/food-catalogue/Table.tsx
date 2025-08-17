@@ -53,7 +53,7 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
       accessorKey: "price",
       header: "Price",
       id: "price",
-      accessorFn: (row) => `${row.price.currency}${row.price.amount}`,
+      accessorFn: (row) => row.price ? `${row.price.currency}${row.price.amount}` : '',
       cell: (props) => <p>{props.getValue<string>()}</p>,
     },
     {

@@ -328,9 +328,9 @@ async function getAvailableFilters(currentFilter: Record<string, any>) {
   const matchingRestaurants = await RestaurantData.find(currentFilter);
   
   // Extract unique values
-  const cuisines = [...new Set(matchingRestaurants.flatMap(r => r.cuisine?.map((c: any) => c.toString()) || []))];
-  const priceRanges = [...new Set(matchingRestaurants.map(r => r.priceRange).filter(Boolean))];
-  const features = [...new Set(matchingRestaurants.flatMap(r => r.features || []))];
+  const cuisines = Array.from(new Set<string>(matchingRestaurants.flatMap(r => r.cuisine?.map((c: any) => c.toString()) || [])));
+  const priceRanges = Array.from(new Set<string>(matchingRestaurants.map(r => r.priceRange).filter(Boolean)));
+  const features = Array.from(new Set<string>(matchingRestaurants.flatMap(r => r.features || [])));
   
   // Group features by category
   const featuresByCategory: Record<string, string[]> = {};

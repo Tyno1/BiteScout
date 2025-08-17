@@ -42,7 +42,7 @@ export function Modal({
     if (isModalOpen) {
       // Store the currently focused element
       previousActiveElement.current = document.activeElement as HTMLElement;
-      
+
       // Focus the modal
       modalRef.current?.focus();
     } else {
@@ -56,17 +56,19 @@ export function Modal({
     if (e.key === "Escape") {
       setIsModalOpen(false);
     }
-    
+
     // Trap focus within modal
     if (e.key === "Tab") {
       const focusableElements = modalRef.current?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      
+
       if (focusableElements && focusableElements.length > 0) {
         const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-        
+        const lastElement = focusableElements[
+          focusableElements.length - 1
+        ] as HTMLElement;
+
         if (e.shiftKey) {
           // Shift + Tab
           if (document.activeElement === firstElement) {
@@ -97,6 +99,7 @@ export function Modal({
             setIsModalOpen(false);
           }
         }}
+        aria-label="Close modal"
         role="button"
         tabIndex={-1}
       />
@@ -121,6 +124,7 @@ export function Modal({
                 )}
               </div>
               <IconButton
+                aria-label="Close modal"
                 variant="plain"
                 color="danger"
                 size="sm"
@@ -142,14 +146,14 @@ export function Modal({
                 onClick={closeModal}
               />
               {modalActionText && (
-              <Button
-                variant="outline"
-                color="primary"
-                size="sm"
-                text={modalActionText}
-                onClick={modalActionOnClick}
-                disabled={isSubmitting}
-              />
+                <Button
+                  variant="outline"
+                  color="primary"
+                  size="sm"
+                  text={modalActionText}
+                  onClick={modalActionOnClick}
+                  disabled={isSubmitting}
+                />
               )}
             </div>
           </div>

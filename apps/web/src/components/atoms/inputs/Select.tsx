@@ -20,7 +20,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   onChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
   value?: string;
   selectClassName?: string;
-  placeholder?: string;
+  placeholder: string;
   fullWidth?: boolean;
   iconStyle?: string;
   theme?: "light" | "dark" | "transparent";
@@ -142,7 +142,7 @@ export function Select({
           )}
           {...props}
         >
-          {placeholder && <option value="">{placeholder}</option>}
+          {placeholder ? <option value="">{placeholder}</option> : null}
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}

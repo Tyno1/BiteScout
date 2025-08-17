@@ -63,6 +63,22 @@ export function Select({
 }: SelectProps) {
   const uniqueId = id || `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
+  // Enhanced onChange handler to ensure first option works
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    // Always call the parent onChange, even for first option
+    if (onChange) {
+      // Force the event to be processed
+      const syntheticEvent = {
+        ...e,
+        target: {
+          ...e.target,
+          value: e.target.value
+        }
+      };
+      onChange(syntheticEvent);
+    }
+  };
+
   const sizeMap = {
     sm: "text-sm px-2 py-3",
     md: "text-base px-4 py-4",
@@ -125,7 +141,7 @@ export function Select({
           id={uniqueId}
           name={name}
           required={required}
-          onChange={onChange}
+          onChange={handleChange}
           value={value}
           aria-label={label}
           aria-describedby={`${uniqueId}-error ${uniqueId}-helper`}
@@ -142,7 +158,7 @@ export function Select({
           )}
           {...props}
         >
-          {placeholder && <option value="">{placeholder}</option>}
+          {placeholder ? <option value="">{placeholder}</option> : null}
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}

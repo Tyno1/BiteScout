@@ -20,6 +20,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useCallback, useMemo } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
+import { AccessStatusEnum } from "shared/types/api/schemas";
 
 interface UseRestaurantAccessOptions {
   includeDeliveryLinks?: boolean;
@@ -157,6 +158,56 @@ export const useRestaurantAccess = (
     session?.user?.restaurantCount,
   ]);
 
+  // Helper function to validate restaurant access
+  const validateRestaurantAccess = useCallback((restaurantId: string) => {
+    if (!restaurantId || !session?.user?._id) {
+      throw new Error("Invalid restaurant ID or user session");
+    }
+
+    if (isOwner()) {
+      // Owners can access their own restaurants
+      if (restaurantData?._id === restaurantId) {
+        return { hasAccess: true, access: null, message: "Owner access granted" };
+      }
+      throw new Error("You can only access your own restaurants");
+    }
+
+    // Non-owners need explicit access records
+    const access = restaurantAccessList.find(
+      (access: RestaurantAccess) => access.restaurantId === restaurantId
+    );
+
+    if (!access) {
+      throw new Error("No access record found for this restaurant");
+    }
+
+    if (access.status !== AccessStatusEnum.Approved) {
+      throw new Error(`Access ${access.status} - Contact restaurant admin`);
+    }
+
+    // Check if access is suspended (assuming there's a suspended status)
+    if (access.status === AccessStatusEnum.Suspended) {
+      throw new Error("Your access has been suspended");
+    }
+
+    return { 
+      hasAccess: true, 
+      access, 
+      message: `Access granted with role: ${access.role}` 
+    };
+  }, [session?.user?._id, isOwner, restaurantData?._id, restaurantAccessList]);
+
+  // Helper function to check if user has access to a specific restaurant
+  const hasAccessToRestaurant = useCallback((restaurantId: string) => {
+    try {
+      const result = validateRestaurantAccess(restaurantId);
+      return result.hasAccess;
+    } catch (error) {
+      console.error("Failed to validate restaurant access:", error);
+      return false;
+    }
+  }, [validateRestaurantAccess]);
+
   // Helper function to get the first approved restaurant access
   const getFirstApprovedRestaurantId = useCallback(() => {
     const approvedAccess = restaurantAccessList.find(
@@ -165,7 +216,7 @@ export const useRestaurantAccess = (
     return approvedAccess?.restaurantId;
   }, [restaurantAccessList]);
 
-  // Helper function to load appropriate restaurant data
+  // Helper function to load appropriate restaurant data with access validation
   const loadRestaurantData = useCallback(async () => {
     if (!session?.user?._id) return;
 
@@ -177,12 +228,15 @@ export const useRestaurantAccess = (
         // User is not an owner, check for approved restaurant access
         const approvedRestaurantId = getFirstApprovedRestaurantId();
         if (approvedRestaurantId) {
+          // Validate access before fetching
+          validateRestaurantAccess(approvedRestaurantId);
           // For non-owners, refetch the approved restaurant data
           await refetchApprovedRestaurant();
         }
       }
     } catch (error) {
       console.error("Failed to load restaurant data:", error);
+      throw error;
     }
   }, [
     session?.user?._id,
@@ -190,22 +244,27 @@ export const useRestaurantAccess = (
     refetchRestaurant,
     refetchApprovedRestaurant,
     getFirstApprovedRestaurantId,
+    validateRestaurantAccess,
   ]);
 
-  // Helper function to load restaurant data by specific ID
+  // Helper function to load restaurant data by specific ID with access validation
   const loadRestaurantDataById = useCallback(
     async (restaurantId: string) => {
       if (!restaurantId) return;
 
       try {
+        // Validate access before proceeding
+        validateRestaurantAccess(restaurantId);
+        
         // This would need a different query hook for specific restaurant by ID
         // For now, we'll use the existing refetch
         await refetchRestaurant();
       } catch (error) {
         console.error("Failed to load restaurant data by ID:", error);
+        throw error;
       }
     },
-    [refetchRestaurant]
+    [refetchRestaurant, validateRestaurantAccess]
   );
 
   // Helper function to get restaurant access by status
@@ -213,17 +272,6 @@ export const useRestaurantAccess = (
     (status: string) => {
       return restaurantAccessList.filter(
         (access: RestaurantAccess) => access.status === status
-      );
-    },
-    [restaurantAccessList]
-  );
-
-  // Helper function to check if user has access to a specific restaurant
-  const hasAccessToRestaurant = useCallback(
-    (restaurantId: string) => {
-      return restaurantAccessList.some(
-        (access: RestaurantAccess) =>
-          access.restaurantId === restaurantId && access.status === "approved"
       );
     },
     [restaurantAccessList]
@@ -263,6 +311,7 @@ export const useRestaurantAccess = (
     hasAccessToRestaurant,
     getPendingAccessRequests,
     getApprovedAccess,
+    validateRestaurantAccess, // New: Access validation function
 
     // Restaurant Actions
     updateRestaurant: updateRestaurantMutation.mutate,

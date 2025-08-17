@@ -3,11 +3,32 @@
 import { Badge, IconButton } from "@/components/atoms";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Ban, CheckCircle, Trash2, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
-  const { restaurantAccessList, deleteAccess, grantAccess, suspendAccess } =
-    useRestaurantAccess();
+  const router = useRouter();
+  const { 
+    restaurantAccessList, 
+    deleteAccess, 
+    grantAccess, 
+    suspendAccess,
+    restaurantData,
+    validateRestaurantAccess
+  } = useRestaurantAccess();
+
+  useEffect(() => {
+    if (restaurantData?._id) {
+      try {
+        validateRestaurantAccess(restaurantData._id);
+      } catch (error) {
+        console.error("Access validation failed:", error);
+        // Redirect to unauthorized if access is denied
+        router.push("/dashboard/unauthorized");
+      }
+    }
+  }, [restaurantData?._id, validateRestaurantAccess, router]);
 
   const handleStatusChange = async (
     accessId: string,

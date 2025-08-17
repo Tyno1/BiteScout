@@ -1,15 +1,29 @@
 "use client";
 
-import { Gallery } from "@/components/ui/dashboard";
+import { Button } from "@/components/atoms";
+import { GallerySkeleton } from "@/components/ui/dashboard/gallery";
 import { useUpdateRestaurant } from "@/hooks";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import type { Media } from "shared/types/api/schemas";
 
+
+
+// Dynamic imports for code splitting
+const Gallery = dynamic(() => import("@/components/ui/dashboard").then(mod => ({ default: mod.Gallery })), {
+  loading: () => <GallerySkeleton count={8} />,
+  ssr: false
+});
+
 export default function GalleryPage() {
-  const { restaurantData, isOwner, hasAccessToRestaurant, isLoading } =
-    useRestaurantAccess();
+  const { 
+    restaurantData, 
+    isOwner, 
+    hasAccessToRestaurant, 
+    isLoading
+  } = useRestaurantAccess();
   const updateRestaurant = useUpdateRestaurant().mutateAsync;
   const [galleryImages, setGalleryImages] = useState<Media[]>([]);
   const [originalImages, setOriginalImages] = useState<Media[]>([]);
@@ -67,9 +81,6 @@ export default function GalleryPage() {
       setSaveError(errorMessage);
       toast.error(errorMessage);
       
-      // Don't automatically rollback - let user decide
-      // setGalleryImages(originalImages);
-      // setHasUnsavedChanges(false);
     } finally {
       setIsSaving(false);
     }
@@ -179,11 +190,13 @@ export default function GalleryPage() {
         </p>
       </div>
 
-      <Gallery
-        images={galleryImages}
-        onImagesChange={handleImagesChange}
-        restaurantId={restaurantData._id}
-      />
+      <Suspense fallback={<GallerySkeleton count={8} />}>
+        <Gallery
+          images={galleryImages}
+          onImagesChange={handleImagesChange}
+          restaurantId={restaurantData._id}
+        />
+      </Suspense>
 
       {/* Save/Cancel Actions */}
       {hasUnsavedChanges && (
@@ -226,22 +239,23 @@ export default function GalleryPage() {
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-3">
-              <button
-                type="button"
+              <Button 
+                text="Discard Changes"
                 onClick={handleCancel}
                 disabled={isSaving}
-                className="px-4 py-2 text-sm font-medium text-foreground bg-background border border-input rounded-md hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Discard Changes
-              </button>
-              <button
-                type="button"
+                variant="solid"
+                color="danger"
+                size="sm"
+              />
+              <Button
+                text={isSaving ? 'Saving...' : 'Save Changes'}
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
+                variant="solid"
+                color="primary"
+                size="sm"
+              />
+
             </div>
           </div>
         </div>

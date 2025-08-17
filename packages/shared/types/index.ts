@@ -16,6 +16,8 @@ export * from './cuisines';
 export * from './media';
 export * from './post';
 export * from './food-catalogue';
+export * from './user-management';
+export * from './user-profile';
 
 // Common types
 export * from './common';

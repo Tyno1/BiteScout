@@ -114,7 +114,7 @@ export default function FoodDetailPage() {
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-primary">
-                {foodData.price.currency} {foodData.price.amount}
+                {foodData.price?.currency} {foodData.price?.amount}
               </span>
               <span className="text-xs text-foreground">per serving</span>
             </div>
@@ -131,7 +131,7 @@ export default function FoodDetailPage() {
                   Cuisine Type
                 </span>
                 <span className="text-foreground font-semibold text-sm">
-                  {foodData.cuisineType.name}
+                  {foodData.cuisineType?.name}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-foreground/50">
@@ -139,7 +139,7 @@ export default function FoodDetailPage() {
                   Course
                 </span>
                 <span className="text-foreground font-semibold text-sm">
-                  {foodData.course.name}
+                  {foodData.course?.name}
                 </span>
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function FoodDetailPage() {
               Ingredients
             </h2>
             <div className="flex flex-wrap gap-2">
-              {foodData.ingredients.map((ingredient: string, index: number) => (
+              {foodData.ingredients?.map((ingredient: string, index: number) => ( 
                 <span
                   key={`ingredient-${index}-${ingredient}`}
                   className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20 hover:bg-primary/20 transition-colors"
@@ -169,7 +169,7 @@ export default function FoodDetailPage() {
                 Allergens
               </h2>
               <div className="flex flex-wrap gap-2">
-                {foodData.allergens.map((allergen, index: number) => (
+                {foodData.allergens?.map((allergen, index: number) => (
                   <span
                     key={`allergen-${index}-${allergen._id || allergen.name}`}
                     className="px-3 py-1 bg-red-50 text-danger rounded-full text-xs font-medium border border-danger/20 hover:bg-danger/10 transition-colors"

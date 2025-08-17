@@ -76,7 +76,7 @@ export default function Onboarding() {
 
   const handleOwnerSubmission = async () => {
     // Validate restaurant name
-    if (!restaurantData.name.trim()) {
+    if (!restaurantData.name?.trim()) {
       setFormError((prev) => ({
         ...prev,
         name: "Restaurant name is required",

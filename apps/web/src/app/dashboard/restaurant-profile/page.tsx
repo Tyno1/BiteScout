@@ -55,9 +55,9 @@ export default function RestaurantProfile() {
     return restaurantData?.businessHours?.length
       ? restaurantData.businessHours.map((hour: BusinessHour) => ({
           day: hour.day,
-          open: hour.open,
-          close: hour.close,
-          closed: hour.closed,
+                  open: hour.open,
+        close: hour.close,
+        closed: hour.isClosed,
         }))
       : DEFAULT_BUSINESS_HOURS;
   }, [restaurantData?.businessHours]);

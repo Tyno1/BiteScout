@@ -28,7 +28,7 @@ export const ImageFullscreen = ({ image, onClose }: ImageFullscreenProps) => {
         {/* Image/Video/File */}
         {image.type === "image" ? (
           <Image
-            src={image.url}
+            src={image.url || ''}
             alt={image.title || "Fullscreen image"}
             width={1200}
             height={800}
@@ -37,7 +37,7 @@ export const ImageFullscreen = ({ image, onClose }: ImageFullscreenProps) => {
           />
         ) : image.type === "video" ? (
           <video
-            src={image.url}
+            src={image.url || ''}
             className="max-w-full max-h-full"
             controls
             autoPlay

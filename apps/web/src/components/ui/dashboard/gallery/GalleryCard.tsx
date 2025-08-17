@@ -2,25 +2,56 @@ import { IconButton } from "@/components/atoms";
 import type { Media } from "@shared/types";
 import { FileText, Maximize2 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface GalleryCardProps {
   image: Media;
   onFullscreen: (image: Media) => void;
+  priority?: boolean;
 }
 
-export const GalleryCard = ({ image, onFullscreen }: GalleryCardProps) => {
+export const GalleryCard = ({ image, onFullscreen, priority = false }: GalleryCardProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
       {/* Image Preview */}
       <div className="aspect-square rounded-t-xl overflow-hidden relative group">
         {image.type === "image" ? (
           <>
+            {/* Loading Placeholder */}
+            {!imageLoaded && !imageError && (
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            
+            {/* Error Placeholder */}
+            {imageError && (
+              <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                <div className="text-center text-gray-500">
+                  <FileText className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-xs">Failed to load</p>
+                </div>
+              </div>
+            )}
+
             <Image
-              src={image.url}
+              src={image.url || ''}
               alt={image.title || "Gallery image"}
               fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className={`object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              priority={priority}
+              loading={priority ? "eager" : "lazy"}
+              quality={priority ? 90 : 75}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
             />
             {/* Fullscreen Button */}
             <IconButton

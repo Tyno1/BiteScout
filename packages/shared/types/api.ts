@@ -1614,21 +1614,21 @@ export interface paths {
   };
   "/api/media": {
     /**
-     * Create new media (JSON metadata)
-     * @description Create a new media item with metadata (for external URLs)
+     * Create media record
+     * @description Create a new media record in the backend database.
+     * This endpoint is typically called after media has been uploaded to the media service.
      */
     post: {
       requestBody: {
         content: {
           "application/json": {
             /**
-             * Format: uri
-             * @description URL to the media file
-             * @example https://example.com/images/restaurant-photo.jpg
+             * @description URL of the uploaded media
+             * @example https://example.com/image.jpg
              */
             url: string;
             /**
-             * @description Type of media file
+             * @description Type of media
              * @example image
              * @enum {string}
              */
@@ -1643,42 +1643,47 @@ export interface paths {
              * @example Beautiful interior view of the restaurant
              */
             description?: string;
-            /** @description Information about what this media is associated with */
-            associatedWith?: {
-              /**
-               * @description Type of content this media is associated with
-               * @example post
-               * @enum {string}
-               */
-              type?: "post" | "dish" | "restaurant";
-              /**
-               * @description ID of the associated content
-               * @example 507f1f77bcf86cd799439016
-               */
-              id?: string;
-            };
             /**
-             * @description Size of the media file in bytes
-             * @example 2048576
-             */
-            fileSize?: number;
-            /**
-             * @description MIME type of the media file
+             * @description MIME type of the media
              * @example image/jpeg
              */
             mimeType?: string;
-            /** @description Dimensions of the media (for images/videos) */
-            dimensions?: {
+            /**
+             * @description File size in bytes
+             * @example 1024000
+             */
+            fileSize?: number;
+            /**
+             * @description Cloud storage provider
+             * @example cloudinary
+             * @enum {string}
+             */
+            provider?: "cloudinary" | "aws-s3";
+            /**
+             * @description Provider-specific media ID
+             * @example cloudinary_123
+             */
+            providerId?: string;
+            /**
+             * @description Media service database ID
+             * @example media_service_456
+             */
+            mediaServiceId?: string;
+            /** @description Media variants (different sizes/formats) */
+            variants?: components["schemas"]["MediaVariant"][];
+            /**
+             * @description Tags for the media
+             * @example ["food", "restaurant"]
+             */
+            tags?: string[];
+            associatedWith?: {
               /**
-               * @description Width of the media in pixels
-               * @example 1920
+               * @example restaurant
+               * @enum {string}
                */
-              width?: number;
-              /**
-               * @description Height of the media in pixels
-               * @example 1080
-               */
-              height?: number;
+              type?: "post" | "dish" | "restaurant";
+              /** @example 507f1f77bcf86cd799439016 */
+              id?: string;
             };
           };
         };
@@ -1690,7 +1695,7 @@ export interface paths {
             "application/json": components["schemas"]["Media"];
           };
         };
-        /** @description Invalid request body */
+        /** @description Invalid request data */
         400: {
           content: {
             "application/json": components["schemas"]["ErrorResponse"];
@@ -2646,6 +2651,383 @@ export interface paths {
       };
     };
   };
+  "/api/user-management": {
+    /**
+     * Get all users
+     * @description Retrieve all users with pagination and filtering (Admin only)
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of items per page */
+          limit?: number;
+          /** @description Search by name, email, or username */
+          search?: string;
+          /** @description Filter by user type */
+          userType?: "guest" | "user" | "admin" | "moderator" | "root";
+          /** @description Filter by restaurant access status */
+          status?: "pending" | "approved" | "suspended" | "innactive";
+        };
+      };
+      responses: {
+        /** @description Successfully retrieved users */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserListResponse"];
+          };
+        };
+        /** @description Access denied - Admin privileges required */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/user-management/stats": {
+    /**
+     * Get user statistics
+     * @description Retrieve user statistics and analytics (Admin only)
+     */
+    get: {
+      responses: {
+        /** @description Successfully retrieved user statistics */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserStats"];
+          };
+        };
+        /** @description Access denied - Admin privileges required */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/user-management/{userId}": {
+    /**
+     * Get user by ID
+     * @description Retrieve a specific user by ID (Admin only)
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description ID of the user to retrieve */
+          userId: string;
+        };
+      };
+      responses: {
+        /** @description Successfully retrieved user */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserDetailResponse"];
+          };
+        };
+        /** @description Invalid user ID format */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Access denied - Admin privileges required */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Update user
+     * @description Update user information (Admin only)
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description ID of the user to update */
+          userId: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["UserUpdateRequest"];
+        };
+      };
+      responses: {
+        /** @description User updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserUpdateResponse"];
+          };
+        };
+        /** @description Invalid request data or user ID format */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Access denied - Admin privileges required or cannot modify this user */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Delete user
+     * @description Delete a user (Admin only)
+     */
+    delete: {
+      parameters: {
+        path: {
+          /** @description ID of the user to delete */
+          userId: string;
+        };
+      };
+      responses: {
+        /** @description User deleted successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserDeleteResponse"];
+          };
+        };
+        /** @description Cannot delete own account or invalid user ID format */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Access denied - Admin privileges required or cannot delete this user */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/user-profile/{userId}": {
+    /**
+     * Get user profile
+     * @description Retrieve user's own profile
+     */
+    get: {
+      parameters: {
+        path: {
+          /** @description ID of the user (must match authenticated user) */
+          userId: string;
+        };
+      };
+      responses: {
+        /** @description Successfully retrieved user profile */
+        200: {
+          content: {
+            "application/json": components["schemas"]["UserProfileGetResponse"];
+          };
+        };
+        /** @description Invalid user ID format */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Authentication required */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Can only view own profile */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+    /**
+     * Update user profile
+     * @description Update user's own profile (non-sensitive fields only)
+     */
+    put: {
+      parameters: {
+        path: {
+          /** @description ID of the user (must match authenticated user) */
+          userId: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["UserProfileUpdateRequest"];
+        };
+      };
+      responses: {
+        /** @description Profile updated successfully */
+        200: {
+          content: {
+            "application/json": {
+              /** @example Profile updated successfully */
+              message?: string;
+              user?: components["schemas"]["User"];
+            };
+          };
+        };
+        /** @description Invalid request data, user ID format, or field conflicts */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Authentication required */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Can only update own profile */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/user-profile/{userId}/password": {
+    /**
+     * Change password
+     * @description Change user's own password
+     */
+    patch: {
+      parameters: {
+        path: {
+          /** @description ID of the user (must match authenticated user) */
+          userId: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PasswordChangeRequest"];
+        };
+      };
+      responses: {
+        /** @description Password changed successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["PasswordChangeResponse"];
+          };
+        };
+        /** @description Invalid request data, user ID format, or password requirements not met */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Authentication required */
+        401: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Can only change own password */
+        403: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Internal Server Error */
+        500: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -2715,16 +3097,374 @@ export interface components {
        */
       updatedAt?: string;
     };
-    Allergen: {
+    RestaurantAccess: {
       /**
-       * @description Unique identifier for the allergen
-       * @example 507f1f77bcf86cd799439013
+       * @description Unique identifier for the restaurant access record
+       * @example 507f1f77bcf86cd799439011
        */
       _id?: string;
-      /** @example egg */
-      name: string;
-      /** @example allergic reaction to eggs and food that has egg content */
-      description: string;
+      /**
+       * @description ID of the user
+       * @example 507f1f77bcf86cd799439012
+       */
+      userId: string;
+      /**
+       * @description ID of the restaurant
+       * @example 507f1f77bcf86cd799439013
+       */
+      restaurantId: string;
+      /**
+       * @description User's role in this restaurant
+       * @example admin
+       * @enum {string}
+       */
+      role: "guest" | "user" | "admin" | "moderator" | "root";
+      /**
+       * @description Status of the access request
+       * @example approved
+       * @enum {string}
+       */
+      status: "pending" | "approved" | "suspended" | "innactive";
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    UserListResponse: {
+      users?: components["schemas"]["User"][];
+      pagination?: {
+        /** @example 1 */
+        currentPage?: number;
+        /** @example 5 */
+        totalPages?: number;
+        /** @example 100 */
+        totalUsers?: number;
+        /** @example true */
+        hasNextPage?: boolean;
+        /** @example false */
+        hasPrevPage?: boolean;
+      };
+    };
+    UserDetailResponse: {
+      user?: components["schemas"]["User"];
+    };
+    UserUpdateRequest: {
+      /** @example John Doe */
+      name?: string;
+      /**
+       * Format: email
+       * @example john@example.com
+       */
+      email?: string;
+      /** @example johndoe */
+      username?: string;
+      /**
+       * @example user
+       * @enum {string}
+       */
+      userType?: "guest" | "user" | "admin" | "moderator" | "root";
+      /** @example +1234567890 */
+      phone?: string;
+      /** @example Food enthusiast and restaurant owner */
+      bio?: string;
+      /**
+       * @example [
+       *   "vegetarian",
+       *   "gluten-free"
+       * ]
+       */
+      dietaryPreferences?: string[];
+      location?: {
+        /** @example New York */
+        city?: string;
+        /** @example USA */
+        country?: string;
+      };
+      /** @example https://example.com/avatar.jpg */
+      imageUrl?: string;
+      notificationSettings?: {
+        /** @example true */
+        likes?: boolean;
+        /** @example false */
+        follows?: boolean;
+        /** @example true */
+        restaurantUpdates?: boolean;
+      };
+    };
+    UserUpdateResponse: {
+      /** @example User updated successfully */
+      message?: string;
+      user?: components["schemas"]["User"];
+    };
+    UserDeleteResponse: {
+      /** @example User deleted successfully */
+      message?: string;
+      deletedUser?: {
+        /** @example 507f1f77bcf86cd799439011 */
+        _id?: string;
+        /** @example John Doe */
+        name?: string;
+        /** @example john@example.com */
+        email?: string;
+      };
+    };
+    UserStats: {
+      /** @example 1000 */
+      totalUsers?: number;
+      /** @example 50 */
+      newUsersThisMonth?: number;
+      userTypeBreakdown?: ({
+          /** @enum {string} */
+          _id?: "guest" | "user" | "admin" | "moderator" | "root";
+          count?: number;
+        })[];
+      accessStatusBreakdown?: ({
+          /** @enum {string} */
+          _id?: "pending" | "approved" | "suspended" | "innactive";
+          count?: number;
+        })[];
+    };
+    PasswordChangeRequest: {
+      /**
+       * Format: password
+       * @example currentPassword123
+       */
+      currentPassword: string;
+      /**
+       * Format: password
+       * @example newPassword123
+       */
+      newPassword: string;
+    };
+    PasswordChangeResponse: {
+      /** @example Password changed successfully */
+      message?: string;
+    };
+    Restaurant: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example Pizza Palace */
+      name?: string;
+      /** @example Best pizza in town */
+      description?: string;
+      /** @example 123 Main St */
+      address?: string;
+      /** @example New York */
+      city?: string;
+      /** @example NY */
+      state?: string;
+      /** @example USA */
+      country?: string;
+      /** @example +1234567890 */
+      phone?: string;
+      /** @example info@pizzapalace.com */
+      email?: string;
+      /** @example https://pizzapalace.com */
+      website?: string;
+      /**
+       * @description Restaurant cuisine types
+       * @example [
+       *   {
+       *     "_id": "507f1f77bcf86cd799439011",
+       *     "name": "Italian"
+       *   },
+       *   {
+       *     "_id": "507f1f77bcf86cd799439012",
+       *     "name": "Mediterranean"
+       *   }
+       * ]
+       */
+      cuisine?: components["schemas"]["Cuisine"][];
+      /**
+       * @example $$
+       * @enum {string}
+       */
+      priceRange?: "$" | "$$" | "$$$" | "$$$$";
+      /** @example 4.5 */
+      rating?: number;
+      /** @example 507f1f77bcf86cd799439012 */
+      ownerId?: string;
+      /** @example true */
+      isActive?: boolean;
+      /** @description Array of media objects for the restaurant gallery */
+      gallery?: components["schemas"]["Media"][];
+      /** @description Restaurant logo image */
+      logo?: components["schemas"]["Media"];
+      /** @description Restaurant business hours */
+      businessHours?: components["schemas"]["BusinessHour"][];
+      /**
+       * @description Restaurant features and amenities
+       * @example [
+       *   "Outdoor seating",
+       *   "Delivery",
+       *   "Takeout",
+       *   "Wheelchair accessible"
+       * ]
+       */
+      features?: components["schemas"]["RestaurantFeature"][];
+      /** @description Additional metadata for the restaurant */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /**
+       * @description Whether the current user is the owner of this restaurant
+       * @example false
+       */
+      owner?: boolean;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    DeliveryLink: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example Uber Eats */
+      name?: string;
+      /** @example Uber Eats */
+      platform?: string;
+      /** @example https://ubereats.com/restaurant */
+      url?: string;
+      /** @example 507f1f77bcf86cd799439012 */
+      restaurantId?: string;
+      /** @example true */
+      isActive?: boolean;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    FoodCatalogue: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example Margherita Pizza */
+      name?: string;
+      /** @example Classic tomato and mozzarella pizza */
+      description?: string;
+      price?: {
+        /** @example 15.99 */
+        amount?: number;
+        /** @example USD */
+        currency?: string;
+      };
+      /** @example Pizza */
+      category?: string;
+      /**
+       * @example [
+       *   {
+       *     "_id": "507f1f77bcf86cd799439011",
+       *     "name": "Gluten"
+       *   },
+       *   {
+       *     "_id": "507f1f77bcf86cd799439012",
+       *     "name": "Dairy"
+       *   }
+       * ]
+       */
+      allergens?: {
+          /** @example 507f1f77bcf86cd799439011 */
+          _id?: string;
+          /** @example Gluten */
+          name?: string;
+        }[];
+      /**
+       * @example [
+       *   "main"
+       * ]
+       */
+      courses?: string[];
+      /**
+       * @example [
+       *   "Italian"
+       * ]
+       */
+      cuisines?: string[];
+      cuisineType?: {
+        /** @example 507f1f77bcf86cd799439011 */
+        _id?: string;
+        /** @example Italian */
+        name?: string;
+        /** @example Traditional Italian cuisine */
+        description?: string;
+      };
+      course?: {
+        /** @example 507f1f77bcf86cd799439011 */
+        _id?: string;
+        /** @example Main Course */
+        name?: string;
+        /** @example Primary dish of the meal */
+        description?: string;
+      };
+      /**
+       * @example [
+       *   "tomato",
+       *   "mozzarella",
+       *   "basil"
+       * ]
+       */
+      ingredients?: string[];
+      /**
+       * @description Restaurant ID
+       * @example 507f1f77bcf86cd799439012
+       */
+      restaurant?: string;
+      /** @example 507f1f77bcf86cd799439012 */
+      restaurantId?: string;
+      /** @example true */
+      isAvailable?: boolean;
+      /**
+       * @description Whether this food item is featured/promoted
+       * @example false
+       */
+      isFeatured?: boolean;
+      /** @example https://example.com/pizza.jpg */
+      imageUrl?: string;
+      /**
+       * @description Array of media IDs associated with this food item
+       * @example [
+       *   "507f1f77bcf86cd799439011",
+       *   "507f1f77bcf86cd799439012"
+       * ]
+       */
+      images?: string[];
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+      /**
+       * Format: date-time
+       * @example 2025-04-20T15:30:00Z
+       */
+      updatedAt?: string;
+    };
+    Allergen: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example Gluten */
+      name?: string;
+      /** @example Contains gluten */
+      description?: string;
+      /** @example 🌾 */
+      icon?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -2737,15 +3477,14 @@ export interface components {
       updatedAt?: string;
     };
     Course: {
-      /**
-       * @description Unique identifier for the course
-       * @example 507f1f77bcf86cd799439014
-       */
+      /** @example 507f1f77bcf86cd799439011 */
       _id?: string;
-      /** @example main */
-      name: string;
-      /** @example Main course in a meal */
+      /** @example Main Course */
+      name?: string;
+      /** @example Primary dish of the meal */
       description?: string;
+      /** @example 🍽️ */
+      icon?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -2758,15 +3497,14 @@ export interface components {
       updatedAt?: string;
     };
     Cuisine: {
-      /**
-       * @description Unique identifier for the cuisine
-       * @example 507f1f77bcf86cd799439015
-       */
+      /** @example 507f1f77bcf86cd799439011 */
       _id?: string;
-      /** @example Nigerian */
-      name: string;
-      /** @example A Type of meal based on region of origin */
+      /** @example Italian */
+      name?: string;
+      /** @example Italian cuisine */
       description?: string;
+      /** @example 🍝 */
+      icon?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -2778,742 +3516,285 @@ export interface components {
        */
       updatedAt?: string;
     };
-    BusinessHour: {
-      /** @enum {string} */
-      day?: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
-      /** @description Opening time in HH:mm format */
-      open?: string;
-      /** @description Closing time in HH:mm format */
-      close?: string;
-      /**
-       * @description Indicates if the restaurant is closed on this day
-       * @default false
-       */
-      closed?: boolean;
-    };
-    Restaurant: {
-      /**
-       * @description Unique identifier for the restaurant
-       * @example 507f1f77bcf86cd799439011
-       */
-      _id?: string;
-      /** @description Unique identifier for the restaurant owner */
-      ownerId: string;
-      /**
-       * @description Whether the current user is the owner of this restaurant
-       * @default false
-       */
-      owner?: boolean;
-      /** @description Name of the restaurant */
-      name: string;
-      /** @description Restaurant logo media */
-      logo?: components["schemas"]["Media"];
-      /** @description Brief description of the restaurant */
-      description?: string;
-      /** @description List of cuisines offered by the restaurant */
-      cuisine?: components["schemas"]["Cuisine"][];
-      /**
-       * @description Price range of the restaurant
-       * @enum {string}
-       */
-      priceRange?: "$" | "$$" | "$$$" | "$$$$";
-      /** @description Physical address of the restaurant */
-      address?: string;
-      /** @description Contact phone number */
-      phone?: string;
-      /**
-       * Format: email
-       * @description Contact email address
-       */
-      email?: string;
-      /**
-       * Format: uri
-       * @description Website URL of the restaurant
-       */
-      website?: string;
-      /** @description Operating hours for each day of the week */
-      businessHours?: components["schemas"]["BusinessHour"][];
-      /** @description List of features available at the restaurant */
-      features?: components["schemas"]["RestaurantFeature"][];
-      /** @description Gallery media items for the restaurant */
-      gallery?: components["schemas"]["Media"][];
-      /** @description List of delivery links for the restaurant */
-      deliveryLinks?: components["schemas"]["DeliveryLink"][];
-      /** @description Additional metadata associated with the restaurant */
-      meta?: {
-        [key: string]: unknown;
-      };
-    };
-    /**
-     * @description Supported currency types
-     * @example USD
-     * @enum {string}
-     */
-    Currency: "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY" | "CNY" | "KRW" | "MYR" | "TWD" | "VND" | "THB" | "ZAR";
-    Price: {
-      /**
-       * @description The price amount
-       * @example 25.99
-       */
-      amount: number;
-      /**
-       * @description Currency type
-       * @example USD
-       */
-      currency: components["schemas"]["Currency"];
-    };
-    FoodCatalogue: {
-      /**
-       * @description Unique identifier for the food catalogue item
-       * @example 507f1f77bcf86cd799439016
-       */
-      _id?: string;
-      /**
-       * @description The name of the food item
-       * @example Spaghetti Bolognese
-       */
-      name: string;
-      /**
-       * @description List of ingredients used in the food item
-       * @example [
-       *   "Spaghetti",
-       *   "Ground beef",
-       *   "Tomato sauce"
-       * ]
-       */
-      ingredients: string[];
-      /** @description Cuisine type the food belongs to */
-      cuisineType: components["schemas"]["Cuisine"];
-      /** @description List of allergens associated with the food */
-      allergens?: components["schemas"]["Allergen"][];
-      /** @description Course type the food belongs to (e.g., starter, main) */
-      course: components["schemas"]["Course"];
-      /** @description Price details for the food item */
-      price: components["schemas"]["Price"];
-      /** @description Array of Media ObjectIds for the food item */
-      images?: string[];
-      /**
-       * @description ID of the restaurant offering the food item
-       * @example restaurant12345
-       */
-      restaurant: string;
-      /**
-       * @description Keywords for better search matching (auto-generated from name, ingredients, etc.)
-       * @example [
-       *   "spaghetti",
-       *   "bolognese",
-       *   "pasta",
-       *   "ground beef",
-       *   "tomato sauce"
-       * ]
-       */
-      searchKeywords?: string[];
-      /**
-       * @description Whether the food item is currently available
-       * @default true
-       * @example true
-       */
-      isAvailable?: boolean;
-      /**
-       * @description Whether the food item is featured/promoted
-       * @default false
-       * @example false
-       */
-      isFeatured?: boolean;
-      /**
-       * @description Calculated price range based on price amount
-       * @example $$
-       * @enum {string}
-       */
-      priceRange?: "$" | "$$" | "$$$" | "$$$$";
-      analytics?: {
-        /**
-         * @description Total number of mentions in posts
-         * @default 0
-         * @example 15
-         */
-        totalMentions?: number;
-        /**
-         * @description Total number of likes received
-         * @default 0
-         * @example 120
-         */
-        totalLikes?: number;
-        /**
-         * @description Average rating from reviews
-         * @default 0
-         * @example 4.5
-         */
-        averageRating?: number;
-        /**
-         * @description Total number of ratings received
-         * @default 0
-         * @example 25
-         */
-        totalRatings?: number;
-        /**
-         * @description Trending score based on recent activity
-         * @default 0
-         * @example 85.5
-         */
-        trendingScore?: number;
-        /**
-         * Format: date-time
-         * @description When the food item was last mentioned
-         * @example 2025-04-20T15:30:00Z
-         */
-        lastMentioned?: string;
-        /**
-         * @description Number of times this item appeared in search results
-         * @default 0
-         * @example 45
-         */
-        searchViews?: number;
-        /**
-         * @description Number of times this item was clicked from search
-         * @default 0
-         * @example 12
-         */
-        searchClicks?: number;
-        /**
-         * @description Calculated popularity score based on various metrics
-         * @default 0
-         * @example 78.3
-         */
-        popularityScore?: number;
-      };
+    MediaVariant: {
+      /** @example original */
+      size?: string;
+      /** @example https://example.com/variant.jpg */
+      url?: string;
+      /** @example 1920 */
+      width?: number;
+      /** @example 1080 */
+      height?: number;
+      /** @example 1024000 */
+      fileSize?: number;
+      /** @example jpeg */
+      format?: string;
       /**
        * Format: date-time
-       * @description When the food item was created
+       * @example 2025-04-20T15:30:00Z
+       */
+      createdAt?: string;
+    };
+    Media: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example https://example.com/image.jpg */
+      url?: string;
+      /**
+       * @example image
+       * @enum {string}
+       */
+      type?: "image" | "video" | "audio";
+      /** @example Pizza Image */
+      title?: string;
+      /** @example Delicious pizza */
+      description?: string;
+      uploadedBy?: {
+        /** @example 507f1f77bcf86cd799439012 */
+        id?: string;
+        /** @example John Doe */
+        name?: string;
+        /** @example johndoe */
+        username?: string;
+        /** @example https://example.com/avatar.jpg */
+        imageUrl?: string;
+      };
+      associatedWith?: {
+        /**
+         * @example restaurant
+         * @enum {string}
+         */
+        type?: "post" | "dish" | "restaurant";
+        /** @example 507f1f77bcf86cd799439012 */
+        id?: string;
+      };
+      /** @example false */
+      verified?: boolean;
+      /** @example 1024000 */
+      fileSize?: number;
+      /** @example image/jpeg */
+      mimeType?: string;
+      dimensions?: {
+        /** @example 1920 */
+        width?: number;
+        /** @example 1080 */
+        height?: number;
+      };
+      /** @example cloudinary_123 */
+      providerId?: string;
+      /** @example media_service_456 */
+      mediaServiceId?: string;
+      /**
+       * @example cloudinary
+       * @enum {string}
+       */
+      provider?: "cloudinary" | "aws-s3";
+      variants?: {
+          /** @example original */
+          size?: string;
+          /** @example https://example.com/variant.jpg */
+          url?: string;
+          /** @example 1920 */
+          width?: number;
+          /** @example 1080 */
+          height?: number;
+          /** @example 1000k */
+          bitrate?: string;
+          /** @example 1920x1080 */
+          resolution?: string;
+          /** @example 1024000 */
+          fileSize?: number;
+          /** @example jpeg */
+          format?: string;
+          /**
+           * Format: date-time
+           * @example 2025-04-20T15:30:00Z
+           */
+          createdAt?: string;
+        }[];
+      /**
+       * @example [
+       *   "pizza",
+       *   "food"
+       * ]
+       */
+      tags?: string[];
+      /**
+       * Format: date-time
        * @example 2025-04-20T15:30:00Z
        */
       createdAt?: string;
       /**
        * Format: date-time
-       * @description When the food item was last updated
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
+    };
+    MediaUploadResponse: {
+      /** @example Media uploaded successfully */
+      message?: string;
+      media?: components["schemas"]["Media"];
     };
     Notification: {
+      /** @example 507f1f77bcf86cd799439011 */
+      _id?: string;
+      /** @example 507f1f77bcf86cd799439012 */
+      userId?: string;
+      /** @example New Order */
+      title?: string;
+      /** @example You have a new order */
+      message?: string;
       /**
-       * @description Unique identifier for the notification
-       * @example 507f1f77bcf86cd799439017
-       */
-      _id: string;
-      /**
-       * @description ID of the user who owns this notification
-       * @example user_12345
-       */
-      userId: string;
-      /**
-       * @description Type of notification
-       * @example access_request
+       * @example order
        * @enum {string}
        */
-      type: "access_request" | "access_granted" | "access_denied" | "access_suspended" | "restaurant_update" | "system";
-      /**
-       * @description Notification title
-       * @example Access Request
-       */
-      title?: string;
-      /**
-       * @description Notification message
-       * @example Your access request for Restaurant ABC has been approved
-       */
-      message: string;
-      /**
-       * @description Whether the notification has been read
-       * @default false
-       * @example false
-       */
+      type?: "order" | "system" | "promotion" | "access_request" | "access_granted" | "access_denied" | "access_suspended" | "restaurant_update";
+      /** @example false */
       isRead?: boolean;
       /**
-       * @description Additional data related to the notification
-       * @example {
-       *   "restaurantId": "rest_12345",
-       *   "restaurantName": "Restaurant ABC"
-       * }
+       * @description Additional notification metadata
+       * @example {}
        */
       metadata?: {
         [key: string]: unknown;
       };
       /**
        * Format: date-time
-       * @description When the notification was created
        * @example 2025-04-20T15:30:00Z
        */
       createdAt?: string;
       /**
        * Format: date-time
-       * @description When the notification was last updated
-       * @example 2025-04-20T15:30:00Z
-       */
-      updatedAt?: string;
-    };
-    Media: {
-      /**
-       * @description Unique identifier for the media
-       * @example 507f1f77bcf86cd799439017
-       */
-      _id?: string;
-      /**
-       * Format: uri
-       * @description URL to the media file
-       * @example https://example.com/images/restaurant-photo.jpg
-       */
-      url: string;
-      /**
-       * @description Type of media file
-       * @example image
-       * @enum {string}
-       */
-      type: "image" | "video" | "audio";
-      /**
-       * @description Title or caption for the media
-       * @example Restaurant Interior
-       */
-      title?: string;
-      /**
-       * @description Description of the media content
-       * @example Beautiful interior view of the restaurant
-       */
-      description?: string;
-      /** @description User who uploaded the media */
-      uploadedBy: {
-        /**
-         * @description ID of the user who uploaded the media
-         * @example 507f1f77bcf86cd799439011
-         */
-        id?: string;
-        /**
-         * @description Name of the user who uploaded the media
-         * @example John Doe
-         */
-        name?: string;
-        /**
-         * @description Username of the user who uploaded the media
-         * @example johndoe
-         */
-        username?: string;
-        /**
-         * @description Profile image URL of the user who uploaded the media
-         * @example https://example.com/profile.jpg
-         */
-        imageUrl?: string;
-      };
-      /** @description Information about what this media is associated with */
-      associatedWith?: {
-        /**
-         * @description Type of content this media is associated with
-         * @example post
-         * @enum {string}
-         */
-        type?: "post" | "dish" | "restaurant";
-        /**
-         * @description ID of the associated content
-         * @example 507f1f77bcf86cd799439016
-         */
-        id?: string;
-      };
-      /**
-       * @description Whether the media has been verified by moderators
-       * @default false
-       * @example false
-       */
-      verified?: boolean;
-      /**
-       * @description Size of the media file in bytes
-       * @example 2048576
-       */
-      fileSize?: number;
-      /**
-       * @description MIME type of the media file
-       * @example image/jpeg
-       */
-      mimeType?: string;
-      /** @description Dimensions of the media (for images/videos) */
-      dimensions?: {
-        /**
-         * @description Width of the media in pixels
-         * @example 1920
-         */
-        width?: number;
-        /**
-         * @description Height of the media in pixels
-         * @example 1080
-         */
-        height?: number;
-      };
-      /**
-       * @description ID of the media in the cloud storage provider
-       * @example social-media/1753952680855_original
-       */
-      providerId?: string;
-      /**
-       * @description ID of the media in the media service database
-       * @example 507f1f77bcf86cd799439018
-       */
-      mediaServiceId?: string;
-      /**
-       * @description Cloud storage provider used for this media
-       * @example cloudinary
-       * @enum {string}
-       */
-      provider?: "cloudinary" | "aws-s3";
-      /** @description Optimized variants of the media (different sizes/qualities) */
-      variants?: components["schemas"]["MediaVariant"][];
-      /**
-       * @description Tags associated with the media
-       * @example [
-       *   "food",
-       *   "restaurant",
-       *   "interior"
-       * ]
-       */
-      tags?: string[];
-      /**
-       * Format: date-time
-       * @description When the media was uploaded
-       * @example 2025-04-20T15:30:00Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description When the media was last updated
-       * @example 2025-04-20T15:30:00Z
-       */
-      updatedAt?: string;
-    };
-    MediaVariant: {
-      /**
-       * @description Size variant name
-       * @example medium
-       * @enum {string}
-       */
-      size: "thumbnail" | "small" | "medium" | "large" | "original";
-      /**
-       * Format: uri
-       * @description URL to the optimized variant
-       * @example https://cloudinary.com/.../medium.jpg
-       */
-      url: string;
-      /**
-       * @description Width of the variant in pixels
-       * @example 800
-       */
-      width?: number;
-      /**
-       * @description Height of the variant in pixels
-       * @example 600
-       */
-      height?: number;
-      /**
-       * @description Video bitrate (for video variants)
-       * @example 1000k
-       */
-      bitrate?: string;
-      /**
-       * @description Video resolution (for video variants)
-       * @example 720p
-       */
-      resolution?: string;
-      /**
-       * @description Size of the variant file in bytes
-       * @example 1024000
-       */
-      fileSize: number;
-      /**
-       * @description File format of the variant
-       * @example jpg
-       */
-      format: string;
-      /**
-       * Format: date-time
-       * @description When the variant was created
-       * @example 2025-04-20T15:30:00Z
-       */
-      createdAt: string;
-    };
-    /** @description The created media record with all variants included */
-    MediaUploadResponse: components["schemas"]["Media"];
-    RestaurantAccess: {
-      /**
-       * @description Unique identifier for the access record
-       * @example access_12345
-       */
-      _id: string;
-      /**
-       * @description ID of the user requesting access
-       * @example user_12345
-       */
-      userId: string;
-      /**
-       * @description ID of the restaurant
-       * @example rest_12345
-       */
-      restaurantId: string;
-      /**
-       * @description Current status of the access request
-       * @example pending
-       * @enum {string}
-       */
-      status: "pending" | "approved" | "suspended" | "innactive";
-      /**
-       * @description Role assigned to the user (references UserType.name)
-       * @example user
-       * @enum {string}
-       */
-      role?: "guest" | "user" | "moderator" | "admin" | "root";
-      /**
-       * Format: date-time
-       * @description When the access was requested
-       * @example 2025-04-20T15:30:00Z
-       */
-      requestedAt?: string;
-      /**
-       * Format: date-time
-       * @description When the access was granted (if applicable)
-       * @example 2025-04-20T16:00:00Z
-       */
-      grantedAt?: string;
-      /**
-       * @description ID of the user who granted access
-       * @example owner_12345
-       */
-      grantedBy?: string;
-      /**
-       * Format: date-time
-       * @description When the access expires (if applicable)
-       * @example 2025-12-31T23:59:59Z
-       */
-      expiresAt?: string;
-      /**
-       * @description Additional notes about the access
-       * @example Temporary access for project collaboration
-       */
-      notes?: string;
-      /**
-       * Format: date-time
-       * @description When the access record was created
-       * @example 2025-04-20T15:30:00Z
-       */
-      createdAt?: string;
-      /**
-       * Format: date-time
-       * @description When the access record was last updated
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
     };
     UserTypeInfo: {
-      /**
-       * @description Name of the user type
-       * @example user
-       * @enum {string}
-       */
-      name: "guest" | "user" | "admin" | "moderator" | "root";
-      /**
-       * @description Access level (1=lowest, 5=highest)
-       * @example 2
-       */
-      level: number;
-      /**
-       * @description Description of the user type
-       * @example an ordinary user with restaurant access
-       */
-      description: string;
-    };
-    DeliveryLink: {
-      /**
-       * @description Unique identifier for the delivery link
-       * @example 507f1f77bcf86cd799439018
-       */
+      /** @example 507f1f77bcf86cd799439011 */
       _id?: string;
+      /** @example Admin */
+      name?: string;
+      /** @example Administrator user */
+      description?: string;
       /**
-       * @description ID of the restaurant this delivery link belongs to
-       * @example 507f1f77bcf86cd799439011
+       * @example [
+       *   "read",
+       *   "write",
+       *   "delete"
+       * ]
        */
-      restaurantId: string;
-      /**
-       * @description Display name for the delivery link
-       * @example Uber Eats
-       */
-      name: string;
-      /**
-       * Format: uri
-       * @description URL to the delivery service
-       * @example https://ubereats.com/restaurant/123
-       */
-      url: string;
-      /**
-       * @description Delivery platform name
-       * @example Uber Eats
-       * @enum {string}
-       */
-      platform: "Uber Eats" | "DoorDash" | "Grubhub" | "Postmates" | "Instacart" | "Amazon Fresh" | "Walmart Grocery" | "Shipt" | "Custom" | "Other";
-      /**
-       * @description Whether this delivery link is active
-       * @default true
-       */
-      isActive?: boolean;
+      permissions?: string[];
       /**
        * Format: date-time
-       * @description When the delivery link was created
        * @example 2025-04-20T15:30:00Z
        */
       createdAt?: string;
       /**
        * Format: date-time
-       * @description When the delivery link was last updated
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
     };
-    /**
-     * @description Available restaurant features
-     * @enum {string}
-     */
-    RestaurantFeature: "Outdoor seating" | "Indoor dining" | "Private dining rooms" | "Bar seating" | "Counter seating" | "Rooftop dining" | "Garden dining" | "Waterfront dining" | "Street-side dining" | "Patio dining" | "Take-out" | "Delivery" | "Drive-through" | "Curbside pickup" | "Catering" | "Private events" | "Corporate events" | "Wedding catering" | "Party catering" | "Food trucks" | "Free WiFi" | "Mobile ordering" | "Online reservations" | "Contactless payment" | "Digital menus" | "QR code menus" | "Self-service kiosks" | "Table service" | "Counter service" | "Buffet service" | "Wheelchair accessible" | "Accessible parking" | "Accessible restrooms" | "Braille menus" | "Service animal friendly" | "Elevator access" | "Ramp access" | "Live music" | "Sports on TV" | "Background music" | "Dance floor" | "Karaoke" | "Trivia nights" | "Comedy nights" | "Wine tastings" | "Cooking classes" | "Chef's table" | "Free parking" | "Valet parking" | "Street parking" | "Parking garage" | "Bike parking" | "Near public transit" | "Uber/Lyft friendly" | "Kid-friendly" | "High chairs" | "Kids menu" | "Play area" | "Changing tables" | "Family restrooms" | "Birthday parties" | "Vegetarian options" | "Vegan options" | "Gluten-free options" | "Halal options" | "Kosher options" | "Dairy-free options" | "Nut-free options" | "Low-sodium options" | "Organic ingredients" | "Local ingredients" | "Full bar" | "Wine list" | "Craft beer" | "Cocktails" | "Happy hour" | "BYOB" | "Coffee service" | "Tea service" | "Juice bar" | "Smoothies" | "Gift cards" | "Loyalty program" | "Rewards program" | "Group discounts" | "Student discounts" | "Senior discounts" | "Military discounts" | "Corporate accounts" | "Catering delivery" | "Event planning" | "Contactless delivery" | "Sanitized surfaces" | "Staff wearing masks" | "Temperature checks" | "Social distancing" | "Air purification" | "UV sanitization" | "Health inspections" | "Food safety certified" | "Allergen information" | "Credit cards accepted" | "Cash only" | "Digital payments" | "Split bills" | "Gratuity included" | "Tipping accepted" | "Corporate billing" | "Invoice available" | "24/7 service" | "Late night dining" | "Breakfast service" | "Lunch service" | "Dinner service" | "Brunch service" | "Holiday hours" | "Seasonal hours" | "Reservations required" | "Walk-ins welcome" | "Romantic dining" | "Anniversary specials" | "Birthday celebrations" | "Date night" | "Business meetings" | "Networking events" | "Graduation parties" | "Holiday parties" | "Corporate lunches" | "Team building";
     Post: {
-      /**
-       * @description Unique identifier for the post
-       * @example 507f1f77bcf86cd799439019
-       */
+      /** @example 507f1f77bcf86cd799439011 */
       _id?: string;
+      /** @example Amazing Pizza */
+      title?: string;
+      /** @example This pizza is incredible! */
+      content?: string;
+      /** @example 507f1f77bcf86cd799439012 */
+      authorId?: string;
+      /** @example 507f1f77bcf86cd799439013 */
+      restaurantId?: string;
+      /** @example 42 */
+      likes?: number;
       /**
-       * @description ID of the user who created the post
-       * @example 507f1f77bcf86cd799439011
-       */
-      userId: string;
-      /**
-       * @description Array of media IDs associated with the post
        * @example [
-       *   "507f1f77bcf86cd799439017"
-       * ]
-       */
-      media: string[];
-      /**
-       * @description Name of the food item in the post
-       * @example Margherita Pizza
-       */
-      foodName: string;
-      /**
-       * @description Array of food items tagged in this post with metadata
-       * @example []
-       */
-      taggedFoods?: ({
-          /**
-           * @description ID of the food catalogue item being tagged
-           * @example 507f1f77bcf86cd799439016
-           */
-          foodCatalogueId: string;
-          /**
-           * @description Type of tag for this food item
-           * @default primary
-           * @example primary
-           * @enum {string}
-           */
-          tagType: "primary" | "secondary" | "mentioned" | "reviewed";
-          /**
-           * @description Optional rating for this food item (1-5)
-           * @example 5
-           */
-          rating?: number;
-          /**
-           * @description Optional review text for this food item
-           * @example Delicious! The best pizza I've ever had.
-           */
-          review?: string;
-          /**
-           * Format: date-time
-           * @description When this food was tagged
-           * @example 2025-04-20T15:30:00Z
-           */
-          taggedAt: string;
-        })[];
-      /** @description Price information for the food item */
-      price: components["schemas"]["Price"];
-      /** @description Location information including restaurant and coordinates */
-      location: {
-        /**
-         * @description ID of the restaurant where the food was consumed
-         * @example 507f1f77bcf86cd799439011
-         */
-        restaurantId: string;
-        coordinates: {
-          /**
-           * @description Type of geometry
-           * @default Point
-           * @enum {string}
-           */
-          type: "Point";
-          /**
-           * @description Longitude and latitude coordinates [longitude, latitude]
-           * @example [
-           *   -73.935242,
-           *   40.73061
-           * ]
-           */
-          coordinates: number[];
-        };
-      };
-      /**
-       * @description ID of the cuisine type
-       * @example 507f1f77bcf86cd799439015
-       */
-      cuisine: string;
-      /**
-       * @description ID of the course type
-       * @example 507f1f77bcf86cd799439014
-       */
-      course: string;
-      /**
-       * @description Array of allergen IDs
-       * @example [
-       *   "507f1f77bcf86cd799439013"
-       * ]
-       */
-      allergens?: string[];
-      /**
-       * @description Optional caption or description for the post
-       * @example Amazing pizza! The crust was perfectly crispy 🍕
-       */
-      caption?: string;
-      /**
-       * @description Array of tags for categorizing the post
-       * @example [
-       *   "delicious",
-       *   "authentic",
-       *   "wood-fired"
+       *   "pizza",
+       *   "delicious"
        * ]
        */
       tags?: string[];
-      /**
-       * @description Array of user IDs who liked the post
-       * @example [
-       *   "507f1f77bcf86cd799439011"
-       * ]
-       */
-      likes?: string[];
-      /**
-       * @description Visibility setting for the post
-       * @default public
-       * @enum {string}
-       */
-      visibility?: "public" | "private" | "followers";
+      /** @example true */
+      isPublished?: boolean;
       /**
        * Format: date-time
-       * @description When the post was created
        * @example 2025-04-20T15:30:00Z
        */
       createdAt?: string;
       /**
        * Format: date-time
-       * @description When the post was last updated
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
+    };
+    Price: {
+      /** @example 15.99 */
+      amount?: number;
+      /** @example USD */
+      currency?: string;
+    };
+    Currency: {
+      /** @example USD */
+      code?: string;
+      /** @example US Dollar */
+      name?: string;
+      /** @example $ */
+      symbol?: string;
+    };
+    BusinessHour: {
+      /**
+       * @example monday
+       * @enum {string}
+       */
+      day?: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+      /** @example 09:00 */
+      open?: string;
+      /** @example 22:00 */
+      close?: string;
+      /** @example false */
+      isClosed?: boolean;
+    };
+    /**
+     * @example Outdoor seating
+     * @enum {string}
+     */
+    RestaurantFeature: "Outdoor seating" | "Indoor dining" | "Private dining rooms" | "Bar seating" | "Counter seating" | "Rooftop dining" | "Garden dining" | "Waterfront dining" | "Street-side dining" | "Patio dining" | "Take-out" | "Delivery" | "Drive-through" | "Curbside pickup" | "Catering" | "Private events" | "Corporate events" | "Wedding catering" | "Party catering" | "Food trucks" | "Free WiFi" | "Mobile ordering" | "Online reservations" | "Contactless payment" | "Digital menus" | "QR code menus" | "Self-service kiosks" | "Table service" | "Counter service" | "Buffet service" | "Wheelchair accessible" | "Accessible parking" | "Accessible restrooms" | "Braille menus" | "Service animal friendly" | "Elevator access" | "Ramp access" | "Live music" | "Sports on TV" | "Background music" | "Dance floor" | "Karaoke" | "Trivia nights" | "Comedy nights" | "Wine tastings" | "Cooking classes" | "Chef's table" | "Free parking" | "Valet parking" | "Street parking" | "Parking garage" | "Bike parking" | "Near public transit" | "Uber/Lyft friendly" | "Kid-friendly" | "High chairs" | "Kids menu" | "Play area" | "Changing tables" | "Family restrooms" | "Birthday parties" | "Vegetarian options" | "Vegan options" | "Gluten-free options" | "Halal options" | "Kosher options" | "Dairy-free options" | "Nut-free options" | "Low-sodium options" | "Organic ingredients" | "Local ingredients" | "Full bar" | "Wine list" | "Craft beer" | "Cocktails" | "Happy hour" | "BYOB" | "Coffee service" | "Tea service" | "Juice bar" | "Smoothies" | "Gift cards" | "Loyalty program" | "Rewards program" | "Group discounts" | "Student discounts" | "Senior discounts" | "Military discounts" | "Corporate accounts" | "Catering delivery" | "Event planning" | "Contactless delivery" | "Sanitized surfaces" | "Staff wearing masks" | "Temperature checks" | "Social distancing" | "Air purification" | "UV sanitization" | "Health inspections" | "Food safety certified" | "Allergen information" | "Credit cards accepted" | "Cash only" | "Digital payments" | "Split bills" | "Gratuity included" | "Tipping accepted" | "Corporate billing" | "Invoice available" | "24/7 service" | "Late night dining" | "Breakfast service" | "Lunch service" | "Dinner service" | "Brunch service" | "Holiday hours" | "Seasonal hours" | "Reservations required" | "Walk-ins welcome" | "Romantic dining" | "Anniversary specials" | "Birthday celebrations" | "Date night" | "Business meetings" | "Networking events" | "Graduation parties" | "Holiday parties" | "Corporate lunches" | "Team building";
+    UserProfileGetResponse: {
+      user?: components["schemas"]["User"];
+    };
+    UserProfileUpdateRequest: {
+      /** @example John Doe */
+      name?: string;
+      /** @example johndoe */
+      username?: string;
+      /** @example +1234567890 */
+      phone?: string;
+      /** @example Food enthusiast and restaurant reviewer */
+      bio?: string;
+      /**
+       * @example [
+       *   "vegan",
+       *   "gluten-free"
+       * ]
+       */
+      dietaryPreferences?: string[];
+      location?: {
+        /** @example New York */
+        city?: string;
+        /** @example USA */
+        country?: string;
+      };
+      /** @example https://example.com/avatar.jpg */
+      imageUrl?: string;
+      notificationSettings?: {
+        /** @example true */
+        likes?: boolean;
+        /** @example true */
+        follows?: boolean;
+        /** @example false */
+        restaurantUpdates?: boolean;
+      };
     };
   };
   responses: never;

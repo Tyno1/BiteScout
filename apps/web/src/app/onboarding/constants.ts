@@ -1,13 +1,13 @@
 import type { BusinessHour, Restaurant } from "shared/types/api/schemas"
 
 export const DEFAULT_BUSINESS_HOURS: BusinessHour[] = [
-  { day: "Monday", open: "09:00", close: "17:00", closed: false },
-  { day: "Tuesday", open: "09:00", close: "17:00", closed: false },
-  { day: "Wednesday", open: "09:00", close: "17:00", closed: false },
-  { day: "Thursday", open: "09:00", close: "17:00", closed: false },
-  { day: "Friday", open: "09:00", close: "17:00", closed: false },
-  { day: "Saturday", open: "09:00", close: "17:00", closed: false },
-  { day: "Sunday", open: "09:00", close: "17:00", closed: false },
+  { day: "monday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "tuesday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "wednesday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "thursday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "friday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "saturday", open: "09:00", close: "17:00", isClosed: false },
+  { day: "sunday", open: "09:00", close: "17:00", isClosed: false },
 ];
 
 export const DEFAULT_RESTAURANT_DATA: Restaurant = {

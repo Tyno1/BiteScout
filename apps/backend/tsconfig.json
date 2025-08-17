@@ -8,6 +8,7 @@
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
+    "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src",

@@ -64,57 +64,50 @@ export const uploadFile = async (
     }
   );
   
-  // Sync to backend database
+  // Use the /api/media/upload endpoint directly
   try {
-    const backendResponse = await apiClient.post<UploadMediaResponse>("/media", {
-      url: mediaServiceResponse.data.media.variants[0]?.url || '',
-      title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
-      description: mediaServiceResponse.data.media.description || '',
-      type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
-      mimeType: mediaServiceResponse.data.media.mimeType,
-      fileSize: mediaServiceResponse.data.media.fileSize,
-      provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
-      providerId: mediaServiceResponse.data.media.providerId,
-      mediaServiceId: mediaServiceResponse.data.media._id,
-      variants: mediaServiceResponse.data.variants.map(variant => ({
-        size: "original" as const,
-        url: variant.url,
-        width: variant.width,
-        height: variant.height,
-        fileSize: 0,
-        format: variant.format || "unknown",
-        createdAt: new Date().toISOString(),
-      })),
-      tags: mediaServiceResponse.data.media.tags || [],
-      // Add associatedWith if provided
-      ...(metadata.associatedWith && { associatedWith: metadata.associatedWith }),
+    const formData = new FormData();
+    formData.append('file', file);
+    if (metadata.title) formData.append('title', metadata.title);
+    if (metadata.description) formData.append('description', metadata.description);
+    if (metadata.tags) formData.append('tags', JSON.stringify(metadata.tags));
+    if (metadata.folder) formData.append('folder', metadata.folder);
+    if (metadata.associatedWith) formData.append('associatedWith', JSON.stringify(metadata.associatedWith));
+
+    const response = await apiClient.post<UploadMediaResponse>("/media/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     
-    return backendResponse.data;
+    return response.data;
   } catch (error: unknown) {
-    console.error('Failed to sync to backend:', error);
+    console.error('Failed to upload media:', error);
     // Convert media service response to UploadMediaResponse format for fallback
     const fallbackResponse: UploadMediaResponse = {
-      _id: '',
-      url: mediaServiceResponse.data.media.variants[0]?.url || '',
-      type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
-      title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
-      description: mediaServiceResponse.data.media.description || '',
-      uploadedBy: { id: '', name: '', username: '', imageUrl: '' },
-      providerId: mediaServiceResponse.data.media.providerId,
-      provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
-      variants: mediaServiceResponse.data.variants.map(variant => ({
-        size: "original" as const,
-        url: variant.url,
-        width: variant.width,
-        height: variant.height,
-        fileSize: 0,
-        format: variant.format || "unknown",
-        createdAt: new Date().toISOString(),
-      })),
-      tags: mediaServiceResponse.data.media.tags || [],
-      createdAt: mediaServiceResponse.data.media.createdAt.toISOString(),
-      updatedAt: mediaServiceResponse.data.media.updatedAt.toISOString(),
+      message: "Media uploaded successfully (fallback)",
+      media: {
+        _id: '',
+        url: mediaServiceResponse.data.media.variants[0]?.url || '',
+        type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
+        title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
+        description: mediaServiceResponse.data.media.description || '',
+        uploadedBy: { id: '', name: '', username: '', imageUrl: '' },
+        providerId: mediaServiceResponse.data.media.providerId,
+        provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
+        variants: mediaServiceResponse.data.variants.map(variant => ({
+          size: "original" as const,
+          url: variant.url,
+          width: variant.width,
+          height: variant.height,
+          fileSize: 0,
+          format: variant.format || "unknown",
+          createdAt: new Date().toISOString(),
+        })),
+        tags: mediaServiceResponse.data.media.tags || [],
+        createdAt: mediaServiceResponse.data.media.createdAt.toISOString(),
+        updatedAt: mediaServiceResponse.data.media.updatedAt.toISOString(),
+      },
     };
     return fallbackResponse;
   }

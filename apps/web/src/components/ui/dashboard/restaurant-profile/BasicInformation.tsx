@@ -88,7 +88,7 @@ export function BasicInformation({
                       label=""
                       options={cuisines.map((cuisine) => ({
                         value: cuisine._id ?? "",
-                        label: cuisine.name,
+                        label: cuisine.name ?? "",
                       }))}
                       value={selectedCuisine}
                       onChange={(e) => setSelectedCuisine(e.target.value)}
@@ -123,14 +123,14 @@ export function BasicInformation({
                   <div className="flex flex-wrap gap-1.5">
                     {displayData.cuisine.map((cuisine) => (
                       <div
-                        key={cuisine?._id}
+                        key={cuisine._id || ''}
                         className="bg-foreground text-background px-2.5 py-1 rounded-md flex items-center gap-1.5 text-sm border border-gray/20 transition-colors"
                       >
                         <span
                           className="font-medium truncate max-w-20"
-                          title={cuisine.name}
+                          title={cuisine.name || ''}
                         >
-                          {cuisine.name}
+                          {cuisine.name || ''}
                         </span>
                         {isEditing && (
                           <IconButton
@@ -139,7 +139,7 @@ export function BasicInformation({
                             size="xs"
                             icon={<X size={12} />}
                             onClick={() => removeCuisine(cuisine)}
-                            aria-label={`Remove ${cuisine.name}`}
+                            aria-label={`Remove ${cuisine.name || ''}`}
                             className=" flex-shrink-0"
                           />
                         )}

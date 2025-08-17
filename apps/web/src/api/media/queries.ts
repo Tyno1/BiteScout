@@ -48,7 +48,7 @@ export const getMediaWithOptimizedUrl = async (
     console.error("Error getting optimized URL:", error);
     return {
       media,
-      optimizedUrl: media.url,
+      optimizedUrl: media.url || '',
     };
   }
 };

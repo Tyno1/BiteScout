@@ -1,11 +1,7 @@
 import express from "express";
 import * as mediaController from "../controllers/mediaController.js";
-import authMiddleware from "../middleware/authmiddleware.js";
 
 const router = express.Router();
-
-// Apply auth middleware to all routes
-router.use(authMiddleware);
 
 // Media CRUD operations
 router.post('/', mediaController.createMedia);

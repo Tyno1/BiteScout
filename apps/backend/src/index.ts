@@ -22,6 +22,8 @@ import restaurantRoutes from "./routes/restaurant.js";
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
 import reviewRoutes from "./routes/review.js";
 import userRoutes from "./routes/user.js";
+import userManagementRoutes from "./routes/userManagement.js";
+import userProfileRoutes from "./routes/userProfile.js";
 import userTypeRoutes from "./routes/userType.js";
 
 dotenv.config();
@@ -179,6 +181,8 @@ app.use("/api/restaurants", authMiddleware, restaurantRoutes);
 
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/user-management", authMiddleware, userManagementRoutes);
+app.use("/api/user-profile", authMiddleware, userProfileRoutes);
 app.use("/api/restaurant-access", restaurantAccessRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/food-catalogue",authMiddleware, foodCatalogueRoutes);
