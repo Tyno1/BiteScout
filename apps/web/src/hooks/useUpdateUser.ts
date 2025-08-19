@@ -52,4 +52,4 @@ export function useUpdateUser() {
   };
 
   return { updateUser, isLoading, error };
-} 
+}

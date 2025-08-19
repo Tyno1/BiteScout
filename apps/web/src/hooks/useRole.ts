@@ -1,7 +1,7 @@
 import { getCurrentSession } from "@/app/actions/getSessionAction";
 import { getRoleFromToken } from "@/utils/getRoleFromSession";
 import type { Session } from "next-auth";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AccessRoles } from "shared/types/api/schemas";
 
 type ReturnType = {
@@ -19,7 +19,7 @@ export const useRole = (): ReturnType => {
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<AccessRoles | null>(null);
 
-  const fetchUserRole = async () => {
+  const fetchUserRole = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -45,38 +45,11 @@ export const useRole = (): ReturnType => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await getCurrentSession();
-
-        if (!response?.user?.accessToken)
-          throw new Error("User session and token not found");
-
-        setSession(response);
-
-        const role = getRoleFromToken(response?.user?.accessToken);
-
-        if (!role) {
-          throw new Error("Failed to fetch user role");
-        }
-
-        setUserRole(role);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchUserRole();
-  }, []);
+  }, [fetchUserRole]);
 
   return {
     isLoading,

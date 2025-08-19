@@ -158,55 +158,9 @@ export const useRestaurantAccess = (
     session?.user?.restaurantCount,
   ]);
 
-  // Helper function to validate restaurant access
-  const validateRestaurantAccess = useCallback((restaurantId: string) => {
-    if (!restaurantId || !session?.user?._id) {
-      throw new Error("Invalid restaurant ID or user session");
-    }
-
-    if (isOwner()) {
-      // Owners can access their own restaurants
-      if (restaurantData?._id === restaurantId) {
-        return { hasAccess: true, access: null, message: "Owner access granted" };
-      }
-      throw new Error("You can only access your own restaurants");
-    }
-
-    // Non-owners need explicit access records
-    const access = restaurantAccessList.find(
-      (access: RestaurantAccess) => access.restaurantId === restaurantId
-    );
-
-    if (!access) {
-      throw new Error("No access record found for this restaurant");
-    }
-
-    if (access.status !== AccessStatusEnum.Approved) {
-      throw new Error(`Access ${access.status} - Contact restaurant admin`);
-    }
-
-    // Check if access is suspended (assuming there's a suspended status)
-    if (access.status === AccessStatusEnum.Suspended) {
-      throw new Error("Your access has been suspended");
-    }
-
-    return { 
-      hasAccess: true, 
-      access, 
-      message: `Access granted with role: ${access.role}` 
-    };
-  }, [session?.user?._id, isOwner, restaurantData?._id, restaurantAccessList]);
-
-  // Helper function to check if user has access to a specific restaurant
-  const hasAccessToRestaurant = useCallback((restaurantId: string) => {
-    try {
-      const result = validateRestaurantAccess(restaurantId);
-      return result.hasAccess;
-    } catch (error) {
-      console.error("Failed to validate restaurant access:", error);
-      return false;
-    }
-  }, [validateRestaurantAccess]);
+  // ✅ REMOVED: Redundant restaurant access validation functions
+  // These are now handled by middleware and RouteProtection
+  // No need for client-side validation that duplicates server-side logic
 
   // Helper function to get the first approved restaurant access
   const getFirstApprovedRestaurantId = useCallback(() => {
@@ -216,7 +170,7 @@ export const useRestaurantAccess = (
     return approvedAccess?.restaurantId;
   }, [restaurantAccessList]);
 
-  // Helper function to load appropriate restaurant data with access validation
+  // Helper function to load appropriate restaurant data
   const loadRestaurantData = useCallback(async () => {
     if (!session?.user?._id) return;
 
@@ -228,8 +182,6 @@ export const useRestaurantAccess = (
         // User is not an owner, check for approved restaurant access
         const approvedRestaurantId = getFirstApprovedRestaurantId();
         if (approvedRestaurantId) {
-          // Validate access before fetching
-          validateRestaurantAccess(approvedRestaurantId);
           // For non-owners, refetch the approved restaurant data
           await refetchApprovedRestaurant();
         }
@@ -244,18 +196,14 @@ export const useRestaurantAccess = (
     refetchRestaurant,
     refetchApprovedRestaurant,
     getFirstApprovedRestaurantId,
-    validateRestaurantAccess,
   ]);
 
-  // Helper function to load restaurant data by specific ID with access validation
+  // Helper function to load restaurant data by specific ID
   const loadRestaurantDataById = useCallback(
     async (restaurantId: string) => {
       if (!restaurantId) return;
 
       try {
-        // Validate access before proceeding
-        validateRestaurantAccess(restaurantId);
-        
         // This would need a different query hook for specific restaurant by ID
         // For now, we'll use the existing refetch
         await refetchRestaurant();
@@ -264,7 +212,7 @@ export const useRestaurantAccess = (
         throw error;
       }
     },
-    [refetchRestaurant, validateRestaurantAccess]
+    [refetchRestaurant]
   );
 
   // Helper function to get restaurant access by status
@@ -308,10 +256,8 @@ export const useRestaurantAccess = (
     loadRestaurantData,
     loadRestaurantDataById,
     getRestaurantAccessByStatus,
-    hasAccessToRestaurant,
     getPendingAccessRequests,
     getApprovedAccess,
-    validateRestaurantAccess, // New: Access validation function
 
     // Restaurant Actions
     updateRestaurant: updateRestaurantMutation.mutate,

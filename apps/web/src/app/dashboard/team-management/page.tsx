@@ -14,21 +14,12 @@ export default function TeamManagement() {
     deleteAccess, 
     grantAccess, 
     suspendAccess,
-    restaurantData,
-    validateRestaurantAccess
+    restaurantData
   } = useRestaurantAccess();
 
-  useEffect(() => {
-    if (restaurantData?._id) {
-      try {
-        validateRestaurantAccess(restaurantData._id);
-      } catch (error) {
-        console.error("Access validation failed:", error);
-        // Redirect to unauthorized if access is denied
-        router.push("/dashboard/unauthorized");
-      }
-    }
-  }, [restaurantData?._id, validateRestaurantAccess, router]);
+  // ✅ REMOVED: Redundant restaurant access validation
+  // Middleware and RouteProtection already handle this validation
+  // No need for client-side useEffect validation
 
   const handleStatusChange = async (
     accessId: string,

@@ -20,6 +20,7 @@ import {
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { AccessManager } from "../general";
+import { RestaurantContextBanner } from "./RestaurantContextBanner";
 
 interface SideNavProp {
   setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +29,7 @@ interface SideNavProp {
 export function SideNav({ setIsMenuOpen }: SideNavProp) {
   const router = useRouter();
 
-  //   handle navigation
+  // Simple navigation handler
   const handleNav = (navName: string) => {
     router.push(navName);
     if (setIsMenuOpen) setIsMenuOpen(false);
@@ -36,12 +37,13 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
 
   return (
     <div className="h-[100vh] w-full bg-background border-r border-foreground/10 flex flex-col">
-      <div className="p-6 items-center h-full mb-2 hidden md:flex">
+      <div className="p-6 items-center mb-2 hidden md:flex">
         <ChefHat size={30} className="mr-2 text-primary" />
         <h2 className="text-xl font-bold text-primary">BiteScout</h2>
       </div>
-      <nav className="flex-1 p-4 w-full h-full">
-        <ul className="w-full h-screen space-y-1">
+
+      <nav className="flex-1 p-4 w-full overflow-y-auto">
+        <ul className="w-full space-y-1">
           <NavItem
             handleNav={handleNav}
             icon={<Home />}
@@ -76,7 +78,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
           <AccessManager roles={["root", "admin"]}>
             <NavItem
               handleNav={handleNav}
-              icon={<UserCog />}
+              icon={<Users />}
               text="Team Management"
               path="/dashboard/team-management"
             />
@@ -112,6 +114,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             text="Customer Insights"
             path="/dashboard/customer-insight"
           />
+          
           <li className="border-t border-foreground/10 w-full mt-auto">
             <ul className="w-full">
               <NavItem
@@ -131,6 +134,11 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
           </li>
         </ul>
       </nav>
+
+      {/* Restaurant Context Banner - Bottom of SideNav */}
+      <div className="p-4 border-t border-border border-foreground/10">
+        <RestaurantContextBanner />
+      </div>
     </div>
   );
 }

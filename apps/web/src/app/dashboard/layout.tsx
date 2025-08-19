@@ -1,7 +1,7 @@
 "use client";
 
 import { Spinner } from "@/components/atoms";
-import { SideNav, TopNav } from "@/components/ui";
+import { RestaurantContextBanner, RouteProtection, SideNav, TopNav } from "@/components/ui";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -53,7 +53,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
           {session?.user && (
             <TopNav onMenuClick={() => setIsMenuOpen(prev => !prev)} user={session.user} />
           )}
-          <div className="mt-14">{children}</div>
+          <div className="mt-14">
+            <RouteProtection>
+              {children}
+            </RouteProtection>
+          </div>
         </div>
       </div>
     </div>
