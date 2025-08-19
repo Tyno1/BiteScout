@@ -7,5 +7,5 @@ export * from './cuisines';
 export * from './food-catalogue';
 export * from './useRestaurantAccess';
 export * from './useRole';
-export * from './useUpdateUser';
-export * from './useNotification'; 
+export * from './useNotification';
+export * from './user-management'; 

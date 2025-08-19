@@ -14,6 +14,8 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
+    "docs": "cd packages/shared && yarn serve-docs",
+    "storybook": "cd apps/web && yarn storybook",
     "docker:dev": "docker compose up -d",
     "docker:dev:build": "docker compose up -d --build",
     "docker:prod": "docker compose -f docker-compose.prod.yml up -d",

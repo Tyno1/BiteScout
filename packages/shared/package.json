@@ -1,7 +1,6 @@
 {
   "name": "shared",
   "version": "1.0.0",
-
   "private": true,
   "main": "dist/index.js",
   "types": "types/index.ts",
@@ -23,10 +22,12 @@
     "generate-types": "openapi-typescript openapi/spec.yaml -o types/api.ts",
     "build": "npm run generate-types && tsc",
     "dev": "npm run generate-types -- --watch",
-    "watch": "npm run generate-types -- --watch",
-    "clean": "rm -rf dist types/api.ts"
+    "clean": "rm -rf dist types/api.ts",
+    "serve-docs": "node serve-docs.js"
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.0"
+    "js-yaml": "^4.1.0",
+    "openapi-typescript": "^6.7.0",
+    "swagger-ui-express": "^5.0.1"
   }
-} 
+}

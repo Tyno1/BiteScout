@@ -1,0 +1,41 @@
+import {
+  getAllUsers,
+  getUserById,
+  getUserStats,
+} from "@/api/user-management/queries";
+import { useQuery } from "@tanstack/react-query";
+
+export const useUsers = (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  userType?: string;
+  status?: string;
+}) => {
+  return useQuery({
+    queryKey: ["user-management", params],
+    queryFn: () => getAllUsers(params),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  });
+};
+
+export const useUserById = (userId: string) => {
+  return useQuery({
+    queryKey: ["user-management", userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  });
+};
+
+export const useUserStats = () => {
+  return useQuery({
+    queryKey: ["user-management", "stats"],
+    queryFn: getUserStats,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  });
+};
+
