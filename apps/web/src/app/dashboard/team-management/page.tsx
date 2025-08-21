@@ -3,18 +3,15 @@
 import { Badge, IconButton } from "@/components/atoms";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Ban, CheckCircle, Trash2, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
-  const router = useRouter();
   const { 
     restaurantAccessList, 
     deleteAccess, 
     grantAccess, 
-    suspendAccess,
-    restaurantData
+    suspendAccess
   } = useRestaurantAccess();
 
   // ✅ REMOVED: Redundant restaurant access validation

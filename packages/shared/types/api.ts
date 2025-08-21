@@ -2653,12 +2653,14 @@ export interface paths {
   };
   "/api/user-management": {
     /**
-     * Get all users
-     * @description Retrieve all users with pagination and filtering (Admin only)
+     * Get restaurant users
+     * @description Retrieve users with access to a specific restaurant with pagination and filtering (Admin only)
      */
     get: {
       parameters: {
-        query?: {
+        query: {
+          /** @description Restaurant ID to filter users by (required for security) */
+          restaurantId: string;
           /** @description Page number for pagination */
           page?: number;
           /** @description Number of items per page */
@@ -3096,6 +3098,33 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
+      /**
+       * @description User's role in the specific restaurant
+       * @example moderator
+       * @enum {string}
+       */
+      role?: "guest" | "user" | "moderator" | "admin" | "root";
+      /**
+       * @description User's access status in the specific restaurant
+       * @example approved
+       * @enum {string}
+       */
+      status?: "pending" | "approved" | "suspended" | "innactive";
+      /**
+       * @description Restaurant access record ID
+       * @example 507f1f77bcf86cd799439012
+       */
+      accessId?: string;
+      /**
+       * @description Number of restaurants user has access to (always 1 for restaurant-specific queries)
+       * @example 1
+       */
+      restaurantAccess?: number;
+      /**
+       * @description Number of active restaurant accesses (0 or 1 for restaurant-specific queries)
+       * @example 1
+       */
+      activeRestaurants?: number;
     };
     RestaurantAccess: {
       /**

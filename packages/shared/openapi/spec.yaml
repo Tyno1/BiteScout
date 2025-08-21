@@ -2859,11 +2859,18 @@ paths:
 # User Management API Endpoints
   /api/user-management:
     get:
-      summary: Get all users
-      description: Retrieve all users with pagination and filtering (Admin only)
+      summary: Get restaurant users
+      description: Retrieve users with access to a specific restaurant with pagination and filtering (Admin only)
       security:
         - bearerAuth: []
       parameters:
+        - name: restaurantId
+          in: query
+          description: Restaurant ID to filter users by (required for security)
+          required: true
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
         - name: page
           in: query
           description: Page number for pagination
@@ -3343,6 +3350,29 @@ components:
           type: string
           format: date-time
           example: "2025-04-20T15:30:00Z"
+        # Restaurant-specific fields (added when returned via user-management API)
+        role:
+          type: string
+          enum: ["guest", "user", "moderator", "admin", "root"]
+          description: "User's role in the specific restaurant"
+          example: "moderator"
+        status:
+          type: string
+          enum: ["pending", "approved", "suspended", "innactive"]
+          description: "User's access status in the specific restaurant"
+          example: "approved"
+        accessId:
+          type: string
+          description: "Restaurant access record ID"
+          example: "507f1f77bcf86cd799439012"
+        restaurantAccess:
+          type: integer
+          description: "Number of restaurants user has access to (always 1 for restaurant-specific queries)"
+          example: 1
+        activeRestaurants:
+          type: integer
+          description: "Number of active restaurant accesses (0 or 1 for restaurant-specific queries)"
+          example: 1
       required:
         - name
         - email

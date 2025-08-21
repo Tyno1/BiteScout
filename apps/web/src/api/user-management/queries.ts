@@ -14,6 +14,7 @@ export const getAllUsers = async (params?: {
   search?: string;
   userType?: string;
   status?: string;
+  restaurantId?: string;
 }): Promise<GetAllUsersResponse> => {
   const response = await apiClient.get<GetAllUsersResponse>(
     "/user-management",

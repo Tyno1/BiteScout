@@ -1,7 +1,7 @@
 "use client";
 
 import { Spinner } from "@/components/atoms";
-import { RestaurantContextBanner, RouteProtection, SideNav, TopNav } from "@/components/ui";
+import { RouteProtection, SideNav, TopNav } from "@/components/ui";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";

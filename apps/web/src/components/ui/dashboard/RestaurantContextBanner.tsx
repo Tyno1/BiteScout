@@ -5,7 +5,7 @@ import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Building2 } from "lucide-react";
 
 export const RestaurantContextBanner = () => {
-  const { restaurantData, isOwner } = useRestaurantAccess();
+  const { restaurantData } = useRestaurantAccess();
 
   // Show banner when user has restaurant context (either as owner or has access)
   if (!restaurantData?._id) {

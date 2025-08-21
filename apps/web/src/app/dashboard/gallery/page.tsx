@@ -9,52 +9,31 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import type { Media } from "shared/types/api/schemas";
 
-
-
-// Dynamic imports for code splitting
 const Gallery = dynamic(() => import("@/components/ui/dashboard").then(mod => ({ default: mod.Gallery })), {
   loading: () => <GallerySkeleton count={8} />,
   ssr: false
 });
 
 export default function GalleryPage() {
-  const { 
-    restaurantData, 
-    isOwner, 
-    hasAccessToRestaurant, 
-    isLoading
-  } = useRestaurantAccess();
+  const { restaurantData, isLoading } = useRestaurantAccess();
   const updateRestaurant = useUpdateRestaurant().mutateAsync;
   const [galleryImages, setGalleryImages] = useState<Media[]>([]);
   const [originalImages, setOriginalImages] = useState<Media[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-
-  // Check if user has access to this restaurant
-  const hasAccess = restaurantData?._id
-    ? isOwner || hasAccessToRestaurant(restaurantData._id)
-    : false;
-
-  // Initialize gallery images from restaurant data
   useEffect(() => {
-    if (restaurantData?.gallery) {
-      setGalleryImages(restaurantData.gallery);
-      setOriginalImages(restaurantData.gallery);
-      setHasUnsavedChanges(false);
-      setSaveError(null);
-    } else {
-      setGalleryImages([]);
-      setOriginalImages([]);
-      setHasUnsavedChanges(false);
-      setSaveError(null);
-    }
+    const images = restaurantData?.gallery || [];
+    setGalleryImages(images);
+    setOriginalImages(images);
+    setHasUnsavedChanges(false);
+    setSaveError(null);
   }, [restaurantData?.gallery]);
 
   const handleImagesChange = useCallback((images: Media[]) => {
     setGalleryImages(images);
     setHasUnsavedChanges(true);
-    setSaveError(null); // Clear any previous save errors
+    setSaveError(null);
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -80,18 +59,14 @@ export default function GalleryPage() {
       const errorMessage = error instanceof Error ? error.message : "Failed to update gallery. Please try again.";
       setSaveError(errorMessage);
       toast.error(errorMessage);
-      
     } finally {
       setIsSaving(false);
     }
   }, [restaurantData, galleryImages, hasUnsavedChanges, updateRestaurant]);
 
   const handleCancel = useCallback(() => {
-    // Confirm before discarding changes if there are unsaved changes
     if (hasUnsavedChanges) {
-      const confirmed = window.confirm(
-        "You have unsaved changes. Are you sure you want to discard them?"
-      );
+      const confirmed = window.confirm("You have unsaved changes. Are you sure you want to discard them?");
       if (!confirmed) return;
     }
 
@@ -101,21 +76,18 @@ export default function GalleryPage() {
     toast.info("Changes discarded");
   }, [hasUnsavedChanges, originalImages]);
 
-  // Auto-save functionality (optional - can be enabled/disabled)
   const [autoSave, setAutoSave] = useState(false);
   const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (autoSave && hasUnsavedChanges && !isSaving) {
-      // Clear existing timeout
       if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
       }
 
-      // Set new timeout for auto-save
       const timeout = setTimeout(() => {
         handleSave();
-      }, 5000); // Auto-save after 5 seconds of inactivity
+      }, 5000);
 
       setAutoSaveTimeout(timeout);
 
@@ -125,7 +97,6 @@ export default function GalleryPage() {
     }
   }, [autoSave, hasUnsavedChanges, isSaving, handleSave, autoSaveTimeout]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (autoSaveTimeout) {
@@ -134,8 +105,7 @@ export default function GalleryPage() {
     };
   }, [autoSaveTimeout]);
 
-  // Show loading state while checking access
-  if (isLoading) {
+  if (isLoading || !restaurantData?._id) {
     return (
       <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
         <div className="flex items-center justify-center py-20">
@@ -148,38 +118,7 @@ export default function GalleryPage() {
     );
   }
 
-  // Check if user has access to this restaurant
-  if (!restaurantData?._id) {
-    return (
-      <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
-        <div className="text-center py-20">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
-            No Restaurant Found
-          </h1>
-          <p className="text-foreground text-sm">
-            You don&apos;t have access to any restaurant gallery.
-          </p>
-        </div>
-      </main>
-    );
-  }
 
-  // Check if user has permission to access this gallery
-  if (!hasAccess) {
-    return (
-      <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
-        <div className="text-center py-20">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
-            Access Denied
-          </h1>
-          <p className="text-foreground text-sm">
-            You don&apos;t have permission to access this restaurant&apos;s
-            gallery.
-          </p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
@@ -194,14 +133,12 @@ export default function GalleryPage() {
         <Gallery
           images={galleryImages}
           onImagesChange={handleImagesChange}
-          restaurantId={restaurantData._id}
+          restaurantId={restaurantData?._id || ''}
         />
       </Suspense>
 
-      {/* Save/Cancel Actions */}
       {hasUnsavedChanges && (
         <div className="space-y-4 pt-6 border-t">
-          {/* Error Display */}
           {saveError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center">
@@ -222,7 +159,6 @@ export default function GalleryPage() {
             </div>
           )}
 
-          {/* Auto-save Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <input
@@ -237,7 +173,6 @@ export default function GalleryPage() {
               </label>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex items-center space-x-3">
               <Button 
                 text="Discard Changes"
@@ -255,7 +190,6 @@ export default function GalleryPage() {
                 color="primary"
                 size="sm"
               />
-
             </div>
           </div>
         </div>

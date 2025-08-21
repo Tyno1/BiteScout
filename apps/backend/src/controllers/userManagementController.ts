@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 
-
 import mongoose from "mongoose";
 import { ErrorCodes, createError } from "../middleware/errorHandler.js";
 import RestaurantAccess from "../models/RestaurantAccess.js";
@@ -9,12 +8,13 @@ import User from "../models/User.js";
 import type { ApiError } from "shared/types/common/errors";
 
 import type {
-  DeleteUserResponse,
-  GetAllUsersResponse,
-  GetUserByIdResponse,
-  GetUserStatsResponse,
-  UpdateUserResponse,
+	DeleteUserResponse,
+	GetAllUsersResponse,
+	GetUserByIdResponse,
+	GetUserStatsResponse,
+	UpdateUserResponse,
 } from "shared/types/user-management";
+import RestaurantData from "../models/RestaurantData.js";
 
 // Type definitions for API responses with error handling
 type GetAllUsersApiResponse = GetAllUsersResponse | ApiError;
@@ -59,7 +59,53 @@ export const getAllUsers = async (
 		// Check if current user has admin privileges
 		const currentUser = req.user;
 		if (!currentUser || !hasAdminPrivileges(currentUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. Admin privileges required."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. Admin privileges required.",
+				),
+			);
+		}
+
+		// Require restaurantId parameter for security
+		const restaurantId = req.query.restaurantId?.toString();
+		if (!restaurantId) {
+			return next(
+				createError(
+					ErrorCodes.BAD_REQUEST,
+					"Restaurant ID is required for security",
+				),
+			);
+		}
+
+		// Validate ObjectId format
+		if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid restaurant ID format"),
+			);
+		}
+
+		// Check if current user has access to this restaurant
+		const userRestaurantAccess = await RestaurantAccess.findOne({
+			userId: currentUser.userId,
+			restaurantId: restaurantId,
+			status: "approved",
+		});
+		const restaurant = await RestaurantData.findById(restaurantId);
+
+		if (!restaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
+
+		const isOwner = req.user?.userId === restaurant.ownerId?.toString();
+
+		if (!userRestaurantAccess && !isOwner) {
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. You don't have access to this restaurant.",
+				),
+			);
 		}
 
 		const page = Number.parseInt(req.query.page?.toString() || "1") || 1;
@@ -68,49 +114,70 @@ export const getAllUsers = async (
 		const userType = req.query.userType?.toString();
 		const status = req.query.status?.toString();
 
-		// Build filter object
-		const filter: Record<string, unknown> = {};
+		// Get users with access to this specific restaurant
+		const restaurantAccessQuery: Record<string, unknown> = { restaurantId };
 
-		if (search) {
-			filter.$or = [
-				{ name: { $regex: search, $options: "i" } },
-				{ email: { $regex: search, $options: "i" } },
-				{ username: { $regex: search, $options: "i" } },
-			];
+		if (status) {
+			restaurantAccessQuery.status = status;
 		}
 
-		if (userType) {
-			filter.userType = userType;
-		}
+		// Get restaurant access records with user details
+		const restaurantAccessRecords = await RestaurantAccess.find(
+			restaurantAccessQuery,
+		)
+			.populate({
+				path: "userId",
+				select: "-password",
+				match: search
+					? {
+							$or: [
+								{ name: { $regex: search, $options: "i" } },
+								{ userType: userType ? userType : { $exists: true } },
+							],
+						}
+					: {},
+			})
+			.sort({ createdAt: -1 });
 
-		// Calculate skip value for pagination
-		const skip = (page - 1) * limit;
-
-		// Get users with pagination
-		const users = await User.find(filter)
-			.select("-password")
-			.sort({ createdAt: -1 })
-			.skip(skip)
-			.limit(limit);
-
-		// Get total count for pagination
-		const totalUsers = await User.countDocuments(filter);
-
-		// Get restaurant access information for each user
-		const usersWithAccess = await Promise.all(
-			users.map(async (user) => {
-				const restaurantAccess = await RestaurantAccess.find({
-					userId: user._id,
-				});
-				return {
-					...user.toObject(),
-					restaurantAccess: restaurantAccess.length,
-					activeRestaurants: restaurantAccess.filter(
-						(ra) => ra.status === "approved",
-					).length,
-				};
-			}),
+		// Filter out records where user population failed (due to search filter)
+		const validRecords = restaurantAccessRecords.filter(
+			(record) => record.userId,
 		);
+
+		// If owner is requesting, also include owner information
+		const allUsers = [...validRecords];
+		if (isOwner) {
+			// Get owner user details
+			const ownerUser = await User.findById(restaurant.ownerId).select(
+				"-password",
+			);
+			if (ownerUser) {
+				// Add owner as first user with admin role (restaurant-level admin)
+				allUsers.unshift({
+					userId: ownerUser,
+					role: "admin",
+					status: "approved",
+					_id: "owner-special-id",
+					createdAt: restaurant.createdAt,
+					updatedAt: restaurant.updatedAt,
+				});
+			}
+		}
+
+		// Apply pagination
+		const totalUsers = allUsers.length;
+		const skip = (page - 1) * limit;
+		const paginatedRecords = allUsers.slice(skip, skip + limit);
+
+		// Transform data to match expected response format
+		const usersWithAccess = paginatedRecords.map((record) => ({
+			...record.userId.toObject(),
+			role: record.role,
+			status: record.status,
+			accessId: record._id === "owner-special-id" ? "owner" : record._id,
+			restaurantAccess: 1, // User has access to this restaurant
+			activeRestaurants: record.status === "approved" ? 1 : 0,
+		}));
 
 		res.status(200).json({
 			users: usersWithAccess,
@@ -137,14 +204,21 @@ export const getUserById = async (
 		// Check if current user has admin privileges
 		const currentUser = req.user;
 		if (!currentUser || !hasAdminPrivileges(currentUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. Admin privileges required."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. Admin privileges required.",
+				),
+			);
 		}
 
 		const userId = req.params.userId;
 
 		// Validate ObjectId
 		if (!mongoose.Types.ObjectId.isValid(userId)) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"));
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"),
+			);
 		}
 
 		const user = await User.findById(userId).select("-password");
@@ -154,7 +228,9 @@ export const getUserById = async (
 		}
 
 		// Get restaurant access information
-		const restaurantAccess = await RestaurantAccess.find({ userId: user._id });
+		const restaurantAccess = await RestaurantAccess.find({
+			userId: user._id.toString(),
+		});
 
 		const userWithAccess = {
 			...user.toObject(),
@@ -181,7 +257,12 @@ export const updateUser = async (
 		// Check if current user has admin privileges
 		const currentUser = req.user;
 		if (!currentUser || !hasAdminPrivileges(currentUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. Admin privileges required."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. Admin privileges required.",
+				),
+			);
 		}
 
 		const userId = req.params.userId;
@@ -189,7 +270,9 @@ export const updateUser = async (
 
 		// Validate ObjectId
 		if (!mongoose.Types.ObjectId.isValid(userId)) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"));
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"),
+			);
 		}
 
 		// Get target user to check their current userType
@@ -200,7 +283,12 @@ export const updateUser = async (
 
 		// Check if current user can modify target user
 		if (!canModifyUser(currentUser.userType, targetUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. You cannot modify this user."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. You cannot modify this user.",
+				),
+			);
 		}
 
 		// Prevent updating sensitive fields unless root
@@ -251,19 +339,31 @@ export const deleteUser = async (
 		// Check if current user has admin privileges
 		const currentUser = req.user;
 		if (!currentUser || !hasAdminPrivileges(currentUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. Admin privileges required."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. Admin privileges required.",
+				),
+			);
 		}
 
 		const userId = req.params.userId;
 
 		// Validate ObjectId
 		if (!mongoose.Types.ObjectId.isValid(userId)) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"));
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid user ID format"),
+			);
 		}
 
 		// Prevent self-deletion
 		if (currentUser.userId === userId) {
-			return next(createError(ErrorCodes.BAD_REQUEST, "You cannot delete your own account"));
+			return next(
+				createError(
+					ErrorCodes.BAD_REQUEST,
+					"You cannot delete your own account",
+				),
+			);
 		}
 
 		// Get target user to check their current userType
@@ -274,7 +374,12 @@ export const deleteUser = async (
 
 		// Check if current user can delete target user
 		if (!canModifyUser(currentUser.userType, targetUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. You cannot delete this user."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. You cannot delete this user.",
+				),
+			);
 		}
 
 		// Delete restaurant access records first
@@ -309,7 +414,12 @@ export const getUserStats = async (
 		// Check if current user has admin privileges
 		const currentUser = req.user;
 		if (!currentUser || !hasAdminPrivileges(currentUser.userType)) {
-			return next(createError(ErrorCodes.FORBIDDEN, "Access denied. Admin privileges required."));
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. Admin privileges required.",
+				),
+			);
 		}
 
 		// Get user counts by type

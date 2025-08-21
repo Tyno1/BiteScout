@@ -20,7 +20,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useCallback, useMemo } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
-import { AccessStatusEnum } from "shared/types/api/schemas";
+
 
 interface UseRestaurantAccessOptions {
   includeDeliveryLinks?: boolean;

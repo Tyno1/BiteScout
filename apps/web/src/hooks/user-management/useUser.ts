@@ -5,18 +5,27 @@ import {
 } from "@/api/user-management/queries";
 import { useQuery } from "@tanstack/react-query";
 
-export const useUsers = (params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  userType?: string;
-  status?: string;
-}) => {
+export const useUsers = (
+  params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    userType?: string;
+    status?: string;
+    restaurantId?: string;
+  },
+  options?: {
+    enabled?: boolean;
+    staleTime?: number;
+    gcTime?: number;
+  }
+) => {
   return useQuery({
     queryKey: ["user-management", params],
     queryFn: () => getAllUsers(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: options?.staleTime ?? 1000 * 60 * 5, // 5 minutes
+    gcTime: options?.gcTime ?? 1000 * 60 * 10, // 10 minutes
+    enabled: options?.enabled ?? true,
   });
 };
 
