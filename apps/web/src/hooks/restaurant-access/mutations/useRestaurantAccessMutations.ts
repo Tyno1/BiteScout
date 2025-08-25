@@ -14,7 +14,7 @@ export const useCreateRestaurantAccess = () => {
   return useMutation({
     mutationFn: ({ restaurantId, userId }: { restaurantId: string; userId: string }) =>
       createRestaurantAccess(restaurantId, userId),
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       // Invalidate and refetch restaurant access queries
       queryClient.invalidateQueries({ queryKey: ["restaurantAccess", "user", variables.userId] });
       queryClient.invalidateQueries({ queryKey: ["restaurantAccess", "owner"] });

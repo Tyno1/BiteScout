@@ -3,7 +3,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -52,6 +52,7 @@
   --color-gray-foreground: var(--gray-foreground);
 }
 
+/* Light theme (default) */
 :root {
   --radius: 0.625rem;
   --background: var(--color-gray-100);
@@ -67,7 +68,7 @@
   --secondary: var(--color-indigo-900);
   --secondary-foreground: var(--color-gray-100);
   --muted: var(--color-zinc-200);
-  --muted-foreground: var(--color-zinc-900);
+  --muted-foreground: var(--color-zinc-700);
   --accent: var(--color-orange-300);
   --accent-foreground: var(--color-orange-50);
   --danger: var(--color-red-700);
@@ -95,7 +96,8 @@
   --gray-foreground: var(--color-gray-600);
 }
 
-.dark {
+/* Dark theme */
+[data-theme="dark"] {
   --background: var(--color-zinc-950);
   --foreground: var(--color-gray-100);
   --card: var(--color-zinc-900);
@@ -109,7 +111,7 @@
   --secondary: oklch(0.7485 0.1319 280.33);
   --secondary-foreground: var(--color-indigo-950);
   --muted: var(--color-gray-200);
-  --muted-foreground: var(--color-zinc-900);
+  --muted-foreground: var(--color-zinc-400);
   --accent: var(--color-orange-400);
   --accent-foreground: var(--color-orange-50);
   --danger: var(--color-red-500);
@@ -141,6 +143,7 @@
   html {
     font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, sans-serif;
+    transition: color-scheme 0.2s ease-in-out;
   }
 
   * {
@@ -150,7 +153,13 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   }
+  
+  [class*="bg-"], [class*="text-"], [class*="border-"] {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  }
+  
   button {
     cursor: pointer;
   }

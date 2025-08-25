@@ -29,11 +29,11 @@ export const useUsers = (
   });
 };
 
-export const useUserById = (userId: string) => {
+export const useUserById = (userId: string, restaurantId?: string) => {
   return useQuery({
-    queryKey: ["user-management", userId],
-    queryFn: () => getUserById(userId),
-    enabled: !!userId,
+    queryKey: ["user-management", userId, restaurantId],
+    queryFn: () => getUserById(userId, restaurantId),
+    enabled: !!userId && !!restaurantId,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes
   });

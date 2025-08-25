@@ -112,9 +112,6 @@ export async function middleware(request: NextRequest) {
       const restaurantId = extractRestaurantId(request);
 
       if (!restaurantId) {
-        console.log(
-          `📱 Allowing page load for route ${pathname} without restaurant ID. RouteProtection will handle redirect.`
-        );
         return NextResponse.next();
       }
 
@@ -133,10 +130,6 @@ export async function middleware(request: NextRequest) {
         nextUrl.pathname = "/dashboard/unauthorized";
         return NextResponse.rewrite(nextUrl);
       }
-
-      console.log(
-        `✅ Restaurant access granted: User ${session.user._id} accessing restaurant ${restaurantId} on route ${pathname}`
-      );
     }
 
     // If all checks pass, allow the request to proceed

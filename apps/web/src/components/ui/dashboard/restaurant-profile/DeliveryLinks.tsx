@@ -54,7 +54,6 @@ export function DeliveryLinks({
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(newLink)
     if (!newLink.name || !newLink.url || !newLink.platform) {
       return;
     }

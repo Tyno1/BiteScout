@@ -7,23 +7,27 @@ type FilterOption = {
   label: string;
 };
 
-type FoodFilterProps = {
+type DataGridFilterProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
   filterField: string;
   onFilterFieldChange: (field: string) => void;
   filterOptions: FilterOption[];
   className?: string;
+  isPopoverOpen: boolean;
+  onPopoverChange: (open: boolean) => void;
 };
 
-export const FoodFilter = ({
+export const DataGridFilter = ({
   searchValue,
   onSearchChange,
   filterField,
   onFilterFieldChange,
   filterOptions,
   className = "",
-}: FoodFilterProps) => {
+  isPopoverOpen,
+  onPopoverChange,
+}: DataGridFilterProps) => {
   return (
     <div className={`flex flex-col gap-4 mb-4 ${className}`}>
       <div className="flex gap-2 items-center w-full">
@@ -39,6 +43,8 @@ export const FoodFilter = ({
           onChange={(e) => onSearchChange(e.target.value)}
         />
         <Popover
+          open={isPopoverOpen}
+          onOpenChange={onPopoverChange}
           trigger={
             <Button
               color="secondary"
@@ -61,7 +67,9 @@ export const FoodFilter = ({
                 fullWidth
                 text={option.label}
                 className="items-left"
-                onClick={() => onFilterFieldChange(option.id)}
+                onClick={() => {
+                  onPopoverChange(false);
+                  onFilterFieldChange(option.id)}}
               />
             ))}
           </div>

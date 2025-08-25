@@ -170,14 +170,22 @@ export const getAllUsers = async (
 		const paginatedRecords = allUsers.slice(skip, skip + limit);
 
 		// Transform data to match expected response format
-		const usersWithAccess = paginatedRecords.map((record) => ({
-			...record.userId.toObject(),
-			role: record.role,
-			status: record.status,
-			accessId: record._id === "owner-special-id" ? "owner" : record._id,
-			restaurantAccess: 1, // User has access to this restaurant
-			activeRestaurants: record.status === "approved" ? 1 : 0,
-		}));
+		const usersWithAccess = paginatedRecords.map((record) => {
+			const userData = {
+				...record.userId.toObject(),
+				role: record.role,
+				status: record.status,
+				accessId: record._id === "owner-special-id" ? "owner" : record._id,
+				restaurantAccess: 1, // User has access to this restaurant
+				activeRestaurants: record.status === "approved" ? 1 : 0,
+			};
+			
+
+			
+			return userData;
+		});
+
+
 
 		res.status(200).json({
 			users: usersWithAccess,
@@ -227,18 +235,77 @@ export const getUserById = async (
 			return next(createError(ErrorCodes.NOT_FOUND, "User not found"));
 		}
 
-		// Get restaurant access information
-		const restaurantAccess = await RestaurantAccess.find({
+		// Get restaurant access information for the current restaurant
+		const restaurantId = req.query.restaurantId?.toString();
+		if (!restaurantId) {
+			return next(
+				createError(
+					ErrorCodes.BAD_REQUEST,
+					"Restaurant ID is required for security",
+				),
+			);
+		}
+
+		// Validate ObjectId format
+		if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid restaurant ID format"),
+			);
+		}
+
+		// Get specific restaurant access for this user
+		const restaurantAccess = await RestaurantAccess.findOne({
 			userId: user._id.toString(),
+			restaurantId: restaurantId,
 		});
+
+		// Check if current user has access to this restaurant
+		const currentUserRestaurantAccess = await RestaurantAccess.findOne({
+			userId: currentUser.userId,
+			restaurantId: restaurantId,
+			status: "approved",
+		});
+
+		const restaurant = await RestaurantData.findById(restaurantId);
+		if (!restaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
+
+		const isOwner = currentUser.userId === restaurant.ownerId?.toString();
+		
+		if (!currentUserRestaurantAccess && !isOwner) {
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. You don't have access to this restaurant.",
+				),
+			);
+		}
+
+		// If user is the owner, add owner-specific data
+		let role = "user";
+		let status = "approved";
+		let accessId = "owner";
+
+		if (restaurantAccess) {
+			role = restaurantAccess.role;
+			status = restaurantAccess.status;
+			accessId = restaurantAccess._id.toString();
+		} else if (user._id.toString() === restaurant.ownerId?.toString()) {
+			// User is the restaurant owner
+			role = "admin";
+			status = "approved";
+			accessId = "owner";
+		}
 
 		const userWithAccess = {
 			...user.toObject(),
-			restaurantAccess: restaurantAccess.length,
-			activeRestaurants: restaurantAccess.filter(
-				(ra) => ra.status === "approved",
-			).length,
-			restaurantAccessDetails: restaurantAccess,
+			role,
+			status,
+			accessId,
+			restaurantAccess: restaurantAccess ? 1 : 0,
+			activeRestaurants: restaurantAccess && restaurantAccess.status === "approved" ? 1 : 0,
+			restaurantAccessDetails: restaurantAccess ? [restaurantAccess] : [],
 		};
 
 		res.status(200).json({ user: userWithAccess });

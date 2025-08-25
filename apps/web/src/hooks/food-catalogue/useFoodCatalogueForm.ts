@@ -254,7 +254,6 @@ export const useFoodCatalogueForm = ({
       setUploadProgress(0);
     }
   }, [
-
     isSubmitting,
     validateForm,
     selectedMediaFiles,
@@ -266,8 +265,8 @@ export const useFoodCatalogueForm = ({
     createFoodDataMutation,
     updateFoodDataMutation,
     onSuccess,
-    // Note: resetForm is defined later in the file, creating a circular dependency
-    // The function works correctly without it in the dependency array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // resetForm is defined later in the file, but the function works correctly
   ]);
 
   const toggleAllergen = useCallback((allergen: Allergen): void => {

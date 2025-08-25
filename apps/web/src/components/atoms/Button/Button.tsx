@@ -13,7 +13,7 @@ type ButtonProps = ComponentProps<"button"> & {
 	type?: "button" | "submit" | "reset";
 	name?: string;
 	value?: string;
-	onClick?: () => void; // Note: this is required (no question mark)
+	onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | (() => void);
 	className?: string;
 	iconStyle?: string;
 	variant: "solid" | "outline" | "plain" | "glass"; // Note: this is required (no question mark)
