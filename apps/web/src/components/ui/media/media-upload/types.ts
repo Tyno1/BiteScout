@@ -1,4 +1,14 @@
-import type { Media, UploadMediaResponse } from "shared/types";
+import type { Media } from "shared/types";
+import type { UploadMediaResponse } from "shared/types";
+
+export enum MediaFolder {
+  USER_PROFILE = "user-profile-images",
+  POST = "post-images", 
+  GALLERY = "gallery-images",
+  FOOD = "food-images",
+  RESTAURANT = "restaurant-images",
+  DISH = "dish-images"
+}
 
 export interface MediaUploadProps {
   onUploadSuccess?: (result: UploadMediaResponse | UploadMediaResponse[]) => void;
@@ -7,7 +17,7 @@ export interface MediaUploadProps {
   onSelectedFilesChange?: (files: FileWithPreview[]) => void;
   onUpdateUploadedFileMetadata?: (index: number, field: string, value: string) => void;
   associatedWith?: Media["associatedWith"];
-  folder?: string;
+  folder?: MediaFolder;
   className?: string;
   multiple?: boolean;
   showUploadedFiles?: boolean;

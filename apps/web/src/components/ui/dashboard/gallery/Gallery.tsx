@@ -3,6 +3,7 @@
 import { Button } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import { MediaUpload } from "@/components/ui/media/media-upload";
+import { MediaFolder } from "@/components/ui/media/media-upload/types";
 import { useGalleryState } from "@/hooks/useGalleryState";
 import type { Media, UploadMediaResponse } from "@shared/types";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -305,7 +306,7 @@ export function Gallery({
             type: selectedCategory === "post" ? "post" : "restaurant",
             id: restaurantId,
           }}
-          folder={selectedCategory === "post" ? "post-images" : "gallery-images"}
+          folder={selectedCategory === "post" ? MediaFolder.POST : MediaFolder.GALLERY}
           multiple={false}
           uploadedFiles={filteredImages.map(image => ({
             message: "Media loaded from gallery",

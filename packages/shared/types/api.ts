@@ -46,12 +46,8 @@ export interface paths {
                  * @example anthony@test.com
                  */
                 email?: string;
-                /**
-                 * @description User role/type
-                 * @example guest
-                 * @enum {string}
-                 */
-                userType?: "guest" | "user" | "admin" | "moderator" | "root";
+                /** @description User role/type */
+                userType?: components["schemas"]["UserType"];
               };
             };
           };
@@ -981,7 +977,7 @@ export interface paths {
     };
   };
   "/api/restaurant-access/access/{accessId}/update": {
-    /** Update restaurant access role */
+    /** Update restaurant access status */
     patch: {
       parameters: {
         path: {
@@ -991,16 +987,17 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
-            role?: string;
+            /** @enum {string} */
+            status?: "pending" | "approved" | "suspended" | "innactive";
           };
         };
       };
       responses: {
-        /** @description Access role updated */
+        /** @description Access status updated */
         200: {
           content: {
             "application/json": {
-              /** @example Role updated successfully */
+              /** @example Status updated successfully */
               message?: string;
               accessRecord?: components["schemas"]["RestaurantAccess"];
             };
@@ -1031,7 +1028,7 @@ export interface paths {
       parameters: {
         path: {
           /** @description The name of the user type to retrieve */
-          userType: "guest" | "user" | "admin" | "moderator" | "root";
+          userType: components["schemas"]["UserType"];
         };
       };
       responses: {
@@ -1681,7 +1678,7 @@ export interface paths {
                * @example restaurant
                * @enum {string}
                */
-              type?: "post" | "dish" | "restaurant";
+              type?: "post" | "dish" | "restaurant" | "user";
               /** @example 507f1f77bcf86cd799439016 */
               id?: string;
             };
@@ -1867,7 +1864,7 @@ export interface paths {
                * @example post
                * @enum {string}
                */
-              type?: "post" | "dish" | "restaurant";
+              type?: "post" | "dish" | "restaurant" | "user";
               /**
                * @description ID of the associated content
                * @example 507f1f77bcf86cd799439016
@@ -1973,7 +1970,7 @@ export interface paths {
       parameters: {
         path: {
           /** @description Type of content (post, dish, restaurant) */
-          type: "post" | "dish" | "restaurant";
+          type: "post" | "dish" | "restaurant" | "user";
           /** @description ID of the associated content */
           id: string;
         };
@@ -2668,7 +2665,7 @@ export interface paths {
           /** @description Search by name, email, or username */
           search?: string;
           /** @description Filter by user type */
-          userType?: "guest" | "user" | "admin" | "moderator" | "root";
+          userType?: components["schemas"]["UserType"];
           /** @description Filter by restaurant access status */
           status?: "pending" | "approved" | "suspended" | "innactive";
         };
@@ -3036,6 +3033,12 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    /**
+     * @description User type/role enumeration
+     * @example user
+     * @enum {string}
+     */
+    UserType: "guest" | "user" | "admin" | "moderator" | "root";
     ErrorResponse: {
       /**
        * @description A human-readable description of the error.
@@ -3071,6 +3074,27 @@ export interface components {
       currentCity?: string;
       /** @example Nigeria */
       country?: string;
+      location?: {
+        /** @example New York */
+        city?: string;
+        /** @example USA */
+        country?: string;
+        geo?: {
+          /**
+           * @example Point
+           * @enum {string}
+           */
+          type?: "Point";
+          /**
+           * @description [longitude, latitude]
+           * @example [
+           *   -74.006,
+           *   40.7128
+           * ]
+           */
+          coordinates?: number[];
+        };
+      };
       /** @example https://example.com/avatar.jpg */
       imageUrl?: string;
       /** @example 123, Some Street, City */
@@ -3082,12 +3106,56 @@ export interface components {
       password: string;
       /** @example false */
       isVerified?: boolean;
+      /** @description User type (platform-wide permissions) */
+      userType: components["schemas"]["UserType"];
       /**
-       * @description User role/type
-       * @example admin
+       * @description User's bio/description
+       * @example Food enthusiast and restaurant owner
+       */
+      bio?: string;
+      /**
+       * @description User's dietary preferences
+       * @example [
+       *   "vegetarian",
+       *   "gluten-free"
+       * ]
+       */
+      dietaryPreferences?: string[];
+      notificationSettings?: {
+        /** @example true */
+        likes?: boolean;
+        /** @example true */
+        follows?: boolean;
+        /** @example true */
+        restaurantUpdates?: boolean;
+      };
+      /**
+       * Format: date-time
+       * @description Last login timestamp
+       * @example 2025-04-20T15:30:00Z
+       */
+      lastLogin?: string;
+      /**
+       * @description User's timezone
+       * @example UTC
+       */
+      timezone?: string;
+      /**
+       * @description Whether two-factor authentication is enabled
+       * @example false
+       */
+      twoFactorEnabled?: boolean;
+      /**
+       * @description User's preferred theme
+       * @example system
        * @enum {string}
        */
-      userType: "guest" | "user" | "admin" | "moderator" | "root";
+      theme?: "light" | "dark" | "system";
+      /**
+       * @description User's preferred language
+       * @example en
+       */
+      language?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -3098,12 +3166,6 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
-      /**
-       * @description User's role in the specific restaurant
-       * @example moderator
-       * @enum {string}
-       */
-      role?: "guest" | "user" | "moderator" | "admin" | "root";
       /**
        * @description User's access status in the specific restaurant
        * @example approved
@@ -3142,12 +3204,6 @@ export interface components {
        * @example 507f1f77bcf86cd799439013
        */
       restaurantId: string;
-      /**
-       * @description User's role in this restaurant
-       * @example admin
-       * @enum {string}
-       */
-      role: "guest" | "user" | "admin" | "moderator" | "root";
       /**
        * @description Status of the access request
        * @example approved
@@ -3193,11 +3249,7 @@ export interface components {
       email?: string;
       /** @example johndoe */
       username?: string;
-      /**
-       * @example user
-       * @enum {string}
-       */
-      userType?: "guest" | "user" | "admin" | "moderator" | "root";
+      userType?: components["schemas"]["UserType"];
       /** @example +1234567890 */
       phone?: string;
       /** @example Food enthusiast and restaurant owner */
@@ -3248,11 +3300,10 @@ export interface components {
       totalUsers?: number;
       /** @example 50 */
       newUsersThisMonth?: number;
-      userTypeBreakdown?: ({
-          /** @enum {string} */
-          _id?: "guest" | "user" | "admin" | "moderator" | "root";
+      userTypeBreakdown?: {
+          _id?: components["schemas"]["UserType"];
           count?: number;
-        })[];
+        }[];
       accessStatusBreakdown?: ({
           /** @enum {string} */
           _id?: "pending" | "approved" | "suspended" | "innactive";
@@ -3593,7 +3644,7 @@ export interface components {
          * @example restaurant
          * @enum {string}
          */
-        type?: "post" | "dish" | "restaurant";
+                  type?: "post" | "dish" | "restaurant" | "user";
         /** @example 507f1f77bcf86cd799439012 */
         id?: string;
       };

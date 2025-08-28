@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -77,6 +77,16 @@ const userSchema = new mongoose.Schema(
       follows: { type: Boolean, default: true },
       restaurantUpdates: { type: Boolean, default: true },
     },
+    // New fields for better user management
+    lastLogin: { type: Date, default: null },
+    loginCount: { type: Number, default: 0 },
+    timezone: { type: String, default: 'UTC' },
+    twoFactorEnabled: { type: Boolean, default: false },
+    failedLoginAttempts: { type: Number, default: 0 },
+    isLocked: { type: Boolean, default: false },
+    lastActivity: { type: Date, default: null },
+    theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+    language: { type: String, default: 'en' },
   },
   { timestamps: true }
 );

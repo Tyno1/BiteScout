@@ -6,13 +6,11 @@ import { useRestaurantsByName } from "@/hooks/restaurant";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const RestaurantSearch = () => {
   const { data: session } = useSession();
   const userId = session?.user?._id;
-  const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [formError, setFormError] = useState("");

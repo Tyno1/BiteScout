@@ -179,8 +179,8 @@ export const getMediaByAssociatedItem = async (
 			throw createError(400, "Type and ID are required");
 		}
 
-		if (!["post", "dish"].includes(type)) {
-			throw createError(400, "Invalid type. Must be 'post' or 'dish'");
+		if (!["post", "dish", "restaurant", "user"].includes(type)) {
+			throw createError(400, "Invalid type. Must be 'post', 'dish', 'restaurant', or 'user'");
 		}
 
 		const media = await Media.find({
@@ -437,7 +437,7 @@ export const getVerifiedMedia = async (
 
 		const filter: Record<string, unknown> = { verified: true };
 
-		if (type && ["post", "dish"].includes(String(type))) {
+		if (type && ["post", "dish", "restaurant", "user"].includes(String(type))) {
 			filter["associatedWith.type"] = type;
 		}
 

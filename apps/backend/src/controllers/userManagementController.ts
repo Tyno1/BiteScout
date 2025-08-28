@@ -16,6 +16,29 @@ import type {
 } from "shared/types/user-management";
 import RestaurantData from "../models/RestaurantData.js";
 
+// Helper function to get user permissions based on userType and context
+const getUserPermissions = (userType: string, isOwner: boolean) => {
+	// Platform-wide permissions (from userType)
+	const platformPermissions = {
+		canAccessAdminPanel: ["admin", "moderator", "root"].includes(userType),
+		canCreateRestaurants: ["admin", "root"].includes(userType),
+		canManageAllUsers: ["admin", "root"].includes(userType),
+		canViewPlatformAnalytics: ["admin", "root"].includes(userType),
+	};
+
+	// Restaurant-specific permissions (from userType + context)
+	const restaurantPermissions = {
+		canEditRestaurant: isOwner || ["admin", "moderator"].includes(userType),
+		canManageUsers: isOwner || ["admin"].includes(userType),
+		canViewAnalytics: isOwner || ["admin", "moderator"].includes(userType),
+		canEditMenu: isOwner || ["admin", "moderator"].includes(userType),
+		canDeleteContent: isOwner || ["admin"].includes(userType),
+		canManageContent: isOwner || ["admin", "moderator"].includes(userType),
+	};
+
+	return { ...platformPermissions, ...restaurantPermissions };
+};
+
 // Type definitions for API responses with error handling
 type GetAllUsersApiResponse = GetAllUsersResponse | ApiError;
 type GetUserByIdApiResponse = GetUserByIdResponse | ApiError;
@@ -283,29 +306,43 @@ export const getUserById = async (
 		}
 
 		// If user is the owner, add owner-specific data
-		let role = "user";
 		let status = "approved";
 		let accessId = "owner";
 
 		if (restaurantAccess) {
-			role = restaurantAccess.role;
 			status = restaurantAccess.status;
 			accessId = restaurantAccess._id.toString();
+			
+			// Set approval date when status changes to approved
+			if (restaurantAccess.status === 'approved' && !restaurantAccess.approvedAt) {
+				restaurantAccess.approvedAt = new Date();
+				await restaurantAccess.save();
+			}
 		} else if (user._id.toString() === restaurant.ownerId?.toString()) {
 			// User is the restaurant owner
-			role = "admin";
 			status = "approved";
 			accessId = "owner";
 		}
 
+		// Calculate permissions based on userType and context
+		const targetIsOwner = user._id.toString() === restaurant.ownerId?.toString();
+		const permissions = getUserPermissions(user.userType, targetIsOwner);
+
 		const userWithAccess = {
 			...user.toObject(),
-			role,
 			status,
 			accessId,
 			restaurantAccess: restaurantAccess ? 1 : 0,
 			activeRestaurants: restaurantAccess && restaurantAccess.status === "approved" ? 1 : 0,
 			restaurantAccessDetails: restaurantAccess ? [restaurantAccess] : [],
+			// Map new fields for frontend
+			lastLoginAt: user.lastLogin,
+			approvedAt: restaurantAccess?.approvedAt,
+			accessExpiresAt: restaurantAccess?.expiresAt,
+			maxRestaurants: restaurantAccess?.maxRestaurants || 1,
+			accessLevel: restaurantAccess?.accessLevel || 'basic',
+			// Use unified permissions instead of separate role
+			permissions,
 		};
 
 		res.status(200).json({ user: userWithAccess });

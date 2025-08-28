@@ -96,7 +96,7 @@
   --gray-foreground: var(--color-gray-600);
 }
 
-/* Dark theme */
+/* Dark theme override */
 [data-theme="dark"] {
   --background: var(--color-zinc-950);
   --foreground: var(--color-gray-100);

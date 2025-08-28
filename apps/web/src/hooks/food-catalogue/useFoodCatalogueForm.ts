@@ -1,10 +1,11 @@
 import { getMedia } from "@/api/media/queries";
 import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
+import { MediaFolder } from "@/components/ui/media/media-upload/types";
 import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
 import { useMediaUpload } from "@/hooks/media";
 import { useCallback, useEffect, useState } from "react";
-import type { UploadMediaResponse } from "shared/types";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
+import type { UploadMediaResponse } from "shared/types/media/create";
 import { z } from "zod";
 import { useCreateFoodCatalogue, useUpdateFoodCatalogue } from "./mutations/useFoodCatalogueMutations";
 
@@ -166,6 +167,27 @@ export const useFoodCatalogueForm = ({
     return true;
   }, [newFood]);
 
+  const resetForm = useCallback(() => {
+    if (mode === 'update' && initialData) {
+      setNewFood({ ...initialData });
+      // Re-fetch existing images for update mode
+      if (initialData.images) {
+        fetchExistingImages(initialData.images);
+      }
+    } else {
+      setNewFood({
+        ...DEFAULT_FOOD_DATA,
+        restaurant: restaurantId,
+      });
+      setExistingImages([]);
+    }
+    setFormError(DEFAULT_FORM_ERROR);
+    setSelectedMediaFiles([]);
+    setIngredient("");
+    setIsUploadingImages(false);
+    setUploadProgress(0);
+  }, [mode, initialData, restaurantId, fetchExistingImages]);
+
   // Main submit handler - Works for both create and update
   const handleSubmitFood = useCallback(async () => {
     if (isSubmitting) return;
@@ -194,7 +216,7 @@ export const useFoodCatalogueForm = ({
               tags: fileWithPreview.tags
                 ? fileWithPreview.tags.split(",").map((tag) => tag.trim())
                 : undefined,
-              folder: "food-images",
+              folder: MediaFolder.FOOD,
             };
 
             const result = await uploadMutation.mutateAsync({
@@ -265,8 +287,7 @@ export const useFoodCatalogueForm = ({
     createFoodDataMutation,
     updateFoodDataMutation,
     onSuccess,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // resetForm is defined later in the file, but the function works correctly
+    resetForm,
   ]);
 
   const toggleAllergen = useCallback((allergen: Allergen): void => {
@@ -318,27 +339,6 @@ export const useFoodCatalogueForm = ({
       return updated;
     });
   }, []);
-
-  const resetForm = useCallback(() => {
-    if (mode === 'update' && initialData) {
-      setNewFood({ ...initialData });
-      // Re-fetch existing images for update mode
-      if (initialData.images) {
-        fetchExistingImages(initialData.images);
-      }
-    } else {
-      setNewFood({
-        ...DEFAULT_FOOD_DATA,
-        restaurant: restaurantId,
-      });
-      setExistingImages([]);
-    }
-    setFormError(DEFAULT_FORM_ERROR);
-    setSelectedMediaFiles([]);
-    setIngredient("");
-    setIsUploadingImages(false);
-    setUploadProgress(0);
-  }, [mode, initialData, restaurantId, fetchExistingImages]);
 
   return {
     // State

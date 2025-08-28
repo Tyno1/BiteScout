@@ -1,7 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import type { AccessRoles } from "shared/types";
-import { AccessRoleEnum, AccessStatusEnum } from "shared/types";
 import type {
   DeleteRestaurantAccessRequest,
   DeleteRestaurantAccessResponse,
@@ -18,6 +16,8 @@ import type {
   UpdateRestaurantAccessRequest,
   UpdateRestaurantAccessResponse,
 } from "shared/types/access";
+import type { AccessRoles } from "shared/types/api/schemas";
+import { AccessRoleEnum, AccessStatusEnum } from "shared/types/api/schemas";
 import type {
   RestaurantAccess as RestaurantAccessType,
 } from "shared/types/api/schemas";
@@ -165,7 +165,6 @@ export const RequestAuthorization = async (
     const newRestaurantAccess = await RestaurantAccess.create({
       restaurantId,
       userId,
-      role: AccessRoleEnum.User,
       status: AccessStatusEnum.Pending,
     });
 
@@ -325,19 +324,19 @@ export const UpdateRole = async (
 ) => {
   try {
     const { accessId } = req.params;
-    const { role } = req.body;
+    const { status } = req.body;
 
     if (!accessId) {
       return next(createError(ErrorCodes.BAD_REQUEST, "Access ID is required"));
     }
 
-    if (!role) {
-      return next(createError(ErrorCodes.BAD_REQUEST, "Role is required"));
+    if (!status) {
+      return next(createError(ErrorCodes.BAD_REQUEST, "Status is required"));
     }
 
     const accessRecord = await RestaurantAccess.findByIdAndUpdate(
       accessId,
-      { role },
+      { status },
       { new: true }
     );
 
@@ -346,7 +345,7 @@ export const UpdateRole = async (
     }
 
     res.status(200).json({
-      message: "Role updated successfully",
+      message: "Status updated successfully",
       accessRecord,
     });
   } catch (error) {

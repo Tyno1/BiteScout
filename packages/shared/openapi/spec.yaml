@@ -60,10 +60,8 @@ paths:
                         format: email
                         example: anthony@test.com
                       userType:
-                        type: string
-                        enum: ["guest", "user", "admin", "moderator", "root"]
+                        $ref: "#/components/schemas/UserType"
                         description: "User role/type"
-                        example: "guest"
         400:
           description: Missing required field or invalid user type
           content:
@@ -1107,7 +1105,7 @@ paths:
                     $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/update:
     patch:
-      summary: Update restaurant access role
+      summary: Update restaurant access status
       parameters:
         - in: path
           name: accessId
@@ -1121,11 +1119,12 @@ paths:
             schema:
               type: object
               properties:
-                role:
+                status:
                   type: string
+                  enum: ["pending", "approved", "suspended", "innactive"]
       responses:
         200:
-          description: Access role updated
+          description: Access status updated
           content:
             application/json:
               schema:
@@ -1133,7 +1132,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Role updated successfully"
+                    example: "Status updated successfully"
                   accessRecord:
                     $ref: "#/components/schemas/RestaurantAccess"
   /api/user-types:
@@ -1159,9 +1158,7 @@ paths:
           required: true
           description: The name of the user type to retrieve
           schema:
-            type: string
-            enum: ["guest", "user", "admin", "moderator", "root"]
-            example: "user"
+            $ref: "#/components/schemas/UserType"
       responses:
         200:
           description: User type retrieved successfully
@@ -2902,9 +2899,7 @@ paths:
           description: Filter by user type
           required: false
           schema:
-            type: string
-            enum: ["guest", "user", "admin", "moderator", "root"]
-            example: "user"
+            $ref: "#/components/schemas/UserType"
         - name: status
           in: query
           description: Filter by restaurant access status
@@ -3283,6 +3278,12 @@ paths:
 
 components:
   schemas:
+    UserType:
+      type: string
+      enum: ["guest", "user", "admin", "moderator", "root"]
+      description: "User type/role enumeration"
+      example: "user"
+    
     ErrorResponse:
       type: object
       properties:
@@ -3324,6 +3325,28 @@ components:
         country:
           type: string
           example: Nigeria
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "New York"
+            country:
+              type: string
+              example: "USA"
+            geo:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["Point"]
+                  example: "Point"
+                coordinates:
+                  type: array
+                  items:
+                    type: number
+                  example: [-74.006, 40.7128]
+                  description: "[longitude, latitude]"
         imageUrl:
           type: string
           example: https://example.com/avatar.jpg
@@ -3338,10 +3361,53 @@ components:
           type: boolean
           example: false
         userType:
+          $ref: "#/components/schemas/UserType"
+          description: "User type (platform-wide permissions)"
+        bio:
           type: string
-          enum: ["guest", "user", "admin", "moderator", "root"]
-          description: "User role/type"
-          example: "admin"
+          maxLength: 200
+          description: "User's bio/description"
+          example: "Food enthusiast and restaurant owner"
+        dietaryPreferences:
+          type: array
+          items:
+            type: string
+          description: "User's dietary preferences"
+          example: ["vegetarian", "gluten-free"]
+        notificationSettings:
+          type: object
+          properties:
+            likes:
+              type: boolean
+              example: true
+            follows:
+              type: boolean
+              example: true
+            restaurantUpdates:
+              type: boolean
+              example: true
+        lastLogin:
+          type: string
+          format: date-time
+          description: "Last login timestamp"
+          example: "2025-04-20T15:30:00Z"
+        timezone:
+          type: string
+          description: "User's timezone"
+          example: "UTC"
+        twoFactorEnabled:
+          type: boolean
+          description: "Whether two-factor authentication is enabled"
+          example: false
+        theme:
+          type: string
+          enum: ["light", "dark", "system"]
+          description: "User's preferred theme"
+          example: "system"
+        language:
+          type: string
+          description: "User's preferred language"
+          example: "en"
         createdAt:
           type: string
           format: date-time
@@ -3351,11 +3417,6 @@ components:
           format: date-time
           example: "2025-04-20T15:30:00Z"
         # Restaurant-specific fields (added when returned via user-management API)
-        role:
-          type: string
-          enum: ["guest", "user", "moderator", "admin", "root"]
-          description: "User's role in the specific restaurant"
-          example: "moderator"
         status:
           type: string
           enum: ["pending", "approved", "suspended", "innactive"]
@@ -3394,11 +3455,6 @@ components:
           type: string
           description: "ID of the restaurant"
           example: "507f1f77bcf86cd799439013"
-        role:
-          type: string
-          enum: ["guest", "user", "admin", "moderator", "root"]
-          description: "User's role in this restaurant"
-          example: "admin"
         status:
           type: string
           enum: ["pending", "approved", "suspended", "innactive"]
@@ -3415,7 +3471,6 @@ components:
       required:
         - userId
         - restaurantId
-        - role
         - status
 
     UserListResponse:
@@ -3464,9 +3519,7 @@ components:
           type: string
           example: "johndoe"
         userType:
-          type: string
-          enum: ["guest", "user", "admin", "moderator", "root"]
-          example: "user"
+          $ref: "#/components/schemas/UserType"
         phone:
           type: string
           example: "+1234567890"
@@ -3546,8 +3599,7 @@ components:
             type: object
             properties:
               _id:
-                type: string
-                enum: ["guest", "user", "admin", "moderator", "root"]
+                $ref: "#/components/schemas/UserType"
               count:
                 type: integer
         accessStatusBreakdown:

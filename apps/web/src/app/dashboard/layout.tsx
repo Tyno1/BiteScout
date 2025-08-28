@@ -1,11 +1,8 @@
 "use client";
 
-import { Spinner } from "@/components/atoms";
 import { RouteProtection, SideNav, TopNav } from "@/components/ui";
-import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function DashboardLayout({
   children,
