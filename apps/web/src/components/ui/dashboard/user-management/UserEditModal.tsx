@@ -1,12 +1,15 @@
 "use client";
 
-import { Badge, Button, Input, Select, Textarea } from "@/components/atoms";
+import { Button, Input, Spinner, Textarea } from "@/components/atoms";
+import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms/Modal";
-import { UserIcon } from "lucide-react";
+import { CheckCircle, UserIcon } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { User } from "shared/types";
-import type { AccessRoleEnumValues } from "shared/types/api/schemas";
+import type { CreateMediaResponse } from "shared/types/media";
+
+import { useDeleteUser, useUpdateUser } from "@/hooks";
 import { MediaFolder, MediaUpload } from "../../media";
 
 interface UserEditModalProps {
@@ -14,7 +17,7 @@ interface UserEditModalProps {
   onClose: () => void;
   user: Pick<
     User,
-	"_id"
+    | "_id"
     | "name"
     | "email"
     | "username"
@@ -29,7 +32,6 @@ interface UserEditModalProps {
     | "imageUrl"
   >;
   onSave: (userData: Partial<User>) => Promise<void>;
-  onChange: (userData: Partial<User>) => void;
   isSubmitting?: boolean;
 }
 
@@ -56,7 +58,18 @@ export function UserEditModal({
   });
 
   const [newDietaryPreference, setNewDietaryPreference] = useState("");
-  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const {
+    mutate: deleteUser,
+    isPending: isDeleting,
+    isSuccess: isDeleted,
+  } = useDeleteUser();
+  const {
+    mutate: updateUser,
+    isPending: isUpdating,
+    isSuccess: isUpdated,
+  } = useUpdateUser();
 
   useEffect(() => {
     setFormData({
@@ -75,18 +88,17 @@ export function UserEditModal({
     });
   }, [user]);
 
-  const handleImageUpload = () => {
-    setShowImageUpload(true);
-  };
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    },
+    []
+  );
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleDietaryPreferenceAdd = () => {
+  const handleDietaryPreferenceAdd = useCallback(() => {
     if (
       newDietaryPreference.trim() &&
       !formData.dietaryPreferences?.includes(newDietaryPreference.trim())
@@ -100,44 +112,40 @@ export function UserEditModal({
       }));
       setNewDietaryPreference("");
     }
-  };
+  }, [newDietaryPreference, formData.dietaryPreferences]);
 
-  const handleDietaryPreferenceRemove = (preference: string) => {
+  const handleDietaryPreferenceRemove = useCallback((preference: string) => {
     setFormData((prev) => ({
       ...prev,
       dietaryPreferences:
         prev.dietaryPreferences?.filter((p) => p !== preference) || [],
     }));
-  };
+  }, []);
 
-  const handleSave = async () => {
-    await onSave(formData);
-    onClose();
-  };
+  const handleSave = useCallback(() => {
+    console.log("Saving form data:", formData);
+    if (user._id) {
+      updateUser({
+        userId: user._id,
+        data: formData,
+      });
+    }
+    if (isUpdated) {
+      onClose();
+    }
 
-  const userTypeOptions: {
-    value: (typeof AccessRoleEnumValues)[keyof typeof AccessRoleEnumValues];
-    label: string;
-  }[] = [
-    { value: "guest", label: "Guest" },
-    { value: "user", label: "User" },
-    { value: "moderator", label: "Moderator" },
-    { value: "admin", label: "Admin" },
-    { value: "root", label: "Root" },
-  ];
+  }, [updateUser, user._id, formData, onClose, isUpdated]);
 
-  return (
-    <Modal
-      isModalOpen={isOpen}
-      setIsModalOpen={() => onClose()}
-      closeModal={onClose}
-      modalTitle="Edit User Profile"
-      modalDescription="Update user information and preferences"
-      modalActionText="Save Changes"
-      modalActionOnClick={handleSave}
-      isSubmitting={isSubmitting}
-      size="lg"
-    >
+  const handlesDelete = useCallback(() => {
+    if (user._id) {
+      deleteUser(user._id);
+      onClose();
+    }
+  }, [deleteUser, user._id, onClose]);
+
+  // Tab content components - memoized to prevent re-creation
+  const ProfileTab = useCallback(
+    () => (
       <div className="space-y-6">
         {/* Basic Information */}
         <div>
@@ -152,6 +160,7 @@ export function UserEditModal({
                   alt="User Image"
                   width={100}
                   height={100}
+                  className="rounded-full object-cover"
                 />
               ) : (
                 <div className="w-[100px] h-[100px] bg-gray-200 rounded-full flex items-center justify-center">
@@ -163,8 +172,8 @@ export function UserEditModal({
               <Button
                 variant="outline"
                 size="xs"
-                text="Upload Image"
-                onClick={() => handleImageUpload()}
+                text="Change Image"
+                onClick={() => setActiveTab("media")}
               />
             </div>
           </div>
@@ -174,7 +183,7 @@ export function UserEditModal({
               type="text"
               label="Full Name"
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={handleInputChange}
               placeholder="Enter full name"
               required
             />
@@ -183,7 +192,7 @@ export function UserEditModal({
               type="email"
               label="Email"
               value={formData.email}
-              onChange={(value) => handleInputChange("email", value)}
+              onChange={handleInputChange}
               placeholder="Enter email address"
               required
             />
@@ -192,7 +201,7 @@ export function UserEditModal({
               type="text"
               label="Username"
               value={formData.username}
-              onChange={(value) => handleInputChange("username", value)}
+              onChange={handleInputChange}
               placeholder="Enter username"
             />
             <Input
@@ -200,25 +209,27 @@ export function UserEditModal({
               type="tel"
               label="Phone"
               value={formData.phone}
-              onChange={(value) => handleInputChange("phone", value)}
+              onChange={handleInputChange}
               placeholder="Enter phone number"
             />
           </div>
         </div>
 
         {/* User Type */}
-        <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            User Type
-          </h3>
-          <Select
-            label="User Type"
-            value={formData.userType}
-            onValueChange={(value) => handleInputChange("userType", value)}
-            options={userTypeOptions}
-            placeholder="Select user type"
-          />
-        </div>
+        {/* <div>
+        <h3 className="text-lg font-semibold text-card-foreground mb-4">
+          User Type
+        </h3>
+        <Select
+          name="userType"
+          disabled={true}
+          label="User Type"
+          value={formData.userType}
+          onChange={()=>{}}
+          options={userTypeOptions}
+          placeholder="Select user type"
+        />
+      </div> */}
 
         {/* Bio */}
         <div>
@@ -229,7 +240,7 @@ export function UserEditModal({
             name="bio"
             label="Bio"
             value={formData.bio}
-            onChange={(value) => handleInputChange("bio", value)}
+            onChange={handleInputChange}
             placeholder="Tell us about yourself..."
             rows={3}
           />
@@ -246,7 +257,7 @@ export function UserEditModal({
               type="text"
               label="Address"
               value={formData.address}
-              onChange={(value) => handleInputChange("address", value)}
+              onChange={handleInputChange}
               placeholder="Enter address"
             />
             <Input
@@ -254,7 +265,7 @@ export function UserEditModal({
               type="text"
               label="Hometown"
               value={formData.hometown}
-              onChange={(value) => handleInputChange("hometown", value)}
+              onChange={handleInputChange}
               placeholder="Enter hometown"
             />
             <Input
@@ -262,7 +273,7 @@ export function UserEditModal({
               type="text"
               label="Current City"
               value={formData.currentCity}
-              onChange={(value) => handleInputChange("currentCity", value)}
+              onChange={handleInputChange}
               placeholder="Enter current city"
             />
             <Input
@@ -270,7 +281,7 @@ export function UserEditModal({
               type="text"
               label="Country"
               value={formData.country}
-              onChange={(value) => handleInputChange("country", value)}
+              onChange={handleInputChange}
               placeholder="Enter country"
             />
           </div>
@@ -304,51 +315,166 @@ export function UserEditModal({
               />
             </div>
 
-            {formData.dietaryPreferences.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.dietaryPreferences.map((preference) => (
-                  <Badge
-                    key={preference}
-                    size="xs"
-                    variant="glass"
-                    color="secondary"
-                    className="cursor-pointer hover:bg-destructive/20"
-                    onClick={() => handleDietaryPreferenceRemove(preference)}
-                  >
-                    {preference} ×
-                  </Badge>
-                ))}
+            {formData.dietaryPreferences &&
+              formData.dietaryPreferences.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.dietaryPreferences.map((preference) => (
+                    <button
+                      key={preference}
+                      type="button"
+                      className="inline-flex items-center justify-center rounded-full font-medium transition-colors duration-200 px-2 py-0.5 text-xs bg-secondary/10 backdrop-blur-sm border border-secondary/20 text-secondary cursor-pointer hover:bg-destructive/20"
+                      onClick={() => handleDietaryPreferenceRemove(preference)}
+                    >
+                      {preference} ×
+                    </button>
+                  ))}
+                </div>
+              )}
+          </div>
+        </div>
+      </div>
+    ),
+    [
+      formData,
+      user,
+      newDietaryPreference,
+      handleDietaryPreferenceAdd,
+      handleDietaryPreferenceRemove,
+      handleInputChange,
+    ]
+  );
+
+  const MediaTab = useCallback(
+    () => (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">
+            Profile Image
+          </h3>
+          <div className="flex items-center justify-start gap-4 mb-4">
+            <div>
+              {user?.imageUrl ? (
+                <Image
+                  src={user?.imageUrl || ""}
+                  alt="User Image"
+                  width={100}
+                  height={100}
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-[100px] h-[100px] bg-gray-200 rounded-full flex items-center justify-center">
+                  <UserIcon className="w-4 h-4 text-gray-500" />
+                </div>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {user?.imageUrl
+                ? "Current profile image"
+                : "No profile image set"}
+            </div>
+          </div>
+
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <MediaUpload
+              onUploadSuccess={(
+                result: CreateMediaResponse | CreateMediaResponse[]
+              ) => {
+                console.log("Media upload success:", result);
+                if (Array.isArray(result)) return;
+                
+                // The backend /api/media endpoint returns Media object directly
+                const imageUrl = result.url;
+                if (imageUrl) {
+                  console.log("Setting imageUrl to:", imageUrl);
+                  setFormData((prev) => ({
+                    ...prev,
+                    imageUrl: imageUrl,
+                  }));
+                } else {
+                  console.log("No URL found in result:", result);
+                }
+              }}
+              onUploadError={(error: string) => {
+                console.error("Upload error:", error);
+
+              }}
+              associatedWith={{
+                type: "user",
+                id: user._id || "",
+              }}
+              folder={MediaFolder.USER_PROFILE}
+              multiple={false}
+              uploadMode="manual"
+            />
+            
+            {/* Upload Status Messages */}
+            {isUpdating && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Spinner />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-800">
+                      Updating profile...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {isUpdated && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-green-800">
+                      Profile updated successfully!
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-          {showImageUpload && (
-            <div className="border rounded-lg p-4 bg-gray-50 mb-4">
-              <MediaUpload
-                onUploadSuccess={(result: any) => {
-                  // Update the form data with the new image URL
-                  if (result && result.media && result.media.url) {
-                    setFormData(prev => ({
-                      ...prev,
-                      imageUrl: result.media.url
-                    }));
-                  }
-                  setShowImageUpload(false);
-                }}
-                onUploadError={(error: string) => {
-                  console.error("Upload error:", error);
-                  setShowImageUpload(false);
-                }}
-                associatedWith={{
-                  type: "user",
-                  id: user._id || "",
-                }}
-                folder={MediaFolder.USER_PROFILE}
-                multiple={false}
-                uploadMode="auto"
-              />
-            </div>
-          )}
         </div>
+      </div>
+    ),
+    [user, isUpdating, isUpdated]
+  );
+
+  // Define tabs
+  const tabs: TabItem[] = [
+    {
+      key: "profile",
+      label: "Profile",
+      content: ProfileTab(),
+    },
+    {
+      key: "media",
+      label: "Media",
+      content: MediaTab(),
+    },
+  ];
+
+  return (
+    <Modal
+      isModalOpen={isOpen}
+      setIsModalOpen={() => onClose()}
+      closeModal={onClose}
+      modalTitle="Edit User Profile"
+      modalDescription="Update user information and preferences"
+      modalActionText="Save Changes"
+      modalActionOnClick={handleSave}
+      isSubmitting={isSubmitting}
+      size="lg"
+    >
+      <div className="space-y-6">
+        {/* Tabs */}
+        <Tabs tabs={tabs} selectedTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </Modal>
   );

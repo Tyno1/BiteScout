@@ -69,6 +69,11 @@ export default function UserManagementPage() {
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+
+
+
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -124,23 +129,11 @@ export default function UserManagementPage() {
 
   const user = data.user as ExtendedUser;
 
-  const handleSaveUser = async (userData: Partial<{
-    name: string;
-    email: string;
-    username: string;
-    phone: string;
-    bio: string;
-    address: string;
-    hometown: string;
-    currentCity: string;
-    country: string;
-    userType: string;
-    dietaryPreferences: string[];
-  }>) => {
+  const handleSaveUser = async (userData: Partial<ExtendedUser>) => {
     try {
       // TODO: Implement API call to update user
       console.log("Saving user data:", userData);
-      // await updateUser(user._id, userData);
+
       // You can add toast notification here
     } catch (error) {
       console.error("Error saving user:", error);

@@ -10,6 +10,7 @@ export * from './useTheme';
 export * from './useNotification';
 export * from './useForceSignOut';
 export * from './user-management';
+export * from './user-profile';
 export * from './media';
 export * from './restaurant';
 export * from './restaurant-access'; 

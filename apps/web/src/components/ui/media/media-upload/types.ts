@@ -1,5 +1,5 @@
 import type { Media } from "shared/types";
-import type { UploadMediaResponse } from "shared/types";
+import type { CreateMediaResponse } from "shared/types";
 
 export enum MediaFolder {
   USER_PROFILE = "user-profile-images",
@@ -11,7 +11,7 @@ export enum MediaFolder {
 }
 
 export interface MediaUploadProps {
-  onUploadSuccess?: (result: UploadMediaResponse | UploadMediaResponse[]) => void;
+  onUploadSuccess?: (result: CreateMediaResponse | CreateMediaResponse[]) => void;
   onUploadError?: (error: string) => void;
   onRemoveUploadedFile?: (index: number) => void;
   onSelectedFilesChange?: (files: FileWithPreview[]) => void;
@@ -21,7 +21,7 @@ export interface MediaUploadProps {
   className?: string;
   multiple?: boolean;
   showUploadedFiles?: boolean;
-  uploadedFiles?: UploadMediaResponse[];
+  uploadedFiles?: CreateMediaResponse[];
   selectedFiles?: FileWithPreview[];
   uploadMode?: 'auto' | 'manual';
   editMode?: boolean;

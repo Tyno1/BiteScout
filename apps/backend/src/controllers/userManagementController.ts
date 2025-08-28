@@ -386,7 +386,32 @@ export const updateUser = async (
 		}
 
 		// Check if current user can modify target user
-		if (!canModifyUser(currentUser.userType, targetUser.userType)) {
+		if (currentUser.userId === userId) {
+			// Self-modification: Only allow non-sensitive personal fields
+			const personalFields = [
+				"name", "username", "phone", "bio", 
+				"dietaryPreferences", "location", "imageUrl", 
+				"notificationSettings"
+			];
+			
+			// Filter to only allow personal fields for self-editing
+			const filteredUpdateData: Record<string, unknown> = {};
+			for (const key of Object.keys(updateData)) {
+				if (personalFields.includes(key)) {
+					filteredUpdateData[key] = updateData[key];
+				}
+			}
+			
+			// Replace updateData with filtered version
+			Object.assign(updateData, filteredUpdateData);
+			
+			// Log the self-modification for audit purposes
+			console.log(`User ${currentUser.userId} modified their own profile fields:`, Object.keys(filteredUpdateData));
+			
+			// Data validation is now handled globally below
+			
+		} else if (!canModifyUser(currentUser.userType, targetUser.userType)) {
+			// For other users, check admin privileges
 			return next(
 				createError(
 					ErrorCodes.FORBIDDEN,
@@ -395,12 +420,57 @@ export const updateUser = async (
 			);
 		}
 
-		// Prevent updating sensitive fields unless root
+		// Additional field filtering for admin users (prevent privilege escalation)
 		if (currentUser.userType !== "root") {
-			const { userType, ...safeUpdateData } = updateData;
-			// Create a clean update object without sensitive fields
-			const cleanUpdateData = { ...safeUpdateData };
-			Object.assign(updateData, cleanUpdateData);
+			// Non-root users (including admins) cannot modify critical fields
+			const criticalFields = ["userType", "password", "securitySettings", "systemFlags"];
+			for (const field of criticalFields) {
+				if (field in updateData) {
+					delete updateData[field];
+				}
+			}
+		}
+		
+		// Validate and clean data for all updates (admin and self)
+		// Remove empty strings and validate unique fields
+		for (const [key, value] of Object.entries(updateData)) {
+			if (value === "" || value === null || value === undefined) {
+				delete updateData[key];
+			}
+		}
+		
+		// Check username uniqueness if updating username
+		if (updateData.username) {
+			const existingUser = await User.findOne({ 
+				username: updateData.username,
+				_id: { $ne: userId }
+			});
+			
+			if (existingUser) {
+				return next(
+					createError(
+						ErrorCodes.CONFLICT,
+						"Username already exists"
+					)
+				);
+			}
+		}
+		
+		// Check phone uniqueness if updating phone
+		if (updateData.phone) {
+			const existingUser = await User.findOne({ 
+				phone: updateData.phone,
+				_id: { $ne: userId }
+			});
+			
+			if (existingUser) {
+				return next(
+					createError(
+						ErrorCodes.CONFLICT,
+						"Phone number already registered"
+					)
+				);
+			}
 		}
 
 		// If updating userType, validate the new type

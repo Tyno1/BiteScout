@@ -1713,93 +1713,6 @@ export interface paths {
       };
     };
   };
-  "/api/media/upload": {
-    /**
-     * Upload media file (Hybrid Architecture)
-     * @description Upload a media file using the hybrid architecture.
-     * This endpoint delegates file processing to the media service while managing metadata in the main backend.
-     * Supports images and videos up to 100MB.
-     */
-    post: {
-      requestBody: {
-        content: {
-          "multipart/form-data": {
-            /**
-             * Format: binary
-             * @description Media file to upload (image or video)
-             */
-            file: string;
-            /**
-             * @description Title or caption for the media
-             * @example Restaurant Interior
-             */
-            title?: string;
-            /**
-             * @description Description of the media content
-             * @example Beautiful interior view of the restaurant
-             */
-            description?: string;
-            /**
-             * @description JSON array of tags
-             * @example ["food", "restaurant", "interior"]
-             */
-            tags?: string;
-            /**
-             * @description Folder path for organizing media
-             * @example restaurants/interior
-             */
-            folder?: string;
-            /**
-             * @description JSON object with type and id
-             * @example {"type": "post", "id": "507f1f77bcf86cd799439016"}
-             */
-            associatedWith?: string;
-          };
-        };
-      };
-      responses: {
-        /** @description Media uploaded successfully */
-        201: {
-          content: {
-            "application/json": components["schemas"]["MediaUploadResponse"];
-          };
-        };
-        /** @description Invalid file or request */
-        400: {
-          content: {
-            "application/json": {
-              /** @example File type not supported or file too large */
-              error?: string;
-            };
-          };
-        };
-        /** @description User not authenticated */
-        401: {
-          content: {
-            "application/json": components["schemas"]["ErrorResponse"];
-          };
-        };
-        /** @description File too large */
-        413: {
-          content: {
-            "application/json": {
-              /** @example File size exceeds maximum limit of 104857600 bytes */
-              error?: string;
-            };
-          };
-        };
-        /** @description Upload failed */
-        500: {
-          content: {
-            "application/json": {
-              /** @example Media service upload failed */
-              error?: string;
-            };
-          };
-        };
-      };
-    };
-  };
   "/api/media/{id}": {
     /**
      * Get media by ID
@@ -1864,7 +1777,7 @@ export interface paths {
                * @example post
                * @enum {string}
                */
-              type?: "post" | "dish" | "restaurant" | "user";
+              type?: "post" | "dish" | "restaurant";
               /**
                * @description ID of the associated content
                * @example 507f1f77bcf86cd799439016
@@ -1970,7 +1883,7 @@ export interface paths {
       parameters: {
         path: {
           /** @description Type of content (post, dish, restaurant) */
-          type: "post" | "dish" | "restaurant" | "user";
+          type: "post" | "dish" | "restaurant";
           /** @description ID of the associated content */
           id: string;
         };
@@ -3644,7 +3557,7 @@ export interface components {
          * @example restaurant
          * @enum {string}
          */
-                  type?: "post" | "dish" | "restaurant" | "user";
+        type?: "post" | "dish" | "restaurant" | "user";
         /** @example 507f1f77bcf86cd799439012 */
         id?: string;
       };
@@ -3709,11 +3622,6 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
-    };
-    MediaUploadResponse: {
-      /** @example Media uploaded successfully */
-      message?: string;
-      media?: components["schemas"]["Media"];
     };
     Notification: {
       /** @example 507f1f77bcf86cd799439011 */

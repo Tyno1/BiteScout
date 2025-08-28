@@ -1,5 +1,5 @@
 import { uploadFile } from "@/api/media/mutations";
-import type { UploadMediaResponse } from "@shared/types";
+import type { CreateMediaResponse } from "@shared/types";
 import type { Media } from "@shared/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -26,9 +26,9 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
     }: { 
       file: File; 
       metadata?: UploadMetadata;
-    }): Promise<UploadMediaResponse> => {
+    }): Promise<CreateMediaResponse> => {
       // Create a custom upload function with progress tracking
-      const uploadWithProgress = async (): Promise<UploadMediaResponse> => {
+      const uploadWithProgress = async (): Promise<CreateMediaResponse> => {
         // Simulate progress for now (in a real implementation, you'd track actual upload progress)
         if (onProgress) {
           // Simulate progress from 0 to 90% during upload
@@ -87,7 +87,7 @@ export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
     }: { 
       files: File[]; 
       metadata?: UploadMetadata;
-    }): Promise<UploadMediaResponse[]> => {
+    }): Promise<CreateMediaResponse[]> => {
       const uploadPromises = files.map((file, index) => {
         const fileMetadata = {
           ...metadata,

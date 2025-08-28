@@ -5,7 +5,7 @@ import { Card } from "@/components/organisms";
 import { MediaUpload } from "@/components/ui/media/media-upload";
 import { MediaFolder } from "@/components/ui/media/media-upload/types";
 import { useGalleryState } from "@/hooks/useGalleryState";
-import type { Media, UploadMediaResponse } from "@shared/types";
+import type { CreateMediaResponse, Media } from "@shared/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GalleryCard, ImageFullscreen } from "./";
 import { GallerySkeleton } from "./GallerySkeleton";
@@ -127,14 +127,13 @@ export function Gallery({
   }, [filteredImages.length]);
 
   const handleUploadSuccess = useCallback(
-    (result: UploadMediaResponse | UploadMediaResponse[]) => {
+            (result: CreateMediaResponse | CreateMediaResponse[]) => {
       
       // Handle both single and array responses
       const results = Array.isArray(result) ? result : [result];
       
       // Extract media from each response and add to gallery
       const newImages: Media[] = results
-        .map(response => response.media)
         .filter((media): media is Media => media !== undefined);
       
       if (newImages.length > 0) {
@@ -308,10 +307,7 @@ export function Gallery({
           }}
           folder={selectedCategory === "post" ? MediaFolder.POST : MediaFolder.GALLERY}
           multiple={false}
-          uploadedFiles={filteredImages.map(image => ({
-            message: "Media loaded from gallery",
-            media: image
-          }))}
+          uploadedFiles={filteredImages}
           editMode={canEditCurrentCategory}
           className={
             canEditCurrentCategory ? "" : "pointer-events-none opacity-75"

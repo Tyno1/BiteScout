@@ -1796,7 +1796,7 @@ paths:
                   properties:
                     type:
                       type: string
-                      enum: ["post", "dish", "restaurant"]
+                      enum: ["post", "dish", "restaurant", "user"]
                       example: "restaurant"
                     id:
                       type: string
@@ -1827,91 +1827,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /api/media/upload:
-    post:
-      summary: Upload media file (Hybrid Architecture)
-      description: |
-        Upload a media file using the hybrid architecture. 
-        This endpoint delegates file processing to the media service while managing metadata in the main backend.
-        Supports images and videos up to 100MB.
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required:
-                - file
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: "Media file to upload (image or video)"
-                title:
-                  type: string
-                  description: "Title or caption for the media"
-                  example: "Restaurant Interior"
-                description:
-                  type: string
-                  description: "Description of the media content"
-                  example: "Beautiful interior view of the restaurant"
-                tags:
-                  type: string
-                  description: "JSON array of tags"
-                  example: '["food", "restaurant", "interior"]'
-                folder:
-                  type: string
-                  description: "Folder path for organizing media"
-                  example: "restaurants/interior"
-                associatedWith:
-                  type: string
-                  description: "JSON object with type and id"
-                  example: '{"type": "post", "id": "507f1f77bcf86cd799439016"}'
-      responses:
-        201:
-          description: Media uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
-        400:
-          description: Invalid file or request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "File type not supported or file too large"
-        401:
-          description: User not authenticated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        413:
-          description: File too large
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "File size exceeds maximum limit of 104857600 bytes"
-        500:
-          description: Upload failed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Media service upload failed"
+  # Note: /api/media/upload endpoint doesn't exist in the backend
+  # Media uploads are handled by the media service directly, then metadata is synced via /api/media
 
   /api/media/{id}:
     get:
@@ -4001,7 +3918,7 @@ components:
           properties:
             type:
               type: string
-              enum: ["post", "dish", "restaurant"]
+              enum: ["post", "dish", "restaurant", "user"]
               example: "restaurant"
             id:
               type: string
@@ -4081,14 +3998,7 @@ components:
           format: date-time
           example: "2025-04-20T15:30:00Z"
 
-    MediaUploadResponse:
-      type: object
-      properties:
-        message:
-          type: string
-          example: "Media uploaded successfully"
-        media:
-          $ref: "#/components/schemas/Media"
+    # MediaUploadResponse schema removed - no longer needed since /api/media/upload doesn't exist
 
     Notification:
       type: object

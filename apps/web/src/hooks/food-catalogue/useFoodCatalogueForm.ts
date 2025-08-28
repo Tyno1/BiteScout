@@ -5,7 +5,7 @@ import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
 import { useMediaUpload } from "@/hooks/media";
 import { useCallback, useEffect, useState } from "react";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
-import type { UploadMediaResponse } from "shared/types/media/create";
+import type { CreateMediaResponse } from "shared/types/media/create";
 import { z } from "zod";
 import { useCreateFoodCatalogue, useUpdateFoodCatalogue } from "./mutations/useFoodCatalogueMutations";
 
@@ -88,7 +88,7 @@ export const useFoodCatalogueForm = ({
   const [formError, setFormError] = useState<FormErrorType>(DEFAULT_FORM_ERROR);
   const [ingredient, setIngredient] = useState<string>("");
   const [selectedMediaFiles, setSelectedMediaFiles] = useState<FileWithPreview[]>([]);
-  const [existingImages, setExistingImages] = useState<UploadMediaResponse[]>([]);
+  const [existingImages, setExistingImages] = useState<CreateMediaResponse[]>([]);
   const [isLoadingExistingImages, setIsLoadingExistingImages] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
@@ -125,11 +125,8 @@ export const useFoodCatalogueForm = ({
       const imagePromises = imageIds.map(id => getMedia(id));
       const images = await Promise.all(imagePromises);
       
-      // Convert GetMediaResponse to UploadMediaResponse format
-      const uploadResponseImages: UploadMediaResponse[] = images.map(image => ({
-        message: "Existing image",
-        media: image,
-      }));
+      // Convert GetMediaResponse to CreateMediaResponse format (they're the same now)
+      const uploadResponseImages: CreateMediaResponse[] = images;
       
       setExistingImages(uploadResponseImages);
     } catch (error) {
@@ -226,7 +223,7 @@ export const useFoodCatalogueForm = ({
             
             completedUploads++;
             setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
-            return result.media?._id;
+            return result._id;
           });
 
           const results = await Promise.all(uploadPromises);
@@ -328,7 +325,7 @@ export const useFoodCatalogueForm = ({
       const updated = prev.filter((_, i) => i !== index);
       
       // Also update newFood.images to reflect the removal
-              const removedImageId = prev[index]?.media?._id;
+              const removedImageId = prev[index]?._id;
       if (removedImageId) {
         setNewFood(current => ({
           ...current,
