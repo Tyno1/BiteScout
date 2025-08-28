@@ -408,8 +408,6 @@ export const updateUser = async (
 			// Log the self-modification for audit purposes
 			console.log(`User ${currentUser.userId} modified their own profile fields:`, Object.keys(filteredUpdateData));
 			
-			// Data validation is now handled globally below
-			
 		} else if (!canModifyUser(currentUser.userType, targetUser.userType)) {
 			// For other users, check admin privileges
 			return next(
@@ -430,48 +428,6 @@ export const updateUser = async (
 				}
 			}
 		}
-		
-		// Validate and clean data for all updates (admin and self)
-		// Remove empty strings and validate unique fields
-		for (const [key, value] of Object.entries(updateData)) {
-			if (value === "" || value === null || value === undefined) {
-				delete updateData[key];
-			}
-		}
-		
-		// Check username uniqueness if updating username
-		if (updateData.username) {
-			const existingUser = await User.findOne({ 
-				username: updateData.username,
-				_id: { $ne: userId }
-			});
-			
-			if (existingUser) {
-				return next(
-					createError(
-						ErrorCodes.CONFLICT,
-						"Username already exists"
-					)
-				);
-			}
-		}
-		
-		// Check phone uniqueness if updating phone
-		if (updateData.phone) {
-			const existingUser = await User.findOne({ 
-				phone: updateData.phone,
-				_id: { $ne: userId }
-			});
-			
-			if (existingUser) {
-				return next(
-					createError(
-						ErrorCodes.CONFLICT,
-						"Phone number already registered"
-					)
-				);
-			}
-		}
 
 		// If updating userType, validate the new type
 		if (updateData.userType && currentUser.userType === "root") {
@@ -481,6 +437,40 @@ export const updateUser = async (
 				)
 			) {
 				return next(createError(ErrorCodes.BAD_REQUEST, "Invalid user type"));
+			}
+		}
+
+		// Handle phone field updates - convert empty strings to null for sparse indexing
+		if (updateData.phone !== undefined) {
+			if (updateData.phone === "") {
+				updateData.phone = null;
+			} else if (updateData.phone) {
+				// Check uniqueness for non-empty phone numbers
+				const existingUser = await User.findOne({ 
+					phone: updateData.phone,
+					_id: { $ne: userId }
+				});
+				
+				if (existingUser) {
+					return next(createError(ErrorCodes.CONFLICT, "Phone number already registered"));
+				}
+			}
+		}
+
+		// Handle username field updates - convert empty strings to null for sparse indexing
+		if (updateData.username !== undefined) {
+			if (updateData.username === "") {
+				updateData.username = null;
+			} else if (updateData.username) {
+				// Check uniqueness for non-empty usernames
+				const existingUser = await User.findOne({ 
+					username: updateData.username,
+					_id: { $ne: userId }
+				});
+				
+				if (existingUser) {
+					return next(createError(ErrorCodes.CONFLICT, "Username already taken"));
+				}
 			}
 		}
 

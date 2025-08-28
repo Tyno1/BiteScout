@@ -3,12 +3,12 @@
 import { Button, Input, Spinner, Textarea } from "@/components/atoms";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms/Modal";
-import { CheckCircle, UserIcon } from "lucide-react";
+import { UserIcon } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { User } from "shared/types";
-import type { CreateMediaResponse } from "shared/types/media";
+import { useCallback, useEffect, useState } from "react";
+import type { CreateMediaResponse, User } from "shared/types";
 
+import { deleteMedia } from "@/api/media/mutations";
 import { useDeleteUser, useUpdateUser } from "@/hooks";
 import { MediaFolder, MediaUpload } from "../../media";
 
@@ -59,6 +59,30 @@ export function UserEditModal({
 
   const [newDietaryPreference, setNewDietaryPreference] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
+  
+  // Profile image state
+  const [profileImage, setProfileImage] = useState<CreateMediaResponse | null>(
+    user.imageUrl ? {
+      _id: user._id || "",
+      url: user.imageUrl,
+      type: "image" as const,
+      title: "Profile Image",
+      description: "User profile image",
+      uploadedBy: { id: "", name: "", username: "", imageUrl: "" },
+      associatedWith: { type: "user", id: user._id || "" },
+      verified: false,
+      fileSize: 0,
+      mimeType: "image/jpeg",
+      dimensions: { width: 100, height: 100 },
+      providerId: "",
+      mediaServiceId: "",
+      provider: "cloudinary" as const,
+      variants: [],
+      tags: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    } : null
+  );
 
   const {
     mutate: deleteUser,
@@ -86,6 +110,32 @@ export function UserEditModal({
       dietaryPreferences: user.dietaryPreferences || [],
       imageUrl: user.imageUrl || "",
     });
+    
+    // Update profile image state when user changes
+    if (user.imageUrl) {
+      setProfileImage({
+        _id: user._id || "",
+        url: user.imageUrl,
+        type: "image" as const,
+        title: "Profile Image",
+        description: "User profile image",
+        uploadedBy: { id: "", name: "", username: "", imageUrl: "" },
+        associatedWith: { type: "user", id: user._id || "" },
+        verified: false,
+        fileSize: 0,
+        mimeType: "image/jpeg",
+        dimensions: { width: 100, height: 100 },
+        providerId: "",
+        mediaServiceId: "",
+        provider: "cloudinary" as const,
+        variants: [],
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    } else {
+      setProfileImage(null);
+    }
   }, [user]);
 
   const handleInputChange = useCallback(
@@ -122,8 +172,32 @@ export function UserEditModal({
     }));
   }, []);
 
+  const [isRemovingImage, setIsRemovingImage] = useState(false);
+
+  const handleRemoveProfileImage = useCallback(async () => {
+    if (profileImage?._id && profileImage._id !== user._id) {
+      setIsRemovingImage(true);
+      try {
+        // Delete the media from the backend
+        await deleteMedia(profileImage._id);
+        console.log("Profile image deleted successfully");
+      } catch (error) {
+        console.error("Failed to delete profile image:", error);
+        // Still remove from UI even if backend deletion fails
+      } finally {
+        setIsRemovingImage(false);
+      }
+    }
+    
+    // Update local state
+    setProfileImage(null);
+    setFormData((prev) => ({
+      ...prev,
+      imageUrl: "",
+    }));
+  }, [profileImage?._id, user._id]);
+
   const handleSave = useCallback(() => {
-    console.log("Saving form data:", formData);
     if (user._id) {
       updateUser({
         userId: user._id,
@@ -337,10 +411,10 @@ export function UserEditModal({
             Profile Image
           </h3>
           <div className="flex items-center justify-start gap-4 mb-4">
-            <div>
-              {user?.imageUrl ? (
+            <div className="relative">
+              {profileImage?.url ? (
                 <Image
-                  src={user?.imageUrl || ""}
+                  src={profileImage.url}
                   alt="User Image"
                   width={100}
                   height={100}
@@ -352,36 +426,46 @@ export function UserEditModal({
                 </div>
               )}
             </div>
-            <div className="text-sm text-muted-foreground">
-              {user?.imageUrl
-                ? "Current profile image"
-                : "No profile image set"}
+            <div className="flex flex-col gap-2">
+              <div className="text-sm text-muted-foreground">
+                {profileImage?.url
+                  ? "Current profile image"
+                  : "No profile image set"}
+              </div>
+              {profileImage?.url && (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  text={isRemovingImage ? "Removing..." : "Remove Image"}
+                  onClick={handleRemoveProfileImage}
+                  disabled={isRemovingImage}
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                />
+              )}
             </div>
           </div>
 
           <div className="border rounded-lg p-4 bg-gray-50">
             <MediaUpload
-              onUploadSuccess={(
-                result: CreateMediaResponse | CreateMediaResponse[]
-              ) => {
-                console.log("Media upload success:", result);
+              uploadMode="auto"
+              uploadedFiles={profileImage ? [profileImage] : []}
+              onUploadSuccess={(result: CreateMediaResponse | CreateMediaResponse[]) => {
+                console.log("Profile image upload success:", result);
                 if (Array.isArray(result)) return;
                 
-                // The backend /api/media endpoint returns Media object directly
+                // Update both the profile image state and form data
                 const imageUrl = result.url;
                 if (imageUrl) {
-                  console.log("Setting imageUrl to:", imageUrl);
+                  console.log("Setting new profile image:", imageUrl);
+                  setProfileImage(result);
                   setFormData((prev) => ({
                     ...prev,
                     imageUrl: imageUrl,
                   }));
-                } else {
-                  console.log("No URL found in result:", result);
                 }
               }}
               onUploadError={(error: string) => {
-                console.error("Upload error:", error);
-
+                console.error("Profile image upload error:", error);
               }}
               associatedWith={{
                 type: "user",
@@ -389,7 +473,6 @@ export function UserEditModal({
               }}
               folder={MediaFolder.USER_PROFILE}
               multiple={false}
-              uploadMode="manual"
             />
             
             {/* Upload Status Messages */}
@@ -428,7 +511,7 @@ export function UserEditModal({
         </div>
       </div>
     ),
-    [user, isUpdating, isUpdated]
+    [user, isUpdating, isUpdated, profileImage, handleRemoveProfileImage, isRemovingImage]
   );
 
   // Define tabs

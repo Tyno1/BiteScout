@@ -65,16 +65,22 @@ export const updateUserProfile = async (
     }
 
     // If updating phone, check for uniqueness
-    if (filteredUpdateData.phone) {
-      const existingUser = await User.findOne({ 
-        phone: filteredUpdateData.phone,
-        _id: { $ne: userId }
-      });
-      
-      if (existingUser) {
-        return res.status(400).json({ 
-          message: "Phone number already registered" 
+    if (filteredUpdateData.phone !== undefined) {
+      // Convert empty string to null for sparse indexing
+      if (filteredUpdateData.phone === "") {
+        filteredUpdateData.phone = null;
+      } else if (filteredUpdateData.phone) {
+        // Only check uniqueness for non-empty phone numbers
+        const existingUser = await User.findOne({ 
+          phone: filteredUpdateData.phone,
+          _id: { $ne: userId }
         });
+        
+        if (existingUser) {
+          return res.status(400).json({ 
+            message: "Phone number already registered" 
+          });
+        }
       }
     }
 

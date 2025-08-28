@@ -63,27 +63,6 @@ const validateUpdateMediaRequest = (body: unknown): UpdateMediaRequest => {
 	return filteredBody as UpdateMediaRequest;
 };
 
-// Upload file using hybrid architecture (delegates to media service)
-export const uploadFile = async (
-	req: Request,
-	res: Response,
-	next: NextFunction,
-): Promise<void> => {
-	try {
-		// This endpoint delegates file uploads to the media service
-		// The frontend should use the media service directly for file uploads
-		// and then call /api/media to sync metadata
-		return next(
-			createError(
-				501,
-				"File uploads should be handled by the media service directly. Use /api/media to sync metadata after upload."
-			)
-		);
-	} catch (error) {
-		return next(error);
-	}
-};
-
 export const createMedia = async (
 	req: Request<Record<string, never>, CreateMediaResponse | ApiError, CreateMediaRequest>,
 	res: Response<CreateMediaResponse | ApiError>,
