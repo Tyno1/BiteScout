@@ -215,22 +215,7 @@ export function UserEditModal({
           </div>
         </div>
 
-        {/* User Type */}
-        {/* <div>
-        <h3 className="text-lg font-semibold text-card-foreground mb-4">
-          User Type
-        </h3>
-        <Select
-          name="userType"
-          disabled={true}
-          label="User Type"
-          value={formData.userType}
-          onChange={()=>{}}
-          options={userTypeOptions}
-          placeholder="Select user type"
-        />
-      </div> */}
-
+       
         {/* Bio */}
         <div>
           <h3 className="text-lg font-semibold text-card-foreground mb-4">
