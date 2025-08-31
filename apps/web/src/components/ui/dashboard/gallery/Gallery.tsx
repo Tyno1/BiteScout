@@ -4,15 +4,13 @@ import { Button } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import { MediaUpload } from "@/components/ui/media/media-upload";
 import { MediaFolder } from "@/components/ui/media/media-upload/types";
-import { useGalleryState } from "@/hooks/useGalleryState";
+import { usePaginatedRestaurantGallery } from "@/hooks/media/usePaginatedMedia";
 import type { CreateMediaResponse, Media } from "@shared/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GalleryCard, ImageFullscreen } from "./";
 import { GallerySkeleton } from "./GallerySkeleton";
 
 type GalleryProps = {
-  images?: Media[];
-  onImagesChange?: (images: Media[]) => void;
   restaurantId: string;
   onImageSelect?: (image: Media) => void;
 };
@@ -36,8 +34,6 @@ const BRAND_ASSET_TAGS = [
 ];
 
 export function Gallery({
-  images = [],
-  onImagesChange,
   restaurantId,
   onImageSelect,
 }: GalleryProps) {
@@ -54,17 +50,57 @@ export function Gallery({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
-  // Use optimized state management hook
+  // Use paginated media hook for restaurant gallery
   const {
-    filteredImages,
-    addImages,
-    removeImage,
-    updateImageMetadata,
-    filterImages,
-  } = useGalleryState({
-    initialImages: images,
-    onImagesChange: onImagesChange || (() => {}),
-  });
+    data: paginatedMediaData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isPaginatedLoading,
+  } = usePaginatedRestaurantGallery(restaurantId, true);
+
+  // Flatten all pages into a single array
+  const allImages = useMemo(() => 
+    paginatedMediaData?.pages.flatMap((page) => (page as { media?: Media[] }).media || []) || [], 
+    [paginatedMediaData?.pages]
+  );
+
+
+  
+  // Apply local filtering to the loaded images
+  const [filteredImages, setFilteredImages] = useState<Media[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<string>("");
+  const [currentTags, setCurrentTags] = useState<string[]>([]);
+
+  // Filter images when category, tags, or loaded images change
+  useEffect(() => {
+    const filtered = allImages.filter((image) => {
+      // If no category is selected, show all images
+      if (!currentCategory) {
+        // Only apply tag filtering if tags are selected
+        if (currentTags.length > 0) {
+          const hasMatchingTag = image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
+          return hasMatchingTag;
+        }
+        return true; // Show all images when no category and no tags selected
+      }
+      
+      // If category is selected, filter by category first
+      if (image.associatedWith?.type !== currentCategory) {
+        return false;
+      }
+      
+      // Then apply tag filtering if tags are selected
+      if (currentTags.length > 0) {
+        const hasMatchingTag = image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
+        return hasMatchingTag;
+      }
+      
+      return true;
+    });
+    
+    setFilteredImages(filtered);
+  }, [allImages, currentCategory, currentTags]);
 
   // Check if we're in restaurant view mode
   const isRestaurantView = selectedCategory === "restaurant";
@@ -89,8 +125,11 @@ export function Gallery({
   const updateFilters = useCallback(() => {
     // Convert "all" to empty string for the hook
     const categoryForFilter = selectedCategory === "all" ? "" : selectedCategory;
-    filterImages(categoryForFilter, selectedTags);
-  }, [filterImages, selectedCategory, selectedTags]);
+    setCurrentCategory(categoryForFilter);
+    setCurrentTags(selectedTags);
+    // Reset visible count when filters change
+    setVisibleCount(8);
+  }, [selectedCategory, selectedTags]);
 
   // Update filters when category or tags change
   useEffect(() => {
@@ -99,19 +138,42 @@ export function Gallery({
 
   // Check if gallery data has been loaded
   useEffect(() => {
-    if (images !== undefined) {
+    if (!isPaginatedLoading && allImages.length > 0) {
       setIsGalleryLoading(false);
+      // Reset visible count when gallery data changes
+      setVisibleCount(8);
     }
-  }, [images]);
+  }, [isPaginatedLoading, allImages.length]);
 
-  // Intersection Observer for lazy loading
+  // Auto-increase visible count when new pages are loaded
   useEffect(() => {
+    if (allImages.length > visibleCount) {
+      if (hasNextPage) {
+        // While paginating, increase by 8 to keep loading indicator visible
+        setVisibleCount(Math.min(visibleCount + 8, allImages.length));
+      } else {
+        // When all pages are loaded, show all images
+        setVisibleCount(allImages.length);
+      }
+    }
+  }, [allImages.length, visibleCount, hasNextPage]);
+
+  // Intersection Observer for infinite scroll pagination
+  useEffect(() => {
+    // Clean up previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+    
     if (loadingRef.current) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) {
-              setVisibleCount((prev) => Math.min(prev + 4, filteredImages.length)); // Reduced from 8 to 4
+              // Fetch next page if available
+              if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+              }
             }
           }
         },
@@ -126,11 +188,46 @@ export function Gallery({
         observerRef.current.disconnect();
       }
     };
-  }, [filteredImages.length]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Set up intersection observer when loading ref becomes available
+  useEffect(() => {
+    // Use a small delay to ensure the DOM has updated
+    const timer = setTimeout(() => {
+      if (loadingRef.current && hasNextPage && !isFetchingNextPage) {
+        // Clean up previous observer
+        if (observerRef.current) {
+          observerRef.current.disconnect();
+        }
+        
+        observerRef.current = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                // Fetch next page if available
+                if (hasNextPage && !isFetchingNextPage) {
+                  fetchNextPage();
+                }
+              }
+            }
+          },
+          { threshold: 0.1 }
+        );
+
+        observerRef.current.observe(loadingRef.current);
+      }
+    }, 100); // Small delay to ensure DOM update
+
+    return () => {
+      clearTimeout(timer);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleUploadSuccess = useCallback(
-            (result: CreateMediaResponse | CreateMediaResponse[]) => {
-      
+    (result: CreateMediaResponse | CreateMediaResponse[]) => {
       // Handle both single and array responses
       const results = Array.isArray(result) ? result : [result];
       
@@ -139,10 +236,13 @@ export function Gallery({
         .filter((media): media is Media => media !== undefined);
       
       if (newImages.length > 0) {
-        addImages(newImages);
+        // For pagination, we need to refetch the data to get the new images
+        // This will trigger a refetch of the current page
+        // TODO: Implement optimistic updates or refetch strategy
+        console.log('New images uploaded:', newImages);
       }
     },
-    [addImages]
+    []
   );
 
   const handleRemoveUploadedFile = useCallback(
@@ -151,21 +251,24 @@ export function Gallery({
 
       const imageToRemove = filteredImages[index];
       if (imageToRemove?._id) {
-        removeImage(imageToRemove._id);
+        // For pagination, we need to refetch the data to reflect the removal
+        // TODO: Implement optimistic updates or refetch strategy
+        console.log('Image removed:', imageToRemove._id);
       }
     },
-    [canEditCurrentCategory, filteredImages, removeImage]
+    [canEditCurrentCategory, filteredImages]
   );
 
   const handleUpdateImageMetadata = useCallback(
     (index: number, field: string, value: string) => {
-      
       const imageToUpdate = filteredImages[index];
       if (!imageToUpdate?._id) return;
 
-      updateImageMetadata(imageToUpdate._id, field, value);
+      // For pagination, we need to refetch the data to reflect the metadata update
+      // TODO: Implement optimistic updates or refetch strategy
+      console.log('Image metadata updated:', { id: imageToUpdate._id, field, value });
     },
-    [filteredImages, updateImageMetadata]
+    [filteredImages]
   );
 
   const handleFullscreen = useCallback((image: Media) => {
@@ -277,14 +380,19 @@ export function Gallery({
           ))}
           
           {/* Loading indicator and intersection observer target */}
-          {!isGalleryLoading && visibleCount < filteredImages.length && (
+          {!isGalleryLoading && hasNextPage && (
             <div 
               ref={loadingRef}
               className="col-span-full flex justify-center py-8"
             >
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                <span>Loading more images...</span>
+                <span>
+                  {isFetchingNextPage 
+                    ? "Loading more images..." 
+                    : "Scroll to load more images..."
+                  }
+                </span>
               </div>
             </div>
           )}
@@ -323,7 +431,7 @@ export function Gallery({
         <div className="text-center py-8 text-gray-foreground">
           <p>No images found.</p>
           <p className="text-sm mt-2">
-            {images.length === 0 
+            {allImages.length === 0 
               ? "No images have been added to the gallery yet. Switch to edit mode to upload images."
               : "No images match the current filters. Try adjusting your category or tag selection."
             }

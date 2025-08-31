@@ -17,7 +17,7 @@ import type {
   UpdateRestaurantAccessResponse,
 } from "shared/types/access";
 import type { AccessRoles } from "shared/types/api/schemas";
-import { AccessRoleEnum, AccessStatusEnum } from "shared/types/api/schemas";
+import { AccessRoleEnumValues, AccessStatusEnum } from "shared/types/api/schemas";
 import type {
   RestaurantAccess as RestaurantAccessType,
 } from "shared/types/api/schemas";
@@ -288,7 +288,7 @@ export const GrantAccess = async (
 
     try {
       const updatedUser = await updateUserUsertype(
-        AccessRoleEnum.Moderator,
+        AccessRoleEnumValues.Moderator,
         accessRecord.userId.toString(),
         res
       );
@@ -415,7 +415,7 @@ export const DeleteAccess = async (
 
     try {
       const updatedUser = await updateUserUsertype(
-        AccessRoleEnum.Guest,
+        AccessRoleEnumValues.Guest,
         accessRecord.userId.toString(),
         res
       );

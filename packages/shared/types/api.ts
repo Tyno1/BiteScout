@@ -2011,10 +2011,16 @@ export interface paths {
   "/api/media/associated/{type}/{id}": {
     /**
      * Get media by associated item
-     * @description Retrieve media items associated with a specific content type and ID
+     * @description Retrieve media items associated with a specific content type and ID with pagination
      */
     get: {
       parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of items per page */
+          limit?: number;
+        };
         path: {
           /** @description Type of content (post, dish, restaurant) */
           type: "post" | "dish" | "restaurant";
@@ -2026,7 +2032,36 @@ export interface paths {
         /** @description Media items retrieved successfully */
         200: {
           content: {
-            "application/json": components["schemas"]["Media"][];
+            "application/json": {
+              media?: components["schemas"]["Media"][];
+              pagination?: {
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 5
+                 */
+                totalPages?: number;
+                /**
+                 * @description Total number of media items
+                 * @example 50
+                 */
+                total?: number;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNext?: boolean;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPrev?: boolean;
+              };
+            };
           };
         };
         /** @description Invalid type or missing ID */

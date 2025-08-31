@@ -2121,7 +2121,7 @@ paths:
   /api/media/associated/{type}/{id}:
     get:
       summary: Get media by associated item
-      description: Retrieve media items associated with a specific content type and ID
+      description: Retrieve media items associated with a specific content type and ID with pagination
       parameters:
         - in: path
           name: type
@@ -2139,15 +2139,58 @@ paths:
           description: ID of the associated content
           schema:
             type: string
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
       responses:
         200:
           description: Media items retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Media"
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      total:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNext:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrev:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
         400:
           description: Invalid type or missing ID
           content:

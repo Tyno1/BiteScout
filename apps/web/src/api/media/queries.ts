@@ -64,9 +64,15 @@ export const getUserMedia = async (
   return response.data;
 };
 
-// Get associated media
-export const getAssociatedMedia = async (type: string, id: string): Promise<GetMediaResponse[]> => {
-  const response = await apiClient.get<GetMediaResponse[]>(`/media/associated/${type}/${id}`);
+// Get associated media with pagination
+export const getAssociatedMedia = async (
+  type: string, 
+  id: string, 
+  page = 1, 
+  limit = 10
+): Promise<PaginatedResponse<GetMediaResponse>> => {
+  const params = buildQueryParams({ page, limit });
+  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(`/media/associated/${type}/${id}?${params}`);
   return response.data;
 };
 

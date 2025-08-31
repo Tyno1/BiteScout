@@ -190,6 +190,7 @@ export const getMediaByAssociatedItem = async (
 ): Promise<void> => {
 	try {
 		const { type, id } = req.params;
+		const { page = "1", limit = "10" } = req.query;
 
 		if (!type || !id) {
 			throw createError(400, "Type and ID are required");
@@ -199,35 +200,55 @@ export const getMediaByAssociatedItem = async (
 			throw createError(400, "Invalid type. Must be 'post', 'dish', 'restaurant', or 'user'");
 		}
 
+		const skip = (Number(page) - 1) * Number(limit);
+
 		const media = await Media.find({
 			"associatedWith.type": type,
 			"associatedWith.id": id,
-		}).populate([{ path: "uploadedBy", select: "name username imageUrl" }]);
+		})
+		.populate([{ path: "uploadedBy", select: "name username imageUrl" }])
+		.sort({ createdAt: -1 })
+		.skip(skip)
+		.limit(Number(limit));
+
+		const total = await Media.countDocuments({
+			"associatedWith.type": type,
+			"associatedWith.id": id,
+		});
 
 		// Transform to match GetMediaByAssociatedResponse type
-		const response: GetMediaByAssociatedResponse = media.map(item => ({
-			_id: item._id.toString(),
-			url: item.url,
-			type: item.type,
-			title: item.title,
-			description: item.description,
-			uploadedBy: {
-				id: item.uploadedBy._id.toString(),
-				name: item.uploadedBy.name,
-				username: item.uploadedBy.username,
-				imageUrl: item.uploadedBy.imageUrl,
+		const response: GetMediaByAssociatedResponse = {
+			media: media.map(item => ({
+				_id: item._id.toString(),
+				url: item.url,
+				type: item.type,
+				title: item.title,
+				description: item.description,
+				uploadedBy: {
+					id: item.uploadedBy._id.toString(),
+					name: item.uploadedBy.name,
+					username: item.uploadedBy.username,
+					imageUrl: item.uploadedBy.imageUrl,
+				},
+				associatedWith: item.associatedWith,
+				verified: item.verified,
+				fileSize: item.fileSize,
+				mimeType: item.mimeType,
+				dimensions: item.dimensions,
+				providerId: item.providerId,
+				mediaServiceId: item.mediaServiceId,
+				provider: item.provider,
+				createdAt: item.createdAt.toISOString(),
+				updatedAt: item.updatedAt.toISOString(),
+			})),
+			pagination: {
+				page: Number(page),
+				totalPages: Math.ceil(total / Number(limit)),
+				total: total,
+				hasNext: Number(page) < Math.ceil(total / Number(limit)),
+				hasPrev: Number(page) > 1,
 			},
-			associatedWith: item.associatedWith,
-			verified: item.verified,
-			fileSize: item.fileSize,
-			mimeType: item.mimeType,
-			dimensions: item.dimensions,
-			providerId: item.providerId,
-			mediaServiceId: item.mediaServiceId,
-			provider: item.provider,
-			createdAt: item.createdAt.toISOString(),
-			updatedAt: item.updatedAt.toISOString(),
-		}));
+		};
 
 		res.json(response);
 	} catch (error) {
