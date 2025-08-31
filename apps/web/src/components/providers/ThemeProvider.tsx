@@ -39,19 +39,17 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
+    // Remove any existing theme attributes
+    root.removeAttribute("data-theme");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
+      // For system theme, let CSS media queries handle it
+      // No data-theme attribute needed
       return;
     }
 
-    root.classList.add(theme);
+    // Set the data-theme attribute for user preference
+    root.setAttribute("data-theme", theme);
   }, [theme]);
 
   const value = {

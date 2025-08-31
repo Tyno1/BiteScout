@@ -5,10 +5,10 @@ import { Input, Textarea } from "@/components/atoms";
 import { Edit3, ExternalLink, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import type { UploadMediaResponse } from "shared/types";
+import type { CreateMediaResponse } from "shared/types";
 
 interface UploadedFilesListProps {
-  uploadedFiles: UploadMediaResponse[];
+  uploadedFiles: CreateMediaResponse[];
   onRemoveFile?: (index: number) => void;
   onUpdateMetadata?: (index: number, field: string, value: string) => void;
   editMode?: boolean;
@@ -42,7 +42,7 @@ export const UploadedFilesList = ({
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {uploadedFiles.map((file, index) => (
-          <div key={`${file.media?._id}-${index}`} className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
+          <div key={`${file._id}-${index}`} className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
             {/* Remove Button */}
             {onRemoveFile && (
               <IconButton
@@ -61,17 +61,17 @@ export const UploadedFilesList = ({
               {/* Left: Preview */}
               <div className="w-1/2 p-2">
                 <div className="relative w-full h-full bg-gray-50 rounded-lg overflow-hidden">
-                  {file.media?.type === "image" ? (
-                    <Image
-                      src={file.media?.url || ""}
-                      alt={file.media?.title || "Uploaded image"}
+                              {file.type === "image" ? (
+              <Image
+                src={file.url || ""}
+                alt={file.title || "Uploaded image"}
                       fill
                       className="object-contain"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
-                  ) : file.media?.type === "video" ? (
-                    <video
-                      src={file.media?.url || ""}
+                              ) : file.type === "video" ? (
+              <video
+                src={file.url || ""}
                       controls
                       className="w-full h-full object-contain"
                     >
@@ -107,7 +107,7 @@ export const UploadedFilesList = ({
                 <div>
                   <div className="mb-1">
                     <h4 className="text-xs font-medium text-foreground truncate">
-                      {file.media?.title || "Untitled"}
+                      {file.title || "Untitled"}
                     </h4>
                   </div>
                   
@@ -115,12 +115,12 @@ export const UploadedFilesList = ({
                   <div className="text-xs text-card-foreground space-y-0.5">
                     <div className="flex justify-between">
                       <span>Type:</span>
-                      <span className="text-foreground font-medium">{file.media?.type?.toUpperCase() || "UNKNOWN"}</span>
+                      <span className="text-foreground font-medium">{file.type?.toUpperCase() || "UNKNOWN"}</span>
                     </div>
-                    {file.media?.fileSize && (
+                    {file.fileSize && (
                       <div className="flex justify-between">
                         <span>Size:</span>
-                        <span className="text-foreground font-medium">{(file.media.fileSize / 1024 / 1024).toFixed(1)}MB</span>
+                        <span className="text-foreground font-medium">{(file.fileSize / 1024 / 1024).toFixed(1)}MB</span>
                       </div>
                     )}
                   </div>
@@ -132,7 +132,7 @@ export const UploadedFilesList = ({
                   size="xs"
                   text="View"
                   IconBefore={<ExternalLink size={10} />}
-                  onClick={() => window.open(file.media?.url || "", "_blank")}
+                  onClick={() => window.open(file.url || "", "_blank")}
                 />
 
                 {/* Edit Button - Only shown in edit mode */}
@@ -158,7 +158,7 @@ export const UploadedFilesList = ({
                     name={`title-${index}`}
                     type="text"
                     label="Title"
-                    value={file.media?.title || ""}
+                    value={file.title || ""}
                     onChange={(e) => onUpdateMetadata(index, "title", e.target.value)}
                     placeholder="Enter a title for your media"
                     fullWidth
@@ -168,7 +168,7 @@ export const UploadedFilesList = ({
                     name={`description-${index}`}
                     fullWidth
                     label="Description"
-                    value={file.media?.description || ""}
+                    value={file.description || ""}
                     onChange={(e) => onUpdateMetadata(index, "description", e.target.value)}
                     placeholder="Enter a description (optional)"
                     rows={2}
@@ -178,7 +178,7 @@ export const UploadedFilesList = ({
                     name={`tags-${index}`}
                     type="text"
                     label="Tags"
-                    value={file.media?.tags?.join(", ") || ""}
+                    value={file.tags?.join(", ") || ""}
                     onChange={(e) => onUpdateMetadata(index, "tags", e.target.value)}
                     placeholder="Enter tags separated by commas (optional)"
                     fullWidth

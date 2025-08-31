@@ -23,20 +23,23 @@ export type Post = components["schemas"]["Post"];
 export type { components } from "../api";
 
 // AccessRoleEnum and AccessStatusEnum moved from enums.ts
-export type AccessRoles = components["schemas"]["RestaurantAccess"]["role"];
+export type AccessRoles = components["schemas"]["UserType"];
 export type AccessStatus = components["schemas"]["RestaurantAccess"]["status"];
 
-export const AccessRoleEnum: Record<string, AccessRoles> = {
-  Guest: "guest" as const,
-  User: "user" as const,
-  Moderator: "moderator" as const,
-  Admin: "admin" as const,
-  Root: "root" as const,
+
+// Create enum object using the generated type values
+export const AccessRoleEnumValues = {
+  Guest: "guest" as AccessRoles,
+  User: "user" as AccessRoles,
+  Moderator: "moderator" as AccessRoles,
+  Admin: "admin" as AccessRoles,
+  Root: "root" as AccessRoles,
 } as const;
 
-export const AccessStatusEnum: Record<string, AccessStatus> = {
-  Pending: "pending" as const,
-  Approved: "approved" as const,
-  Suspended: "suspended" as const,
-  Innactive: "innactive" as const,
+export const AccessStatusEnum = {
+  Pending: "pending" as AccessStatus,
+  Approved: "approved" as AccessStatus,
+  Suspended: "suspended" as AccessStatus,
+  Innactive: "innactive" as AccessStatus,
 } as const;
+

@@ -16,6 +16,29 @@ import type {
 } from "shared/types/user-management";
 import RestaurantData from "../models/RestaurantData.js";
 
+// Helper function to get user permissions based on userType and context
+const getUserPermissions = (userType: string, isOwner: boolean) => {
+	// Platform-wide permissions (from userType)
+	const platformPermissions = {
+		canAccessAdminPanel: ["admin", "moderator", "root"].includes(userType),
+		canCreateRestaurants: ["admin", "root"].includes(userType),
+		canManageAllUsers: ["admin", "root"].includes(userType),
+		canViewPlatformAnalytics: ["admin", "root"].includes(userType),
+	};
+
+	// Restaurant-specific permissions (from userType + context)
+	const restaurantPermissions = {
+		canEditRestaurant: isOwner || ["admin", "moderator"].includes(userType),
+		canManageUsers: isOwner || ["admin"].includes(userType),
+		canViewAnalytics: isOwner || ["admin", "moderator"].includes(userType),
+		canEditMenu: isOwner || ["admin", "moderator"].includes(userType),
+		canDeleteContent: isOwner || ["admin"].includes(userType),
+		canManageContent: isOwner || ["admin", "moderator"].includes(userType),
+	};
+
+	return { ...platformPermissions, ...restaurantPermissions };
+};
+
 // Type definitions for API responses with error handling
 type GetAllUsersApiResponse = GetAllUsersResponse | ApiError;
 type GetUserByIdApiResponse = GetUserByIdResponse | ApiError;
@@ -170,14 +193,22 @@ export const getAllUsers = async (
 		const paginatedRecords = allUsers.slice(skip, skip + limit);
 
 		// Transform data to match expected response format
-		const usersWithAccess = paginatedRecords.map((record) => ({
-			...record.userId.toObject(),
-			role: record.role,
-			status: record.status,
-			accessId: record._id === "owner-special-id" ? "owner" : record._id,
-			restaurantAccess: 1, // User has access to this restaurant
-			activeRestaurants: record.status === "approved" ? 1 : 0,
-		}));
+		const usersWithAccess = paginatedRecords.map((record) => {
+			const userData = {
+				...record.userId.toObject(),
+				role: record.role,
+				status: record.status,
+				accessId: record._id === "owner-special-id" ? "owner" : record._id,
+				restaurantAccess: 1, // User has access to this restaurant
+				activeRestaurants: record.status === "approved" ? 1 : 0,
+			};
+			
+
+			
+			return userData;
+		});
+
+
 
 		res.status(200).json({
 			users: usersWithAccess,
@@ -227,18 +258,91 @@ export const getUserById = async (
 			return next(createError(ErrorCodes.NOT_FOUND, "User not found"));
 		}
 
-		// Get restaurant access information
-		const restaurantAccess = await RestaurantAccess.find({
+		// Get restaurant access information for the current restaurant
+		const restaurantId = req.query.restaurantId?.toString();
+		if (!restaurantId) {
+			return next(
+				createError(
+					ErrorCodes.BAD_REQUEST,
+					"Restaurant ID is required for security",
+				),
+			);
+		}
+
+		// Validate ObjectId format
+		if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+			return next(
+				createError(ErrorCodes.BAD_REQUEST, "Invalid restaurant ID format"),
+			);
+		}
+
+		// Get specific restaurant access for this user
+		const restaurantAccess = await RestaurantAccess.findOne({
 			userId: user._id.toString(),
+			restaurantId: restaurantId,
 		});
+
+		// Check if current user has access to this restaurant
+		const currentUserRestaurantAccess = await RestaurantAccess.findOne({
+			userId: currentUser.userId,
+			restaurantId: restaurantId,
+			status: "approved",
+		});
+
+		const restaurant = await RestaurantData.findById(restaurantId);
+		if (!restaurant) {
+			return next(createError(ErrorCodes.NOT_FOUND, "Restaurant not found"));
+		}
+
+		const isOwner = currentUser.userId === restaurant.ownerId?.toString();
+		
+		if (!currentUserRestaurantAccess && !isOwner) {
+			return next(
+				createError(
+					ErrorCodes.FORBIDDEN,
+					"Access denied. You don't have access to this restaurant.",
+				),
+			);
+		}
+
+		// If user is the owner, add owner-specific data
+		let status = "approved";
+		let accessId = "owner";
+
+		if (restaurantAccess) {
+			status = restaurantAccess.status;
+			accessId = restaurantAccess._id.toString();
+			
+			// Set approval date when status changes to approved
+			if (restaurantAccess.status === 'approved' && !restaurantAccess.approvedAt) {
+				restaurantAccess.approvedAt = new Date();
+				await restaurantAccess.save();
+			}
+		} else if (user._id.toString() === restaurant.ownerId?.toString()) {
+			// User is the restaurant owner
+			status = "approved";
+			accessId = "owner";
+		}
+
+		// Calculate permissions based on userType and context
+		const targetIsOwner = user._id.toString() === restaurant.ownerId?.toString();
+		const permissions = getUserPermissions(user.userType, targetIsOwner);
 
 		const userWithAccess = {
 			...user.toObject(),
-			restaurantAccess: restaurantAccess.length,
-			activeRestaurants: restaurantAccess.filter(
-				(ra) => ra.status === "approved",
-			).length,
-			restaurantAccessDetails: restaurantAccess,
+			status,
+			accessId,
+			restaurantAccess: restaurantAccess ? 1 : 0,
+			activeRestaurants: restaurantAccess && restaurantAccess.status === "approved" ? 1 : 0,
+			restaurantAccessDetails: restaurantAccess ? [restaurantAccess] : [],
+			// Map new fields for frontend
+			lastLoginAt: user.lastLogin,
+			approvedAt: restaurantAccess?.approvedAt,
+			accessExpiresAt: restaurantAccess?.expiresAt,
+			maxRestaurants: restaurantAccess?.maxRestaurants || 1,
+			accessLevel: restaurantAccess?.accessLevel || 'basic',
+			// Use unified permissions instead of separate role
+			permissions,
 		};
 
 		res.status(200).json({ user: userWithAccess });
@@ -282,7 +386,30 @@ export const updateUser = async (
 		}
 
 		// Check if current user can modify target user
-		if (!canModifyUser(currentUser.userType, targetUser.userType)) {
+		if (currentUser.userId === userId) {
+			// Self-modification: Only allow non-sensitive personal fields
+			const personalFields = [
+				"name", "username", "phone", "bio", 
+				"dietaryPreferences", "location", "imageUrl", 
+				"notificationSettings"
+			];
+			
+			// Filter to only allow personal fields for self-editing
+			const filteredUpdateData: Record<string, unknown> = {};
+			for (const key of Object.keys(updateData)) {
+				if (personalFields.includes(key)) {
+					filteredUpdateData[key] = updateData[key];
+				}
+			}
+			
+			// Replace updateData with filtered version
+			Object.assign(updateData, filteredUpdateData);
+			
+			// Log the self-modification for audit purposes
+			console.log(`User ${currentUser.userId} modified their own profile fields:`, Object.keys(filteredUpdateData));
+			
+		} else if (!canModifyUser(currentUser.userType, targetUser.userType)) {
+			// For other users, check admin privileges
 			return next(
 				createError(
 					ErrorCodes.FORBIDDEN,
@@ -291,12 +418,15 @@ export const updateUser = async (
 			);
 		}
 
-		// Prevent updating sensitive fields unless root
+		// Additional field filtering for admin users (prevent privilege escalation)
 		if (currentUser.userType !== "root") {
-			const { userType, ...safeUpdateData } = updateData;
-			// Create a clean update object without sensitive fields
-			const cleanUpdateData = { ...safeUpdateData };
-			Object.assign(updateData, cleanUpdateData);
+			// Non-root users (including admins) cannot modify critical fields
+			const criticalFields = ["userType", "password", "securitySettings", "systemFlags"];
+			for (const field of criticalFields) {
+				if (field in updateData) {
+					delete updateData[field];
+				}
+			}
 		}
 
 		// If updating userType, validate the new type
@@ -307,6 +437,40 @@ export const updateUser = async (
 				)
 			) {
 				return next(createError(ErrorCodes.BAD_REQUEST, "Invalid user type"));
+			}
+		}
+
+		// Handle phone field updates - convert empty strings to null for sparse indexing
+		if (updateData.phone !== undefined) {
+			if (updateData.phone === "") {
+				updateData.phone = null;
+			} else if (updateData.phone) {
+				// Check uniqueness for non-empty phone numbers
+				const existingUser = await User.findOne({ 
+					phone: updateData.phone,
+					_id: { $ne: userId }
+				});
+				
+				if (existingUser) {
+					return next(createError(ErrorCodes.CONFLICT, "Phone number already registered"));
+				}
+			}
+		}
+
+		// Handle username field updates - convert empty strings to null for sparse indexing
+		if (updateData.username !== undefined) {
+			if (updateData.username === "") {
+				updateData.username = null;
+			} else if (updateData.username) {
+				// Check uniqueness for non-empty usernames
+				const existingUser = await User.findOne({ 
+					username: updateData.username,
+					_id: { $ne: userId }
+				});
+				
+				if (existingUser) {
+					return next(createError(ErrorCodes.CONFLICT, "Username already taken"));
+				}
 			}
 		}
 

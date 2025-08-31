@@ -3,9 +3,10 @@ import type React from "react";
 
 type BadgeProps = {
   children: React.ReactNode;
-  color?: "primary" | "secondary" | "danger" | "success" | "neutral";
+  color?: "primary" | "secondary" | "danger" | "success" | "neutral" | "warning";
   variant?: "solid" | "outline" | "plain" | "glass";
   size?: "xs" | "sm" | "md";
+  fullWidth?: boolean;
   className?: string;
 };
 
@@ -14,9 +15,10 @@ export function Badge({
   color = "neutral",
   variant = "solid",
   size = "sm",
+  fullWidth = false,
   className = "",
 }: BadgeProps) {
-  const baseStyles = "inline-flex items-center justify-center rounded-full font-medium transition-colors duration-200";
+  const baseStyles = `${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center rounded-full font-medium transition-colors duration-200`;
 
   const colorStyles = {
     primary: `${
@@ -63,6 +65,15 @@ export function Badge({
           : variant === "solid"
             ? "bg-neutral text-neutral-foreground"
             : "border border-neutral/40 text-neutral hover:bg-neutral/10"
+    }`,
+    warning: `${
+      variant === "plain"
+        ? "text-yellow-600 hover:bg-yellow-50"
+        : variant === "glass"
+          ? "bg-yellow-50/80 backdrop-blur-sm border border-yellow-200/60 text-yellow-700"
+          : variant === "solid"
+            ? "bg-yellow-500 text-white"
+            : "border border-yellow-300 text-yellow-600 hover:bg-yellow-50"
     }`,
   };
 

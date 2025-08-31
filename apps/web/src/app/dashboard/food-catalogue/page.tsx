@@ -251,7 +251,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
         {foodDatas && foodDatas.length > 0 ? (
-          <Button size="sm" className="font-bold" variant="solid" text="Create New" onClick={handleAddFood} />
+          <Button size="sm"  variant="solid" text="Create New" onClick={handleAddFood} />
         ) : null}
       </div>
 

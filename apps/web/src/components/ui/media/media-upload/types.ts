@@ -1,20 +1,31 @@
-import type { Media, UploadMediaResponse } from "shared/types";
+import type { Media } from "shared/types";
+import type { CreateMediaResponse } from "shared/types";
+
+export enum MediaFolder {
+  USER_PROFILE = "user-profile-images",
+  POST = "post-images", 
+  GALLERY = "gallery-images",
+  FOOD = "food-images",
+  RESTAURANT = "restaurant-images",
+  DISH = "dish-images"
+}
 
 export interface MediaUploadProps {
-  onUploadSuccess?: (result: UploadMediaResponse | UploadMediaResponse[]) => void;
+  onUploadSuccess?: (result: CreateMediaResponse | CreateMediaResponse[]) => void;
   onUploadError?: (error: string) => void;
   onRemoveUploadedFile?: (index: number) => void;
   onSelectedFilesChange?: (files: FileWithPreview[]) => void;
   onUpdateUploadedFileMetadata?: (index: number, field: string, value: string) => void;
   associatedWith?: Media["associatedWith"];
-  folder?: string;
+  folder?: MediaFolder;
   className?: string;
   multiple?: boolean;
   showUploadedFiles?: boolean;
-  uploadedFiles?: UploadMediaResponse[];
+  uploadedFiles?: CreateMediaResponse[];
   selectedFiles?: FileWithPreview[];
   uploadMode?: 'auto' | 'manual';
   editMode?: boolean;
+  singleUpload?: boolean;
 }
 
 export interface FileWithPreview {
@@ -37,8 +48,9 @@ export interface FileDropZoneProps {
   onClearAll: () => void;
   uploading: boolean;
   multiple: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
   uploadMode?: 'auto' | 'manual';
+  singleUpload?: boolean;
 }
 
 export interface MediaPreviewProps {

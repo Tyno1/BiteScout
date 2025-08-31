@@ -34,10 +34,15 @@ export const useRestaurantAccess = (
 
   // Helper function to determine if user is an owner
   const isOwner = useCallback(() => {
+    if (session?.user?.userType === "moderator") {
+      return false;
+    }
+    
+    // Only admins and root users with restaurants are considered owners
     return Boolean(
       session?.user?.restaurantCount && session.user.restaurantCount > 0
     );
-  }, [session?.user?.restaurantCount]);
+  }, [session?.user?.restaurantCount, session?.user?.userType]);
 
   // Restaurant mutations
   const updateRestaurantMutation = useUpdateRestaurant();
@@ -106,7 +111,9 @@ export const useRestaurantAccess = (
     data: ownerRestaurantData,
     isLoading: ownerRestaurantLoading,
     refetch: refetchOwnerRestaurant,
-  } = useRestaurantByOwner(session?.user?._id || "");
+  } = useRestaurantByOwner(
+    isOwner() ? (session?.user?._id || "") : ""
+  );
 
   // Restaurant query - fetch by restaurant ID for non-owners with approved access
   const {

@@ -16,6 +16,8 @@ interface PopoverProps {
   triggerClassName?: string;
   color?: "primary" | "secondary" | "danger" | "success" | "neutral";
   variant?: "solid" | "outline" | "plain" | "glass";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function Popover({
@@ -28,6 +30,8 @@ export function Popover({
   triggerClassName = "",
   color = "neutral",
   variant = "solid",
+  open,
+  onOpenChange,
 }: PopoverProps) {
   const colorStyles = {
     primary: `${
@@ -80,7 +84,7 @@ export function Popover({
   const baseStyles = "rounded-lg shadow-lg border transition-colors duration-200 p-4";
 
   return (
-    <ShadcnPopover>
+    <ShadcnPopover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild className={triggerClassName}>
         {trigger}
       </PopoverTrigger>

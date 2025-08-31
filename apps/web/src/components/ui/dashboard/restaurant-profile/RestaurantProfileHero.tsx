@@ -1,10 +1,10 @@
-import { Input } from "@/components/atoms";
+import { IconButton, Input } from "@/components/atoms";
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import type { Restaurant } from "shared/types/api/schemas";
 
 type RestaurantProfileHeroProps = {
-	image1: string;
+	image1: string | null;
 	isEditing: boolean;
 	displayData: Restaurant | undefined;
 	handleInputChange: (
@@ -14,7 +14,7 @@ type RestaurantProfileHeroProps = {
 	handleSave: () => void;
 	handleEdit: () => void;
 	handleCancel: () => void;
-	handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	handleImageUpload: () => void;
 };
 
 export function RestaurantProfileHero({
@@ -32,15 +32,17 @@ export function RestaurantProfileHero({
 			className="relative h-[30vh] w-full bg-black text-white flex flex-col items-start justify-center px-14"
 			aria-label="Restaurant header"
 		>
-			<Image
-				src={image1}
-				style={{ objectFit: "cover" }}
-				alt="hero image"
-				fill
-				className="absolute inset-0"
-			/>
+			{image1 && (
+				<Image
+					src={image1}
+					style={{ objectFit: "cover" }}
+					alt="hero image"
+					fill
+					className="absolute inset-0"
+				/>
+			)}
 
-			<div className="absolute inset-0 bg-foreground/80" aria-hidden="true" />
+			<div className="absolute inset-0 bg-black/40" aria-hidden="true" />
 			<div className="z-10 w-full flex items-end justify-between">
 				<div>
 					<h1 className="text-6xl font-bold">
@@ -65,49 +67,41 @@ export function RestaurantProfileHero({
 				<div className="flex gap-2" role="toolbar" aria-label="Profile actions">
 					{isEditing ? (
 						<>
-							<button
-								type="button"
+							<IconButton
+								icon={<Save className="w-4 h-4" />}
+								variant="outline"
+								color="neutral"
+								size="sm"
 								onClick={handleSave}
-								className="inline-flex items-center justify-center px-4 py-2 border-2  border-white rounded text-white hover:bg-white hover:text-black transition-colors"
-								aria-label="Save changes"
-							>
-								<Save className="w-4 h-4" />
-							</button>
-							<button
-								type="button"
+								ariaLabel="Save changes"
+							/>
+							<IconButton
+								icon={<X className="w-4 h-4" />}
+								variant="outline"
+								color="neutral"
+								size="sm"
 								onClick={handleCancel}
-								className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
-								aria-label="Cancel editing"
-							>
-								<X className="w-4 h-4" />
-							</button>
+								ariaLabel="Cancel editing"
+							/>
 						</>
 					) : (
-						<button
-							type="button"
+						<IconButton
+							icon={<Edit className="w-4 h-4" />}
+							variant="outline"
+							color="neutral"
+							size="sm"
 							onClick={handleEdit}
-							className="inline-flex items-center justify-center px-4 py-2 border-2 border-white rounded text-white hover:bg-white hover:text-black transition-colors"
-							aria-label="Edit profile"
-						>
-							<Edit className="w-4 h-4" />
-						</button>
-					)}
-					<label className="cursor-pointer">
-						<button
-							type="button"
-							className="inline-flex items-center justify-center px-4 py-2 border-2  border-white  rounded text-white hover:bg-white hover:text-black transition-colors"
-							aria-label="Upload new cover image"
-						>
-							<Upload className="w-4 h-4" />
-						</button>
-						<input
-							type="file"
-							className="hidden"
-							accept="image/*"
-							onChange={handleImageUpload}
-							aria-label="Upload image"
+							ariaLabel="Edit profile"
 						/>
-					</label>
+					)}
+					<IconButton
+						icon={<Upload className="w-4 h-4" />}
+						variant="outline"
+						color="neutral"
+						size="sm"
+						onClick={handleImageUpload}
+						ariaLabel="Upload new cover image"
+					/>
 				</div>
 			</div>
 		</section>

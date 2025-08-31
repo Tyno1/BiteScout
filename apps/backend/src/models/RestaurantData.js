@@ -66,10 +66,6 @@ const restaurantData = new Schema({
     required: true,
     trim: true,
   },
-  logo: {
-    type: String,
-    trim: true,
-  },
   description: {
     type: String,
     trim: true,
@@ -112,6 +108,36 @@ const restaurantData = new Schema({
       ref: "Media",
     },
   ],
+  assignedImages: {
+    logo: {
+      mediaId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Media",
+      },
+      assignedAt: {
+        type: Date,
+        default: Date.now,
+      },
+      assignedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+    profileImage: {
+      mediaId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Media",
+      },
+      assignedAt: {
+        type: Date,
+        default: Date.now,
+      },
+      assignedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  },
   features: {
     type: [String],
   },

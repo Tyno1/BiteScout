@@ -27,6 +27,9 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://s3.amazonaws.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://s3.amazonaws.com" />
+        
+        {/* Prevent theme flash */}
+        <script src="/theme-script.js" defer />
       </head>
       <body>
         <Provider session={session}>

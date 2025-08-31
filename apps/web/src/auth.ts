@@ -1,5 +1,7 @@
 import axios from "axios";
 import NextAuth from "next-auth";
+import type { Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import type { UserType } from "shared/types/api/schemas";
 import type {
@@ -161,10 +163,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	],
 	callbacks: {
 		async jwt({ token, user, trigger, session }: { 
-			token: import("next-auth/jwt").JWT; 
-			user?: import("next-auth").User; 
+			token: JWT; 
+			user?: User; 
 			trigger?: "signIn" | "signUp" | "update"; 
-			session?: import("next-auth").Session;
+			session?: Session;
 		}) {
 			try {
 				// Handle update trigger first (before expiration check)
@@ -203,7 +205,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			}
 		},
 
-		async session({ session, token }: { session: import("next-auth").Session; token: import("next-auth/jwt").JWT }) {
+		async session({ session, token }: { session: Session; token: JWT }) {
 			try {
 				if (token.accessToken) {
 					session.user.accessToken = token.accessToken as string;
@@ -227,8 +229,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				// Use token restaurantCount if it exists, otherwise fetch from backend
 				if (token.restaurantCount !== undefined) {
 					session.user.restaurantCount = token.restaurantCount;
-				} else if (token._id) {
-					// Only fetch restaurant count if not already cached in token
+				} else if (token._id && token.userType !== "guest") {
+					// Only fetch restaurant count for non-guest users (owners/admins/moderators)
 					try {
 						const restaurant = await axios.get<GetOwnerRestaurantsResponse>(
 							`${BACKEND_SERVER}/api/restaurants/owner-restaurants/${token._id}`,
@@ -246,6 +248,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						console.error("Error fetching restaurant count:", error);
 						session.user.restaurantCount = 0;
 					}
+				} else {
+					// For guest users, set restaurant count to 0
+					session.user.restaurantCount = 0;
 				}
 
 				return session;

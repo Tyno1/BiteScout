@@ -46,12 +46,8 @@ export interface paths {
                  * @example anthony@test.com
                  */
                 email?: string;
-                /**
-                 * @description User role/type
-                 * @example guest
-                 * @enum {string}
-                 */
-                userType?: "guest" | "user" | "admin" | "moderator" | "root";
+                /** @description User role/type */
+                userType?: components["schemas"]["UserType"];
               };
             };
           };
@@ -485,6 +481,53 @@ export interface paths {
           };
         };
         /** @description Invalid input */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Restaurant not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
+  "/api/restaurants/{id}/assigned-images": {
+    /** Update assigned images for a restaurant (logo and profile image) */
+    put: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description Media ID for logo (null to remove assignment)
+             * @example 507f1f77bcf86cd799439011
+             */
+            logo?: string | null;
+            /**
+             * @description Media ID for profile image (null to remove assignment)
+             * @example 507f1f77bcf86cd799439011
+             */
+            profileImage?: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Assigned images updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Restaurant"];
+          };
+        };
+        /** @description Invalid input or media not in gallery */
         400: {
           content: {
             "application/json": components["schemas"]["ErrorResponse"];
@@ -981,7 +1024,7 @@ export interface paths {
     };
   };
   "/api/restaurant-access/access/{accessId}/update": {
-    /** Update restaurant access role */
+    /** Update restaurant access status */
     patch: {
       parameters: {
         path: {
@@ -991,16 +1034,17 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
-            role?: string;
+            /** @enum {string} */
+            status?: "pending" | "approved" | "suspended" | "innactive";
           };
         };
       };
       responses: {
-        /** @description Access role updated */
+        /** @description Access status updated */
         200: {
           content: {
             "application/json": {
-              /** @example Role updated successfully */
+              /** @example Status updated successfully */
               message?: string;
               accessRecord?: components["schemas"]["RestaurantAccess"];
             };
@@ -1031,7 +1075,7 @@ export interface paths {
       parameters: {
         path: {
           /** @description The name of the user type to retrieve */
-          userType: "guest" | "user" | "admin" | "moderator" | "root";
+          userType: components["schemas"]["UserType"];
         };
       };
       responses: {
@@ -1681,7 +1725,7 @@ export interface paths {
                * @example restaurant
                * @enum {string}
                */
-              type?: "post" | "dish" | "restaurant";
+              type?: "post" | "dish" | "restaurant" | "user";
               /** @example 507f1f77bcf86cd799439016 */
               id?: string;
             };
@@ -1764,7 +1808,7 @@ export interface paths {
         /** @description Media uploaded successfully */
         201: {
           content: {
-            "application/json": components["schemas"]["MediaUploadResponse"];
+            "application/json": components["schemas"]["Media"];
           };
         };
         /** @description Invalid file or request */
@@ -1967,10 +2011,16 @@ export interface paths {
   "/api/media/associated/{type}/{id}": {
     /**
      * Get media by associated item
-     * @description Retrieve media items associated with a specific content type and ID
+     * @description Retrieve media items associated with a specific content type and ID with pagination
      */
     get: {
       parameters: {
+        query?: {
+          /** @description Page number for pagination */
+          page?: number;
+          /** @description Number of items per page */
+          limit?: number;
+        };
         path: {
           /** @description Type of content (post, dish, restaurant) */
           type: "post" | "dish" | "restaurant";
@@ -1982,7 +2032,36 @@ export interface paths {
         /** @description Media items retrieved successfully */
         200: {
           content: {
-            "application/json": components["schemas"]["Media"][];
+            "application/json": {
+              media?: components["schemas"]["Media"][];
+              pagination?: {
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 5
+                 */
+                totalPages?: number;
+                /**
+                 * @description Total number of media items
+                 * @example 50
+                 */
+                total?: number;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNext?: boolean;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPrev?: boolean;
+              };
+            };
           };
         };
         /** @description Invalid type or missing ID */
@@ -2668,7 +2747,7 @@ export interface paths {
           /** @description Search by name, email, or username */
           search?: string;
           /** @description Filter by user type */
-          userType?: "guest" | "user" | "admin" | "moderator" | "root";
+          userType?: components["schemas"]["UserType"];
           /** @description Filter by restaurant access status */
           status?: "pending" | "approved" | "suspended" | "innactive";
         };
@@ -3036,6 +3115,12 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    /**
+     * @description User type/role enumeration
+     * @example user
+     * @enum {string}
+     */
+    UserType: "guest" | "user" | "admin" | "moderator" | "root";
     ErrorResponse: {
       /**
        * @description A human-readable description of the error.
@@ -3071,6 +3156,27 @@ export interface components {
       currentCity?: string;
       /** @example Nigeria */
       country?: string;
+      location?: {
+        /** @example New York */
+        city?: string;
+        /** @example USA */
+        country?: string;
+        geo?: {
+          /**
+           * @example Point
+           * @enum {string}
+           */
+          type?: "Point";
+          /**
+           * @description [longitude, latitude]
+           * @example [
+           *   -74.006,
+           *   40.7128
+           * ]
+           */
+          coordinates?: number[];
+        };
+      };
       /** @example https://example.com/avatar.jpg */
       imageUrl?: string;
       /** @example 123, Some Street, City */
@@ -3082,12 +3188,56 @@ export interface components {
       password: string;
       /** @example false */
       isVerified?: boolean;
+      /** @description User type (platform-wide permissions) */
+      userType: components["schemas"]["UserType"];
       /**
-       * @description User role/type
-       * @example admin
+       * @description User's bio/description
+       * @example Food enthusiast and restaurant owner
+       */
+      bio?: string;
+      /**
+       * @description User's dietary preferences
+       * @example [
+       *   "vegetarian",
+       *   "gluten-free"
+       * ]
+       */
+      dietaryPreferences?: string[];
+      notificationSettings?: {
+        /** @example true */
+        likes?: boolean;
+        /** @example true */
+        follows?: boolean;
+        /** @example true */
+        restaurantUpdates?: boolean;
+      };
+      /**
+       * Format: date-time
+       * @description Last login timestamp
+       * @example 2025-04-20T15:30:00Z
+       */
+      lastLogin?: string;
+      /**
+       * @description User's timezone
+       * @example UTC
+       */
+      timezone?: string;
+      /**
+       * @description Whether two-factor authentication is enabled
+       * @example false
+       */
+      twoFactorEnabled?: boolean;
+      /**
+       * @description User's preferred theme
+       * @example system
        * @enum {string}
        */
-      userType: "guest" | "user" | "admin" | "moderator" | "root";
+      theme?: "light" | "dark" | "system";
+      /**
+       * @description User's preferred language
+       * @example en
+       */
+      language?: string;
       /**
        * Format: date-time
        * @example 2025-04-20T15:30:00Z
@@ -3098,12 +3248,6 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
-      /**
-       * @description User's role in the specific restaurant
-       * @example moderator
-       * @enum {string}
-       */
-      role?: "guest" | "user" | "moderator" | "admin" | "root";
       /**
        * @description User's access status in the specific restaurant
        * @example approved
@@ -3142,12 +3286,6 @@ export interface components {
        * @example 507f1f77bcf86cd799439013
        */
       restaurantId: string;
-      /**
-       * @description User's role in this restaurant
-       * @example admin
-       * @enum {string}
-       */
-      role: "guest" | "user" | "admin" | "moderator" | "root";
       /**
        * @description Status of the access request
        * @example approved
@@ -3193,11 +3331,7 @@ export interface components {
       email?: string;
       /** @example johndoe */
       username?: string;
-      /**
-       * @example user
-       * @enum {string}
-       */
-      userType?: "guest" | "user" | "admin" | "moderator" | "root";
+      userType?: components["schemas"]["UserType"];
       /** @example +1234567890 */
       phone?: string;
       /** @example Food enthusiast and restaurant owner */
@@ -3248,11 +3382,10 @@ export interface components {
       totalUsers?: number;
       /** @example 50 */
       newUsersThisMonth?: number;
-      userTypeBreakdown?: ({
-          /** @enum {string} */
-          _id?: "guest" | "user" | "admin" | "moderator" | "root";
+      userTypeBreakdown?: {
+          _id?: components["schemas"]["UserType"];
           count?: number;
-        })[];
+        }[];
       accessStatusBreakdown?: ({
           /** @enum {string} */
           _id?: "pending" | "approved" | "suspended" | "innactive";
@@ -3323,8 +3456,33 @@ export interface components {
       isActive?: boolean;
       /** @description Array of media objects for the restaurant gallery */
       gallery?: components["schemas"]["Media"][];
-      /** @description Restaurant logo image */
-      logo?: components["schemas"]["Media"];
+      /** @description Assigned images for logo and profile */
+      assignedImages?: {
+        logo?: {
+          /** @description Assigned logo media */
+          mediaId?: components["schemas"]["Media"];
+          /**
+           * Format: date-time
+           * @description When the logo was assigned
+           * @example 2025-04-20T15:30:00Z
+           */
+          assignedAt?: string;
+          /** @description User who assigned the logo */
+          assignedBy?: components["schemas"]["User"];
+        };
+        profileImage?: {
+          /** @description Assigned profile image media */
+          mediaId?: components["schemas"]["Media"];
+          /**
+           * Format: date-time
+           * @description When the profile image was assigned
+           * @example 2025-04-20T15:30:00Z
+           */
+          assignedAt?: string;
+          /** @description User who assigned the profile image */
+          assignedBy?: components["schemas"]["User"];
+        };
+      };
       /** @description Restaurant business hours */
       businessHours?: components["schemas"]["BusinessHour"][];
       /**
@@ -3593,7 +3751,7 @@ export interface components {
          * @example restaurant
          * @enum {string}
          */
-        type?: "post" | "dish" | "restaurant";
+        type?: "post" | "dish" | "restaurant" | "user";
         /** @example 507f1f77bcf86cd799439012 */
         id?: string;
       };
@@ -3658,11 +3816,6 @@ export interface components {
        * @example 2025-04-20T15:30:00Z
        */
       updatedAt?: string;
-    };
-    MediaUploadResponse: {
-      /** @example Media uploaded successfully */
-      message?: string;
-      media?: components["schemas"]["Media"];
     };
     Notification: {
       /** @example 507f1f77bcf86cd799439011 */

@@ -1,10 +1,11 @@
 import { getMedia } from "@/api/media/queries";
 import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
+import { MediaFolder } from "@/components/ui/media/media-upload/types";
 import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
 import { useMediaUpload } from "@/hooks/media";
 import { useCallback, useEffect, useState } from "react";
-import type { UploadMediaResponse } from "shared/types";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
+import type { CreateMediaResponse } from "shared/types/media/create";
 import { z } from "zod";
 import { useCreateFoodCatalogue, useUpdateFoodCatalogue } from "./mutations/useFoodCatalogueMutations";
 
@@ -87,7 +88,7 @@ export const useFoodCatalogueForm = ({
   const [formError, setFormError] = useState<FormErrorType>(DEFAULT_FORM_ERROR);
   const [ingredient, setIngredient] = useState<string>("");
   const [selectedMediaFiles, setSelectedMediaFiles] = useState<FileWithPreview[]>([]);
-  const [existingImages, setExistingImages] = useState<UploadMediaResponse[]>([]);
+  const [existingImages, setExistingImages] = useState<CreateMediaResponse[]>([]);
   const [isLoadingExistingImages, setIsLoadingExistingImages] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
@@ -124,11 +125,8 @@ export const useFoodCatalogueForm = ({
       const imagePromises = imageIds.map(id => getMedia(id));
       const images = await Promise.all(imagePromises);
       
-      // Convert GetMediaResponse to UploadMediaResponse format
-      const uploadResponseImages: UploadMediaResponse[] = images.map(image => ({
-        message: "Existing image",
-        media: image,
-      }));
+      // Convert GetMediaResponse to CreateMediaResponse format (they're the same now)
+      const uploadResponseImages: CreateMediaResponse[] = images;
       
       setExistingImages(uploadResponseImages);
     } catch (error) {
@@ -166,6 +164,27 @@ export const useFoodCatalogueForm = ({
     return true;
   }, [newFood]);
 
+  const resetForm = useCallback(() => {
+    if (mode === 'update' && initialData) {
+      setNewFood({ ...initialData });
+      // Re-fetch existing images for update mode
+      if (initialData.images) {
+        fetchExistingImages(initialData.images);
+      }
+    } else {
+      setNewFood({
+        ...DEFAULT_FOOD_DATA,
+        restaurant: restaurantId,
+      });
+      setExistingImages([]);
+    }
+    setFormError(DEFAULT_FORM_ERROR);
+    setSelectedMediaFiles([]);
+    setIngredient("");
+    setIsUploadingImages(false);
+    setUploadProgress(0);
+  }, [mode, initialData, restaurantId, fetchExistingImages]);
+
   // Main submit handler - Works for both create and update
   const handleSubmitFood = useCallback(async () => {
     if (isSubmitting) return;
@@ -194,7 +213,7 @@ export const useFoodCatalogueForm = ({
               tags: fileWithPreview.tags
                 ? fileWithPreview.tags.split(",").map((tag) => tag.trim())
                 : undefined,
-              folder: "food-images",
+              folder: MediaFolder.FOOD,
             };
 
             const result = await uploadMutation.mutateAsync({
@@ -204,7 +223,7 @@ export const useFoodCatalogueForm = ({
             
             completedUploads++;
             setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
-            return result.media?._id;
+            return result._id;
           });
 
           const results = await Promise.all(uploadPromises);
@@ -254,7 +273,6 @@ export const useFoodCatalogueForm = ({
       setUploadProgress(0);
     }
   }, [
-
     isSubmitting,
     validateForm,
     selectedMediaFiles,
@@ -266,8 +284,7 @@ export const useFoodCatalogueForm = ({
     createFoodDataMutation,
     updateFoodDataMutation,
     onSuccess,
-    // Note: resetForm is defined later in the file, creating a circular dependency
-    // The function works correctly without it in the dependency array
+    resetForm,
   ]);
 
   const toggleAllergen = useCallback((allergen: Allergen): void => {
@@ -308,7 +325,7 @@ export const useFoodCatalogueForm = ({
       const updated = prev.filter((_, i) => i !== index);
       
       // Also update newFood.images to reflect the removal
-              const removedImageId = prev[index]?.media?._id;
+              const removedImageId = prev[index]?._id;
       if (removedImageId) {
         setNewFood(current => ({
           ...current,
@@ -319,27 +336,6 @@ export const useFoodCatalogueForm = ({
       return updated;
     });
   }, []);
-
-  const resetForm = useCallback(() => {
-    if (mode === 'update' && initialData) {
-      setNewFood({ ...initialData });
-      // Re-fetch existing images for update mode
-      if (initialData.images) {
-        fetchExistingImages(initialData.images);
-      }
-    } else {
-      setNewFood({
-        ...DEFAULT_FOOD_DATA,
-        restaurant: restaurantId,
-      });
-      setExistingImages([]);
-    }
-    setFormError(DEFAULT_FORM_ERROR);
-    setSelectedMediaFiles([]);
-    setIngredient("");
-    setIsUploadingImages(false);
-    setUploadProgress(0);
-  }, [mode, initialData, restaurantId, fetchExistingImages]);
 
   return {
     // State

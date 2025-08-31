@@ -1,3 +1,5 @@
+
+
 import { IconButton } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import {
@@ -11,119 +13,29 @@ import {
   ArrowDownUp,
   ArrowDownWideNarrow,
   ArrowUpNarrowWide,
-  Pen,
-  Trash2,
 } from "lucide-react";
 
-import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 
 
-type TableProps = {
-  foodDatas: FoodCatalogue[];
+type DataGridProps<TData> = {
+  data: TData[];
+  columns: ColumnDef<TData>[];
   handleRowClick: (id: string) => void;
   handleDelete: (id: string) => void;
   handleEdit: (id: string) => void;
+  emptyMessage?: string;
 };
-export type ColumnType = ColumnDef<FoodCatalogue>;
 
-export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: TableProps) {
-  const column: ColumnType[] = [
-    {
-      accessorKey: "name",
-      header: "Name",
-      id: "name",
-      cell: (props) => <p>{props.getValue<string>()}</p>,
-    },
-
-    {
-      accessorKey: "cuisineType",
-      header: "Cuisine",
-      id: "cuisine",
-      accessorFn: (row) => row.cuisineType?.name || "N/A",
-      cell: (props) => <p>{props.getValue<string>()}</p>,
-    },
-    {
-      accessorKey: "course",
-      header: "Course",
-      id: "course",
-      accessorFn: (row) => row.course?.name || "N/A",
-      cell: (props) => <p>{props.getValue<string>()}</p>,
-    },
-    {
-      accessorKey: "price",
-      header: "Price",
-      id: "price",
-      accessorFn: (row) => row.price ? `${row.price.currency}${row.price.amount}` : '',
-      cell: (props) => <p>{props.getValue<string>()}</p>,
-    },
-    {
-      accessorKey: "allergens",
-      header: "Allergens",
-      enableSorting: false,
-      id: "allergens",
-      cell: (props) => {
-        const allergens = props.getValue<Allergen[]>();
-        return (
-          <p className="line-clamp-2">
-            {allergens && allergens.length > 0
-              ? allergens.map((val: Allergen) => val.name).join(", ")
-              : "None"}
-          </p>
-        );
-      },
-    },
-    {
-      accessorKey: "images",
-      header: () => (
-        <div className="hidden xl:flex items-center gap-2">
-          Images Count
-        </div>
-      ),
-      id: "images",
-      enableSorting: false,
-      accessorFn: (row) => row.images?.length || 0,
-      cell: (props) => <p>{props.getValue<number>()}</p>,
-    },
-    {
-      accessorKey: "_id",
-      header: "",
-      enableSorting: false,
-      cell: (props) => (
-        <div className="flex justify-end space-x-2">
-          <IconButton
-            name="edit-food-item"
-            variant="plain"
-            color="secondary"
-            icon={<Pen size={20} />}
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (props.row.original._id) {
-                handleEdit(props.row.original._id);
-              }
-            }}
-          />
-          <IconButton
-            name="delete-food-item"
-            color="danger"
-            variant="plain"
-            size="sm"
-            icon={<Trash2 size={20} />}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (props.row.original._id) {
-                handleDelete(props.row.original._id);
-              }
-            }}
-          />
-        </div>
-      ),
-    },
-  ];
+export function DataGrid<TData>({ 
+  data, 
+  columns, 
+  handleRowClick, 
+  emptyMessage = "No data found."
+}: DataGridProps<TData>) {
 
   const table = useReactTable({
-    data: foodDatas,
-    columns: column,
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
@@ -131,9 +43,9 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
   return (
     <Card shadow="sm" className="overflow-hidden">
       <div className="max-h-[60vh] overflow-y-auto">
-        {foodDatas.length === 0 ? (
+        {data.length === 0 ? (
           <div className="p-8 text-center text-card-foreground">
-            No food items found. Add some food items to get started.
+            {emptyMessage}
           </div>
         ) : (
           <table className="w-full table-fixed border-collapse">
@@ -143,7 +55,7 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className={`px-4 py-5 text-left text-sm font-semibold text-secondary ${
+                      className={`px-4 py-5 text-left text-sm font-semibold text-card-foreground ${
                         header.id === "images" ? "hidden xl:table-cell" : ""
                       }`}
                     >
@@ -153,13 +65,12 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
                           header.getContext()
                         )}
                         {header.column.getCanSort() && (
-
                           <IconButton
-                            name="sort-food-item"
+                            name="sort-item"
                             variant="plain"
-                            color="secondary"
+                            color="primary"
                             icon={<ArrowDownUp size={17} />}
-                            size="sm"
+                            size="xs"
                             onClick={header.column.getToggleSortingHandler()}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" || e.key === " ") {
@@ -190,13 +101,15 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-secondary/10 focus:bg-secondary/10 focus:outline-none focus:ring-0 cursor-pointer"
-                  onClick={() =>
-                    row.original._id && handleRowClick(row.original._id)
-                  }
+                  className="hover:bg-muted/10 focus:bg-muted/10 focus:outline-none focus:ring-0 cursor-pointer"
+                  onClick={() => {
+                    const id = (row.original as { _id?: string })._id;
+                    if (id) handleRowClick(id);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      if (row.original._id) handleRowClick(row.original._id);
+                      const id = (row.original as { _id?: string })._id;
+                      if (id) handleRowClick(id);
                     }
                   }}
                   tabIndex={0}
@@ -204,7 +117,7 @@ export function Table({ foodDatas, handleRowClick, handleDelete, handleEdit }: T
                   {row.getVisibleCells().map((cell) => (
                     <td 
                       key={cell.id} 
-                      className={`p-4 text-sm text-card-foreground ${
+                      className={`p-4 text-sm text-card-foreground truncate max-w-[150px] ${
                         cell.column.id === "images" ? "hidden xl:table-cell" : ""
                       }`}
                     >

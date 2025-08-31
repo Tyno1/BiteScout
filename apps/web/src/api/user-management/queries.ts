@@ -26,10 +26,14 @@ export const getAllUsers = async (params?: {
 };
 
 export const getUserById = async (
-  userId: string
+  userId: string,
+  restaurantId?: string
 ): Promise<GetUserByIdResponse> => {
   const response = await apiClient.get<GetUserByIdResponse>(
-    `/user-management/${userId}`
+    `/user-management/${userId}`,
+    {
+      params: restaurantId ? { restaurantId } : {},
+    }
   );
   return response.data;
 };

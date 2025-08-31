@@ -26,8 +26,8 @@ import apiClient from '@/utils/authClient';
 import config from '@/utils/config';
 import { createUploadFormData } from '@/utils/mediaUtils';
 import type { 
-  GetMediaResponse,
-  UploadMediaResponse 
+  CreateMediaResponse, 
+  GetMediaResponse
 } from '@shared/types';
 import type { Media } from '@shared/types';
 import axios from 'axios';
@@ -42,7 +42,7 @@ export const uploadFile = async (
     folder?: string;
     associatedWith?: Media["associatedWith"];
   } = {},
-): Promise<UploadMediaResponse> => {
+): Promise<CreateMediaResponse> => {
   // Only send media service specific fields to the media service
   const mediaServiceMetadata = {
     title: metadata.title,
@@ -64,52 +64,36 @@ export const uploadFile = async (
     }
   );
   
-  // Use the /api/media/upload endpoint directly
+  // Now sync the media metadata with the backend
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (metadata.title) formData.append('title', metadata.title);
-    if (metadata.description) formData.append('description', metadata.description);
-    if (metadata.tags) formData.append('tags', JSON.stringify(metadata.tags));
-    if (metadata.folder) formData.append('folder', metadata.folder);
-    if (metadata.associatedWith) formData.append('associatedWith', JSON.stringify(metadata.associatedWith));
-
-    const response = await apiClient.post<UploadMediaResponse>("/media/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const mediaMetadata = {
+      url: mediaServiceResponse.data.media.variants[0]?.url || '',
+      type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
+      title: metadata.title || mediaServiceResponse.data.media.originalName,
+      description: metadata.description || '',
+      associatedWith: metadata.associatedWith,
+      providerId: mediaServiceResponse.data.media.providerId,
+      mediaServiceId: mediaServiceResponse.data.media._id,
+      provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
+      mimeType: mediaServiceResponse.data.media.mimeType,
+      fileSize: mediaServiceResponse.data.media.fileSize || 0,
+      dimensions: {
+        width: mediaServiceResponse.data.media.variants[0]?.width,
+        height: mediaServiceResponse.data.media.variants[0]?.height,
       },
-    });
-    
-    return response.data;
-  } catch (error: unknown) {
-    console.error('Failed to upload media:', error);
-    // Convert media service response to UploadMediaResponse format for fallback
-    const fallbackResponse: UploadMediaResponse = {
-      message: "Media uploaded successfully (fallback)",
-      media: {
-        _id: '',
-        url: mediaServiceResponse.data.media.variants[0]?.url || '',
-        type: mediaServiceResponse.data.media.mimeType.startsWith('image/') ? 'image' : 'video',
-        title: mediaServiceResponse.data.media.title || mediaServiceResponse.data.media.originalName,
-        description: mediaServiceResponse.data.media.description || '',
-        uploadedBy: { id: '', name: '', username: '', imageUrl: '' },
-        providerId: mediaServiceResponse.data.media.providerId,
-        provider: mediaServiceResponse.data.media.provider as "cloudinary" | "aws-s3",
-        variants: mediaServiceResponse.data.variants.map(variant => ({
-          size: "original" as const,
-          url: variant.url,
-          width: variant.width,
-          height: variant.height,
-          fileSize: 0,
-          format: variant.format || "unknown",
-          createdAt: new Date().toISOString(),
-        })),
-        tags: mediaServiceResponse.data.media.tags || [],
-        createdAt: mediaServiceResponse.data.media.createdAt.toISOString(),
-        updatedAt: mediaServiceResponse.data.media.updatedAt.toISOString(),
-      },
+      tags: metadata.tags || [],
     };
-    return fallbackResponse;
+
+    // Send metadata to backend to create media record
+    const backendResponse = await apiClient.post<CreateMediaResponse>("/media", mediaMetadata);
+    
+    return backendResponse.data;
+  } catch (error: unknown) {
+    console.error('Failed to sync media with backend:', error);
+    
+    // Since we can't create a proper Media object without backend sync,
+    // throw an error to let the caller handle it
+    throw new Error('Failed to sync media with backend. Media was uploaded but not saved.');
   }
 };
 

@@ -28,7 +28,7 @@ const mediaSchema = new mongoose.Schema(
     associatedWith: {
       type: {
         type: String,
-        enum: ["post", "dish", "restaurant"],
+        enum: ["post", "dish", "restaurant", "user"],
         required: false,
       },
       id: {
@@ -118,6 +118,8 @@ mediaSchema.virtual("associatedWith.ref").get(function () {
       return "FoodCatalogue";
     case "restaurant":
       return "RestaurantData";
+    case "user":
+      return "User";
     default:
       return null;
   }

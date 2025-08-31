@@ -28,13 +28,7 @@ export default function GalleryPage() {
     setOriginalImages(images);
     setHasUnsavedChanges(false);
     setSaveError(null);
-  }, [restaurantData?.gallery]);
-
-  const handleImagesChange = useCallback((images: Media[]) => {
-    setGalleryImages(images);
-    setHasUnsavedChanges(true);
-    setSaveError(null);
-  }, []);
+  }, [restaurantData]);
 
   const handleSave = useCallback(async () => {
     if (!restaurantData?._id || !hasUnsavedChanges) return;
@@ -131,8 +125,6 @@ export default function GalleryPage() {
 
       <Suspense fallback={<GallerySkeleton count={8} />}>
         <Gallery
-          images={galleryImages}
-          onImagesChange={handleImagesChange}
           restaurantId={restaurantData?._id || ''}
         />
       </Suspense>

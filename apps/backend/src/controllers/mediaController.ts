@@ -90,6 +90,21 @@ export const createMedia = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
+		// If media is associated with a restaurant, add it to the restaurant's gallery
+		if (newMedia.associatedWith?.type === "restaurant" && newMedia.associatedWith?.id) {
+			try {
+				const RestaurantData = (await import("../models/RestaurantData.js")).default;
+				await RestaurantData.findByIdAndUpdate(
+					newMedia.associatedWith.id,
+					{ $addToSet: { gallery: newMedia._id } }
+				);
+				console.log(`Media ${newMedia._id} added to restaurant ${newMedia.associatedWith.id} gallery`);
+			} catch (error) {
+				console.error("Failed to add media to restaurant gallery:", error);
+				// Don't fail the media creation if gallery update fails
+			}
+		}
+
 		// Transform to match CreateMediaResponse type
 		const response: CreateMediaResponse = {
 			_id: newMedia._id.toString(),
@@ -156,6 +171,7 @@ export const getMediaById = async (
 			mimeType: media.mimeType,
 			dimensions: media.dimensions,
 			providerId: media.providerId,
+			mediaServiceId: media.mediaServiceId,
 			provider: media.provider,
 			createdAt: media.createdAt.toISOString(),
 			updatedAt: media.updatedAt.toISOString(),
@@ -174,43 +190,65 @@ export const getMediaByAssociatedItem = async (
 ): Promise<void> => {
 	try {
 		const { type, id } = req.params;
+		const { page = "1", limit = "10" } = req.query;
 
 		if (!type || !id) {
 			throw createError(400, "Type and ID are required");
 		}
 
-		if (!["post", "dish"].includes(type)) {
-			throw createError(400, "Invalid type. Must be 'post' or 'dish'");
+		if (!["post", "dish", "restaurant", "user"].includes(type)) {
+			throw createError(400, "Invalid type. Must be 'post', 'dish', 'restaurant', or 'user'");
 		}
+
+		const skip = (Number(page) - 1) * Number(limit);
 
 		const media = await Media.find({
 			"associatedWith.type": type,
 			"associatedWith.id": id,
-		}).populate([{ path: "uploadedBy", select: "name username imageUrl" }]);
+		})
+		.populate([{ path: "uploadedBy", select: "name username imageUrl" }])
+		.sort({ createdAt: -1 })
+		.skip(skip)
+		.limit(Number(limit));
+
+		const total = await Media.countDocuments({
+			"associatedWith.type": type,
+			"associatedWith.id": id,
+		});
 
 		// Transform to match GetMediaByAssociatedResponse type
-		const response: GetMediaByAssociatedResponse = media.map(item => ({
-			_id: item._id.toString(),
-			url: item.url,
-			type: item.type,
-			title: item.title,
-			description: item.description,
-			uploadedBy: {
-				id: item.uploadedBy._id.toString(),
-				name: item.uploadedBy.name,
-				username: item.uploadedBy.username,
-				imageUrl: item.uploadedBy.imageUrl,
+		const response: GetMediaByAssociatedResponse = {
+			media: media.map(item => ({
+				_id: item._id.toString(),
+				url: item.url,
+				type: item.type,
+				title: item.title,
+				description: item.description,
+				uploadedBy: {
+					id: item.uploadedBy._id.toString(),
+					name: item.uploadedBy.name,
+					username: item.uploadedBy.username,
+					imageUrl: item.uploadedBy.imageUrl,
+				},
+				associatedWith: item.associatedWith,
+				verified: item.verified,
+				fileSize: item.fileSize,
+				mimeType: item.mimeType,
+				dimensions: item.dimensions,
+				providerId: item.providerId,
+				mediaServiceId: item.mediaServiceId,
+				provider: item.provider,
+				createdAt: item.createdAt.toISOString(),
+				updatedAt: item.updatedAt.toISOString(),
+			})),
+			pagination: {
+				page: Number(page),
+				totalPages: Math.ceil(total / Number(limit)),
+				total: total,
+				hasNext: Number(page) < Math.ceil(total / Number(limit)),
+				hasPrev: Number(page) > 1,
 			},
-			associatedWith: item.associatedWith,
-			verified: item.verified,
-			fileSize: item.fileSize,
-			mimeType: item.mimeType,
-			dimensions: item.dimensions,
-			providerId: item.providerId,
-			provider: item.provider,
-			createdAt: item.createdAt.toISOString(),
-			updatedAt: item.updatedAt.toISOString(),
-		}));
+		};
 
 		res.json(response);
 	} catch (error) {
@@ -257,6 +295,7 @@ export const getUserMedia = async (
 				mimeType: item.mimeType,
 				dimensions: item.dimensions,
 				providerId: item.providerId,
+				mediaServiceId: item.mediaServiceId,
 				provider: item.provider,
 				createdAt: item.createdAt.toISOString(),
 				updatedAt: item.updatedAt.toISOString(),
@@ -326,6 +365,7 @@ export const updateMedia = async (
 			mimeType: updatedMedia.mimeType,
 			dimensions: updatedMedia.dimensions,
 			providerId: updatedMedia.providerId,
+			mediaServiceId: updatedMedia.mediaServiceId,
 			provider: updatedMedia.provider,
 			createdAt: updatedMedia.createdAt.toISOString(),
 			updatedAt: updatedMedia.updatedAt.toISOString(),
@@ -414,6 +454,7 @@ export const verifyMedia = async (
 			mimeType: media.mimeType,
 			dimensions: media.dimensions,
 			providerId: media.providerId,
+			mediaServiceId: media.mediaServiceId,
 			provider: media.provider,
 			createdAt: media.createdAt.toISOString(),
 			updatedAt: media.updatedAt.toISOString(),
@@ -437,7 +478,7 @@ export const getVerifiedMedia = async (
 
 		const filter: Record<string, unknown> = { verified: true };
 
-		if (type && ["post", "dish"].includes(String(type))) {
+		if (type && ["post", "dish", "restaurant", "user"].includes(String(type))) {
 			filter["associatedWith.type"] = type;
 		}
 
@@ -469,6 +510,7 @@ export const getVerifiedMedia = async (
 				mimeType: item.mimeType,
 				dimensions: item.dimensions,
 				providerId: item.providerId,
+				mediaServiceId: item.mediaServiceId,
 				provider: item.provider,
 				createdAt: item.createdAt.toISOString(),
 				updatedAt: item.updatedAt.toISOString(),

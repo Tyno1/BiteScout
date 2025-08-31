@@ -1,40 +1,16 @@
 "use client";
 
-import { Spinner } from "@/components/atoms";
 import { RouteProtection, SideNav, TopNav } from "@/components/ui";
-import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-const Layout = ({ children }: { children: ReactNode }) => {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: session, status: sessionStatus } = useSession();
-  const { restaurantAccessList, isLoading: restaurantLoading } = useRestaurantAccess();
-  const router = useRouter();
-
-  const checkAccessRights = useCallback(() => {
-    if (sessionStatus === "loading") return;
-    
-    const isOwner = !!(session?.user?.restaurantCount && session.user.restaurantCount >= 1);
-    const hasApprovedAccess = restaurantAccessList.some(access => access.status === "approved");
-    
-    if (!isOwner && !hasApprovedAccess) {
-      router.push("/onboarding/roles");
-    }
-  }, [sessionStatus, session?.user?.restaurantCount, restaurantAccessList, router]);
-
-  useEffect(() => {
-    checkAccessRights();
-  }, [checkAccessRights]);
-
-  if (sessionStatus === "loading" || restaurantLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen w-screen">
-        <Spinner />
-      </div>
-    );
-  }
+  const { data: session } = useSession();
 
   return (
     <div className="flex flex-col h-screen w-screen relative">
@@ -51,7 +27,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
         <div className="flex-1 relative overflow-y-auto overflow-x-hidden">
           {session?.user && (
-            <TopNav onMenuClick={() => setIsMenuOpen(prev => !prev)} user={session.user} />
+            <TopNav onMenuClick={() => setIsMenuOpen((prev: boolean) => !prev)} user={session.user} />
           )}
           <div className="mt-14">
             <RouteProtection>
@@ -62,6 +38,4 @@ const Layout = ({ children }: { children: ReactNode }) => {
       </div>
     </div>
   );
-};
-
-export default Layout;
+}

@@ -13,7 +13,6 @@ export const DEFAULT_BUSINESS_HOURS: BusinessHour[] = [
 export const DEFAULT_RESTAURANT_DATA: Restaurant = {
   _id: "",
   name: "",
-  logo: undefined,
   description: "",
   cuisine: [],
   priceRange: "$",
@@ -24,6 +23,7 @@ export const DEFAULT_RESTAURANT_DATA: Restaurant = {
   businessHours: DEFAULT_BUSINESS_HOURS,
   features: [],
   gallery: [],
+  assignedImages: undefined,
   meta: {},
   owner: false,
   ownerId: "",

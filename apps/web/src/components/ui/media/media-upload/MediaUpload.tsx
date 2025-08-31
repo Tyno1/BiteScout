@@ -22,6 +22,7 @@ export const MediaUpload = ({
   selectedFiles,
   uploadMode = 'manual',
   editMode = false,
+  singleUpload = false,
 }: MediaUploadProps) => {
   const [files, setFiles] = useState<FileWithPreview[]>(selectedFiles || []);
   const [uploading, setUploading] = useState(false);
@@ -164,6 +165,8 @@ export const MediaUpload = ({
     }
   }, [files, uploadMutation, folder, associatedWith, onUploadSuccess, onUploadError, onSelectedFilesChange]);
 
+
+
   const handleDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
@@ -187,7 +190,8 @@ export const MediaUpload = ({
     }));
 
     setFiles(prev => [...prev, ...newFiles]);
-  }, [validateFile]);
+    onSelectedFilesChange?.([...files, ...newFiles]);
+  }, [files, validateFile, onSelectedFilesChange]);
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -226,9 +230,9 @@ export const MediaUpload = ({
       URL.revokeObjectURL(f.previewUrl);
     }
     setFiles([]);
-          setUploadProgress({});
-      setUploadErrors({});
-      onSelectedFilesChange?.([]);
+    setUploadProgress({});
+    setUploadErrors({});
+    onSelectedFilesChange?.([]);
   }, [files, onSelectedFilesChange]);
 
 
@@ -247,6 +251,8 @@ export const MediaUpload = ({
     await handleUpload();
   }, [files, uploadErrors, handleUpload]);
 
+
+
   return (
     <div className={`space-y-4 ${className}`}>
       <FileDropZone
@@ -260,6 +266,7 @@ export const MediaUpload = ({
         multiple={multiple}
         fileInputRef={fileInputRef}
         uploadMode={uploadMode}
+        singleUpload={singleUpload}
       />
 
       {/* Error Summary */}
@@ -308,4 +315,4 @@ export const MediaUpload = ({
       )}
     </div>
   );
-}; 
+}
