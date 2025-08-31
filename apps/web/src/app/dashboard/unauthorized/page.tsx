@@ -1,72 +1,71 @@
 "use client";
-import { Shield, ArrowLeft, Home } from "lucide-react";
-import { useState } from "react";
+
+import { Button } from "@/components/atoms";
+import { AlertTriangle, Home, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function UnauthorizedPage() {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleGoBack = () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = '/dashboard';
-    }
-  };
-
-  const handleGoHome = () => {
-    window.location.href = '/dashboard';
-  };
+  const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md text-center space-y-6">
         {/* Icon */}
-        <div className="mb-8 flex justify-center">
-          <div 
-            className={`p-6 rounded-full bg-red-100 transition-all duration-300 ${
-              isHovered ? 'scale-110 bg-red-200' : ''
-            }`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <Shield className="w-16 h-16 text-red-600" />
+        <div className="flex justify-center">
+          <div className="p-4 bg-red-100 rounded-full">
+            <Shield className="h-12 w-12 text-red-600" />
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        {/* Title */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-foreground">
             Access Denied
           </h1>
-          
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            You don&apos;t have permission to access this page. Please contact your administrator if you believe this is an error.
+          <p className="text-muted-foreground">
+            You don&apos;t have permission to access this restaurant.
           </p>
+        </div>
 
-          <div className="space-y-3">
-            <button
-              onClick={handleGoBack}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Go Back
-            </button>
-            
-            <button
-              onClick={handleGoHome}
-              className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200"
-            >
-              <Home className="w-4 h-4" />
-              Go to Home
-            </button>
+        {/* Message */}
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div className="text-left">
+              <p className="text-sm font-medium text-yellow-800">
+                Restaurant Access Required
+              </p>
+              <p className="text-sm text-yellow-700 mt-1">
+                Contact your restaurant administrator to request access or verify your permissions.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Additional Info */}
-        <div className="text-sm text-gray-500">
-          <p>Error Code: 403 - Forbidden</p>
-          <p className="mt-1">Need help? Contact support</p>
+        {/* Actions */}
+        <div className="space-y-3">
+          <Button
+            text="Go to Dashboard"
+            variant="solid"
+            color="primary"
+            fullWidth
+            onClick={() => router.push("/dashboard")}
+            IconBefore={<Home size={16} />}
+          />
+          
+          <Button
+            text="Go to Onboarding"
+            variant="outline"
+            color="neutral"
+            fullWidth
+            onClick={() => router.push("/onboarding/roles")}
+          />
         </div>
+
+        {/* Help Text */}
+        <p className="text-xs text-muted-foreground">
+          If you believe this is an error, please contact support.
+        </p>
       </div>
     </div>
   );

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Montserrat } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
 import { auth } from "@/auth";
 import Provider from "@/providers/Provider";
+import { ToastContainer } from "react-toastify";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -21,6 +21,16 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html lang="en" className={montserrat.className}>
+      <head>
+        {/* Preconnect to external domains for faster loading */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://s3.amazonaws.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://s3.amazonaws.com" />
+        
+        {/* Prevent theme flash */}
+        <script src="/theme-script.js" defer />
+      </head>
       <body>
         <Provider session={session}>
           <ToastContainer />

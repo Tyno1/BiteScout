@@ -25,7 +25,7 @@ export const createPost = async (
 		}
 
 		// Add userId from authenticated user
-		body.userId = req.user?.id;
+		body.userId = req.user?.userId;
 
 		if (!body.userId) {
 			res.status(401).json({ error: "User not authenticated" });
@@ -294,7 +294,7 @@ export const updatePost = async (
 			return;
 		}
 
-		if (existingPost.userId.toString() !== req.user?.id) {
+		if (existingPost.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to update this post" });
 			return;
 		}
@@ -339,7 +339,7 @@ export const deletePost = async (
 			return;
 		}
 
-		if (existingPost.userId.toString() !== req.user?.id) {
+		if (existingPost.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to delete this post" });
 			return;
 		}
@@ -361,7 +361,7 @@ export const likePost = async (
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const userId = req.user?.id;
+		const userId = req.user?.userId;
 
 		if (!userId) {
 			res.status(401).json({ error: "User not authenticated" });
@@ -490,7 +490,7 @@ export const tagFoodInPost = async (
 			return;
 		}
 
-		if (post.userId.toString() !== req.user?.id) {
+		if (post.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to modify this post" });
 			return;
 		}
@@ -555,7 +555,7 @@ export const removeFoodTag = async (
 			return;
 		}
 
-		if (post.userId.toString() !== req.user?.id) {
+		if (post.userId.toString() !== req.user?.userId) {
 			res.status(403).json({ error: "Not authorized to modify this post" });
 			return;
 		}

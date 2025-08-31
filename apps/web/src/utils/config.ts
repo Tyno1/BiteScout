@@ -8,6 +8,13 @@ const config = {
     client: process.env.BACKEND_URL_CLIENT || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
   },
   
+  // Media Service URLs
+  mediaService: {
+    // For client-side requests (browser)
+    url: process.env.NEXT_PUBLIC_MEDIA_SERVICE_URL || 
+      (process.env.NODE_ENV === 'development' ? "http://localhost:3002/api/v1" : "http://localhost:3002/api/v1"),
+  },
+  
   // NextAuth configuration
   auth: {
     secret: process.env.NEXTAUTH_SECRET,

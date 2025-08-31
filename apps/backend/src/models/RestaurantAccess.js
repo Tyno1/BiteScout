@@ -12,11 +12,6 @@ const restaurantAccessSchema = new Schema({
     required: true,
     ref: "RestaurantData",
   },
-  role: {
-    type: String,
-    enum: ["guest", "user", "moderator", "admin", "root"],
-    required: true,
-  },
   status: {
     type: String,
     enum: ["pending", "approved", "suspended", "innactive"],
@@ -30,6 +25,18 @@ const restaurantAccessSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  // New fields for better access management
+  approvedAt: { type: Date, default: null },
+  expiresAt: { type: Date, default: null },
+  maxRestaurants: { type: Number, default: 1 },
+  accessLevel: { type: String, enum: ['basic', 'premium', 'enterprise'], default: 'basic' },
+  
+  // Permission flags
+  canEdit: { type: Boolean, default: false },
+  canDelete: { type: Boolean, default: false },
+  canViewAnalytics: { type: Boolean, default: false },
+  canManageUsers: { type: Boolean, default: false },
+  canManageContent: { type: Boolean, default: false },
 });
 
 export default mongoose.models.RestaurantAccess ||

@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
-  darkMode: 'class', // Enable dark mode using the 'class' strategy
+  darkMode: 'class', 
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -15,8 +15,9 @@ const config: Config = {
   },
   plugins: [
     require('tw-animate-css'),
-    plugin(function({ addVariant }) {
-      addVariant('dark', '&:is(.dark *)');
+    plugin(({ addVariant }) => {
+      // Override the default dark variant to use data-theme
+      addVariant('dark', '[data-theme="dark"] &');
     }),
   ],
 };

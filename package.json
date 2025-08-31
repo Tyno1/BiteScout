@@ -14,14 +14,20 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
+    "docs": "cd packages/shared && yarn serve-docs",
+    "storybook": "cd apps/web && yarn storybook",
     "docker:dev": "docker compose up -d",
     "docker:dev:build": "docker compose up -d --build",
-    "docker:prod": "docker compose -f docker compose.prod.yml up -d",
-    "docker:prod:build": "docker compose -f docker compose.prod.yml up -d --build",
+    "docker:prod": "docker compose -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
+    "media:dev": "cd apps/media-service && docker compose up -d",
+    "media:dev:build": "cd apps/media-service && docker compose up -d --build",
+    "media:down": "cd apps/media-service && docker compose down",
+    "media:logs": "cd apps/media-service && docker compose logs -f",
     "deploy:render": "echo 'Push to GitHub and deploy via Render dashboard'",
-    "predeploy": "npm run build"
+    "predeploy": "yarn build"
   },
   "devDependencies": {
     "turbo": "^2.5.5"

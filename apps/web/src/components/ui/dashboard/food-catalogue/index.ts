@@ -1,2 +1,3 @@
-export * from "./AddNewFood";
-export * from "./Table"
+export { FoodCard } from "./FoodCard";
+export { FoodCatalogueList } from "./FoodCatalogueList";
+export { AddNewFood } from "./AddNewFood";

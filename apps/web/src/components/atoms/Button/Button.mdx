@@ -1,0 +1,48 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+
+import * as ButtonStories from "./Button.stories"
+
+<Meta of={ButtonStories}/>
+
+# Button
+
+A versatile button component that supports multiple variants, colors, and sizes. Buttons are used to trigger actions and can include icons before or after the text.
+
+## Features
+
+- **Multiple variants**: solid, outline, plain, and glass
+- **Color options**: primary, secondary, danger, success, neutral
+- **Size variants**: xs, sm, md, lg
+- **Icon support**: Add icons before or after text
+- **Accessibility**: Full keyboard and screen reader support
+- **Responsive**: Works across all device sizes
+
+## Default Button
+
+<Canvas of={ButtonStories.Default} />
+
+## Button with Icon
+
+<Canvas of={ButtonStories.IconAfter} />
+
+## Usage
+
+```tsx
+import { Button } from "@/components/atoms";
+
+// Basic button
+<Button 
+  text="Click me" 
+  color="primary" 
+  variant="solid" 
+/>
+
+// Button with icon
+<Button 
+  text="Delete" 
+  color="danger" 
+  variant="solid"
+  IconAfter={<TrashIcon />}
+/>
+```
+

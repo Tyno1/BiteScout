@@ -1,4 +1,4 @@
-import { useRole } from "@/app/hooks/useRole";
+import { useRole } from "@/hooks/useRole";
 import type React from "react";
 import type { AccessRoles } from "shared/types/api/schemas";
 

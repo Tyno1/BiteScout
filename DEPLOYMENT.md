@@ -5,16 +5,16 @@
 ### Development (Local)
 ```bash
 # Start development environment
-npm run docker:dev
+yarn docker:dev
 
 # Rebuild and start
-npm run docker:dev:build
+yarn docker:dev:build
 
 # View logs
-npm run docker:logs
+yarn docker:logs
 
 # Stop services
-npm run docker:down
+yarn docker:down
 ```
 
 ### Production (Render)
@@ -111,7 +111,7 @@ git push origin main
 4. **CORS errors**: Check ALLOWED_ORIGINS in backend
 
 ### Logs
-- **Development**: `npm run docker:logs`
+- **Development**: `yarn docker:logs`
 - **Production**: Check Render dashboard logs
 
 ## Security Notes

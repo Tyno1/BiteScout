@@ -20,7 +20,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   onChange?: (e: ChangeEvent<HTMLSelectElement>) => void;
   value?: string;
   selectClassName?: string;
-  placeholder?: string;
+  placeholder: string;
   fullWidth?: boolean;
   iconStyle?: string;
   theme?: "light" | "dark" | "transparent";
@@ -70,8 +70,8 @@ export function Select({
   };
 
   const outlineMap = {
-    round: "border border-gray-500 rounded-lg",
-    bottom: "border-b border-gray-500",
+    round: "border border-foreground/10 rounded-sm",
+    bottom: "border-b border-foreground/10",
     none: "border-none",
   };
 
@@ -80,7 +80,7 @@ export function Select({
       ? "bg-black text-white"
       : theme === "transparent"
         ? "bg-transparent text-gray-700"
-        : "bg-white text-black";
+        : "bg-input text-input-foreground";
 
   const paddingLeft = icon ? "pl-10" : "";
   const paddingRight = rightButton ? "pr-12" : "";
@@ -93,7 +93,7 @@ export function Select({
         <label
           htmlFor={uniqueId}
           className={clsx(
-            `block ${!labelRow && "mb-3"} font-medium text-gray-700`,
+            `block ${!labelRow && "mb-3"} font-medium text-input-foreground`,
             labelStyle
           )}
         >
@@ -103,7 +103,7 @@ export function Select({
     {errorMessage && (
         <p
           id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
+          className="text-sm text-danger mt-1"
           role="alert"
         >
           {errorMessage}
@@ -137,12 +137,12 @@ export function Select({
             paddingLeft,
             paddingRight,
             "rounded-lg",
-            errorMessage && "border-red-500",
+            errorMessage && "border-danger",
             selectClassName
           )}
           {...props}
         >
-          {placeholder && <option value="">{placeholder}</option>}
+          {placeholder ? <option value="">{placeholder}</option> : null}
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}

@@ -60,10 +60,8 @@ paths:
                         format: email
                         example: anthony@test.com
                       userType:
-                        type: string
-                        enum: ["guest", "user", "admin", "moderator", "root"]
+                        $ref: "#/components/schemas/UserType"
                         description: "User role/type"
-                        example: "guest"
         400:
           description: Missing required field or invalid user type
           content:
@@ -555,6 +553,53 @@ paths:
                 $ref: "#/components/schemas/DeliveryLink"
         400:
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/restaurants/{id}/assigned-images:
+    put:
+      summary: Update assigned images for a restaurant (logo and profile image)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  nullable: true
+                  description: "Media ID for logo (null to remove assignment)"
+                  example: "507f1f77bcf86cd799439011"
+                profileImage:
+                  type: string
+                  nullable: true
+                  description: "Media ID for profile image (null to remove assignment)"
+                  example: "507f1f77bcf86cd799439011"
+      responses:
+        200:
+          description: Assigned images updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        400:
+          description: Invalid input or media not in gallery
           content:
             application/json:
               schema:
@@ -1107,7 +1152,7 @@ paths:
                     $ref: "#/components/schemas/RestaurantAccess"
   /api/restaurant-access/access/{accessId}/update:
     patch:
-      summary: Update restaurant access role
+      summary: Update restaurant access status
       parameters:
         - in: path
           name: accessId
@@ -1121,11 +1166,12 @@ paths:
             schema:
               type: object
               properties:
-                role:
+                status:
                   type: string
+                  enum: ["pending", "approved", "suspended", "innactive"]
       responses:
         200:
-          description: Access role updated
+          description: Access status updated
           content:
             application/json:
               schema:
@@ -1133,7 +1179,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Role updated successfully"
+                    example: "Status updated successfully"
                   accessRecord:
                     $ref: "#/components/schemas/RestaurantAccess"
   /api/user-types:
@@ -1159,9 +1205,7 @@ paths:
           required: true
           description: The name of the user type to retrieve
           schema:
-            type: string
-            enum: ["guest", "user", "admin", "moderator", "root"]
-            example: "user"
+            $ref: "#/components/schemas/UserType"
       responses:
         200:
           description: User type retrieved successfully
@@ -1725,10 +1769,14 @@ paths:
                     type: string
                     example: "Internal server error"
 
+
+
   /api/media:
     post:
-      summary: Create new media (JSON metadata)
-      description: Create a new media item with metadata (for external URLs)
+      summary: Create media record
+      description: |
+        Create a new media record in the backend database.
+        This endpoint is typically called after media has been uploaded to the media service.
       security:
         - bearerAuth: []
       requestBody:
@@ -1743,16 +1791,12 @@ paths:
               properties:
                 url:
                   type: string
-                  format: uri
-                  description: "URL to the media file"
-                  example: "https://example.com/images/restaurant-photo.jpg"
+                  description: "URL of the uploaded media"
+                  example: "https://example.com/image.jpg"
                 type:
                   type: string
-                  enum:
-                    - "image"
-                    - "video"
-                    - "audio"
-                  description: "Type of media file"
+                  enum: ["image", "video", "audio"]
+                  description: "Type of media"
                   example: "image"
                 title:
                   type: string
@@ -1762,42 +1806,48 @@ paths:
                   type: string
                   description: "Description of the media content"
                   example: "Beautiful interior view of the restaurant"
+                mimeType:
+                  type: string
+                  description: "MIME type of the media"
+                  example: "image/jpeg"
+                fileSize:
+                  type: integer
+                  description: "File size in bytes"
+                  example: 1024000
+                provider:
+                  type: string
+                  enum: ["cloudinary", "aws-s3"]
+                  description: "Cloud storage provider"
+                  example: "cloudinary"
+                providerId:
+                  type: string
+                  description: "Provider-specific media ID"
+                  example: "cloudinary_123"
+                mediaServiceId:
+                  type: string
+                  description: "Media service database ID"
+                  example: "media_service_456"
+                variants:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MediaVariant"
+                  description: "Media variants (different sizes/formats)"
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: "Tags for the media"
+                  example: '["food", "restaurant"]'
                 associatedWith:
                   type: object
                   properties:
                     type:
                       type: string
-                      enum:
-                        - "post"
-                        - "dish"
-                        - "restaurant"
-                      description: "Type of content this media is associated with"
-                      example: "post"
+                      enum: ["post", "dish", "restaurant", "user"]
+                      example: "restaurant"
                     id:
                       type: string
-                      description: "ID of the associated content"
                       example: "507f1f77bcf86cd799439016"
-                  description: "Information about what this media is associated with"
-                fileSize:
-                  type: number
-                  description: "Size of the media file in bytes"
-                  example: 2048576
-                mimeType:
-                  type: string
-                  description: "MIME type of the media file"
-                  example: "image/jpeg"
-                dimensions:
-                  type: object
-                  properties:
-                    width:
-                      type: number
-                      description: "Width of the media in pixels"
-                      example: 1920
-                    height:
-                      type: number
-                      description: "Height of the media in pixels"
-                      example: 1080
-                  description: "Dimensions of the media (for images/videos)"
       responses:
         201:
           description: Media created successfully
@@ -1806,7 +1856,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Media"
         400:
-          description: Invalid request body
+          description: Invalid request data
           content:
             application/json:
               schema:
@@ -1872,7 +1922,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaUploadResponse"
+                $ref: "#/components/schemas/Media"
         400:
           description: Invalid file or request
           content:
@@ -2071,7 +2121,7 @@ paths:
   /api/media/associated/{type}/{id}:
     get:
       summary: Get media by associated item
-      description: Retrieve media items associated with a specific content type and ID
+      description: Retrieve media items associated with a specific content type and ID with pagination
       parameters:
         - in: path
           name: type
@@ -2089,15 +2139,58 @@ paths:
           description: ID of the associated content
           schema:
             type: string
+        - in: query
+          name: page
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - in: query
+          name: limit
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
       responses:
         200:
           description: Media items retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Media"
+                type: object
+                properties:
+                  media:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Media"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        description: "Current page number"
+                        example: 1
+                      totalPages:
+                        type: integer
+                        description: "Total number of pages"
+                        example: 5
+                      total:
+                        type: integer
+                        description: "Total number of media items"
+                        example: 50
+                      hasNext:
+                        type: boolean
+                        description: "Whether there is a next page"
+                        example: true
+                      hasPrev:
+                        type: boolean
+                        description: "Whether there is a previous page"
+                        example: false
         400:
           description: Invalid type or missing ID
           content:
@@ -2850,8 +2943,437 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+# User Management API Endpoints
+  /api/user-management:
+    get:
+      summary: Get restaurant users
+      description: Retrieve users with access to a specific restaurant with pagination and filtering (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: query
+          description: Restaurant ID to filter users by (required for security)
+          required: true
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            example: 20
+        - name: search
+          in: query
+          description: Search by name, email, or username
+          required: false
+          schema:
+            type: string
+            example: "john"
+        - name: userType
+          in: query
+          description: Filter by user type
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserType"
+        - name: status
+          in: query
+          description: Filter by restaurant access status
+          required: false
+          schema:
+            type: string
+            enum: ["pending", "approved", "suspended", "innactive"]
+            example: "approved"
+      responses:
+        200:
+          description: Successfully retrieved users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        403:
+          description: Access denied - Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/user-management/stats:
+    get:
+      summary: Get user statistics
+      description: Retrieve user statistics and analytics (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieved user statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+        403:
+          description: Access denied - Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/user-management/{userId}:
+    get:
+      summary: Get user by ID
+      description: Retrieve a specific user by ID (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to retrieve
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        200:
+          description: Successfully retrieved user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailResponse"
+        400:
+          description: Invalid user ID format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Access denied - Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update user
+      description: Update user information (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to update
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        200:
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdateResponse"
+        400:
+          description: Invalid request data or user ID format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Access denied - Admin privileges required or cannot modify this user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete user
+      description: Delete a user (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to delete
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        200:
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDeleteResponse"
+        400:
+          description: Cannot delete own account or invalid user ID format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Access denied - Admin privileges required or cannot delete this user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# User Profile API Endpoints
+  /api/user-profile/{userId}:
+    get:
+      summary: Get user profile
+      description: Retrieve user's own profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user (must match authenticated user)
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        200:
+          description: Successfully retrieved user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileGetResponse"
+        400:
+          description: Invalid user ID format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Can only view own profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update user profile
+      description: Update user's own profile (non-sensitive fields only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user (must match authenticated user)
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdateRequest"
+      responses:
+        200:
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profile updated successfully"
+                  user:
+                    $ref: "#/components/schemas/User"
+        400:
+          description: Invalid request data, user ID format, or field conflicts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Can only update own profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/user-profile/{userId}/password:
+    patch:
+      summary: Change password
+      description: Change user's own password
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user (must match authenticated user)
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+            example: "507f1f77bcf86cd799439011"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChangeRequest"
+      responses:
+        200:
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordChangeResponse"
+        400:
+          description: Invalid request data, user ID format, or password requirements not met
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Can only change own password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# Note: User Profile API Endpoints are defined earlier in the paths section
+
+
 components:
   schemas:
+    UserType:
+      type: string
+      enum: ["guest", "user", "admin", "moderator", "root"]
+      description: "User type/role enumeration"
+      example: "user"
+    
     ErrorResponse:
       type: object
       properties:
@@ -2893,6 +3415,28 @@ components:
         country:
           type: string
           example: Nigeria
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "New York"
+            country:
+              type: string
+              example: "USA"
+            geo:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["Point"]
+                  example: "Point"
+                coordinates:
+                  type: array
+                  items:
+                    type: number
+                  example: [-74.006, 40.7128]
+                  description: "[longitude, latitude]"
         imageUrl:
           type: string
           example: https://example.com/avatar.jpg
@@ -2907,10 +3451,53 @@ components:
           type: boolean
           example: false
         userType:
+          $ref: "#/components/schemas/UserType"
+          description: "User type (platform-wide permissions)"
+        bio:
           type: string
-          enum: ["guest", "user", "admin", "moderator", "root"]
-          description: "User role/type"
-          example: "admin"
+          maxLength: 200
+          description: "User's bio/description"
+          example: "Food enthusiast and restaurant owner"
+        dietaryPreferences:
+          type: array
+          items:
+            type: string
+          description: "User's dietary preferences"
+          example: ["vegetarian", "gluten-free"]
+        notificationSettings:
+          type: object
+          properties:
+            likes:
+              type: boolean
+              example: true
+            follows:
+              type: boolean
+              example: true
+            restaurantUpdates:
+              type: boolean
+              example: true
+        lastLogin:
+          type: string
+          format: date-time
+          description: "Last login timestamp"
+          example: "2025-04-20T15:30:00Z"
+        timezone:
+          type: string
+          description: "User's timezone"
+          example: "UTC"
+        twoFactorEnabled:
+          type: boolean
+          description: "Whether two-factor authentication is enabled"
+          example: false
+        theme:
+          type: string
+          enum: ["light", "dark", "system"]
+          description: "User's preferred theme"
+          example: "system"
+        language:
+          type: string
+          description: "User's preferred language"
+          example: "en"
         createdAt:
           type: string
           format: date-time
@@ -2919,25 +3506,50 @@ components:
           type: string
           format: date-time
           example: "2025-04-20T15:30:00Z"
+        # Restaurant-specific fields (added when returned via user-management API)
+        status:
+          type: string
+          enum: ["pending", "approved", "suspended", "innactive"]
+          description: "User's access status in the specific restaurant"
+          example: "approved"
+        accessId:
+          type: string
+          description: "Restaurant access record ID"
+          example: "507f1f77bcf86cd799439012"
+        restaurantAccess:
+          type: integer
+          description: "Number of restaurants user has access to (always 1 for restaurant-specific queries)"
+          example: 1
+        activeRestaurants:
+          type: integer
+          description: "Number of active restaurant accesses (0 or 1 for restaurant-specific queries)"
+          example: 1
       required:
         - name
         - email
         - password
         - userType
 
-    Allergen:
+    RestaurantAccess:
       type: object
       properties:
         _id:
           type: string
-          description: "Unique identifier for the allergen"
+          description: "Unique identifier for the restaurant access record"
+          example: "507f1f77bcf86cd799439011"
+        userId:
+          type: string
+          description: "ID of the user"
+          example: "507f1f77bcf86cd799439012"
+        restaurantId:
+          type: string
+          description: "ID of the restaurant"
           example: "507f1f77bcf86cd799439013"
-        name:
+        status:
           type: string
-          example: egg
-        description:
-          type: string
-          example: allergic reaction to eggs and food that has egg content
+          enum: ["pending", "approved", "suspended", "innactive"]
+          description: "Status of the access request"
+          example: "approved"
         createdAt:
           type: string
           format: date-time
@@ -2947,22 +3559,469 @@ components:
           format: date-time
           example: "2025-04-20T15:30:00Z"
       required:
-        - name
-        - description
+        - userId
+        - restaurantId
+        - status
+
+    UserListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        pagination:
+          type: object
+          properties:
+            currentPage:
+              type: integer
+              example: 1
+            totalPages:
+              type: integer
+              example: 5
+            totalUsers:
+              type: integer
+              example: 100
+            hasNextPage:
+              type: boolean
+              example: true
+            hasPrevPage:
+              type: boolean
+              example: false
+
+    UserDetailResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        username:
+          type: string
+          example: "johndoe"
+        userType:
+          $ref: "#/components/schemas/UserType"
+        phone:
+          type: string
+          example: "+1234567890"
+        bio:
+          type: string
+          example: "Food enthusiast and restaurant owner"
+        dietaryPreferences:
+          type: array
+          items:
+            type: string
+          example: ["vegetarian", "gluten-free"]
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "New York"
+            country:
+              type: string
+              example: "USA"
+        imageUrl:
+          type: string
+          example: "https://example.com/avatar.jpg"
+        notificationSettings:
+          type: object
+          properties:
+            likes:
+              type: boolean
+              example: true
+            follows:
+              type: boolean
+              example: false
+            restaurantUpdates:
+              type: boolean
+              example: true
+
+    UserUpdateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User updated successfully"
+        user:
+          $ref: "#/components/schemas/User"
+
+    UserDeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User deleted successfully"
+        deletedUser:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "507f1f77bcf86cd799439011"
+            name:
+              type: string
+              example: "John Doe"
+            email:
+              type: string
+              example: "john@example.com"
+
+    UserStats:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+          example: 1000
+        newUsersThisMonth:
+          type: integer
+          example: 50
+        userTypeBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                $ref: "#/components/schemas/UserType"
+              count:
+                type: integer
+        accessStatusBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                enum: ["pending", "approved", "suspended", "innactive"]
+              count:
+                type: integer
+
+    PasswordChangeRequest:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          example: "currentPassword123"
+        newPassword:
+          type: string
+          format: password
+          example: "newPassword123"
+
+    PasswordChangeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Password changed successfully"
+
+    Restaurant:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Pizza Palace"
+        description:
+          type: string
+          example: "Best pizza in town"
+        address:
+          type: string
+          example: "123 Main St"
+        city:
+          type: string
+          example: "New York"
+        state:
+          type: string
+          example: "NY"
+        country:
+          type: string
+          example: "USA"
+        phone:
+          type: string
+          example: "+1234567890"
+        email:
+          type: string
+          example: "info@pizzapalace.com"
+        website:
+          type: string
+          example: "https://pizzapalace.com"
+        cuisine:
+          type: array
+          items:
+            $ref: "#/components/schemas/Cuisine"
+          description: "Restaurant cuisine types"
+          example: [{"_id": "507f1f77bcf86cd799439011", "name": "Italian"}, {"_id": "507f1f77bcf86cd799439012", "name": "Mediterranean"}]
+        priceRange:
+          type: string
+          enum: ["$", "$$", "$$$", "$$$$"]
+          example: "$$"
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+          example: 4.5
+        ownerId:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        isActive:
+          type: boolean
+          example: true
+        gallery:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+          description: "Array of media objects for the restaurant gallery"
+        assignedImages:
+          type: object
+          description: "Assigned images for logo and profile"
+          properties:
+            logo:
+              type: object
+              properties:
+                mediaId:
+                  $ref: "#/components/schemas/Media"
+                  description: "Assigned logo media"
+                assignedAt:
+                  type: string
+                  format: date-time
+                  description: "When the logo was assigned"
+                  example: "2025-04-20T15:30:00Z"
+                assignedBy:
+                  $ref: "#/components/schemas/User"
+                  description: "User who assigned the logo"
+            profileImage:
+              type: object
+              properties:
+                mediaId:
+                  $ref: "#/components/schemas/Media"
+                  description: "Assigned profile image media"
+                assignedAt:
+                  type: string
+                  format: date-time
+                  description: "When the profile image was assigned"
+                  example: "2025-04-20T15:30:00Z"
+                assignedBy:
+                  $ref: "#/components/schemas/User"
+                  description: "User who assigned the profile image"
+        businessHours:
+          type: array
+          items:
+            $ref: "#/components/schemas/BusinessHour"
+          description: "Restaurant business hours"
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/RestaurantFeature"
+          description: "Restaurant features and amenities"
+          example: ["Outdoor seating", "Delivery", "Takeout", "Wheelchair accessible"]
+        meta:
+          type: object
+          description: "Additional metadata for the restaurant"
+          additionalProperties: true
+        owner:
+          type: boolean
+          description: "Whether the current user is the owner of this restaurant"
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+
+
+    DeliveryLink:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Uber Eats"
+        platform:
+          type: string
+          example: "Uber Eats"
+        url:
+          type: string
+          example: "https://ubereats.com/restaurant"
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    FoodCatalogue:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Margherita Pizza"
+        description:
+          type: string
+          example: "Classic tomato and mozzarella pizza"
+        price:
+          type: object
+          properties:
+            amount:
+              type: number
+              example: 15.99
+            currency:
+              type: string
+              example: "USD"
+        category:
+          type: string
+          example: "Pizza"
+        allergens:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: "507f1f77bcf86cd799439011"
+              name:
+                type: string
+                example: "Gluten"
+          example: [{"_id": "507f1f77bcf86cd799439011", "name": "Gluten"}, {"_id": "507f1f77bcf86cd799439012", "name": "Dairy"}]
+        courses:
+          type: array
+          items:
+            type: string
+          example: ["main"]
+        cuisines:
+          type: array
+          items:
+            type: string
+          example: ["Italian"]
+        cuisineType:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "507f1f77bcf86cd799439011"
+            name:
+              type: string
+              example: "Italian"
+            description:
+              type: string
+              example: "Traditional Italian cuisine"
+        course:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "507f1f77bcf86cd799439011"
+            name:
+              type: string
+              example: "Main Course"
+            description:
+              type: string
+              example: "Primary dish of the meal"
+        ingredients:
+          type: array
+          items:
+            type: string
+          example: ["tomato", "mozzarella", "basil"]
+        restaurant:
+          type: string
+          description: "Restaurant ID"
+          example: "507f1f77bcf86cd799439012"
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        isAvailable:
+          type: boolean
+          example: true
+        isFeatured:
+          type: boolean
+          description: "Whether this food item is featured/promoted"
+          example: false
+        imageUrl:
+          type: string
+          example: "https://example.com/pizza.jpg"
+        images:
+          type: array
+          items:
+            type: string
+          description: "Array of media IDs associated with this food item"
+          example: ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"]
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    Allergen:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Gluten"
+        description:
+          type: string
+          example: "Contains gluten"
+        icon:
+          type: string
+          example: "🌾"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
 
     Course:
       type: object
       properties:
         _id:
           type: string
-          description: "Unique identifier for the course"
-          example: "507f1f77bcf86cd799439014"
+          example: "507f1f77bcf86cd799439011"
         name:
           type: string
-          example: main
+          example: "Main Course"
         description:
           type: string
-          example: Main course in a meal
+          example: "Primary dish of the meal"
+        icon:
+          type: string
+          example: "🍽️"
         createdAt:
           type: string
           format: date-time
@@ -2971,23 +4030,22 @@ components:
           type: string
           format: date-time
           example: "2025-04-20T15:30:00Z"
-      required:
-        - name
-        - description
 
     Cuisine:
       type: object
       properties:
         _id:
           type: string
-          description: "Unique identifier for the cuisine"
-          example: "507f1f77bcf86cd799439015"
+          example: "507f1f77bcf86cd799439011"
         name:
           type: string
-          example: Nigerian
+          example: "Italian"
         description:
           type: string
-          example: A Type of meal based on region of origin
+          example: "Italian cuisine"
+        icon:
+          type: string
+          example: "🍝"
         createdAt:
           type: string
           format: date-time
@@ -2996,931 +4054,387 @@ components:
           type: string
           format: date-time
           example: "2025-04-20T15:30:00Z"
-      required:
-        - name
-        - description
+
+    MediaVariant:
+      type: object
+      properties:
+        size:
+          type: string
+          example: "original"
+        url:
+          type: string
+          example: "https://example.com/variant.jpg"
+        width:
+          type: integer
+          example: 1920
+        height:
+          type: integer
+          example: 1080
+        fileSize:
+          type: integer
+          example: 1024000
+        format:
+          type: string
+          example: "jpeg"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    Media:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        url:
+          type: string
+          example: "https://example.com/image.jpg"
+        type:
+          type: string
+          enum: ["image", "video", "audio"]
+          example: "image"
+        title:
+          type: string
+          example: "Pizza Image"
+        description:
+          type: string
+          example: "Delicious pizza"
+        uploadedBy:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "507f1f77bcf86cd799439012"
+            name:
+              type: string
+              example: "John Doe"
+            username:
+              type: string
+              example: "johndoe"
+            imageUrl:
+              type: string
+              example: "https://example.com/avatar.jpg"
+        associatedWith:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: ["post", "dish", "restaurant", "user"]
+              example: "restaurant"
+            id:
+              type: string
+              example: "507f1f77bcf86cd799439012"
+        verified:
+          type: boolean
+          example: false
+        fileSize:
+          type: integer
+          example: 1024000
+        mimeType:
+          type: string
+          example: "image/jpeg"
+        dimensions:
+          type: object
+          properties:
+            width:
+              type: integer
+              example: 1920
+            height:
+              type: integer
+              example: 1080
+        providerId:
+          type: string
+          example: "cloudinary_123"
+        mediaServiceId:
+          type: string
+          example: "media_service_456"
+        provider:
+          type: string
+          enum: ["cloudinary", "aws-s3"]
+          example: "cloudinary"
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              size:
+                type: string
+                example: "original"
+              url:
+                type: string
+                example: "https://example.com/variant.jpg"
+              width:
+                type: integer
+                example: 1920
+              height:
+                type: integer
+                example: 1080
+              bitrate:
+                type: string
+                example: "1000k"
+              resolution:
+                type: string
+                example: "1920x1080"
+              fileSize:
+                type: integer
+                example: 1024000
+              format:
+                type: string
+                example: "jpeg"
+              createdAt:
+                type: string
+                format: date-time
+                example: "2025-04-20T15:30:00Z"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["pizza", "food"]
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+
+
+    Notification:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        userId:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        title:
+          type: string
+          example: "New Order"
+        message:
+          type: string
+          example: "You have a new order"
+        type:
+          type: string
+          enum: ["order", "system", "promotion", "access_request", "access_granted", "access_denied", "access_suspended", "restaurant_update"]
+          example: "order"
+        isRead:
+          type: boolean
+          example: false
+        metadata:
+          type: object
+          additionalProperties: true
+          description: "Additional notification metadata"
+          example: {}
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    UserTypeInfo:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Admin"
+        description:
+          type: string
+          example: "Administrator user"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["read", "write", "delete"]
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        title:
+          type: string
+          example: "Amazing Pizza"
+        content:
+          type: string
+          example: "This pizza is incredible!"
+        authorId:
+          type: string
+          example: "507f1f77bcf86cd799439012"
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439013"
+        likes:
+          type: integer
+          example: 42
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["pizza", "delicious"]
+        isPublished:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-20T15:30:00Z"
+
+    Price:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 15.99
+        currency:
+          type: string
+          example: "USD"
+
+    Currency:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "USD"
+        name:
+          type: string
+          example: "US Dollar"
+        symbol:
+          type: string
+          example: "$"
 
     BusinessHour:
       type: object
       properties:
         day:
           type: string
-          enum:
-            - Monday
-            - Tuesday
-            - Wednesday
-            - Thursday
-            - Friday
-            - Saturday
-            - Sunday
+          enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+          example: "monday"
         open:
           type: string
-          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
-          description: "Opening time in HH:mm format"
+          example: "09:00"
         close:
           type: string
-          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
-          description: "Closing time in HH:mm format"
-        closed:
+          example: "22:00"
+        isClosed:
           type: boolean
-          default: false
-          description: "Indicates if the restaurant is closed on this day"
-
-    Restaurant:
-      type: object
-      required:
-        - ownerId
-        - name
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the restaurant"
-          example: "507f1f77bcf86cd799439011"
-        ownerId:
-          type: string
-          description: "Unique identifier for the restaurant owner"
-        owner:
-          type: boolean
-          default: false
-          description: "Whether the current user is the owner of this restaurant"
-        name:
-          type: string
-          description: "Name of the restaurant"
-        logo:
-          $ref: "#/components/schemas/Media"
-          description: "Restaurant logo media"
-        description:
-          type: string
-          description: "Brief description of the restaurant"
-        cuisine:
-          type: array
-          items:
-            $ref: "#/components/schemas/Cuisine"
-          description: "List of cuisines offered by the restaurant"
-        priceRange:
-          type: string
-          enum:
-            - "$"
-            - "$$"
-            - "$$$"
-            - "$$$$"
-          description: "Price range of the restaurant"
-        address:
-          type: string
-          description: "Physical address of the restaurant"
-        phone:
-          type: string
-          pattern: "^\\+?[\\d\\s-()]+$"
-          description: "Contact phone number"
-        email:
-          type: string
-          format: email
-          description: "Contact email address"
-        website:
-          type: string
-          format: uri
-          description: "Website URL of the restaurant"
-        businessHours:
-          type: array
-          items:
-            $ref: "#/components/schemas/BusinessHour"
-          description: "Operating hours for each day of the week"
-        features:
-          type: array
-          items:
-            $ref: "#/components/schemas/RestaurantFeature"
-          description: "List of features available at the restaurant"
-        gallery:
-          type: array
-          items:
-            $ref: "#/components/schemas/Media"
-          description: "Gallery media items for the restaurant"
-        deliveryLinks:
-          type: array
-          items:
-            $ref: "#/components/schemas/DeliveryLink"
-          description: "List of delivery links for the restaurant"
-        meta:
-          type: object
-          additionalProperties: true
-          description: "Additional metadata associated with the restaurant"
-
-    Currency:
-      type: string
-      enum:
-        - USD
-        - EUR
-        - GBP
-        - CAD
-        - AUD
-        - JPY
-        - CNY
-        - KRW
-        - MYR
-        - TWD
-        - VND
-        - THB
-        - ZAR
-      description: "Supported currency types"
-      example: "USD"
-
-    Price:
-      type: object
-      required:
-        - amount
-        - currency
-      properties:
-        amount:
-          type: number
-          description: "The price amount"
-          example: 25.99
-        currency:
-          $ref: "#/components/schemas/Currency"
-          description: "Currency type"
-          example: "USD"
-
-    FoodCatalogue:
-      type: object
-      required:
-        - name
-        - ingredients
-        - cuisineType
-        - course
-        - price
-        - images
-        - restaurant
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the food catalogue item"
-          example: "507f1f77bcf86cd799439016"
-        name:
-          type: string
-          description: "The name of the food item"
-          example: "Spaghetti Bolognese"
-        ingredients:
-          type: array
-          items:
-            type: string
-          description: "List of ingredients used in the food item"
-          example:
-            - "Spaghetti"
-            - "Ground beef"
-            - "Tomato sauce"
-        cuisineType:
-          $ref: "#/components/schemas/Cuisine"
-          description: "Cuisine type the food belongs to"
-        allergens:
-          type: array
-          items:
-            $ref: "#/components/schemas/Allergen"
-          description: "List of allergens associated with the food"
-        course:
-          $ref: "#/components/schemas/Course"
-          description: "Course type the food belongs to (e.g., starter, main)"
-        price:
-          $ref: "#/components/schemas/Price"
-          description: "Price details for the food item"
-        images:
-          type: array
-          items:
-            $ref: "#/components/schemas/Media"
-          description: "Media items for the food item"
-        restaurant:
-          type: string
-          description: "ID of the restaurant offering the food item"
-          example: "restaurant12345"
-        # Search optimization fields
-        searchKeywords:
-          type: array
-          items:
-            type: string
-          description: "Keywords for better search matching (auto-generated from name, ingredients, etc.)"
-          example:
-            - "spaghetti"
-            - "bolognese"
-            - "pasta"
-            - "ground beef"
-            - "tomato sauce"
-        isAvailable:
-          type: boolean
-          default: true
-          description: "Whether the food item is currently available"
-          example: true
-        isFeatured:
-          type: boolean
-          default: false
-          description: "Whether the food item is featured/promoted"
           example: false
-        priceRange:
-          type: string
-          enum: ["$", "$$", "$$$", "$$$$"]
-          description: "Calculated price range based on price amount"
-          example: "$$"
-        # Analytics fields
-        analytics:
-          type: object
-          properties:
-            totalMentions:
-              type: number
-              default: 0
-              description: "Total number of mentions in posts"
-              example: 15
-            totalLikes:
-              type: number
-              default: 0
-              description: "Total number of likes received"
-              example: 120
-            averageRating:
-              type: number
-              default: 0
-              description: "Average rating from reviews"
-              example: 4.5
-            totalRatings:
-              type: number
-              default: 0
-              description: "Total number of ratings received"
-              example: 25
-            trendingScore:
-              type: number
-              default: 0
-              description: "Trending score based on recent activity"
-              example: 85.5
-            lastMentioned:
-              type: string
-              format: date-time
-              description: "When the food item was last mentioned"
-              example: "2025-04-20T15:30:00Z"
-            searchViews:
-              type: number
-              default: 0
-              description: "Number of times this item appeared in search results"
-              example: 45
-            searchClicks:
-              type: number
-              default: 0
-              description: "Number of times this item was clicked from search"
-              example: 12
-            popularityScore:
-              type: number
-              default: 0
-              description: "Calculated popularity score based on various metrics"
-              example: 78.3
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the food item was created"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the food item was last updated"
-          example: "2025-04-20T15:30:00Z"
-
-    Notification:
-      type: object
-      required:
-        - _id
-        - userId
-        - type
-        - message
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the notification"
-          example: "507f1f77bcf86cd799439017"
-        userId:
-          type: string
-          description: "ID of the user who owns this notification"
-          example: "user_12345"
-        type:
-          type: string
-          enum:
-            - "access_request"
-            - "access_granted"
-            - "access_denied"
-            - "access_suspended"
-            - "restaurant_update"
-            - "system"
-          description: "Type of notification"
-          example: "access_request"
-        title:
-          type: string
-          description: "Notification title"
-          example: "Access Request"
-        message:
-          type: string
-          description: "Notification message"
-          example: "Your access request for Restaurant ABC has been approved"
-        isRead:
-          type: boolean
-          default: false
-          description: "Whether the notification has been read"
-          example: false
-        metadata:
-          type: object
-          additionalProperties: true
-          description: "Additional data related to the notification"
-          example:
-            restaurantId: "rest_12345"
-            restaurantName: "Restaurant ABC"
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the notification was created"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the notification was last updated"
-          example: "2025-04-20T15:30:00Z"
-
-    Media:
-      type: object
-      required:
-        - url
-        - type
-        - uploadedBy
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the media"
-          example: "507f1f77bcf86cd799439017"
-        url:
-          type: string
-          format: uri
-          description: "URL to the media file"
-          example: "https://example.com/images/restaurant-photo.jpg"
-        type:
-          type: string
-          enum:
-            - "image"
-            - "video"
-            - "audio"
-          description: "Type of media file"
-          example: "image"
-        title:
-          type: string
-          description: "Title or caption for the media"
-          example: "Restaurant Interior"
-        description:
-          type: string
-          description: "Description of the media content"
-          example: "Beautiful interior view of the restaurant"
-        uploadedBy:
-          type: object
-          properties:
-            id:
-              type: string
-              description: "ID of the user who uploaded the media"
-              example: "507f1f77bcf86cd799439011"
-            name:
-              type: string
-              description: "Name of the user who uploaded the media"
-              example: "John Doe"
-            username:
-              type: string
-              description: "Username of the user who uploaded the media"
-              example: "johndoe"
-            imageUrl:
-              type: string
-              description: "Profile image URL of the user who uploaded the media"
-              example: "https://example.com/profile.jpg"
-          description: "User who uploaded the media"
-        associatedWith:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - "post"
-                - "dish"
-                - "restaurant"
-              description: "Type of content this media is associated with"
-              example: "post"
-            id:
-              type: string
-              description: "ID of the associated content"
-              example: "507f1f77bcf86cd799439016"
-          description: "Information about what this media is associated with"
-        verified:
-          type: boolean
-          default: false
-          description: "Whether the media has been verified by moderators"
-          example: false
-        fileSize:
-          type: number
-          description: "Size of the media file in bytes"
-          example: 2048576
-        mimeType:
-          type: string
-          description: "MIME type of the media file"
-          example: "image/jpeg"
-        dimensions:
-          type: object
-          properties:
-            width:
-              type: number
-              description: "Width of the media in pixels"
-              example: 1920
-            height:
-              type: number
-              description: "Height of the media in pixels"
-              example: 1080
-          description: "Dimensions of the media (for images/videos)"
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the media was uploaded"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the media was last updated"
-          example: "2025-04-20T15:30:00Z"
-
-    MediaVariant:
-      type: object
-      required:
-        - size
-        - url
-      properties:
-        size:
-          type: string
-          enum: ["thumbnail", "small", "medium", "large", "original"]
-          description: "Size variant name"
-          example: "medium"
-        url:
-          type: string
-          format: uri
-          description: "URL to the optimized variant"
-          example: "https://cloudinary.com/.../medium.jpg"
-        width:
-          type: number
-          description: "Width of the variant in pixels"
-          example: 800
-        height:
-          type: number
-          description: "Height of the variant in pixels"
-          example: 600
-
-    MediaUploadResponse:
-      type: object
-      required:
-        - media
-        - variants
-      properties:
-        media:
-          $ref: "#/components/schemas/Media"
-          description: "The created media record"
-        variants:
-          type: array
-          description: "Optimized variants of the uploaded media"
-          items:
-            $ref: "#/components/schemas/MediaVariant"
-
-    RestaurantAccess:
-      type: object
-      required:
-        - _id
-        - userId
-        - restaurantId
-        - status
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the access record"
-          example: "access_12345"
-        userId:
-          type: string
-          description: "ID of the user requesting access"
-          example: "user_12345"
-        restaurantId:
-          type: string
-          description: "ID of the restaurant"
-          example: "rest_12345"
-        status:
-          type: string
-          enum:
-            - "pending"
-            - "approved"
-            - "suspended"
-            - "innactive"
-          description: "Current status of the access request"
-          example: "pending"
-        role:
-          type: string
-          enum:
-            - "guest"
-            - "user"
-            - "moderator"
-            - "admin"
-            - "root"
-          description: "Role assigned to the user (references UserType.name)"
-          example: "user"
-        requestedAt:
-          type: string
-          format: date-time
-          description: "When the access was requested"
-          example: "2025-04-20T15:30:00Z"
-        grantedAt:
-          type: string
-          format: date-time
-          description: "When the access was granted (if applicable)"
-          example: "2025-04-20T16:00:00Z"
-        grantedBy:
-          type: string
-          description: "ID of the user who granted access"
-          example: "owner_12345"
-        expiresAt:
-          type: string
-          format: date-time
-          description: "When the access expires (if applicable)"
-          example: "2025-12-31T23:59:59Z"
-        notes:
-          type: string
-          description: "Additional notes about the access"
-          example: "Temporary access for project collaboration"
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the access record was created"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the access record was last updated"
-          example: "2025-04-20T15:30:00Z"
-
-
-    UserTypeInfo:
-      type: object
-      required:
-        - name
-        - level
-        - description
-      properties:
-        name:
-          type: string
-          enum: ["guest", "user", "admin", "moderator", "root"]
-          description: "Name of the user type"
-          example: "user"
-        level:
-          type: number
-          minimum: 1
-          maximum: 5
-          description: "Access level (1=lowest, 5=highest)"
-          example: 2
-        description:
-          type: string
-          description: "Description of the user type"
-          example: "an ordinary user with restaurant access"
-
-    DeliveryLink:
-      type: object
-      required:
-        - name
-        - url
-        - platform
-        - restaurantId
-      properties:
-        _id:
-          type: string
-          description: "Unique identifier for the delivery link"
-          example: "507f1f77bcf86cd799439018"
-        restaurantId:
-          type: string
-          description: "ID of the restaurant this delivery link belongs to"
-          example: "507f1f77bcf86cd799439011"
-        name:
-          type: string
-          description: "Display name for the delivery link"
-          example: "Uber Eats"
-        url:
-          type: string
-          format: uri
-          description: "URL to the delivery service"
-          example: "https://ubereats.com/restaurant/123"
-        platform:
-          type: string
-          enum:
-            - "Uber Eats"
-            - "DoorDash"
-            - "Grubhub"
-            - "Postmates"
-            - "Instacart"
-            - "Amazon Fresh"
-            - "Walmart Grocery"
-            - "Shipt"
-            - "Custom"
-            - "Other"
-          description: "Delivery platform name"
-          example: "Uber Eats"
-        isActive:
-          type: boolean
-          default: true
-          description: "Whether this delivery link is active"
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the delivery link was created"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the delivery link was last updated"
-          example: "2025-04-20T15:30:00Z"
 
     RestaurantFeature:
       type: string
-      enum:
-        # Seating & Dining
-        - "Outdoor seating"
-        - "Indoor dining"
-        - "Private dining rooms"
-        - "Bar seating"
-        - "Counter seating"
-        - "Rooftop dining"
-        - "Garden dining"
-        - "Waterfront dining"
-        - "Street-side dining"
-        - "Patio dining"
-        # Service Types
-        - "Take-out"
-        - "Delivery"
-        - "Drive-through"
-        - "Curbside pickup"
-        - "Catering"
-        - "Private events"
-        - "Corporate events"
-        - "Wedding catering"
-        - "Party catering"
-        - "Food trucks"
-        # Technology & Convenience
-        - "Free WiFi"
-        - "Mobile ordering"
-        - "Online reservations"
-        - "Contactless payment"
-        - "Digital menus"
-        - "QR code menus"
-        - "Self-service kiosks"
-        - "Table service"
-        - "Counter service"
-        - "Buffet service"
-        # Accessibility
-        - "Wheelchair accessible"
-        - "Accessible parking"
-        - "Accessible restrooms"
-        - "Braille menus"
-        - "Service animal friendly"
-        - "Elevator access"
-        - "Ramp access"
-        # Entertainment & Atmosphere
-        - "Live music"
-        - "Sports on TV"
-        - "Background music"
-        - "Dance floor"
-        - "Karaoke"
-        - "Trivia nights"
-        - "Comedy nights"
-        - "Wine tastings"
-        - "Cooking classes"
-        - "Chef's table"
-        # Parking & Transportation
-        - "Free parking"
-        - "Valet parking"
-        - "Street parking"
-        - "Parking garage"
-        - "Bike parking"
-        - "Near public transit"
-        - "Uber/Lyft friendly"
-        # Family & Kids
-        - "Kid-friendly"
-        - "High chairs"
-        - "Kids menu"
-        - "Play area"
-        - "Changing tables"
-        - "Family restrooms"
-        - "Birthday parties"
-        # Dietary Accommodations
-        - "Vegetarian options"
-        - "Vegan options"
-        - "Gluten-free options"
-        - "Halal options"
-        - "Kosher options"
-        - "Dairy-free options"
-        - "Nut-free options"
-        - "Low-sodium options"
-        - "Organic ingredients"
-        - "Local ingredients"
-        # Beverages & Bar
-        - "Full bar"
-        - "Wine list"
-        - "Craft beer"
-        - "Cocktails"
-        - "Happy hour"
-        - "BYOB"
-        - "Coffee service"
-        - "Tea service"
-        - "Juice bar"
-        - "Smoothies"
-        # Special Services
-        - "Gift cards"
-        - "Loyalty program"
-        - "Rewards program"
-        - "Group discounts"
-        - "Student discounts"
-        - "Senior discounts"
-        - "Military discounts"
-        - "Corporate accounts"
-        - "Catering delivery"
-        - "Event planning"
-        # Health & Safety
-        - "Contactless delivery"
-        - "Sanitized surfaces"
-        - "Staff wearing masks"
-        - "Temperature checks"
-        - "Social distancing"
-        - "Air purification"
-        - "UV sanitization"
-        - "Health inspections"
-        - "Food safety certified"
-        - "Allergen information"
-        # Payment & Financial
-        - "Credit cards accepted"
-        - "Cash only"
-        - "Digital payments"
-        - "Split bills"
-        - "Gratuity included"
-        - "Tipping accepted"
-        - "Corporate billing"
-        - "Invoice available"
-        # Hours & Availability
-        - "24/7 service"
-        - "Late night dining"
-        - "Breakfast service"
-        - "Lunch service"
-        - "Dinner service"
-        - "Brunch service"
-        - "Holiday hours"
-        - "Seasonal hours"
-        - "Reservations required"
-        - "Walk-ins welcome"
-        # Special Occasions
-        - "Romantic dining"
-        - "Anniversary specials"
-        - "Birthday celebrations"
-        - "Date night"
-        - "Business meetings"
-        - "Networking events"
-        - "Graduation parties"
-        - "Holiday parties"
-        - "Corporate lunches"
-        - "Team building"
-      description: "Available restaurant features"
+      enum: [
+        "Outdoor seating", "Indoor dining", "Private dining rooms", "Bar seating", "Counter seating", "Rooftop dining",
+        "Garden dining", "Waterfront dining", "Street-side dining", "Patio dining",
+        "Take-out", "Delivery", "Drive-through", "Curbside pickup", "Catering",
+        "Private events", "Corporate events", "Wedding catering", "Party catering", "Food trucks",
+        "Free WiFi", "Mobile ordering", "Online reservations", "Contactless payment",
+        "Digital menus", "QR code menus", "Self-service kiosks", "Table service", "Counter service", "Buffet service",
+        "Wheelchair accessible", "Accessible parking", "Accessible restrooms", "Braille menus",
+        "Service animal friendly", "Elevator access", "Ramp access",
+        "Live music", "Sports on TV", "Background music", "Dance floor", "Karaoke",
+        "Trivia nights", "Comedy nights", "Wine tastings", "Cooking classes", "Chef's table",
+        "Free parking", "Valet parking", "Street parking", "Parking garage", "Bike parking",
+        "Near public transit", "Uber/Lyft friendly",
+        "Kid-friendly", "High chairs", "Kids menu", "Play area", "Changing tables",
+        "Family restrooms", "Birthday parties",
+        "Vegetarian options", "Vegan options", "Gluten-free options", "Halal options",
+        "Kosher options", "Dairy-free options", "Nut-free options", "Low-sodium options",
+        "Organic ingredients", "Local ingredients",
+        "Full bar", "Wine list", "Craft beer", "Cocktails", "Happy hour", "BYOB",
+        "Coffee service", "Tea service", "Juice bar", "Smoothies",
+        "Gift cards", "Loyalty program", "Rewards program", "Group discounts",
+        "Student discounts", "Senior discounts", "Military discounts", "Corporate accounts",
+        "Catering delivery", "Event planning",
+        "Contactless delivery", "Sanitized surfaces", "Staff wearing masks",
+        "Temperature checks", "Social distancing", "Air purification", "UV sanitization",
+        "Health inspections", "Food safety certified", "Allergen information",
+        "Credit cards accepted", "Cash only", "Digital payments", "Split bills",
+        "Gratuity included", "Tipping accepted", "Corporate billing", "Invoice available",
+        "24/7 service", "Late night dining", "Breakfast service", "Lunch service",
+        "Dinner service", "Brunch service", "Holiday hours", "Seasonal hours",
+        "Reservations required", "Walk-ins welcome",
+        "Romantic dining", "Anniversary specials", "Birthday celebrations",
+        "Date night", "Business meetings", "Networking events", "Graduation parties",
+        "Holiday parties", "Corporate lunches", "Team building"
+      ]
+      example: "Outdoor seating"
 
-    Post:
+    UserProfileGetResponse:
       type: object
-      required:
-        - userId
-        - media
-        - foodName
-        - price
-        - location
-        - cuisine
-        - course
       properties:
-        _id:
+        user:
+          $ref: "#/components/schemas/User"
+
+    UserProfileUpdateRequest:
+      type: object
+      properties:
+        name:
           type: string
-          description: "Unique identifier for the post"
-          example: "507f1f77bcf86cd799439019"
-        userId:
+          example: "John Doe"
+        username:
           type: string
-          description: "ID of the user who created the post"
-          example: "507f1f77bcf86cd799439011"
-        media:
+          example: "johndoe"
+        phone:
+          type: string
+          example: "+1234567890"
+        bio:
+          type: string
+          example: "Food enthusiast and restaurant reviewer"
+        dietaryPreferences:
           type: array
           items:
             type: string
-          description: "Array of media IDs associated with the post"
-          example: ["507f1f77bcf86cd799439017"]
-        foodName:
-          type: string
-          description: "Name of the food item in the post"
-          example: "Margherita Pizza"
-        taggedFoods:
-          type: array
-          items:
-            type: object
-            required:
-              - foodCatalogueId
-              - tagType
-              - taggedAt
-            properties:
-              foodCatalogueId:
-                type: string
-                description: "ID of the food catalogue item being tagged"
-                example: "507f1f77bcf86cd799439016"
-              tagType:
-                type: string
-                enum: ["primary", "secondary", "mentioned", "reviewed"]
-                default: "primary"
-                description: "Type of tag for this food item"
-                example: "primary"
-              rating:
-                type: number
-                minimum: 1
-                maximum: 5
-                description: "Optional rating for this food item (1-5)"
-                example: 5
-              review:
-                type: string
-                maxLength: 200
-                description: "Optional review text for this food item"
-                example: "Delicious! The best pizza I've ever had."
-              taggedAt:
-                type: string
-                format: date-time
-                description: "When this food was tagged"
-                example: "2025-04-20T15:30:00Z"
-          description: "Array of food items tagged in this post with metadata"
-          example: []
-        price:
-          $ref: "#/components/schemas/Price"
-          description: "Price information for the food item"
+          example: ["vegan", "gluten-free"]
         location:
           type: object
-          required:
-            - restaurantId
-            - coordinates
           properties:
-            restaurantId:
+            city:
               type: string
-              description: "ID of the restaurant where the food was consumed"
-              example: "507f1f77bcf86cd799439011"
-            coordinates:
-              type: object
-              required:
-                - type
-                - coordinates
-              properties:
-                type:
-                  type: string
-                  enum: ["Point"]
-                  default: "Point"
-                  description: "Type of geometry"
-                coordinates:
-                  type: array
-                  items:
-                    type: number
-                  minItems: 2
-                  maxItems: 2
-                  description: "Longitude and latitude coordinates [longitude, latitude]"
-                  example: [-73.935242, 40.730610]
-          description: "Location information including restaurant and coordinates"
-        cuisine:
+              example: "New York"
+            country:
+              type: string
+              example: "USA"
+        imageUrl:
           type: string
-          description: "ID of the cuisine type"
-          example: "507f1f77bcf86cd799439015"
-        course:
-          type: string
-          description: "ID of the course type"
-          example: "507f1f77bcf86cd799439014"
-        allergens:
-          type: array
-          items:
-            type: string
-          description: "Array of allergen IDs"
-          example: ["507f1f77bcf86cd799439013"]
-        caption:
-          type: string
-          maxLength: 500
-          description: "Optional caption or description for the post"
-          example: "Amazing pizza! The crust was perfectly crispy 🍕"
-        tags:
-          type: array
-          items:
-            type: string
-          description: "Array of tags for categorizing the post"
-          example: ["delicious", "authentic", "wood-fired"]
-        likes:
-          type: array
-          items:
-            type: string
-          description: "Array of user IDs who liked the post"
-          example: ["507f1f77bcf86cd799439011"]
-        visibility:
-          type: string
-          enum: ["public", "private", "followers"]
-          default: "public"
-          description: "Visibility setting for the post"
-        createdAt:
-          type: string
-          format: date-time
-          description: "When the post was created"
-          example: "2025-04-20T15:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: "When the post was last updated"
-          example: "2025-04-20T15:30:00Z"
+          example: "https://example.com/avatar.jpg"
+        notificationSettings:
+          type: object
+          properties:
+            likes:
+              type: boolean
+              example: true
+            follows:
+              type: boolean
+              example: true
+            restaurantUpdates:
+              type: boolean
+              example: false
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token for authentication"

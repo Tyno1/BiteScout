@@ -9,8 +9,8 @@ import { Server } from "socket.io";
 import authMiddleware from "./middleware/authmiddleware.js";
 import errorHandler from "./middleware/errorHandler.js";
 
-import authRoutes from "./routes/auth.js";
 import allergenRoutes from "./routes/alergen.js";
+import authRoutes from "./routes/auth.js";
 import courseRoutes from "./routes/course.js";
 import cuisineRoutes from "./routes/cuisine.js";
 import foodCatalogueRoutes from "./routes/foodCatalogue.js";
@@ -22,6 +22,8 @@ import restaurantRoutes from "./routes/restaurant.js";
 import restaurantAccessRoutes from "./routes/restaurantAccess.js";
 import reviewRoutes from "./routes/review.js";
 import userRoutes from "./routes/user.js";
+import userManagementRoutes from "./routes/userManagement.js";
+import userProfileRoutes from "./routes/userProfile.js";
 import userTypeRoutes from "./routes/userType.js";
 
 dotenv.config();
@@ -179,9 +181,11 @@ app.use("/api/restaurants", authMiddleware, restaurantRoutes);
 
 app.use("/api/user-types", userTypeRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/user-management", authMiddleware, userManagementRoutes);
+app.use("/api/user-profile", authMiddleware, userProfileRoutes);
 app.use("/api/restaurant-access", restaurantAccessRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api/food-catalogue", foodCatalogueRoutes);
+app.use("/api/food-catalogue",authMiddleware, foodCatalogueRoutes);
 app.use("/api/allergens", allergenRoutes);
 app.use("/api/cuisines", cuisineRoutes);
 app.use("/api/courses", courseRoutes);

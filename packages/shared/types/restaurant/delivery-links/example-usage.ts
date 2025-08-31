@@ -30,7 +30,6 @@ export const getDeliveryLinks = async (
     {
       _id: "507f1f77bcf86cd799439018",
       restaurantId: id,
-      name: "Uber Eats",
       url: "https://ubereats.com/restaurant/123",
       platform: "Uber Eats",
       isActive: true,
@@ -52,14 +51,13 @@ export const addDeliveryLink = async (
   },
   res: { status: (code: number) => { json: (data: DeliveryLinksPostResponse) => void } }
 ) => {
-  // req.body is typed with required fields: name, url, platform
-  const { name, url, platform, isActive = true } = req.body;
+  // req.body is typed with required fields: url, platform
+  const { url, platform, isActive = true } = req.body;
   
   // Response is typed as DeliveryLink
   const newDeliveryLink: DeliveryLinksPostResponse = {
     _id: "507f1f77bcf86cd799439018",
     restaurantId: req.params.id,
-    name,
     url,
     platform,
     isActive,
@@ -81,13 +79,12 @@ export const updateDeliveryLink = async (
   res: { json: (data: DeliveryLinksPutResponse) => void }
 ) => {
   // req.body is typed with optional fields
-  const { name, url, platform, isActive } = req.body;
+  const { url, platform, isActive } = req.body;
   
   // Response is typed as DeliveryLink
   const updatedLink: DeliveryLinksPutResponse = {
     _id: req.params.linkId,
     restaurantId: req.params.id,
-    name: name || "Updated Name",
     url: url || "https://example.com",
     platform: platform || "Custom",
     isActive: isActive ?? true,

@@ -1,8 +1,8 @@
 import { Button, IconButton, Select, Textarea } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import type { Cuisine, Restaurant } from "shared/types/api/schemas";
-import { X, Info, ChefHat, DollarSign } from "lucide-react";
+import { ChefHat, DollarSign, Info, X } from "lucide-react";
 import { useState } from "react";
+import type { Cuisine, Restaurant } from "shared/types/api/schemas";
 
 type BasicInformation = {
   isEditing: boolean;
@@ -10,7 +10,7 @@ type BasicInformation = {
   addCuisine: (cuisine: Cuisine) => void;
   editableData: Restaurant | null;
   setEditableData: (value: Restaurant) => void;
-  displayData: Restaurant | null;
+  displayData: Restaurant | undefined;
   handleInputChange: (
     field: keyof Restaurant,
     value: Restaurant[keyof Restaurant]
@@ -28,7 +28,6 @@ export function BasicInformation({
 }: BasicInformation) {
   const [selectedCuisine, setSelectedCuisine] = useState<string>("");
 
-  
   const handleAddCuisine = () => {
     if (!selectedCuisine) return;
 
@@ -41,7 +40,7 @@ export function BasicInformation({
 
   return (
     <Card
-      Component="section"
+      component="section"
       padding="lg"
       header={
         <div className="flex items-center gap-3">
@@ -49,7 +48,7 @@ export function BasicInformation({
             Basic Information
           </h2>
           {isEditing && (
-            <div className="text-xs text-gray-foreground bg-gray px-2 py-1 rounded">
+            <div className="text-xs px-2 py-1 rounded bg-secondary text-secondary-foreground">
               Complete profile to attract customers
             </div>
           )}
@@ -61,27 +60,27 @@ export function BasicInformation({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
-              <ChefHat className="w-4 h-4 text-gray-foreground" />
+              <ChefHat className="w-4 h-4 text-secondary" />
               <label
                 htmlFor="cuisine-type"
                 id="cuisine-type"
-                className="font-medium text-black"
+                className="font-medium"
               >
                 Cuisine Type
               </label>
             </div>
             {isEditing && (
-              <p className="text-sm text-gray-foreground">
+              <p className="text-sm">
                 Select cuisine types to help customers find you
               </p>
             )}
             <div className="flex gap-4 mt-2">
               {isEditing && (
                 <div className="w-full space-y-3">
-                  <div className="text-xs text-gray-foreground bg-gray px-2 py-1 rounded">
+                  <div className="text-xs text-secondary px-2 py-1 rounded">
                     Select cuisine → Add → Repeat
                   </div>
-                                    <div className="flex items-center gap-2 w-full">
+                  <div className="flex items-center gap-2 w-full">
                     <Select
                       fullWidth
                       outlineType="round"
@@ -89,7 +88,7 @@ export function BasicInformation({
                       label=""
                       options={cuisines.map((cuisine) => ({
                         value: cuisine._id ?? "",
-                        label: cuisine.name,
+                        label: cuisine.name ?? "",
                       }))}
                       value={selectedCuisine}
                       onChange={(e) => setSelectedCuisine(e.target.value)}
@@ -101,7 +100,7 @@ export function BasicInformation({
                     />
                     <Button
                       text={selectedCuisine ? "Add Cuisine" : "Select & Add"}
-                      variant="solid"
+                      variant="outline"
                       onClick={handleAddCuisine}
                       disabled={!selectedCuisine || cuisines.length === 0}
                       className="whitespace-nowrap"
@@ -111,30 +110,37 @@ export function BasicInformation({
               )}
             </div>
             <div>
-              {isEditing && displayData?.cuisine && displayData.cuisine.length > 0 && (
-                <div className="text-xs text-gray-foreground bg-gray px-2 py-1 rounded mb-2">
-                  ✓ {displayData.cuisine.length} cuisine{displayData.cuisine.length > 1 ? 's' : ''} added
-                </div>
-              )}
+              {isEditing &&
+                displayData?.cuisine &&
+                displayData.cuisine.length > 0 && (
+                  <div className="text-xs text-secondary px-2 py-1 rounded mb-2">
+                    ✓ {displayData.cuisine.length} cuisine
+                    {displayData.cuisine.length > 1 ? "s" : ""} added
+                  </div>
+                )}
               <div className="mt-2">
                 {displayData?.cuisine && displayData.cuisine.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
                     {displayData.cuisine.map((cuisine) => (
                       <div
-                        key={cuisine?._id}
-                        className="bg-gray text-gray-foreground px-2.5 py-1 rounded-md flex items-center gap-1.5 text-sm border border-gray/20 hover:bg-gray/80 transition-colors"
+                        key={cuisine._id || ''}
+                        className="bg-foreground text-background px-2.5 py-1 rounded-md flex items-center gap-1.5 text-sm border border-gray/20 transition-colors"
                       >
-                        <span className="font-medium truncate max-w-20" title={cuisine.name}>
-                          {cuisine.name}
+                        <span
+                          className="font-medium truncate max-w-20"
+                          title={cuisine.name || ''}
+                        >
+                          {cuisine.name || ''}
                         </span>
                         {isEditing && (
                           <IconButton
                             variant="plain"
+                            color="primary"
                             size="xs"
                             icon={<X size={12} />}
                             onClick={() => removeCuisine(cuisine)}
-                            aria-label={`Remove ${cuisine.name}`}
-                            className="text-gray-foreground hover:text-gray-foreground/80 flex-shrink-0"
+                            aria-label={`Remove ${cuisine.name || ''}`}
+                            className=" flex-shrink-0"
                           />
                         )}
                       </div>
@@ -145,7 +151,9 @@ export function BasicInformation({
                     <div className="flex items-center gap-2">
                       <span>No cuisines added</span>
                       {isEditing && (
-                        <span className="text-gray-foreground">← Select above</span>
+                        <span className="text-gray-foreground">
+                          ← Select above
+                        </span>
                       )}
                     </div>
                   </div>
@@ -156,8 +164,8 @@ export function BasicInformation({
 
           <div className="space-y-2 flex flex-col">
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-gray-foreground" />
-              <label className="font-medium text-black">Price Range</label>
+              <DollarSign className="w-4 h-4 text-secondary" />
+              <label htmlFor="price-range" className="font-medium">Price Range</label>
             </div>
             {isEditing && (
               <p className="text-sm text-gray-foreground">
@@ -167,6 +175,7 @@ export function BasicInformation({
             <Select
               disabled={!isEditing}
               label=""
+              id="price-range"
               name="price-range"
               useLabel={false}
               outlineType={isEditing ? "round" : "none"}
@@ -186,8 +195,8 @@ export function BasicInformation({
 
         <div className="space-y-2 flex flex-col">
           <div className="flex items-center gap-2">
-            <Info className="w-4 h-4 text-gray-foreground" />
-            <label className="font-medium text-black">Full Description</label>
+            <Info className="w-4 h-4 text-secondary" />
+            <label htmlFor="description-label" className="font-medium">Full Description</label>
           </div>
           {isEditing && (
             <p className="text-sm text-gray-foreground">

@@ -1,5 +1,8 @@
-import type { formErrorType } from "@/app/dashboard/food-catalogue/page";
 import { Button, IconButton, Input, Select } from "@/components/atoms";
+import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm";
+import { X } from "lucide-react";
+import type React from "react";
+import type { ReactNode } from "react";
 import type {
   Allergen,
   Course,
@@ -7,9 +10,6 @@ import type {
   FoodCatalogue,
 } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
-import { X } from "lucide-react";
-import type React from "react";
-import type { ReactNode } from "react";
 
 type FoodCatalogueModalType = {
   setNewFood: React.Dispatch<React.SetStateAction<FoodCatalogue>>;
@@ -17,14 +17,13 @@ type FoodCatalogueModalType = {
   cuisineData: Cuisine[];
   courseData: Course[];
   allergenData: Allergen[];
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleAllergen: (allergen: Allergen) => void;
   currencies: string[];
   handleAddIngredients: (ingredient: string) => void;
   handleRemoveIngredients: (ingredient: string) => void;
   setIngredient: (ingredient: string) => void;
   ingredient: string;
-  formError: formErrorType;
+  formError: FormErrorType;
   FormWarning: (message: string) => ReactNode;
 };
 export function AddNewFood({
@@ -33,7 +32,6 @@ export function AddNewFood({
   cuisineData,
   courseData,
   allergenData,
-  handleImageUpload,
   toggleAllergen,
   currencies,
   handleAddIngredients,
@@ -64,7 +62,7 @@ export function AddNewFood({
         />
 
         <div className="w-[100%] overflow-hidden px-2">
-           <Input
+          <Input
             label="Ingredients"
             useLabel
             outlineType="round"
@@ -78,13 +76,13 @@ export function AddNewFood({
             value={ingredient}
             onChange={(e) => setIngredient(e.target.value)}
             rightButton={
-              <button
-                type="button"
+              <Button
+                text="Add"
                 onClick={() => handleAddIngredients(ingredient)}
-                className="bg-primary text-sm text-white h-full w-full px-4 py-2 rounded"
-              >
-                Add
-              </button>
+                variant="solid"
+                color="primary"
+                size="sm"
+              />
             }
             errorMessage={
               formError.ingredients && FormWarning(formError.ingredients)
@@ -92,7 +90,7 @@ export function AddNewFood({
           />
 
           <div className="flex gap-2 mt-2 overflow-x-auto">
-            {newFood.ingredients.map((ingredient: string) => (
+            {newFood.ingredients?.map((ingredient: string) => (
               <div
                 key={ingredient}
                 className="flex items-center gap-2 text-sm bg-black rounded-xl px-2 py-1"
@@ -100,6 +98,7 @@ export function AddNewFood({
                 <span className="text-white ">{ingredient}</span>
 
                 <IconButton
+                  aria-label="Remove ingredient"
                   icon={<X size={16} />}
                   size="xs"
                   variant="plain"
@@ -112,6 +111,7 @@ export function AddNewFood({
         </div>
 
         <Select
+          placeholder="Please select"
           label="Cuisine Type"
           name="cuisine-type"
           useLabel
@@ -120,24 +120,27 @@ export function AddNewFood({
             { value: "", label: "Please select" },
             ...(cuisineData?.map((cuisine: Cuisine) => ({
               value: cuisine?._id ?? "",
-              label: cuisine?.name,
-            })) || [])
+              label: cuisine?.name ?? "",
+            })) || []),
           ]}
           value={newFood?.cuisineType?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCuisine = e.target.value
+              ? cuisineData.find((cuisine) => cuisine._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              cuisineType: cuisineData.find(
-                (cuisine) => cuisine._id === e.target.value
-              ) as Cuisine,
-            }))
-          }
+              cuisineType: selectedCuisine as Cuisine,
+            }));
+          }}
           errorMessage={
             formError.cuisineType && FormWarning(formError.cuisineType)
           }
         />
 
         <Select
+          placeholder="Please select"
           label="Course"
           name="course"
           useLabel
@@ -146,19 +149,21 @@ export function AddNewFood({
             { value: "", label: "Please select" },
             ...(courseData?.map((course: Course) => ({
               value: course?._id ?? "",
-              label: course?.name,
-            })) || [])
+              label: course?.name ?? "",
+            })) || []),
           ]}
           value={newFood?.course?._id}
-          onChange={(e) =>
+          onChange={(e) => {
+            const selectedCourse = e.target.value
+              ? courseData.find((course) => course._id === e.target.value)
+              : { _id: "", name: "", description: "" };
+
             setNewFood((prev: FoodCatalogue) => ({
               ...prev,
-              course: courseData.find(
-                (course) => course._id === e.target.value
-              ) as Course,
-            }))
-          }
-          errorMessage={formError.course && FormWarning(formError.course)}
+              course: selectedCourse as Course,
+            }));
+          }}
+          errorMessage={formError?.course && FormWarning(formError.course)}
         />
 
         <div className="flex gap-2 items-end">
@@ -174,31 +179,35 @@ export function AddNewFood({
             onWheel={(e) => e.currentTarget.blur()}
             inputMode="decimal"
             placeholder="0.00"
-            value={newFood.price.amount}
-            onChange={(e) =>
+            value={newFood.price?.amount ?? 0}
+            onChange={(e) => {
+              const value = e.target.value;
+              const amount = value === "" ? 0 : Number.parseFloat(value) || 0;
+
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,
                 price: {
                   ...prev.price,
-                  amount: Number.parseFloat(e.target.value),
+                  amount: amount,
                 },
-              }))
-            }
-            errorMessage={formError.name && FormWarning(formError.price ?? "Price is required")}
+              }));
+            }}
+            errorMessage={formError.price && FormWarning(formError.price)}
           />
 
           <Select
+            placeholder="Please select"
             className="w-[100px]"
             label="Currencies"
             name="currencies"
             outlineType="round"
             options={
               currencies?.map((currency: string) => ({
-                value: currency ?? "",
+                value: currency,
                 label: currency,
               })) || []
             }
-            value={newFood?.course?._id}
+            value={newFood?.price?.currency}
             onChange={(e) =>
               setNewFood((prev: FoodCatalogue) => ({
                 ...prev,
@@ -212,55 +221,31 @@ export function AddNewFood({
           />
         </div>
 
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isAvailable"
-              checked={newFood.isAvailable ?? true}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isAvailable: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
-              Available for ordering
-            </label>
-          </div>
+        <div className="flex flex-col gap-4 items-start">
+          <Input
+            labelRow
+            label="Available for ordering"
+            useLabel
+            name="isAvailable"
+            type="checkbox"
+            checked={newFood.isAvailable ?? true}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isAvailable: e.target.checked }))
+            }
+          />
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isFeatured"
-              checked={newFood.isFeatured ?? false}
-              onChange={(e) =>
-                setNewFood((prev) => ({
-                  ...prev,
-                  isFeatured: e.target.checked,
-                }))
-              }
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
-              Featured item
-            </label>
-          </div>
+          <Input
+            useLabel
+            labelRow
+            label="Featured item"
+            name="isFeatured"
+            type="checkbox"
+            checked={newFood.isFeatured ?? false}
+            onChange={(e) =>
+              setNewFood((prev) => ({ ...prev, isFeatured: e.target.checked }))
+            }
+          />
         </div>
-
-        <Input
-          label="Image"
-          name="image"
-          useLabel
-          outlineType="round"
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageUpload}
-		  errorMessage={formError.images && FormWarning(formError.images)}
-        />
       </div>
 
       <div className="mt-4">
@@ -273,7 +258,7 @@ export function AddNewFood({
           {allergenData.map((allergen: Allergen) => (
             <Button
               size="sm"
-              color="black"
+              color="neutral"
               variant={
                 newFood.allergens?.some((a) => a._id === allergen._id)
                   ? "solid"

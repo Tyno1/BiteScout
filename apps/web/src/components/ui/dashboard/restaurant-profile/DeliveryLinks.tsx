@@ -1,16 +1,21 @@
-import { Button } from "@/components/atoms";
+import { Alert, Button, Input, Select } from "@/components/atoms";
 import { Card } from "@/components/organisms";
+import {
+  ExternalLink,
+  Plus,
+  Trash2,
+  Truck,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import type { DeliveryLink } from "shared/types/api/schemas";
-import { ExternalLink, Plus, Trash2, Truck, Sparkles, Info } from "lucide-react";
-import { useState } from "react";
 
 type DeliveryLinksProps = {
   isEditing: boolean;
   restaurantId: string;
   links: DeliveryLink[];
   isLoading: boolean;
-  onAdd: (data: Partial<DeliveryLink>) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
+  onAdd: (data: Partial<DeliveryLink>) => void;
+  onDelete: (id: string) => void;
 };
 
 const DELIVERY_PLATFORMS = [
@@ -35,45 +40,45 @@ export function DeliveryLinks({
 }: DeliveryLinksProps) {
   const [newLink, setNewLink] = useState({
     name: "",
-    platform: "" as string,
+    platform: "", // No default needed - Select component handles this
     url: "",
   });
 
-  const handleAdd = async () => {
+  // Memoize the options to prevent recreation on every render
+  const platformOptions = useMemo(() => 
+    DELIVERY_PLATFORMS.map((platform: string) => ({
+      label: platform,
+      value: platform,
+    })), []
+  );
+
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!newLink.name || !newLink.url || !newLink.platform) {
       return;
     }
+    onAdd({
+      name: newLink.name,
+      url: newLink.url,
+      platform: newLink.platform as DeliveryLink["platform"],
+      isActive: true,
+    });
 
-    try {
-      await onAdd({
-        name: newLink.name,
-        url: newLink.url,
-        platform: newLink.platform as DeliveryLink["platform"],
-        isActive: true,
-      });
-
-      setNewLink({ name: "", platform: "" as string, url: "" });
-    } catch (error) {
-console.log(error);
-    }
+    setNewLink({ name: "", platform: "" as string, url: "" });
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await onDelete(id);
-    } catch (error) {
-console.log(error);
-    }
+    onDelete(id);
   };
 
   if (isLoading && links.length === 0) {
     return (
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-card rounded-lg border p-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
+          <div className="h-6 bg-card rounded w-1/3 mb-4" />
           <div className="space-y-3">
-            <div className="h-12 bg-gray-200 rounded" />
-            <div className="h-12 bg-gray-200 rounded" />
+            <div className="h-12 bg-card rounded" />
+            <div className="h-12 bg-card rounded" />
           </div>
         </div>
       </div>
@@ -85,16 +90,14 @@ console.log(error);
       header={
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Truck className="w-5 h-5 text-gray-600" />
+            <Truck className="w-5 h-5 text-secondary" />
             <h2 className="text-lg font-semibold">Delivery Links</h2>
           </div>
           {isEditing && (
-            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
-              <Sparkles className="w-4 h-4" />
-              <span>
-                <strong>Boost your reach:</strong> Add delivery platform links so customers can order from your restaurant through their favorite apps!
-              </span>
-            </div>
+            <Alert status="information">
+              Boost your reach: Add delivery platform links so customers can
+              order from your restaurant through their favorite apps!
+            </Alert>
           )}
         </div>
       }
@@ -105,11 +108,11 @@ console.log(error);
           {links.map((link) => (
             <div
               key={link._id}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              className="flex items-center justify-between p-3 bg-background rounded-lg"
             >
-              <div>
+              <div className="flex flex-col items-start gap-2">
                 <div className="font-medium text-sm">{link.name}</div>
-                <div className="text-xs text-gray-500">{link.platform}</div>
+                <div className="text-xs text-secondary">{link.platform}</div>
               </div>
               <div className="flex items-center space-x-2">
                 <Button
@@ -141,46 +144,46 @@ console.log(error);
 
       {/* Add New Link */}
       {isEditing && (
-        <div className="border-t pt-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg mb-4">
-            <Info className="w-4 h-4" />
-            <span>Add your restaurant&apos;s delivery platform links. Include the platform name, link name, and URL.</span>
-          </div>
+        <form onSubmit={handleAdd}>
+        <div className="border-t pt-4 space-y-4">
+          <Alert status="information">
+            Add your restaurant&apos;s delivery platform links. Include the
+            platform name, link name, and URL.
+          </Alert>
+
           <h3 className="text-md font-medium mb-3">Add New Delivery Link</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <input
+            <Input
+              label="Link Name"
+              name="link-name"
               type="text"
               placeholder="Link Name"
               value={newLink.name}
               onChange={(e) =>
                 setNewLink((prev) => ({ ...prev, name: e.target.value }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
               disabled={isLoading}
             />
-            <select
+            <Select
+              label="Platform"
+              name="platform"
+              placeholder="Select Platform"
+              options={platformOptions}
               value={newLink.platform}
-              onChange={(e) =>
-                setNewLink((prev) => ({ ...prev, platform: e.target.value }))
-              }
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+              onChange={(e) => {
+                setNewLink((prev) => ({ ...prev, platform: e.target.value }));
+              }}
               disabled={isLoading}
-            >
-              <option value="">Select Platform</option>
-              {DELIVERY_PLATFORMS.map((platform) => (
-                <option key={platform} value={platform}>
-                  {platform}
-                </option>
-              ))}
-            </select>
-            <input
+            />
+            <Input
+              label="URL"
+              name="url"
               type="url"
               placeholder="https://..."
               value={newLink.url}
               onChange={(e) =>
                 setNewLink((prev) => ({ ...prev, url: e.target.value }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
               disabled={isLoading}
             />
           </div>
@@ -188,17 +191,18 @@ console.log(error);
             variant="outline"
             size="sm"
             text="Add Delivery Link"
-            onClick={handleAdd}
             className="flex items-center space-x-2"
             disabled={isLoading}
+            type="submit"
           >
             <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+            </Button>
+          </div>
+        </form>
       )}
 
       {!isEditing && links.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-foreground">
           <p>No delivery links added yet.</p>
         </div>
       )}

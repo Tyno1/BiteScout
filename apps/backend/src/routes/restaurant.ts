@@ -11,6 +11,7 @@ router.get("/search/:name", controller.getRestaurantsByName);
 router.get("/filter", controller.filterRestaurants);
 router.get("/:id", controller.getRestaurantById);
 router.put("/:id", controller.updateRestaurantData);
+router.put("/:id/assigned-images", controller.updateAssignedImages);
 router.delete("/:id", controller.deletedRestaurant);
 
 // Delivery link routes

@@ -16,9 +16,9 @@ export const RecentActivityPanel = () => {
       <Card className="h-[10vh] overflow-y-auto">
         {ACTIVITIES.map((activity, index) => (
           <React.Fragment key={activity}>
-            <p className="text-sm text-gray-500">{activity}</p>
+            <p className="text-sm text-card-foreground">{activity}</p>
             {index !== ACTIVITIES.length - 1 && (
-              <div className="border-b-[1px] border-gray-200 my-2" />
+              <div className="border-b-[1px] border-secondary/30 my-2" />
             )}
           </React.Fragment>
         ))}

@@ -1,4 +1,4 @@
-import { useNotifications } from "@/app/hooks/useNotification";
+import { useNotifications } from "@/hooks/useNotification";
 import React from "react";
 
 type NotificationBadgeProps = {

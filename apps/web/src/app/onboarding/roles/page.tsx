@@ -2,12 +2,12 @@
 
 import type React from "react";
 
-import { useRestaurantAccess } from "@/app/hooks/useRestaurantAccess";
-import { useUpdateUser } from "@/app/hooks/useUpdateUser";
-import { Spinner } from "@/components/atoms/loaders/Spinners";
+import { Spinner } from "@/components/atoms/loaders/Spinner/Spinners";
 import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
-import useRestaurantStore from "@/stores/restaurantStore";
-import { useSession } from "next-auth/react";
+import { useCreateRestaurant } from "@/hooks/restaurant";
+import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -15,8 +15,8 @@ import type { Restaurant } from "shared/types/api/schemas";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
-  const { createRestaurant } = useRestaurantStore();
-  const {isOwner, getRestaurantListAccess,getFirstApprovedRestaurantId } = useRestaurantAccess()
+  const createRestaurantMutation = useCreateRestaurant();
+  const { isOwner, getRestaurantListAccess, getFirstApprovedRestaurantId } = useRestaurantAccess();
 
   const session = useSession();
   const router = useRouter();
@@ -76,7 +76,7 @@ export default function Onboarding() {
 
   const handleOwnerSubmission = async () => {
     // Validate restaurant name
-    if (!restaurantData.name.trim()) {
+    if (!restaurantData.name?.trim()) {
       setFormError((prev) => ({
         ...prev,
         name: "Restaurant name is required",
@@ -97,11 +97,10 @@ export default function Onboarding() {
 
     // Prepare restaurant data
     const preparedData = prepareRestaurantData();
-    console.log("Prepared restaurant data:", preparedData);
 
     // Create restaurant
     try {
-       await createRestaurant(preparedData);
+      await createRestaurantMutation.mutateAsync(preparedData);
       await handleSuccessfulCreation();
     } catch (error) {
       const errorMessage =
@@ -111,8 +110,6 @@ export default function Onboarding() {
   };
 
   const prepareRestaurantData = (): Restaurant => {
-    
-
     return {
       ...restaurantData,
       ownerId: session?.data?.user?._id || "",
@@ -122,24 +119,28 @@ export default function Onboarding() {
   };
 
   const handleSuccessfulCreation = async () => {
-    setMessage("Restaurant created successfully!");
+    setMessage("Restaurant created successfully! User role updated. Please log in again to access your new permissions.");
 
-    try {
-      if (session?.data?.user?._id) {
-        await updateUser(session.data.user._id);
-        router.push("/dashboard");
+          try {
+        if (session?.data?.user?._id) {
+          await updateUser(session.data.user._id);
+          
+          // Force logout to get fresh session with new role
+          await signOut({ redirect: false });
+        
+        // Redirect to login page
+        router.push("/login");
       }
     } catch (updateError) {
       console.error("Failed to update user restaurant count:", updateError);
       toast.warning(
-        "Restaurant created, but profile update incomplete. This will be fixed automatically."
+        "Restaurant created, but profile update incomplete. Please log in again."
       );
-      router.push("/dashboard");
+      router.push("/login");
     }
   };
 
   const handleCreationError = (error: string | undefined) => {
-    console.log("Restaurant creation error:", error);
     setApiError(error || "An error occurred");
   };
 
@@ -167,7 +168,7 @@ export default function Onboarding() {
         return false;
       }
       
-      await getRestaurantListAccess(session.data.user._id); 
+      await getRestaurantListAccess(); 
       const approvedRestaurantId = getFirstApprovedRestaurantId();
       
       if (approvedRestaurantId) {

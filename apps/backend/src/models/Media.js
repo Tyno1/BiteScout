@@ -28,12 +28,12 @@ const mediaSchema = new mongoose.Schema(
     associatedWith: {
       type: {
         type: String,
-        enum: ["post", "dish", "restaurant"],
-        required: true,
+        enum: ["post", "dish", "restaurant", "user"],
+        required: false,
       },
       id: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         refPath: "associatedWith.type",
       },
     },
@@ -55,6 +55,50 @@ const mediaSchema = new mongoose.Schema(
         type: Number,
       },
     },
+    providerId: {
+      type: String,
+      description: "ID of the media in the cloud storage provider (Cloudinary/AWS S3)",
+    },
+    mediaServiceId: {
+      type: String,
+      description: "ID of the media in the media service database",
+    },
+    provider: {
+      type: String,
+      enum: ["cloudinary", "aws-s3"],
+      description: "Cloud storage provider used for this media",
+    },
+    // Advanced features from media service
+    variants: [{
+      size: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      width: Number,
+      height: Number,
+      bitrate: String,
+      resolution: String,
+      fileSize: {
+        type: Number,
+        required: true,
+      },
+      format: {
+        type: String,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
+    tags: [{
+      type: String,
+      default: [],
+    }],
   },
   { timestamps: true }
 );
@@ -74,6 +118,8 @@ mediaSchema.virtual("associatedWith.ref").get(function () {
       return "FoodCatalogue";
     case "restaurant":
       return "RestaurantData";
+    case "user":
+      return "User";
     default:
       return null;
   }

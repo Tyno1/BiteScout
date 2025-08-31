@@ -1,7 +1,7 @@
-import { Button } from "@/components/atoms";
-import type { RestaurantAccess } from "shared/types/api/schemas";
+import { Button, RefreshButton } from "@/components/atoms";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { RestaurantAccess } from "shared/types/api/schemas";
 
 type RestaurantData = {
 	_id: string;
@@ -19,7 +19,7 @@ export function SearchResultCard({
 	handleRestaurantSelect,
 	restaurantAccessList,
 }: CardProp) {
-	const [accessStatus, setAccessStatus] = useState<RestaurantAccess["status"] | null>("pending");
+	const [accessStatus, setAccessStatus] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!Array.isArray(restaurantAccessList) || !data?._id) {
@@ -69,7 +69,7 @@ export function SearchResultCard({
 		switch (accessStatus) {
 			case "pending":
 				return (
-					<div className="flex flex-col justify-end">
+					<div className="flex flex-col justify-end gap-2">
 						<Button
 							disabled
 							variant="solid"
@@ -78,25 +78,29 @@ export function SearchResultCard({
 							text="Access Pending"
 							className="cursor-not-allowed"
 						/>
+						<RefreshButton size="sm" variant="glass" />
 						<ContactAdmin />
 					</div>
 				);
 
 			case "approved":
 				return (
-					<Button
-						variant="solid"
-						type="button"
-						text="Access Approved"
-						disabled
-						fullWidth
-						className="cursor-not-allowed"
-					/>
+					<div className="flex flex-col justify-end gap-2">
+						<Button
+							variant="solid"
+							type="button"
+							text="Access Approved"
+							disabled
+							fullWidth
+							className="cursor-not-allowed"
+						/>
+						<RefreshButton size="sm" variant="glass" />
+					</div>
 				);
 
 			case "suspended":
 				return (
-					<div className="flex flex-col justify-end">
+					<div className="flex flex-col justify-end gap-2">
 						<Button
 							disabled
 							variant="solid"
@@ -105,13 +109,14 @@ export function SearchResultCard({
 							fullWidth
 							className="cursor-not-allowed"
 						/>
+						<RefreshButton size="sm" variant="glass" />
 						<ContactAdmin />
 					</div>
 				);
 
 			case "innactive":
 				return (
-					<div className="flex flex-col justify-end">
+					<div className="flex flex-col justify-end gap-2">
 						<Button
 							disabled
 							className="cursor-not-allowed"
@@ -120,19 +125,21 @@ export function SearchResultCard({
 							fullWidth
 							text="Access Deactivated"
 						/>
-						<ContactAdmin />
+						<RefreshButton size="sm" variant="glass" />
 					</div>
 				);
 			case null:
 				return (
-					<Button
-						onClick={() => data._id && handleRestaurantSelect(data._id)}
-						variant="solid"
-						type="button"
-						text="Request Access"
-						fullWidth
-						className="cursor-not-allowed"
-					/>
+					<div className="flex flex-col justify-end gap-2">
+						<Button
+							onClick={() => data._id && handleRestaurantSelect(data._id)}
+							variant="solid"
+							type="button"
+							text="Request Access"
+							fullWidth
+						/>
+						<RefreshButton size="sm" variant="glass" />
+					</div>
 				);
 		}
 	};

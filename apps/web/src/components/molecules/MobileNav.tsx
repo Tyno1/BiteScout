@@ -1,6 +1,6 @@
-import React from "react";
+import type { Session } from "next-auth";
+import type React from "react";
 import { Button } from "../atoms";
-import { Session } from "next-auth";
 
 type NavProp = {
   toggleMenu: () => void;

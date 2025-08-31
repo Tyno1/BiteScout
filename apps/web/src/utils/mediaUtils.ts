@@ -1,62 +1,37 @@
-import type { Media } from "shared/types/api/schemas";
 
-// Utility function to get media URL with fallback
-export const getMediaUrl = (
-  media?: Media | Media[] | null,
-  fallback?: string
-): string => {
-  if (!media) return fallback || "/api/placeholder/400/300";
 
-  if (Array.isArray(media)) {
-    return media[0]?.url || fallback || "/api/placeholder/400/300";
+// Pure function for building query parameters
+export const buildQueryParams = (params: Record<string, string | number | boolean>): string => {
+  const searchParams = new URLSearchParams();
+  
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      searchParams.append(key, String(value));
+    }
   }
 
-  return media.url || fallback || "/api/placeholder/400/300";
+  return searchParams.toString();
 };
 
-// Utility function to get media alt text
-export const getMediaAlt = (
-  media?: Media | Media[] | null,
-  fallback?: string
-): string => {
-  if (!media) return fallback || "Image";
+// Pure function for creating form data
+export const createUploadFormData = (
+  file: File,
+  metadata: {
+    title?: string;
+    description?: string;
+    tags?: string[];
+    folder?: string;
+    // Note: associatedWith is not sent to media service, only to backend sync
+  } = {}
+): FormData => {
+  const formData = new FormData();
+  formData.append("file", file);
 
-  if (Array.isArray(media)) {
-    return media[0]?.title || media[0]?.description || fallback || "Image";
-  }
+  if (metadata.title) formData.append("title", metadata.title);
+  if (metadata.description) formData.append("description", metadata.description);
+  if (metadata.tags) formData.append("tags", JSON.stringify(metadata.tags));
+  if (metadata.folder) formData.append("folder", metadata.folder);
+  // associatedWith is handled separately in backend sync, not sent to media service
 
-  return media.title || media.description || fallback || "Image";
-};
-
-// Utility function to check if media is an image
-export const isImage = (media?: Media | Media[] | null): boolean => {
-  if (!media) return false;
-
-  if (Array.isArray(media)) {
-    return media[0]?.type === "image";
-  }
-
-  return media.type === "image";
-};
-
-// Utility function to check if media is a video
-export const isVideo = (media?: Media | Media[] | null): boolean => {
-  if (!media) return false;
-
-  if (Array.isArray(media)) {
-    return media[0]?.type === "video";
-  }
-
-  return media.type === "video";
-};
-
-// Utility function to check if media is audio
-export const isAudio = (media?: Media | Media[] | null): boolean => {
-  if (!media) return false;
-
-  if (Array.isArray(media)) {
-    return media[0]?.type === "audio";
-  }
-
-  return media.type === "audio";
+  return formData;
 }; 

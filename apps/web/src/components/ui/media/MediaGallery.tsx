@@ -1,210 +1,236 @@
 "use client";
 
-import type { GetMediaResponse, PaginatedResponse } from "@shared/types";
+import { Button, IconButton } from "@/components/atoms";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getUserMedia, getVerifiedMedia } from "../../../utils/mediaApi";
-import { MediaDisplay } from "./MediaDisplay";
+import { ImageFullscreen } from "../dashboard";
 
 interface MediaGalleryProps {
-	userId?: string;
-	type?: "image" | "video";
-	verified?: boolean;
-	page?: number;
-	limit?: number;
-	className?: string;
+  mediaIds: string[];
+  altText?: string;
+  className?: string;
+  showThumbnails?: boolean;
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
 }
 
 export const MediaGallery = ({
-	userId,
-	type,
-	verified = false,
-	page = 1,
-	limit = 12,
-	className = "",
+  mediaIds,
+  altText = "Gallery image",
+  className = "",
+  showThumbnails = true,
+  autoPlay = false,
+  autoPlayInterval = 3000,
 }: MediaGalleryProps) => {
-	const [media, setMedia] = useState<GetMediaResponse[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [pagination, setPagination] = useState({
-		currentPage: 1,
-		totalPages: 1,
-		totalMedia: 0,
-		hasNextPage: false,
-		hasPrevPage: false,
-	});
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-	useEffect(() => {
-		const loadMedia = async () => {
-			try {
-				setLoading(true);
-				setError(null);
+  // Use React Query hooks for each media item
+  const currentMediaId = mediaIds[currentIndex];
+  const { 
+    data: currentMediaData, 
+    isLoading: currentLoading, 
+    error: currentError 
+  } = useMediaWithOptimizedUrl(currentMediaId, "medium");
 
-				let result: PaginatedResponse<GetMediaResponse>;
-				if (userId) {
-					result = await getUserMedia(userId, page, limit);
-				} else if (verified) {
-					result = await getVerifiedMedia(page, limit, type);
-				} else {
-					// Default to verified media if no specific criteria
-					result = await getVerifiedMedia(page, limit, type);
-				}
+  // Auto-play functionality
+  useEffect(() => {
+    if (!autoPlay || mediaIds.length <= 1) return;
 
-				setMedia(result.data);
-				setPagination({
-					currentPage: result.pagination.page,
-					totalPages: result.pagination.totalPages,
-					totalMedia: result.pagination.total,
-					hasNextPage: result.pagination.hasNext,
-					hasPrevPage: result.pagination.hasPrev,
-				});
-			} catch (err) {
-				setError(err instanceof Error ? err.message : "Failed to load media");
-			} finally {
-				setLoading(false);
-			}
-		};
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % mediaIds.length);
+    }, autoPlayInterval);
 
-		loadMedia();
-	}, [userId, type, verified, page, limit]);
+    return () => clearInterval(interval);
+  }, [autoPlay, autoPlayInterval, mediaIds.length]);
 
-	if (loading) {
-		return (
-			<div
-				className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ${className}`}
-			>
-				{Array.from({ length: limit }, (_, index) => (
-					<div key={`loading-skeleton-${index}-${Date.now()}`} className="animate-pulse">
-						<div className="bg-gray-200 rounded-lg h-48 w-full" />
-						<div className="mt-2 space-y-2">
-							<div className="bg-gray-200 h-4 w-3/4 rounded" />
-							<div className="bg-gray-200 h-3 w-1/2 rounded" />
-						</div>
-					</div>
-				))}
-			</div>
-		);
-	}
+  // Escape key handler for fullscreen
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
 
-	if (error) {
-		return (
-			<div
-				className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}
-			>
-				<p className="text-red-600 text-sm">
-					Error loading media gallery: {error}
-				</p>
-			</div>
-		);
-	}
+    if (isFullscreen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [isFullscreen]);
 
-	if (media.length === 0) {
-		return (
-			<div
-				className={`bg-gray-50 border border-gray-200 rounded-lg p-8 text-center ${className}`}
-			>
-				<div className="text-gray-400 mb-4">
-					<svg
-						className="mx-auto h-12 w-12"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-						/>
-					</svg>
-				</div>
-				<h3 className="text-lg font-medium text-gray-900 mb-2">
-					No media found
-				</h3>
-				<p className="text-gray-500">
-					{verified
-						? "No verified media available at the moment."
-						: "No media has been uploaded yet."}
-				</p>
-			</div>
-		);
-	}
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + mediaIds.length) % mediaIds.length);
+  };
 
-	return (
-		<div className={className}>
-			{/* Media Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-				{media.map((item) => (
-					<div key={item._id || `media-${item.url}`} className="space-y-2">
-						<MediaDisplay mediaId={item._id || ''} />
-						{/* Media Info */}
-						<div className="space-y-1">
-							{item.title && (
-								<h4 className="text-sm font-medium text-gray-900 truncate">
-									{item.title}
-								</h4>
-							)}
-							{item.description && (
-								<p className="text-xs text-gray-500 line-clamp-2">
-									{item.description}
-								</p>
-							)}
-							<div className="flex items-center justify-between text-xs text-gray-400">
-								<span>{item.type}</span>
-								{item.fileSize && (
-									<span>
-										{(item.fileSize / 1024 / 1024).toFixed(1)} MB
-									</span>
-								)}
-							</div>
-						</div>
-					</div>
-				))}
-			</div>
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % mediaIds.length);
+  };
 
-			{/* Pagination */}
-			{pagination.totalPages > 1 && (
-				<div className="mt-8 flex justify-center space-x-2">
-					<button
-						type="button"
-						onClick={() => {
-							// Handle previous page
-							if (pagination.hasPrevPage) {
-								// You would typically update the page state here
-								console.log("Previous page");
-							}
-						}}
-						disabled={!pagination.hasPrevPage}
-						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-					>
-						Previous
-					</button>
+  const goToImage = (index: number) => {
+    setCurrentIndex(index);
+  };
 
-					<span className="px-3 py-2 text-sm text-gray-600">
-						Page {pagination.currentPage} of {pagination.totalPages}
-					</span>
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
 
-					<button
-						type="button"
-						onClick={() => {
-							// Handle next page
-							if (pagination.hasNextPage) {
-								// You would typically update the page state here
-								console.log("Next page");
-							}
-						}}
-						disabled={!pagination.hasNextPage}
-						className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-					>
-						Next
-					</button>
-				</div>
-			)}
+  if (!mediaIds || mediaIds.length === 0) {
+    return (
+      <div
+        className={`aspect-[3/4] bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-lg border shadow-inner ${className}`}
+      >
+        No images available
+      </div>
+    );
+  }
 
-			{/* Media Count */}
-			<div className="mt-4 text-center text-sm text-gray-500">
-				Showing {media.length} of {pagination.totalMedia} media items
-			</div>
-		</div>
-	);
+  const currentUrl = currentMediaData?.optimizedUrl || currentMediaData?.media?.url || "/api/placeholder/400/300";
+  const currentAlt = currentMediaData?.media?.title || currentMediaData?.media?.description || altText;
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Main Image Display */}
+      <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden shadow-sm">
+        {currentLoading ? (
+          <div className="w-full h-full bg-gray-200 animate-pulse">
+            <div className="w-full h-full bg-gray-300" />
+          </div>
+        ) : currentError ? (
+          <div className="w-full h-full bg-red-50 flex items-center justify-center">
+            <p className="text-red-600 text-sm">Failed to load image</p>
+          </div>
+        ) : (
+          <Image
+            src={currentUrl}
+            alt={currentAlt}
+            fill
+            className="object-cover"
+          />
+        )}
+
+        {/* Navigation Controls */}
+        {mediaIds.length > 1 && (
+          <>
+            {/* Previous Button */}
+            <IconButton
+              variant="glass"
+              color="neutral"
+              size="sm"
+              onClick={goToPrevious}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2"
+              icon={<ChevronLeft size={20} />}
+            />
+            
+            {/* Next Button */}
+            <IconButton
+              variant="glass" 
+              color="neutral"
+              size="sm"
+              onClick={goToNext}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              icon={<ChevronRight size={20} />}
+            />
+          </>
+        )}
+
+        {/* Image Counter */}
+        <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+          {currentIndex + 1} / {mediaIds.length}
+        </div>
+
+        {/* Fullscreen Toggle */}
+        <Button
+          variant="glass"
+          color="neutral"
+          size="sm"
+          onClick={toggleFullscreen}
+          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white border-0"
+          text="Fullscreen"
+        />
+      </div>
+
+      {/* Thumbnails */}
+      {showThumbnails && mediaIds.length > 1 && (
+        <div className="mt-4">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {mediaIds.map((mediaId, index) => (
+              <ThumbnailItem
+                key={mediaId}
+                mediaId={mediaId}
+                index={index}
+                currentIndex={currentIndex}
+                altText={altText}
+                onClick={() => goToImage(index)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && currentMediaData?.media && (
+        <ImageFullscreen image={currentMediaData.media} onClose={() => setIsFullscreen(false)} />
+      )}
+    </div>
+  );
+};
+
+// Separate component for thumbnails to use React Query hooks
+const ThumbnailItem = ({ 
+  mediaId, 
+  index, 
+  currentIndex, 
+  altText, 
+  onClick 
+}: {
+  mediaId: string;
+  index: number;
+  currentIndex: number;
+  altText: string;
+  onClick: () => void;
+}) => {
+  const { 
+    data: mediaData, 
+    isLoading, 
+    error 
+  } = useMediaWithOptimizedUrl(mediaId, "small");
+
+  const thumbnailUrl = mediaData?.optimizedUrl || mediaData?.media?.url || "/api/placeholder/400/300";
+  const thumbnailAlt = mediaData?.media?.title || mediaData?.media?.description || `${altText} thumbnail ${index + 1}`;
+
+  return (
+    <button
+      type="button"
+      className={`relative flex-shrink-0 cursor-pointer transition-all duration-200 ${
+        index === currentIndex
+          ? "ring-2 ring-blue-500 ring-offset-2"
+          : "hover:opacity-80"
+      }`}
+      onClick={onClick}
+    >
+      <div className="relative w-16 h-16 rounded-lg overflow-hidden border">
+        {isLoading ? (
+          <div className="w-full h-full bg-gray-200 animate-pulse">
+            <div className="w-full h-full bg-gray-300" />
+          </div>
+        ) : error ? (
+          <div className="w-full h-full bg-red-50 flex items-center justify-center">
+            <div className="w-4 h-4 bg-red-300 rounded" />
+          </div>
+        ) : (
+          <Image
+            src={thumbnailUrl}
+            alt={thumbnailAlt}
+            fill
+            className="object-cover"
+          />
+        )}
+      </div>
+      {index === currentIndex && (
+        <div className="absolute inset-0 bg-blue-500/20 rounded-lg" />
+      )}
+    </button>
+  );
 };
