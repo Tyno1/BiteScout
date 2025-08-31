@@ -6,6 +6,7 @@ import type {
   RestaurantDetailPutRequest,
   RestaurantDetailPutResponse,
 } from "shared/types/restaurant";
+import type { RestaurantAssignedImagesPutRequest, RestaurantAssignedImagesPutResponse } from "shared/types/restaurant/detail";
 
 // Restaurant Mutations
 export const createRestaurant = async (data: CreateRestaurantRequest): Promise<CreateRestaurantResponse> => {
@@ -35,4 +36,18 @@ export const updateDeliveryLink = async (
 
 export const deleteDeliveryLink = async (restaurantId: string, linkId: string): Promise<void> => {
   await apiClient.delete(`/restaurants/${restaurantId}/delivery-links/${linkId}`);
+};
+
+/**
+ * Update assigned images for a restaurant (logo and profile image)
+ */
+export const updateAssignedImages = async (
+  restaurantId: string,
+  data: RestaurantAssignedImagesPutRequest
+): Promise<RestaurantAssignedImagesPutResponse> => {
+  const response = await apiClient.put<RestaurantAssignedImagesPutResponse>(
+    `/restaurants/${restaurantId}/assigned-images`,
+    data
+  );
+  return response.data;
 }; 

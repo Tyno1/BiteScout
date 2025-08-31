@@ -623,38 +623,7 @@ export default function UserManagementPage() {
         </Card>
       )}
 
-      {/* Action Buttons */}
-      <Card>
-        <h3 className="text-lg font-semibold text-card-foreground mb-4">Actions</h3>
-        <div className="flex flex-wrap gap-3">
-          <Button
-            variant="solid"
-            color="primary"
-            size="sm"
-            IconBefore={<Edit size={16} />}
-            text="Edit User Profile"
-          />
-          <Button
-            variant="outline"
-            color="secondary"
-            size="sm"
-            text="Change Role"
-          />
-          <Button
-            variant="outline"
-            color="secondary"
-            size="sm"
-            text="Suspend Access"
-          />
-          <Button
-            variant="outline"
-            color="danger"
-            size="sm"
-            IconBefore={<Trash2 size={16} />}
-            text="Delete User"
-          />
-        </div>
-      </Card>
+
 
       {/* User Edit Modal */}
       <UserEditModal

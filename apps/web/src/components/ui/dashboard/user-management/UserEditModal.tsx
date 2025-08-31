@@ -92,7 +92,6 @@ export function UserEditModal({
   const {
     mutate: updateUser,
     isPending: isUpdating,
-    isSuccess: isUpdated,
   } = useUpdateUser();
 
   useEffect(() => {
@@ -173,6 +172,7 @@ export function UserEditModal({
   }, []);
 
   const [isRemovingImage, setIsRemovingImage] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleRemoveProfileImage = useCallback(async () => {
     if (profileImage?._id && profileImage._id !== user._id) {
@@ -199,16 +199,28 @@ export function UserEditModal({
 
   const handleSave = useCallback(() => {
     if (user._id) {
-      updateUser({
-        userId: user._id,
-        data: formData,
-      });
+      updateUser(
+        {
+          userId: user._id,
+          data: formData,
+        },
+        {
+          onSuccess: () => {
+            // Show success message briefly, then close modal
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+              setShowSuccessMessage(false);
+              onClose();
+            }, 1500); // Show for 1.5 seconds
+          },
+          onError: (error) => {
+            console.error('Failed to update user:', error);
+            // You could add error handling here (e.g., show error toast)
+          }
+        }
+      );
     }
-    if (isUpdated) {
-      onClose();
-    }
-
-  }, [updateUser, user._id, formData, onClose, isUpdated]);
+  }, [updateUser, user._id, formData, onClose]);
 
   const handlesDelete = useCallback(() => {
     if (user._id) {
@@ -467,15 +479,17 @@ export function UserEditModal({
               onUploadError={(error: string) => {
                 console.error("Profile image upload error:", error);
               }}
+			  onRemoveUploadedFile={handleRemoveProfileImage}
               associatedWith={{
                 type: "user",
                 id: user._id || "",
               }}
               folder={MediaFolder.USER_PROFILE}
               multiple={false}
+              singleUpload={true}
             />
             
-            {/* Upload Status Messages */}
+                        {/* Upload Status Messages */}
             {isUpdating && (
               <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-center">
@@ -491,7 +505,7 @@ export function UserEditModal({
               </div>
             )}
             
-            {isUpdated && (
+            {showSuccessMessage && (
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -507,11 +521,12 @@ export function UserEditModal({
                 </div>
               </div>
             )}
+            
           </div>
         </div>
       </div>
     ),
-    [user, isUpdating, isUpdated, profileImage, handleRemoveProfileImage, isRemovingImage]
+    [user, isUpdating, profileImage, handleRemoveProfileImage, isRemovingImage, showSuccessMessage]
   );
 
   // Define tabs

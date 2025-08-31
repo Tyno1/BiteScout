@@ -90,6 +90,21 @@ export const createMedia = async (
 			{ path: "uploadedBy", select: "name username imageUrl" },
 		]);
 
+		// If media is associated with a restaurant, add it to the restaurant's gallery
+		if (newMedia.associatedWith?.type === "restaurant" && newMedia.associatedWith?.id) {
+			try {
+				const RestaurantData = (await import("../models/RestaurantData.js")).default;
+				await RestaurantData.findByIdAndUpdate(
+					newMedia.associatedWith.id,
+					{ $addToSet: { gallery: newMedia._id } }
+				);
+				console.log(`Media ${newMedia._id} added to restaurant ${newMedia.associatedWith.id} gallery`);
+			} catch (error) {
+				console.error("Failed to add media to restaurant gallery:", error);
+				// Don't fail the media creation if gallery update fails
+			}
+		}
+
 		// Transform to match CreateMediaResponse type
 		const response: CreateMediaResponse = {
 			_id: newMedia._id.toString(),

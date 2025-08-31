@@ -564,6 +564,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/restaurants/{id}/assigned-images:
+    put:
+      summary: Update assigned images for a restaurant (logo and profile image)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Restaurant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  nullable: true
+                  description: "Media ID for logo (null to remove assignment)"
+                  example: "507f1f77bcf86cd799439011"
+                profileImage:
+                  type: string
+                  nullable: true
+                  description: "Media ID for profile image (null to remove assignment)"
+                  example: "507f1f77bcf86cd799439011"
+      responses:
+        200:
+          description: Assigned images updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        400:
+          description: Invalid input or media not in gallery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /api/restaurants/{id}/delivery-links/{linkId}:
     put:
       summary: Update a delivery link
@@ -3694,9 +3741,38 @@ components:
           items:
             $ref: "#/components/schemas/Media"
           description: "Array of media objects for the restaurant gallery"
-        logo:
-          $ref: "#/components/schemas/Media"
-          description: "Restaurant logo image"
+        assignedImages:
+          type: object
+          description: "Assigned images for logo and profile"
+          properties:
+            logo:
+              type: object
+              properties:
+                mediaId:
+                  $ref: "#/components/schemas/Media"
+                  description: "Assigned logo media"
+                assignedAt:
+                  type: string
+                  format: date-time
+                  description: "When the logo was assigned"
+                  example: "2025-04-20T15:30:00Z"
+                assignedBy:
+                  $ref: "#/components/schemas/User"
+                  description: "User who assigned the logo"
+            profileImage:
+              type: object
+              properties:
+                mediaId:
+                  $ref: "#/components/schemas/Media"
+                  description: "Assigned profile image media"
+                assignedAt:
+                  type: string
+                  format: date-time
+                  description: "When the profile image was assigned"
+                  example: "2025-04-20T15:30:00Z"
+                assignedBy:
+                  $ref: "#/components/schemas/User"
+                  description: "User who assigned the profile image"
         businessHours:
           type: array
           items:

@@ -6,6 +6,7 @@ import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/B
 import { BusinessHours } from "@/components/ui/dashboard/restaurant-profile/BusinessHours";
 import { ContactInformation } from "@/components/ui/dashboard/restaurant-profile/ContactInformation";
 import { DeliveryLinks } from "@/components/ui/dashboard/restaurant-profile/DeliveryLinks";
+import { RestaurantImageModal } from "@/components/ui/dashboard/restaurant-profile/RestaurantImageModal";
 import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileFeatures";
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
 import { useMediaWithOptimizedUrl } from "@/hooks/media";
@@ -18,6 +19,16 @@ import type {
   Restaurant,
   RestaurantFeature,
 } from "shared/types/api/schemas";
+
+// Helper function to validate URLs
+const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export default function RestaurantProfile() {
   const {
@@ -36,19 +47,29 @@ export default function RestaurantProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<Restaurant | null>(null);
   const [newFeature, setNewFeature] = useState<RestaurantFeature | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   // Get the display data (either editable or current)
   const displayData = editableData || restaurantData;
 
-  // Get the hero image from restaurant media using React Query
-  const mediaId =
-    restaurantData?.logo?.url || restaurantData?.gallery?.[0]?.url;
-  const { data: mediaData } = useMediaWithOptimizedUrl(mediaId || "", "large");
+  // Get the hero image from assigned images only
+  const heroImageId = 
+    restaurantData?.assignedImages?.profileImage?.mediaId?._id ||
+    restaurantData?.assignedImages?.logo?.mediaId?._id;
+  
+  const { data: mediaData } = useMediaWithOptimizedUrl(heroImageId || "", "large");
 
-  const heroImage =
-    mediaData?.optimizedUrl ||
-    mediaData?.media?.url ||
-    "/api/placeholder/1200/800";
+  const heroImage = (() => {
+    // Only use URLs that are valid
+    const optimizedUrl = mediaData?.optimizedUrl;
+    const mediaUrl = mediaData?.media?.url;
+    
+    if (optimizedUrl && isValidUrl(optimizedUrl)) return optimizedUrl;
+    if (mediaUrl && isValidUrl(mediaUrl)) return mediaUrl;
+    if (heroImageId && isValidUrl(heroImageId)) return heroImageId;
+    
+    return null; 
+  })();
 
   // Merge business hours from restaurant data with defaults
   const mergedBusinessHours = useMemo(() => {
@@ -63,8 +84,13 @@ export default function RestaurantProfile() {
   }, [restaurantData?.businessHours]);
 
   const handleImageUpload = useCallback(() => {
-    // Handle image upload logic here
-    // TODO: Implement actual image upload functionality
+    setIsImageModalOpen(true);
+  }, []);
+
+  const handleImageModalClose = useCallback(() => {
+    setIsImageModalOpen(false);
+    // The useAssignedImages hook will automatically invalidate and refetch restaurant data
+    // so the hero image will update automatically
   }, []);
 
   const handleInputChange = useCallback(
@@ -308,6 +334,8 @@ export default function RestaurantProfile() {
           handleInputChange={handleInputChange}
         />
 
+
+
         <DeliveryLinks
           isEditing={isEditing}
           restaurantId={restaurantData?._id || ""}
@@ -329,6 +357,15 @@ export default function RestaurantProfile() {
           </div>
         )}
       </div>
+
+      {/* Image Management Modal */}
+      <RestaurantImageModal
+        isOpen={isImageModalOpen}
+        onClose={handleImageModalClose}
+        restaurantId={restaurantData?._id || ""}
+        assignedImages={restaurantData?.assignedImages}
+        gallery={restaurantData?.gallery || []}
+      />
     </main>
   );
 }

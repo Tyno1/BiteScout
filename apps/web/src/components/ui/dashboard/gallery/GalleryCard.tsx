@@ -1,6 +1,6 @@
-import { IconButton } from "@/components/atoms";
+import { Button, IconButton } from "@/components/atoms";
 import type { Media } from "@shared/types";
-import { FileText, Maximize2 } from "lucide-react";
+import { Maximize2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -8,9 +8,10 @@ interface GalleryCardProps {
   image: Media;
   onFullscreen: (image: Media) => void;
   priority?: boolean;
+  onUseImage?: (image: Media) => void;
 }
 
-export const GalleryCard = ({ image, onFullscreen, priority = false }: GalleryCardProps) => {
+export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage }: GalleryCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -31,7 +32,9 @@ export const GalleryCard = ({ image, onFullscreen, priority = false }: GalleryCa
             {imageError && (
               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <FileText className="w-8 h-8 mx-auto mb-2" />
+                  <div className="w-8 h-8 mx-auto mb-2 bg-gray-300 rounded flex items-center justify-center">
+                    <span className="text-xs text-gray-600">!</span>
+                  </div>
                   <p className="text-xs">Failed to load</p>
                 </div>
               </div>
@@ -63,6 +66,19 @@ export const GalleryCard = ({ image, onFullscreen, priority = false }: GalleryCa
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               ariaLabel="View fullscreen"
             />
+            
+            {/* Use This Image Button */}
+            {onUseImage && (
+              <Button
+                text="Use This Image"
+                variant="glass"
+                color="primary"
+                size="xs"
+                onClick={() => onUseImage(image)}
+                className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                ariaLabel="Use this image"
+              />
+            )}
           </>
         ) : image.type === "video" ? (
           <video
@@ -76,7 +92,9 @@ export const GalleryCard = ({ image, onFullscreen, priority = false }: GalleryCa
         ) : (
           <div className="w-full h-full bg-gray-100 flex items-center justify-center">
             <div className="text-center text-gray-500">
-              <FileText className="w-12 h-12 mx-auto mb-2" />
+              <div className="w-12 h-12 mx-auto mb-2 bg-gray-300 rounded flex items-center justify-center">
+                <span className="text-sm text-gray-600">?</span>
+              </div>
               <p className="text-xs">File preview not available</p>
             </div>
           </div>

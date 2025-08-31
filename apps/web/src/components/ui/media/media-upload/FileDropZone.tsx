@@ -14,6 +14,7 @@ export const FileDropZone = ({
   multiple,
   fileInputRef,
   uploadMode = 'manual',
+  singleUpload = false,
 }: FileDropZoneProps) => {
   return (
     <div
@@ -32,7 +33,7 @@ export const FileDropZone = ({
         onChange={onFileSelect}
         className="hidden"
         id="file-input"
-        multiple={multiple}
+        multiple={singleUpload ? false : multiple}
       />
 
       {!files.length ? (
@@ -55,20 +56,20 @@ export const FileDropZone = ({
           </div>
           
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {multiple ? "Upload Multiple Files" : "Upload Media"}
+            {singleUpload ? "Upload Profile Image" : multiple ? "Upload Multiple Files" : "Upload Media"}
           </h3>
           <p className="text-base text-gray-600 mb-4">
-            Drag and drop your files here, or{" "}
+            Drag and drop your {singleUpload ? "image" : "files"} here, or{" "}
             <label
               htmlFor="file-input"
               className="text-blue-600 hover:text-blue-500 font-medium cursor-pointer underline"
             >
-              browse files
+              browse {singleUpload ? "image" : "files"}
             </label>
           </p>
           <div className="text-sm text-gray-500 space-y-1">
             <p>Supports images and videos up to 100MB</p>
-            {multiple && <p>You can select multiple files at once</p>}
+            {!singleUpload && multiple && <p>You can select multiple files at once</p>}
           </div>
         </div>
       ) : (
@@ -96,12 +97,14 @@ export const FileDropZone = ({
             Total size: {(files.reduce((sum, f) => sum + f.file.size, 0) / 1024 / 1024).toFixed(2)} MB
           </p>
           <div className="flex justify-center space-x-3">
-            <label
-              htmlFor="file-input"
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {files.length === 0 ? "Select Files" : "Select More Files"}
-            </label>
+            {(!singleUpload || files.length === 0) && (
+              <label
+                htmlFor="file-input"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {files.length === 0 ? "Select Files" : "Select More Files"}
+              </label>
+            )}
             {files.length > 0 && uploadMode === 'manual' && (
               <>
                 <Button

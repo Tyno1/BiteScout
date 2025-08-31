@@ -60,6 +60,31 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
         queryClient.invalidateQueries({ 
           queryKey: ["media", "associated", type, id] 
         });
+        
+        // If associated with a restaurant, also invalidate restaurant queries
+        // that contain gallery data so the gallery gets updated with the new image
+        if (type === "restaurant") {
+          // Invalidate specific restaurant queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant", id] 
+          });
+          // Invalidate restaurant by owner queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant", "owner"] 
+          });
+          // Invalidate restaurant search queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurants", "search"] 
+          });
+          // Invalidate restaurant filter queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurants", "filter"] 
+          });
+          // Invalidate restaurant-by-owner queries (used by useAssignedImages)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant-by-owner"] 
+          });
+        }
       }
       
       // Optimistically update user media if we have user context
@@ -116,6 +141,31 @@ export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
         queryClient.invalidateQueries({ 
           queryKey: ["media", "associated", type, id] 
         });
+        
+        // If associated with a restaurant, also invalidate restaurant queries
+        // that contain gallery data so the gallery gets updated with the new image
+        if (type === "restaurant") {
+          // Invalidate specific restaurant queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant", id] 
+          });
+          // Invalidate restaurant by owner queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant", "owner"] 
+          });
+          // Invalidate restaurant search queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurants", "search"] 
+          });
+          // Invalidate restaurant filter queries (contains gallery)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurants", "filter"] 
+          });
+          // Invalidate restaurant-by-owner queries (used by useAssignedImages)
+          queryClient.invalidateQueries({ 
+            queryKey: ["restaurant-by-owner"] 
+          });
+        }
       }
     },
     onError: (error) => {

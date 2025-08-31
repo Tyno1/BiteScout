@@ -14,6 +14,7 @@ type GalleryProps = {
   images?: Media[];
   onImagesChange?: (images: Media[]) => void;
   restaurantId: string;
+  onImageSelect?: (image: Media) => void;
 };
 
 // Gallery categories - based on available associatedWith.type values
@@ -38,6 +39,7 @@ export function Gallery({
   images = [],
   onImagesChange,
   restaurantId,
+  onImageSelect,
 }: GalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -270,6 +272,7 @@ export function Gallery({
               image={image}
               onFullscreen={handleFullscreen}
               priority={index < 2} // Priority load first 2 images for better LCP
+              onUseImage={onImageSelect}
             />
           ))}
           

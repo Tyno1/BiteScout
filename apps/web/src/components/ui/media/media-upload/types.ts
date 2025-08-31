@@ -25,6 +25,7 @@ export interface MediaUploadProps {
   selectedFiles?: FileWithPreview[];
   uploadMode?: 'auto' | 'manual';
   editMode?: boolean;
+  singleUpload?: boolean;
 }
 
 export interface FileWithPreview {
@@ -47,8 +48,9 @@ export interface FileDropZoneProps {
   onClearAll: () => void;
   uploading: boolean;
   multiple: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
   uploadMode?: 'auto' | 'manual';
+  singleUpload?: boolean;
 }
 
 export interface MediaPreviewProps {

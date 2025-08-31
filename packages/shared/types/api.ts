@@ -495,6 +495,53 @@ export interface paths {
       };
     };
   };
+  "/api/restaurants/{id}/assigned-images": {
+    /** Update assigned images for a restaurant (logo and profile image) */
+    put: {
+      parameters: {
+        path: {
+          /** @description Restaurant ID */
+          id: string;
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description Media ID for logo (null to remove assignment)
+             * @example 507f1f77bcf86cd799439011
+             */
+            logo?: string | null;
+            /**
+             * @description Media ID for profile image (null to remove assignment)
+             * @example 507f1f77bcf86cd799439011
+             */
+            profileImage?: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Assigned images updated successfully */
+        200: {
+          content: {
+            "application/json": components["schemas"]["Restaurant"];
+          };
+        };
+        /** @description Invalid input or media not in gallery */
+        400: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+        /** @description Restaurant not found */
+        404: {
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"];
+          };
+        };
+      };
+    };
+  };
   "/api/restaurants/{id}/delivery-links/{linkId}": {
     /** Update a delivery link */
     put: {
@@ -3374,8 +3421,33 @@ export interface components {
       isActive?: boolean;
       /** @description Array of media objects for the restaurant gallery */
       gallery?: components["schemas"]["Media"][];
-      /** @description Restaurant logo image */
-      logo?: components["schemas"]["Media"];
+      /** @description Assigned images for logo and profile */
+      assignedImages?: {
+        logo?: {
+          /** @description Assigned logo media */
+          mediaId?: components["schemas"]["Media"];
+          /**
+           * Format: date-time
+           * @description When the logo was assigned
+           * @example 2025-04-20T15:30:00Z
+           */
+          assignedAt?: string;
+          /** @description User who assigned the logo */
+          assignedBy?: components["schemas"]["User"];
+        };
+        profileImage?: {
+          /** @description Assigned profile image media */
+          mediaId?: components["schemas"]["Media"];
+          /**
+           * Format: date-time
+           * @description When the profile image was assigned
+           * @example 2025-04-20T15:30:00Z
+           */
+          assignedAt?: string;
+          /** @description User who assigned the profile image */
+          assignedBy?: components["schemas"]["User"];
+        };
+      };
       /** @description Restaurant business hours */
       businessHours?: components["schemas"]["BusinessHour"][];
       /**
