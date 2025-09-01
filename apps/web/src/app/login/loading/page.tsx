@@ -36,7 +36,7 @@ export default function AuthLoader() {
   }, [session?.data?.user?._id, session.data?.user?.restaurantCount, session?.data?.user?.userTypeDetails?.level, router]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="flex flex-col items-center justify-center space-y-6 px-4 text-center">
         <div className="relative">
           <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 opacity-75 blur-sm"/>
@@ -64,7 +64,7 @@ export default function AuthLoader() {
 
       <div className="mt-16 flex flex-col items-center justify-center">
         <div className="h-1 w-48 overflow-hidden rounded-full bg-muted">
-          <div className="animate-progress h-full bg-gradient-to-r from-orange-500 to-red-500"/>
+          <div className="animate-progress h-full bg-gradient-to-r from-primary/30 to-primary"/>
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ export function ContactInformation({
       header={
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Phone className="w-5 h-5 text-secondary" />
+            <Phone className="w-5 h-5 text-primary" />
             <h2 id="contact-info-heading" className="text-lg font-semibold">
               Contact Information
             </h2>

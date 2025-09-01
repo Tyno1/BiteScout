@@ -25,7 +25,7 @@ export function BusinessHours({
       header={
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-secondary" />
+            <Clock className="w-5 h-5 text-primary" />
             <h2 id="hours-heading" className="text-lg font-semibold">
               Business Hours
             </h2>
@@ -48,7 +48,7 @@ export function BusinessHours({
       )}
       <table className="w-full border-collapse" aria-label="Business hours">
         <thead>
-          <tr className="border-b border-foreground text-secondary">
+          <tr className="border-b border-foreground text-primary">
             <th className="text-left py-3 px-4 font-medium ">
               Day
             </th>
@@ -67,7 +67,7 @@ export function BusinessHours({
           {businessHours.map((hours: BusinessHour, index: number) => (
             <tr
               key={hours.day}
-              className="border-b border-secondary/10"
+              className="border-b border-primary/10"
             >
               <td className="py-3 px-4 font-medium ">
                 {hours.day}

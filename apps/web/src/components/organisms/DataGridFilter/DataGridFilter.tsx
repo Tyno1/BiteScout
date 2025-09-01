@@ -39,7 +39,7 @@ export const DataGridFilter = ({
           placeholder="Search food items..."
           fullWidth
           value={searchValue}
-          icon={<Search size={17} className="text-secondary" />}
+          icon={<Search size={17} className="text-primary" />}
           onChange={(e) => onSearchChange(e.target.value)}
         />
         <Popover
@@ -47,21 +47,21 @@ export const DataGridFilter = ({
           onOpenChange={onPopoverChange}
           trigger={
             <Button
-              color="secondary"
+              color="primary"
               variant="outline"
               text="Filter"
               size="sm"
               IconBefore={<Filter size={17} />}
             />
           }
-          color="secondary"
+          color="primary"
           variant="glass"
         >
           <div className="flex flex-col gap-2 items-start">
             {filterOptions.map((option) => (
               <Button
                 key={option.id}
-                color="secondary"
+                color="primary"
                 variant="plain"
                 size="sm"
                 fullWidth
@@ -76,9 +76,9 @@ export const DataGridFilter = ({
         </Popover>
       </div>
 
-      <div className="flex gap-2 text-sm w-full text-secondary p-2 rounded-lg">
+      <div className="flex gap-2 text-sm w-full text-primary p-2 rounded-lg">
         <p>Current Filter:</p>
-        <p className="text-secondary font-bold">
+        <p className="text-primary font-bold">
           {filterField
             ? filterOptions.find(opt => opt.id === filterField)?.label || "None"
             : "None"}
