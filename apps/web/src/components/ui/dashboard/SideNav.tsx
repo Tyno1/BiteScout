@@ -1,6 +1,7 @@
 "use client";
 
 import { NavItem } from "@/components/ui";
+import { usePlatform } from "@/hooks";
 import {
   AudioLines,
   BellDot,
@@ -28,6 +29,7 @@ interface SideNavProp {
 
 export function SideNav({ setIsMenuOpen }: SideNavProp) {
   const router = useRouter();
+  const { isTablet } = usePlatform();
 
   // Simple navigation handler
   const handleNav = (navName: string) => {
@@ -37,9 +39,11 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
 
   return (
     <div className="h-[100vh] w-full bg-background border-r border-foreground/10 flex flex-col">
-      <div className="p-6 items-center mb-2 hidden md:flex">
-        <ChefHat size={30} className="mr-2 text-primary" />
-        <h2 className="text-xl font-bold text-primary">BiteScout</h2>
+      <div className={`p-6 flex gap-2 justify-center  mb-2 hidden md:flex ${isTablet ? "justify-center" : "justify-start"}`}>
+        <ChefHat size={30} className="text-primary" />
+        {!isTablet && (
+          <h2 className="text-xl font-bold text-primary">BiteScout</h2>
+        )}
       </div>
 
       <nav className="flex-1 p-4 w-full overflow-y-auto">
@@ -114,7 +118,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             text="Customer Insights"
             path="/dashboard/customer-insight"
           />
-          
+
           <li className="border-t border-foreground/10 w-full mt-auto">
             <ul className="w-full">
               <NavItem
