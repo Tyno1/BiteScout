@@ -2,8 +2,10 @@
 
 import { Button, IconButton } from "@/components/atoms";
 import { usePlatform } from "@/hooks";
+
 import { signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
+
 import type React from "react";
 
 type NavItemProps = {
@@ -16,6 +18,7 @@ type NavItemProps = {
 export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
   const pathname = usePathname();
   const { isTablet } = usePlatform();
+
 
   const isActive = path
     ? path !== "/dashboard"

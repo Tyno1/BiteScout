@@ -106,7 +106,7 @@ export function Modal({
 
       {/* Modal Content */}
       <div className="fixed inset-0 z-50">
-        <div className="flex min-h-full items-center justify-center p-4">
+        <div className="flex min-h-full items-center justify-center p-1 md:p-4">
           <div
             ref={modalRef}
             className={`bg-card rounded-lg shadow-2xl w-full ${sizeMap[size]} border border-foreground/10`}

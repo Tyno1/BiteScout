@@ -10,7 +10,7 @@ type CardProps = {
   footer?: ReactNode;
   fullWidth?: boolean;
   component?: keyof JSX.IntrinsicElements;
-  padding?: "sm" | "md" | "lg";
+  padding?: "sm" | "md" | "lg" | "none";
   shadow?: "sm" | "md" | "lg";
   onClick?: () => void;
   containerClassName?: string;
@@ -31,6 +31,7 @@ export const Card = ({
   containerClassName,
 }: CardProps) => {
   const paddingClasses = {
+    none: "p-0",
     sm: "p-2",
     md: "p-4",
     lg: "p-6",

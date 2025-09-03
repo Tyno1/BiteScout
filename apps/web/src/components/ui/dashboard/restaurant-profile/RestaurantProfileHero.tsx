@@ -29,7 +29,7 @@ export function RestaurantProfileHero({
 }: RestaurantProfileHeroProps) {
   return (
     <section
-      className="relative h-[30vh] w-full bg-black text-white flex flex-col items-start justify-center px-14"
+      className="relative h-[30vh] w-full bg-black text-white flex flex-col items-start justify-center px-2 md:px-14"
       aria-label="Restaurant header"
     >
       {image1 && (
@@ -43,26 +43,28 @@ export function RestaurantProfileHero({
       )}
 
       <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
-      <div className="z-10 w-full flex items-center justify-between">
+      <div className="z-10 w-full flex flex-col  gap-4 items-center justify-between">
         <div className="flex-5 flex min-w-0">
-            {isEditing ? (
-              <div className="flex-1 min-w-0">
-                <Input
-                  fullWidth
-                  outlineType={isEditing ? "round" : "none"}
-                  type="text"
-                  name="restaurant-name"
-                  label="Restaurant Name"
-                  disabled={!isEditing}
-                  value={displayData?.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Add Restaurant Name here"
-                  className="text-6xl font-bold bg-transparent w-full"
-                />
-              </div>
-            ) : (
-              <h1 className="text-6xl font-bold">{displayData?.name}</h1>
-            )}
+          {isEditing ? (
+            <div className="flex-1 min-w-0">
+              <Input
+                fullWidth
+                outlineType={isEditing ? "round" : "none"}
+                type="text"
+                name="restaurant-name"
+                label="Restaurant Name"
+                disabled={!isEditing}
+                value={displayData?.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                placeholder="Add Restaurant Name here"
+                className="text-4xl md:text-6xl font-bold bg-transparent w-full"
+              />
+            </div>
+          ) : (
+            <h1 className="text-4xl md:text-6xl font-bold text-center md:text-left">
+              {displayData?.name}
+            </h1>
+          )}
         </div>
         <div
           className="flex gap-2 flex-2"
@@ -104,7 +106,7 @@ export function RestaurantProfileHero({
               size="sm"
               onClick={handleEdit}
               ariaLabel="Edit profile"
-			  className="ml-auto"
+              className="ml-auto"
             />
           )}
         </div>

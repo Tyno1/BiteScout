@@ -1,10 +1,19 @@
+import { useEffect, useState } from 'react';
 import { useScreenSize } from './useScreenSize';
 
-// Platform hook that uses useScreenSize for mobile, tablet, and desktop
 export const usePlatform = () => {
-  const isMobile = useScreenSize('mobile');
-  const isTablet = useScreenSize('tablet');
-  const isDesktop = useScreenSize('desktop');
+  const [isMounted, setIsMounted] = useState(false);
+  const rawIsMobile = useScreenSize('mobile');
+  const rawIsTablet = useScreenSize('tablet');
+  const rawIsDesktop = useScreenSize('desktop');
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isMobile = isMounted ? rawIsMobile : false;
+  const isTablet = isMounted ? rawIsTablet : false; 
+  const isDesktop = isMounted ? rawIsDesktop : true;
 
   return {
     isMobile,

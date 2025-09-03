@@ -31,6 +31,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
   const router = useRouter();
   const { isTablet } = usePlatform();
 
+
   // Simple navigation handler
   const handleNav = (navName: string) => {
     router.push(navName);

@@ -280,9 +280,9 @@ export function Gallery({
   }, []);
 
   return (
-    <Card component="section" padding="lg" aria-labelledby="gallery-heading">
+    <Card component="section" padding="sm"  aria-labelledby="gallery-heading">
       {/* Image Category Filter */}
-      <div className="mb-6">
+      <div className="mb-6 p-4">
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -364,7 +364,7 @@ export function Gallery({
 
       {/* Image Grid - Only visible in view mode */}
       {!isLocalEditing && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {/* Show skeleton only while gallery data is loading */}
           {isGalleryLoading && <GallerySkeleton count={8} />}
           

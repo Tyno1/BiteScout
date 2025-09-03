@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 
-// Custom hook for screen size detection - returns boolean based on passed size
-export const useScreenSize = (size: 'mobile' | 'tablet' | 'desktop') => {
+export const useScreenSize = (size: 'mobile' | 'tablet' | 'desktop'): boolean => {
   const [isSize, setIsSize] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+    
     const checkSize = () => {
       const width = window.innerWidth;
       
@@ -28,5 +30,5 @@ export const useScreenSize = (size: 'mobile' | 'tablet' | 'desktop') => {
     return () => window.removeEventListener('resize', checkSize);
   }, [size]);
 
-  return isSize;
+  return isMounted ? isSize : false;
 };
