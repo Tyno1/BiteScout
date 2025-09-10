@@ -1,125 +1,78 @@
 # BiteScout Mobile App
 
-A React Native mobile application built with Expo for discovering and exploring restaurants.
-
-## Features
-
-- **Restaurant Discovery**: Search and browse restaurants by location, cuisine, and ratings
-- **User Authentication**: Login and registration functionality
-- **Restaurant Details**: View detailed information about restaurants including menus and reviews
-- **User Profiles**: Manage user preferences and favorites
-- **Modern UI**: Clean and intuitive user interface with consistent design
-
-## Tech Stack
-
-- **React Native** with **Expo**
-- **TypeScript** for type safety
-- **React Navigation** for navigation
-- **Zustand** for state management
-- **Axios** for API communication
-- **React Native Safe Area Context** for safe area handling
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-├── screens/            # Screen components
-├── stores/             # Zustand state stores
-├── services/           # API services
-├── types/              # TypeScript type definitions
-├── utils/              # Utility functions and constants
-├── hooks/              # Custom React hooks
-└── navigation/         # Navigation configuration
-```
+This is the mobile application for BiteScout, built with Expo and React Native.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- yarn (recommended)
-- Expo CLI
-- iOS Simulator (for iOS development)
-- Android Studio (for Android development)
+- Node.js (v18 or later)
+- Yarn package manager
+- Expo CLI (`npm install -g @expo/cli`)
+- For iOS development: Xcode
+- For Android development: Android Studio
 
 ### Installation
 
-1. Install dependencies:
-   ```bash
+```bash
+# Install dependencies
 yarn install
+
+# Start the development server
+yarn dev
 ```
 
-2. Start the development server:
-   ```bash
-yarn start
-```
+### Available Scripts
 
-3. Run on specific platform:
-   ```bash
-   # iOS
-   yarn ios
-   
-   # Android
-   yarn android
-   
-   # Web
-   yarn web
-   ```
-
-## Available Scripts
-
-- `yarn start` - Start the Expo development server
+- `yarn dev` - Start the Expo development server
 - `yarn android` - Run on Android device/emulator
-- `yarn ios` - Run on iOS simulator
+- `yarn ios` - Run on iOS device/simulator
 - `yarn web` - Run in web browser
+- `yarn build` - Build the app for production
+- `yarn lint` - Run ESLint
+- `yarn test` - Run tests
 
-## Configuration
+### Development
 
-### API Configuration
+The app uses TypeScript and follows React Native best practices. The project structure includes:
 
-Update the API base URL in `src/services/api.ts` to point to your backend server:
+- `App.tsx` - Main app component
+- `assets/` - Images and other static assets
+- `src/` - Source code (to be created)
 
-```typescript
-const api = axios.create({
-  baseURL: 'http://your-backend-url/api',
-  // ...
-});
+### Testing
+
+Tests are written using Jest and React Native Testing Library. Run tests with:
+
+```bash
+yarn test
 ```
 
-### Environment Variables
+### Building for Production
 
-Create a `.env` file in the root directory for environment-specific configuration:
+To build the app for production:
 
-```env
-API_BASE_URL=http://localhost:3000/api
+```bash
+# For Android
+yarn build:android
+
+# For iOS
+yarn build:ios
+
+# For web
+yarn build
 ```
 
-## State Management
+## Project Structure
 
-The app uses Zustand for state management with the following stores:
-
-- **authStore**: Manages user authentication state
-- **restaurantStore**: Manages restaurant data and search functionality
-
-## Navigation
-
-The app uses React Navigation with a stack navigator for the following screens:
-
-- Home
-- Login
-- Register
-- Restaurant Details
-- Profile
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License. 
+```
+apps/mobile/
+├── App.tsx              # Main app component
+├── app.json             # Expo configuration
+├── assets/              # Static assets
+├── src/                 # Source code
+├── jest.config.js       # Jest configuration
+├── jest.setup.js        # Jest setup
+├── .eslintrc.js         # ESLint configuration
+└── package.json         # Dependencies and scripts
+```
