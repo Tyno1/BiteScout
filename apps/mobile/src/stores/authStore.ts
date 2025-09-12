@@ -88,22 +88,12 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await apiClient.post('/auth/register', userData);
           
-          // Sync tokens with token manager
-          await tokenManager.setTokens({
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-            expiresIn: response.data.expiresIn,
-          });
-          
           set({
-            user: response.data.user,
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-            expiresIn: response.data.expiresIn,
-            isAuthenticated: true,
             isLoading: false,
             error: null,
           });
+          
+          return response.data;
         } catch (error: unknown) {
           if (axios.isAxiosError(error) && error.response?.data) {
             const errorMessage = handleApiError(error);

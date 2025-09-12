@@ -1,176 +1,279 @@
-import { Link } from 'expo-router';
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
-import { Button } from '../../src/components';
-import { useTheme } from '../../src/providers/ThemeProvider';
-import { useClearError, useError, useIsLoading, useRegister } from '../../src/stores/authStore';
+import { Link, router } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Alert as RNAlert,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import z from "zod";
+import { Alert, Button, Input } from "../../src/components";
+import {
+  useClearError,
+  useError,
+  useIsLoading,
+  useRegister,
+} from "../../src/stores/authStore";
 
 export default function RegisterScreen() {
-  const { isDark } = useTheme();
   const register = useRegister();
   const isLoading = useIsLoading();
   const error = useError();
   const clearError = useClearError();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [payload, setPayload] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const payloadSchema = z
+    .object({
+      firstName: z.string().min(1, { message: "First name is required" }),
+      lastName: z.string().min(1, { message: "Last name is required" }),
+      email: z.email({ message: "Invalid email address" }),
+      password: z
+        .string()
+        .min(6, { message: "Password must be at least 6 characters" }),
+      confirmPassword: z
+        .string()
+        .min(6, { message: "Password must be at least 6 characters" }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
+
+  // Clear errors when component mounts
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+    if (
+      !payload.firstName ||
+      !payload.lastName ||
+      !payload.email ||
+      !payload.password ||
+      !payload.confirmPassword
+    ) {
+      RNAlert.alert("Error", "Please fill in all fields");
       return;
     }
 
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+    const result = payloadSchema.safeParse(payload);
+    if (!result.success) {
+      const errors = z.treeifyError(result.error);
+      const newFieldErrors: Record<string, string> = {};
+      if (errors.properties?.firstName) {
+        newFieldErrors.firstName = errors.properties.firstName.errors[0];
+      }
+      if (errors.properties?.lastName) {
+        newFieldErrors.lastName = errors.properties.lastName.errors[0];
+      }
+      if (errors.properties?.email) {
+        newFieldErrors.email = errors.properties.email.errors[0];
+      }
+       if (errors.properties?.password) {
+         newFieldErrors.password = errors.properties.password.errors[0];
+       }
+       if (errors.properties?.confirmPassword) {
+         newFieldErrors.confirmPassword = errors.properties.confirmPassword.errors[0];
+       }
+       setFieldErrors(newFieldErrors);
       return;
     }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
-      return;
-    }
-
     try {
       clearError(); // Clear any previous errors
-      await register({ firstName, lastName, email, password });
-      // Navigation is handled by the ProtectedRoute component
+      await register(payload);
+      
+      // Show success alert
+      RNAlert.alert(
+        "Registration Successful!",
+        "Your account has been created successfully. Please login with your credentials.",
+        [
+          {
+            text: "Go to Login",
+            onPress: () => router.replace("/(auth)/login"),
+          },
+        ]
+      );
     } catch (error) {
-      // Error is already set in the store, no need to show alert here
-      // The error will be displayed in the UI
+      console.log("error", error);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView className="flex-1">
-        <View className="flex-1 items-center justify-center p-6">
-          <View className="w-full max-w-sm">
-            <View className="mb-8">
-              <Text className="text-3xl font-bold text-foreground text-center mb-2">
-                Create Account
-              </Text>
-              <Text className="text-base text-muted-foreground text-center">
-                Sign up to get started
-              </Text>
-            </View>
-
-            <View className="space-y-4">
-              <View className="flex-row space-x-3">
-                <View className="flex-1">
-                  <Text className="text-sm font-medium text-foreground mb-2">
-                    First Name
-                  </Text>
-                  <TextInput
-                    className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
-                    placeholder="First name"
-                    placeholderTextColor="#9CA3AF"
-                    value={firstName}
-                    onChangeText={setFirstName}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-medium text-foreground mb-2">
-                    Last Name
-                  </Text>
-                  <TextInput
-                    className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
-                    placeholder="Last name"
-                    placeholderTextColor="#9CA3AF"
-                    value={lastName}
-                    onChangeText={setLastName}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="flex-1 items-center justify-center p-6">
+            <View className="w-full max-w-sm">
+              <View className="mb-8">
+                <Text className="text-3xl font-bold text-foreground text-center mb-2">
+                  Create Account
+                </Text>
+                <Text className="text-base text-muted-foreground text-center">
+                  Sign up to get started
+                </Text>
               </View>
 
-              <View>
-                <Text className="text-sm font-medium text-foreground mb-2">
-                  Email
-                </Text>
-                <TextInput
-                  className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
-                  placeholder="Enter your email"
-                  placeholderTextColor="#9CA3AF"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
+              <View className="flex flex-col gap-4">
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                     <Input
+                       outline="none"
+                       label="First Name"
+                       placeholder="First name"
+                       value={payload.firstName}
+                       onChangeText={(text) => {
+                         setPayload({ ...payload, firstName: text });
+                         if (fieldErrors.firstName) {
+                           setFieldErrors((prev) => ({
+                             ...prev,
+                             firstName: "",
+                           }));
+                         }
+                       }}
+                       autoCapitalize="words"
+                       autoCorrect={false}
+                       required
+                       error={fieldErrors.firstName}
+                     />
+                  </View>
+                  <View className="flex-1">
+                     <Input
+                       outline="none"
+                       label="Last Name"
+                       placeholder="Last name"
+                       value={payload.lastName}
+                       onChangeText={(text) => {
+                         setPayload({ ...payload, lastName: text });
+                         if (fieldErrors.lastName) {
+                           setFieldErrors((prev) => ({
+                             ...prev,
+                             lastName: "",
+                           }));
+                         }
+                       }}
+                       autoCapitalize="words"
+                       autoCorrect={false}
+                       required
+                       error={fieldErrors.lastName}
+                     />
+                  </View>
+                </View>
 
-              <View>
-                <Text className="text-sm font-medium text-foreground mb-2">
-                  Password
-                </Text>
-                <TextInput
-                  className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
+                 <Input
+                   outline="none"
+                   label="Email"
+                   placeholder="Enter your email"
+                   value={payload.email}
+                   onChangeText={(text) => {
+                     setPayload({ ...payload, email: text });
+                     if (fieldErrors.email) {
+                       setFieldErrors((prev) => ({
+                         ...prev,
+                         email: "",
+                       }));
+                     }
+                   }}
+                   keyboardType="email-address"
+                   autoCapitalize="none"
+                   autoCorrect={false}
+                   required
+                   error={fieldErrors.email}
+                 />
+
+                <Input
+                  outline="none"
+                  label="Password"
                   placeholder="Create a password"
-                  placeholderTextColor="#9CA3AF"
-                  value={password}
-                  onChangeText={setPassword}
+                  value={payload.password}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, password: text });
+                    if (fieldErrors.password) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        password: "",
+                      }));
+                    }
+                  }}
                   secureTextEntry
+                  required
+                  error={fieldErrors.password}
                 />
-              </View>
 
-              <View>
-                <Text className="text-sm font-medium text-foreground mb-2">
-                  Confirm Password
-                </Text>
-                <TextInput
-                  className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
+                <Input
+                  outline="none"
+                  label="Confirm Password"
                   placeholder="Confirm your password"
-                  placeholderTextColor="#9CA3AF"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
+                  value={payload.confirmPassword}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, confirmPassword: text });
+                    if (fieldErrors.confirmPassword) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        confirmPassword: "",
+                      }));
+                    }
+                  }}
                   secureTextEntry
+                  required
+                  error={fieldErrors.confirmPassword}
                 />
-              </View>
 
-              {error && (
-                <View className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
-                  <Text className="text-sm text-destructive text-center">
-                    {error}
-                  </Text>
-                </View>
-              )}
-
-              <Button
-                title="Create Account"
-                onPress={handleRegister}
-                loading={isLoading}
-                disabled={isLoading}
-                fullWidth
-                color="primary"
-                size="lg"
-              />
-
-              <View className="flex-row items-center justify-center space-x-2">
-                <Text className="text-sm text-muted-foreground">
-                  Already have an account?
-                </Text>
-                <Link href="/auth/login" asChild>
-                  <Button
-                    title="Sign In"
-                    variant="plain"
-                    color="primary"
+                {error && (
+                  <Alert
+                    status="error"
                     size="sm"
-                  />
-                </Link>
+                    dismissible
+                    onClose={clearError}
+                  >
+                    {error}
+                  </Alert>
+                )}
+
+                <Button
+                  title="Create Account"
+                  onPress={handleRegister}
+                  loading={isLoading}
+                  disabled={isLoading}
+                  fullWidth
+                  color="primary"
+                  size="lg"
+                />
+
+                <View className="flex-row items-center justify-center space-x-2">
+                  <Text className="text-sm text-muted-foreground">
+                    Already have an account?
+                  </Text>
+                  <Link href="/(auth)/login" asChild>
+                    <Button
+                      title="Sign In"
+                      variant="plain"
+                      color="primary"
+                      size="sm"
+                    />
+                  </Link>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

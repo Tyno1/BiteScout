@@ -1,16 +1,16 @@
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
+  Alert as RNAlert,
+  SafeAreaView,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
-import { Button } from "../../src/components";
-import { useTheme } from "../../src/providers/ThemeProvider";
+import z from "zod";
+import { Alert, Button, Input } from "../../src/components";
 import {
   useClearError,
   useError,
@@ -19,7 +19,6 @@ import {
 } from "../../src/stores/authStore";
 
 export default function LoginScreen() {
-  const { isDark } = useTheme();
   const login = useLogin();
   const isLoading = useIsLoading();
   const error = useError();
@@ -28,12 +27,43 @@ export default function LoginScreen() {
     email: "",
     password: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Clear errors when component mounts
+  useEffect(() => {
+    clearError();
+    setFieldErrors({});
+  }, [clearError]);
+
+  const payloadSchema = z.object({
+    email: z.email({ message: "Invalid email address" }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+  });
 
   const handleLogin = async () => {
     if (!payload.email || !payload.password) {
-      Alert.alert("Error", "Please fill in all fields");
+      RNAlert.alert("Error", "Please fill in all fields");
       return;
     }
+    const result = payloadSchema.safeParse(payload);
+    if (!result.success) {
+      const errors = z.treeifyError(result.error);
+      const newFieldErrors: Record<string, string> = {};
+      
+      if (errors.properties?.email) {
+        newFieldErrors.email = errors.properties.email.errors[0];
+      }
+        if (errors.properties?.password) {
+        newFieldErrors.password = errors.properties.password.errors[0];
+      }
+      
+      setFieldErrors(newFieldErrors);
+      return;
+    }
+    
+    setFieldErrors({});
 
     try {
       clearError();
@@ -45,88 +75,101 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-background"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView className="flex-1">
-        <View className="flex-1 items-center justify-center p-6">
-          <View className="w-full max-w-sm">
-            <View className="mb-8">
-              <Text className="text-3xl font-bold text-foreground text-center mb-2">
-                Welcome Back
-              </Text>
-              <Text className="text-base text-muted-foreground text-center">
-                Sign in to your account
-              </Text>
-            </View>
-
-            <View className="space-y-4">
-              <View>
-                <Text className="text-sm font-medium text-foreground mb-2">
-                  Email
+    <SafeAreaView className="flex-1 bg-background ">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="flex-1 items-center justify-center p-6">
+            <View className="w-full max-w-sm">
+              <View className="mb-8">
+                <Text className="text-3xl font-bold text-foreground text-center mb-2">
+                  Welcome Back
                 </Text>
-                <TextInput
-                  className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
+                <Text className="text-base text-muted-foreground text-center">
+                  Sign in to your account
+                </Text>
+              </View>
+
+              <View className="flex flex-col gap-4">
+                <Input
+                  outline="none"
+                  label="Email"
                   placeholder="Enter your email"
-                  placeholderTextColor="#9CA3AF"
                   value={payload.email}
-                  onChangeText={(text) => setPayload({ ...payload, email: text })}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, email: text });
+                    if (fieldErrors.email) {
+                      setFieldErrors(prev => ({ ...prev, email: "" }));
+                    }
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  required
+                  error={fieldErrors.email}
                 />
-              </View>
 
-              <View>
-                <Text className="text-sm font-medium text-foreground mb-2">
-                  Password
-                </Text>
-                <TextInput
-                  className="bg-input border border-border rounded-md px-3 py-2 text-foreground"
+                <Input
+                  outline="none"
+                  label="Password"
                   placeholder="Enter your password"
-                  placeholderTextColor="#9CA3AF"
                   value={payload.password}
-                  onChangeText={(text) => setPayload({ ...payload, password: text })}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, password: text });
+                    if (fieldErrors.password) {
+                      setFieldErrors(prev => ({ ...prev, password: "" }));
+                    }
+                  }}
                   secureTextEntry
+                  required
+                  error={fieldErrors.password}
                 />
-              </View>
 
-              {error && (
-                <View className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
-                  <Text className="text-sm text-destructive text-center">
-                    {error}
-                  </Text>
-                </View>
-              )}
-
-              <Button
-                title="Sign In"
-                onPress={handleLogin}
-                loading={isLoading}
-                disabled={isLoading}
-                fullWidth
-                color="primary"
-                size="lg"
-              />
-
-              <View className="flex-row items-center justify-center space-x-2">
-                <Text className="text-sm text-muted-foreground">
-                  Don't have an account?
-                </Text>
-                <Link href="/auth/register" asChild>
-                  <Button
-                    title="Sign Up"
-                    variant="plain"
-                    color="primary"
+                {error && (
+                  <Alert
+                    status="error"
                     size="sm"
-                  />
-                </Link>
+                    dismissible
+                    onClose={clearError}
+                  >
+                    {error}
+                  </Alert>
+                )}
+
+                <Button
+                  title="Sign In"
+                  onPress={handleLogin}
+                  loading={isLoading}
+                  disabled={isLoading}
+                  fullWidth
+                  color="primary"
+                  size="lg"
+                />
+
+                <View className="flex-row items-center justify-center space-x-2">
+                  <Text className="text-sm text-muted-foreground">
+                    Don't have an account?
+                  </Text>
+                  <Link href="/(auth)/register" asChild>
+                    <Button
+                      title="Sign Up"
+                      variant="plain"
+                      color="primary"
+                      size="sm"
+                    />
+                  </Link>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
