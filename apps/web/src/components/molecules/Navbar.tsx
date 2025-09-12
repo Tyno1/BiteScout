@@ -166,7 +166,7 @@ export function Navbar({ theme }: NavTheme) {
                   size="sm"
                   text="Logout"
                   type="button"
-                  onClick={async () => await signOut({ callbackUrl: "/" })}
+                  onClick={() => signOut({ redirectTo: "/" })}
                 />
               </li>
               <li>

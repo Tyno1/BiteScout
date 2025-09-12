@@ -92,12 +92,12 @@ export function RestaurantProfileFeatures({
         <div className="space-y-3">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
-              <Tag className="w-5 h-5 text-secondary" />
+              <Tag className="w-5 h-5 text-primary" />
               <div>
                 <h2 id="features-heading" className="text-lg font-semibold">
                   Restaurant Features
                 </h2>
-                <p className="text-sm text-secondary">
+                <p className="text-sm text-primary">
                   {getSelectedCount()} features selected
                 </p>
               </div>
@@ -106,7 +106,7 @@ export function RestaurantProfileFeatures({
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  color={viewMode === "categorized" ? "secondary" : "neutral"}
+                  color={viewMode === "categorized" ? "primary" : "neutral"}
                   size="xs"
                   text="Categorized"
                   onClick={() => setViewMode("categorized")}
@@ -116,7 +116,7 @@ export function RestaurantProfileFeatures({
 
                 <Button
                   variant="outline"
-                  color={viewMode === "list" ? "secondary" : "neutral"}
+                  color={viewMode === "list" ? "primary" : "neutral"}
                   size="xs"
                   text="List"
                   onClick={() => setViewMode("list")}
@@ -150,15 +150,15 @@ export function RestaurantProfileFeatures({
               return (
                 <div
                   key={category}
-                  className="border border-gray-200 rounded-lg"
+                  className="border border-primary/20 rounded-lg"
                 >
                   <button
                     type="button"
                     onClick={() => toggleCategory(category)}
-                    className="w-full px-4 py-3 flex justify-between items-center bg-gray hover:bg-gray/80 rounded-t-lg transition-colors"
+                    className="w-full px-4 py-3 flex justify-between items-center bg-background hover:bg-background/20 rounded-t-lg transition-colors"
                   >
                     <div className="flex items-center gap-6 ">
-                      <span className="font-medium text-sm  text-foreground">
+                      <span className="font-medium text-sm text-foreground">
                         {category}
                       </span>
                       {selectedFeatures.length > 0 && (
@@ -231,6 +231,7 @@ export function RestaurantProfileFeatures({
             />
             <IconButton
               variant="solid"
+              size="sm"
               color="primary"
               icon={<Plus />}
               onClick={() => newFeature && addFeature(newFeature)}
@@ -243,7 +244,7 @@ export function RestaurantProfileFeatures({
             {ALL_FEATURES.map((feature) => (
               <label
                 key={feature}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-gray p-2 rounded"
+                className="flex items-center space-x-2 cursor-pointer hover:bg-background p-2 rounded"
               >
                 <input
                   type="checkbox"
@@ -252,7 +253,7 @@ export function RestaurantProfileFeatures({
                   className="rounded border-border text-primary focus:ring-primary"
                 />
                 <span
-                  className={`text-sm ${isFeatureSelected(feature) ? "text-secondary font-medium" : "text-foreground"}`}
+                  className={`text-sm ${isFeatureSelected(feature) ? "text-primary font-medium" : "text-foreground"}`}
                 >
                   {feature}
                 </span>
@@ -274,7 +275,7 @@ export function RestaurantProfileFeatures({
                   {category.features.map((feature) => (
                     <div
                       key={feature}
-                      className="bg-secondary text-secondary-foreground px-3 py-1 rounded-sm text-sm"
+                      className="bg-primary text-primary-foreground px-3 py-1 rounded-sm text-sm"
                     >
                       {feature}
                     </div>
@@ -283,7 +284,7 @@ export function RestaurantProfileFeatures({
               </div>
             ))
           ) : (
-            <p className="text-gray-foreground italic">No features added yet</p>
+            <p className="text-foreground italic">No features added yet</p>
           )}
         </div>
       )}

@@ -1,4 +1,4 @@
-import { Button, IconButton, Select, Textarea } from "@/components/atoms";
+import { Badge, Button, IconButton, Select, Textarea } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import { ChefHat, DollarSign, Info, X } from "lucide-react";
 import { useState } from "react";
@@ -48,9 +48,9 @@ export function BasicInformation({
             Basic Information
           </h2>
           {isEditing && (
-            <div className="text-xs px-2 py-1 rounded bg-secondary text-secondary-foreground">
+            <Badge variant="solid" color="neutral" size="xs">
               Complete profile to attract customers
-            </div>
+            </Badge>
           )}
         </div>
       }
@@ -60,7 +60,7 @@ export function BasicInformation({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
-              <ChefHat className="w-4 h-4 text-secondary" />
+              <ChefHat className="w-4 h-4 text-primary" />
               <label
                 htmlFor="cuisine-type"
                 id="cuisine-type"
@@ -77,7 +77,7 @@ export function BasicInformation({
             <div className="flex gap-4 mt-2">
               {isEditing && (
                 <div className="w-full space-y-3">
-                  <div className="text-xs text-secondary px-2 py-1 rounded">
+                  <div className="text-xs text-primary px-2 py-1 rounded">
                     Select cuisine → Add → Repeat
                   </div>
                   <div className="flex items-center gap-2 w-full">
@@ -100,6 +100,7 @@ export function BasicInformation({
                     />
                     <Button
                       text={selectedCuisine ? "Add Cuisine" : "Select & Add"}
+                      size="sm"
                       variant="outline"
                       onClick={handleAddCuisine}
                       disabled={!selectedCuisine || cuisines.length === 0}
@@ -113,7 +114,7 @@ export function BasicInformation({
               {isEditing &&
                 displayData?.cuisine &&
                 displayData.cuisine.length > 0 && (
-                  <div className="text-xs text-secondary px-2 py-1 rounded mb-2">
+                  <div className="text-xs text-primary px-2 py-1 rounded mb-2">
                     ✓ {displayData.cuisine.length} cuisine
                     {displayData.cuisine.length > 1 ? "s" : ""} added
                   </div>
@@ -147,11 +148,11 @@ export function BasicInformation({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-foreground text-sm bg-gray p-3 rounded-lg italic border border-dashed border-gray/20">
+                  <div className="text-foreground text-sm bg-background p-3 rounded-lg italic border border-dashed border-gray/20">
                     <div className="flex items-center gap-2">
                       <span>No cuisines added</span>
                       {isEditing && (
-                        <span className="text-gray-foreground">
+                        <span>
                           ← Select above
                         </span>
                       )}
@@ -164,7 +165,7 @@ export function BasicInformation({
 
           <div className="space-y-2 flex flex-col">
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-secondary" />
+              <DollarSign className="w-4 h-4 text-primary" />
               <label htmlFor="price-range" className="font-medium">Price Range</label>
             </div>
             {isEditing && (
@@ -195,7 +196,7 @@ export function BasicInformation({
 
         <div className="space-y-2 flex flex-col">
           <div className="flex items-center gap-2">
-            <Info className="w-4 h-4 text-secondary" />
+            <Info className="w-4 h-4 text-primary" />
             <label htmlFor="description-label" className="font-medium">Full Description</label>
           </div>
           {isEditing && (

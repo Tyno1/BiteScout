@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import type { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -17,7 +17,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	isExpanded?: boolean;
 };
 
-export function IconButton({
+export const IconButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 	icon,
 	color = "primary",
 	size = "md",
@@ -33,7 +33,7 @@ export function IconButton({
 	isPressed = false,
 	isExpanded = false,
 	...props
-}: ButtonProps) {
+}, ref) => {
 	const baseStyles =
 		"rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer";
 
@@ -106,6 +106,7 @@ export function IconButton({
 
 	return (
 		<button
+			ref={ref}
 			type={type}
 			disabled={disabled}
 			onClick={onClick}
@@ -122,4 +123,4 @@ export function IconButton({
 			{icon}
 		</button>
 	);
-}
+});

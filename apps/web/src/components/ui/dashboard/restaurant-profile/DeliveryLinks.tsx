@@ -1,11 +1,7 @@
-import { Alert, Button, Input, Select } from "@/components/atoms";
+import { Alert, Button, IconButton, Input, Select } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import {
-  ExternalLink,
-  Plus,
-  Trash2,
-  Truck,
-} from "lucide-react";
+import { usePlatform } from "@/hooks";
+import { ExternalLink, Icon, Plus, Trash2, Truck } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { DeliveryLink } from "shared/types/api/schemas";
 
@@ -43,13 +39,16 @@ export function DeliveryLinks({
     platform: "", // No default needed - Select component handles this
     url: "",
   });
+  const { isMobile } = usePlatform();
 
   // Memoize the options to prevent recreation on every render
-  const platformOptions = useMemo(() => 
-    DELIVERY_PLATFORMS.map((platform: string) => ({
-      label: platform,
-      value: platform,
-    })), []
+  const platformOptions = useMemo(
+    () =>
+      DELIVERY_PLATFORMS.map((platform: string) => ({
+        label: platform,
+        value: platform,
+      })),
+    []
   );
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -90,11 +89,11 @@ export function DeliveryLinks({
       header={
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Truck className="w-5 h-5 text-secondary" />
+            <Truck className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-semibold">Delivery Links</h2>
           </div>
           {isEditing && (
-            <Alert status="information">
+            <Alert status="information" size={isMobile ? "xs" : "sm"}>
               Boost your reach: Add delivery platform links so customers can
               order from your restaurant through their favorite apps!
             </Alert>
@@ -112,29 +111,26 @@ export function DeliveryLinks({
             >
               <div className="flex flex-col items-start gap-2">
                 <div className="font-medium text-sm">{link.name}</div>
-                <div className="text-xs text-secondary">{link.platform}</div>
+                <div className="text-xs text-primary">{link.platform}</div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button
+
+                <IconButton
                   variant="outline"
                   color="primary"
-                  size="sm"
-                  text="Visit Link"
+                  size={isMobile ? "xs" : "sm"}
+                  icon={<ExternalLink className="w-4 h-4" />}
                   onClick={() => window.open(link.url, "_blank")}
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
+                />
                 {isEditing && (
-                  <Button
+                  <IconButton
                     variant="outline"
                     color="danger"
-                    size="sm"
-                    text="Delete Link"
+                    size={isMobile ? "xs" : "sm"}
+                    icon={<Trash2 className="w-4 h-4" />}
                     onClick={() => handleDelete(link._id || "")}
                     disabled={isLoading}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  />
                 )}
               </div>
             </div>
@@ -145,58 +141,57 @@ export function DeliveryLinks({
       {/* Add New Link */}
       {isEditing && (
         <form onSubmit={handleAdd}>
-        <div className="border-t pt-4 space-y-4">
-          <Alert status="information">
-            Add your restaurant&apos;s delivery platform links. Include the
-            platform name, link name, and URL.
-          </Alert>
+          <div className="border-t pt-4 space-y-4">
+            <Alert status="information" size={isMobile ? "xs" : "sm"}>
+              Add your restaurant&apos;s delivery platform links. Include the
+              platform name, link name, and URL.
+            </Alert>
 
-          <h3 className="text-md font-medium mb-3">Add New Delivery Link</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <Input
-              label="Link Name"
-              name="link-name"
-              type="text"
-              placeholder="Link Name"
-              value={newLink.name}
-              onChange={(e) =>
-                setNewLink((prev) => ({ ...prev, name: e.target.value }))
-              }
+            <h3 className="text-md font-medium mb-3">Add New Delivery Link</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+              <Input
+                label="Link Name"
+                name="link-name"
+                type="text"
+                placeholder="Link Name"
+                value={newLink.name}
+                onChange={(e) =>
+                  setNewLink((prev) => ({ ...prev, name: e.target.value }))
+                }
+                disabled={isLoading}
+              />
+              <Select
+                label="Platform"
+                name="platform"
+                placeholder="Select Platform"
+                options={platformOptions}
+                value={newLink.platform}
+                onChange={(e) => {
+                  setNewLink((prev) => ({ ...prev, platform: e.target.value }));
+                }}
+                disabled={isLoading}
+              />
+              <Input
+                label="URL"
+                name="url"
+                type="url"
+                placeholder="https://..."
+                value={newLink.url}
+                onChange={(e) =>
+                  setNewLink((prev) => ({ ...prev, url: e.target.value }))
+                }
+                disabled={isLoading}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="xs"
+              text="Add Delivery Link"
+              className="flex items-center space-x-2"
               disabled={isLoading}
+              type="submit"
+              IconBefore={<Plus className="w-4 h-4" />}
             />
-            <Select
-              label="Platform"
-              name="platform"
-              placeholder="Select Platform"
-              options={platformOptions}
-              value={newLink.platform}
-              onChange={(e) => {
-                setNewLink((prev) => ({ ...prev, platform: e.target.value }));
-              }}
-              disabled={isLoading}
-            />
-            <Input
-              label="URL"
-              name="url"
-              type="url"
-              placeholder="https://..."
-              value={newLink.url}
-              onChange={(e) =>
-                setNewLink((prev) => ({ ...prev, url: e.target.value }))
-              }
-              disabled={isLoading}
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            text="Add Delivery Link"
-            className="flex items-center space-x-2"
-            disabled={isLoading}
-            type="submit"
-          >
-            <Plus className="w-4 h-4" />
-            </Button>
           </div>
         </form>
       )}

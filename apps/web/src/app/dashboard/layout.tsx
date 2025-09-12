@@ -1,6 +1,7 @@
 "use client";
 
 import { RouteProtection, SideNav, TopNav } from "@/components/ui";
+import { usePlatform } from "@/hooks";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
@@ -10,6 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isTablet } = usePlatform();
   const { data: session } = useSession();
 
   return (
@@ -21,7 +23,7 @@ export default function DashboardLayout({
       )}
 
       <div className="flex h-full w-full">
-        <div className="w-72 shrink-0 md:block hidden overflow-hidden">
+        <div className={`shrink-0 md:block hidden overflow-hidden ${isTablet ? "w-30" : "w-72"}`}>
           <SideNav />
         </div>
 

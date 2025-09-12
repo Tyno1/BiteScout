@@ -2,7 +2,7 @@ import { Button, IconButton } from "@/components/atoms";
 import type { Media } from "@shared/types";
 import { Maximize2 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface GalleryCardProps {
   image: Media;
@@ -15,10 +15,40 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
+  const [isCardFocused, setIsCardFocused] = useState(false);
+
+  // Detect if device supports touch
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    
+    checkTouchDevice();
+    // Also check on resize in case device orientation changes
+    window.addEventListener('resize', checkTouchDevice);
+    return () => window.removeEventListener('resize', checkTouchDevice);
+  }, []);
+
+  // Handle tap to reveal buttons on touch devices
+  const handleImageTap = () => {
+    if (isTouchDevice) {
+      setShowButtons(!showButtons);
+    }
+  };
+
   return (
     <div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
       {/* Image Preview */}
-      <div className="aspect-square rounded-t-xl overflow-hidden relative group">
+      <button 
+        type="button"
+        className="aspect-square rounded-t-xl overflow-hidden relative group cursor-pointer w-full border-0 p-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary"
+        onClick={handleImageTap}
+        onFocus={() => setIsCardFocused(true)}
+        onBlur={() => setIsCardFocused(false)}
+        aria-label="Tap to reveal image options"
+      >
         {image.type === "image" ? (
           <>
             {/* Loading Placeholder */}
@@ -62,8 +92,15 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
               variant="glass"
               color="primary"
               size="xs"
-              onClick={() => onFullscreen(image)}
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onFullscreen(image);
+              }}
+              className={`absolute top-2 right-2 transition-opacity duration-200 ${
+                isCardFocused || (isTouchDevice && showButtons)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100'
+              }`}
               ariaLabel="View fullscreen"
             />
             
@@ -74,10 +111,26 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
                 variant="glass"
                 color="primary"
                 size="xs"
-                onClick={() => onUseImage(image)}
-                className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUseImage(image);
+                }}
+                className={`absolute bottom-2 left-2 transition-opacity duration-200 ${
+                  isCardFocused || (isTouchDevice && showButtons)
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100'
+                }`}
                 ariaLabel="Use this image"
               />
+            )}
+
+            {/* Touch Device Indicator - Show a subtle hint */}
+            {isTouchDevice && !showButtons && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-black/20 backdrop-blur-sm rounded-full p-2 opacity-0 animate-pulse">
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                </div>
+              </div>
             )}
           </>
         ) : image.type === "video" ? (
@@ -99,7 +152,7 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
             </div>
           </div>
         )}
-      </div>
+      </button>
 
       {/* Image Info */}
       <div className="p-3">

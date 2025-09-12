@@ -1,5 +1,6 @@
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { useState } from "react";
+import { IconButton } from "../IconButton";
 
 export type AlertStatus = "warning" | "information" | "error" | "success";
 
@@ -9,6 +10,7 @@ export interface AlertProps {
   onClose?: () => void;
   dismissible?: boolean;
   className?: string;
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 const statusConfig = {
@@ -48,6 +50,7 @@ export const Alert = ({
   onClose,
   dismissible = false,
   className = "",
+  size = "sm",
 }: AlertProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const config = statusConfig[status];
@@ -65,20 +68,21 @@ export const Alert = ({
       className={`rounded-lg border p-2 ${config.bgColor} ${config.borderColor} ${className}`}
       role="alert"
     >
-      <div className={`flex items-start text-sm ${config.textColor}`}>
+      <div className={`flex items-start text-${size} ${config.textColor}`}>
         <Icon className={`h-5 w-5 flex-shrink-0 ${config.iconColor} mr-2`} />
         <p className="break-words">{children}</p>
 
         {dismissible && (
           <div className="ml-auto pl-3 flex-shrink-0">
-            <button
-              type="button"
-              className={`inline-flex rounded-md ${config.bgColor} ${config.textColor} hover:bg-opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600`}
+
+            <IconButton
+              variant="plain"
+              color="danger"
+              size="sm"
+              icon={<X className="h-4 w-4" />}
               onClick={handleClose}
               aria-label="Close alert"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            />
           </div>
         )}
       </div>

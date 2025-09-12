@@ -89,8 +89,6 @@ export default function RestaurantProfile() {
 
   const handleImageModalClose = useCallback(() => {
     setIsImageModalOpen(false);
-    // The useAssignedImages hook will automatically invalidate and refetch restaurant data
-    // so the hero image will update automatically
   }, []);
 
   const handleInputChange = useCallback(
@@ -129,6 +127,7 @@ export default function RestaurantProfile() {
     setEditableData({
       ...restaurantData,
       businessHours: mergedBusinessHours,
+      assignedImages: restaurantData.assignedImages,
     });
     setIsEditing(true);
   }, [restaurantData, mergedBusinessHours]);
@@ -224,6 +223,19 @@ export default function RestaurantProfile() {
     getCuisines();
   }, [getCuisines]);
 
+  // Sync editableData with restaurantData when assignedImages change
+  useEffect(() => {
+    if (isEditing && editableData && restaurantData) {
+      // Only update if assignedImages actually changed to avoid infinite loops
+      if (JSON.stringify(editableData.assignedImages) !== JSON.stringify(restaurantData.assignedImages)) {
+        setEditableData(prev => prev ? {
+          ...prev,
+          assignedImages: restaurantData.assignedImages,
+        } : null);
+      }
+    }
+  }, [isEditing, editableData, restaurantData]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -297,7 +309,7 @@ export default function RestaurantProfile() {
         handleImageUpload={handleImageUpload}
       />
 
-      <div className="w-full mx-auto px-4 md:px-10 py-10 space-y-4">
+      <div className="w-full mx-auto px-2 md:px-10 py-10 space-y-4">
         <BasicInformation
           removeCuisine={removeCuisine}
           isEditing={isEditing}

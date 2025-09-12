@@ -9,6 +9,8 @@ export * from './useGalleryState';
 export * from './useTheme';
 export * from './useNotification';
 export * from './useForceSignOut';
+export * from './useScreenSize';
+export * from './usePlatform';
 export * from './user-management';
 export * from './user-profile';
 export * from './media';

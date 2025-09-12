@@ -1,3 +1,5 @@
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import type { LoginPostRequest, LoginPostResponse } from "shared/types/auth/login";
 import type { RefreshPostRequest, RefreshPostResponse } from "shared/types/auth/refresh";
 import type {
@@ -5,8 +7,6 @@ import type {
   RegisterPostResponse,
 } from "shared/types/auth/register";
 import type { ApiError } from "shared/types/common/errors";
-import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import {
 	type MyJWTPayload,
 	generateAccessToken,
@@ -60,6 +60,8 @@ export const login = async (
 			expiresIn: Date.now() + 3600 * 1000, // expiresIn is a timestamp in milliseconds
 		});
 	} catch (error) {
+		console.log(error);
+		
 		return next(error);
 	}
 };
