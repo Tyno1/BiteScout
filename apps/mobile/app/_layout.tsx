@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '../src/providers/ThemeProvider';
+import "../global.css"
 
 function AppContent() {
   
@@ -16,17 +17,10 @@ function AppContent() {
           }} 
         />
         <Stack.Screen 
-          name="auth/login" 
+          name="(auth)" 
           options={{ 
             headerShown: false,
-            title: 'Login'
-          }} 
-        />
-        <Stack.Screen 
-          name="auth/register" 
-          options={{ 
-            headerShown: false,
-            title: 'Register'
+            title: 'Authentication'
           }} 
         />
         <Stack.Screen name="(protected)" options={{ headerShown: false }} />

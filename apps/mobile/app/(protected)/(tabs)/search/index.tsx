@@ -1,128 +1,104 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+import { Button } from '../../../../src/components';
 
 export default function Search() {
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <Text style={styles.subtitle}>Manage your account</Text>
-      </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Information</Text>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Name:</Text>
-          <Text style={styles.infoValue}>John Doe</Text>
+    <ScrollView className="flex-1 bg-background">
+      <View className="p-4">
+        <View className="mb-6">
+          <Text className="text-3xl font-bold text-foreground mb-2">Search</Text>
+          <Text className="text-base text-muted-foreground">Find restaurants near you</Text>
         </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Email:</Text>
-          <Text style={styles.infoValue}>john@example.com</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-4">Search Filters</Text>
+          
+          <View className="space-y-3">
+            <View>
+              <Text className="text-sm font-medium text-foreground mb-2">Cuisine Type</Text>
+              <View className="flex-row flex-wrap gap-2">
+                <Button title="Italian" variant="outline" size="sm" />
+                <Button title="Chinese" variant="outline" size="sm" />
+                <Button title="Mexican" variant="outline" size="sm" />
+                <Button title="Indian" variant="outline" size="sm" />
+              </View>
+            </View>
+            
+            <View>
+              <Text className="text-sm font-medium text-foreground mb-2">Price Range</Text>
+              <View className="flex-row flex-wrap gap-2">
+                <Button title="$" variant="outline" size="sm" />
+                <Button title="$$" variant="outline" size="sm" />
+                <Button title="$$$" variant="outline" size="sm" />
+                <Button title="$$$$" variant="outline" size="sm" />
+              </View>
+            </View>
+          </View>
         </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Member since:</Text>
-          <Text style={styles.infoValue}>January 2024</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-4">Recent Searches</Text>
+          
+          <View className="space-y-2">
+            <View className="flex-row items-center justify-between py-2">
+              <Text className="text-base text-foreground">Pizza near me</Text>
+              <Text className="text-sm text-muted-foreground">2 hours ago</Text>
+            </View>
+            <View className="flex-row items-center justify-between py-2">
+              <Text className="text-base text-foreground">Sushi restaurants</Text>
+              <Text className="text-sm text-muted-foreground">1 day ago</Text>
+            </View>
+            <View className="flex-row items-center justify-between py-2">
+              <Text className="text-base text-foreground">Coffee shops</Text>
+              <Text className="text-sm text-muted-foreground">3 days ago</Text>
+            </View>
+          </View>
         </View>
-      </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
-        <View style={styles.preferenceItem}>
-          <Text style={styles.preferenceLabel}>Notifications</Text>
-          <Text style={styles.preferenceValue}>Enabled</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-4">Popular Near You</Text>
+          
+          <View className="space-y-3">
+            <View className="border border-border rounded-lg p-3">
+              <Text className="text-base font-semibold text-foreground mb-1">Mario's Pizza</Text>
+              <Text className="text-sm text-muted-foreground mb-2">Italian • $$ • 0.5 miles</Text>
+              <Text className="text-sm text-foreground">⭐⭐⭐⭐⭐ 4.8 (124 reviews)</Text>
+            </View>
+            
+            <View className="border border-border rounded-lg p-3">
+              <Text className="text-base font-semibold text-foreground mb-1">Golden Dragon</Text>
+              <Text className="text-sm text-muted-foreground mb-2">Chinese • $ • 0.8 miles</Text>
+              <Text className="text-sm text-foreground">⭐⭐⭐⭐ 4.5 (89 reviews)</Text>
+            </View>
+            
+            <View className="border border-border rounded-lg p-3">
+              <Text className="text-base font-semibold text-foreground mb-1">Taco Fiesta</Text>
+              <Text className="text-sm text-muted-foreground mb-2">Mexican • $ • 1.2 miles</Text>
+              <Text className="text-sm text-foreground">⭐⭐⭐⭐ 4.3 (67 reviews)</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.preferenceItem}>
-          <Text style={styles.preferenceLabel}>Location Services</Text>
-          <Text style={styles.preferenceValue}>Enabled</Text>
+        
+        <View className="space-y-3">
+          <Button
+            title="Start New Search"
+            color="primary"
+            size="lg"
+            fullWidth
+            onPress={() => {}}
+          />
+          
+          <Link href="/(protected)/(tabs)/(home)" asChild>
+            <Button
+              title="← Back to Home"
+              color="secondary"
+              variant="outline"
+              fullWidth
+            />
+          </Link>
         </View>
-      </View>
-      
-      <View style={styles.actions}>
-        <Link href="/" style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>← Back to Home</Text>
-        </Link>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#007AFF',
-    padding: 20,
-    paddingTop: 60,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
-  section: {
-    backgroundColor: 'white',
-    margin: 15,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 15,
-    color: '#333',
-  },
-  infoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: '#666',
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
-  preferenceItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  preferenceLabel: {
-    fontSize: 16,
-    color: '#666',
-  },
-  preferenceValue: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '500',
-  },
-  actions: {
-    padding: 20,
-  },
-  actionButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

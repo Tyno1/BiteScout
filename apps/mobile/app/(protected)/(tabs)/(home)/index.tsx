@@ -1,219 +1,148 @@
 import { Link } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { Button } from '../../../../src/components';
-import { styles, useTheme } from '../../../../src/config';
+import { useTheme } from '../../../../src/providers/ThemeProvider';
 import { useLogout, useUser } from '../../../../src/stores/authStore';
 
 export default function HomeScreen() {
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { isDark, setTheme } = useTheme();
   const user = useUser();
   const logout = useLogout();
 
   return (
-    <ScrollView style={[
-      styles.flex.flex1,
-      { backgroundColor: theme.colors.background }
-    ]}>
-      <View style={[
-        styles.flex.flex1,
-        styles.flex.center,
-        styles.spacing.p(4)
-      ]}>
-        <Text style={{
-          fontSize: theme.typography.fontSize['4xl'],
-          fontWeight: theme.typography.fontWeight.bold,
-          color: theme.colors.foreground,
-          textAlign: 'center',
-          marginBottom: theme.spacing[2]
-        }}>
+    <ScrollView className="flex-1 bg-background">
+      <View className="flex-1 items-center justify-center p-4">
+        <Text className="text-4xl font-bold text-foreground text-center mb-2">
           Welcome to BiteScout!
         </Text>
         
-        <Text style={{
-          fontSize: theme.typography.fontSize.lg,
-          color: theme.colors.mutedForeground,
-          textAlign: 'center',
-          marginBottom: theme.spacing[4]
-        }}>
+        <Text className="text-lg text-muted-foreground text-center mb-4">
           Your restaurant discovery app
         </Text>
         
-        <Text style={{
-          fontSize: theme.typography.fontSize.base,
-          color: theme.colors.primary,
-          textAlign: 'center',
-          marginBottom: theme.spacing[8]
-        }}>
-          Hello, {user?.firstName || 'User'}! 👋
+        <Text className="text-base text-primary text-center mb-8">
+          Hello, {user?.name || 'User'}! 👋
         </Text>
         
         {/* Color System Demo */}
-        <View style={{
-          backgroundColor: theme.colors.card,
-          borderRadius: theme.borderRadius.lg,
-          padding: theme.spacing[4],
-          marginBottom: theme.spacing[8],
-          ...theme.shadows.sm
-        }}>
-          <Text style={{
-            fontSize: theme.typography.fontSize['2xl'],
-            fontWeight: theme.typography.fontWeight.semibold,
-            color: theme.colors.cardForeground,
-            marginBottom: theme.spacing[3]
-          }}>
+        <View className="bg-card rounded-lg p-4 mb-8 shadow-sm">
+          <Text className="text-2xl font-semibold text-card-foreground mb-3">
             Color System Usage
           </Text>
           
-          <View style={[
-            styles.flex.row,
-            { gap: theme.spacing[2], marginBottom: theme.spacing[3] }
-          ]}>
-            <View style={[
-              styles.flex.center,
-              {
-                backgroundColor: theme.colors.primary,
-                padding: theme.spacing[2],
-                borderRadius: theme.borderRadius.sm,
-                flex: 1
-              }
-            ]}>
-              <Text style={{
-                fontSize: theme.typography.fontSize.xs,
-                color: theme.colors.primaryForeground
-              }}>
+          <View className="flex-row gap-2 mb-3">
+            <View className="flex-1 items-center justify-center bg-primary p-2 rounded-sm">
+              <Text className="text-xs text-primary-foreground">
                 Primary
               </Text>
             </View>
-            <View style={[
-              styles.flex.center,
-              {
-                backgroundColor: theme.colors.secondary,
-                padding: theme.spacing[2],
-                borderRadius: theme.borderRadius.sm,
-                flex: 1
-              }
-            ]}>
-              <Text style={{
-                fontSize: theme.typography.fontSize.xs,
-                color: theme.colors.secondaryForeground
-              }}>
+            <View className="flex-1 items-center justify-center bg-secondary p-2 rounded-sm">
+              <Text className="text-xs text-secondary-foreground">
                 Secondary
+              </Text>
+            </View>
+            <View className="flex-1 items-center justify-center bg-success p-2 rounded-sm">
+              <Text className="text-xs text-success-foreground">
+                Success
               </Text>
             </View>
           </View>
           
-          <Text style={{
-            fontSize: theme.typography.fontSize.sm,
-            color: theme.colors.mutedForeground
-          }}>
-            Use: theme.colors.primary (automatically switches with theme!)
+          <Text className="text-sm text-muted-foreground text-center">
+            This demonstrates the design system colors
           </Text>
         </View>
         
-        <View style={[
-          styles.flex.column,
-          { gap: theme.spacing[4], marginBottom: theme.spacing[8] }
-        ]}>
+        {/* Theme Toggle */}
+        <View className="bg-card rounded-lg p-4 mb-8 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-3 text-center">
+            Theme Settings
+          </Text>
+          
+          <View className="flex-row items-center justify-center gap-4">
+            <Button
+              title="Light"
+              variant="outline"
+              size="sm"
+              onPress={() => setTheme('light')}
+            />
+            <Button
+              title="Dark"
+              variant="outline"
+              size="sm"
+              onPress={() => setTheme('dark')}
+            />
+            <Button
+              title="System"
+              variant="outline"
+              size="sm"
+              onPress={() => setTheme('system')}
+            />
+          </View>
+          
+          <Text className="text-sm text-muted-foreground text-center mt-2">
+            Current: {isDark ? 'Dark' : 'Light'}
+          </Text>
+        </View>
+        
+        {/* Action Buttons */}
+        <View className="w-full gap-3">
           <Button
-            title="Toggle Theme"
+            title="Explore Restaurants"
             color="primary"
-            variant="solid"
-            onPress={toggleTheme}
+            size="lg"
             fullWidth
-          />
-          
-          <Button
-            title="About"
-            color="secondary"
-            variant="solid"
             onPress={() => {}}
-            fullWidth
           />
           
-          <Button
-            title="Profile"
-            color="primary"
-            variant="outline"
-            onPress={() => {}}
-            fullWidth
-          />
-          
-          <Button
-            title="Loading Example"
-            color="success"
-            variant="plain"
-            loading
-            fullWidth
-          />
-          
-          <Button
-            title="Danger Action"
-            color="danger"
-            variant="solid"
-            onPress={() => {}}
-            fullWidth
-          />
-          
-          <Button
-            title="Glass Effect"
-            color="primary"
-            variant="glass"
-            onPress={() => {}}
-            fullWidth
-          />
+          <View className="flex-row gap-3">
+            <Button
+              title="Search"
+              color="secondary"
+              variant="outline"
+              size="md"
+              style={{ flex: 1 }}
+              onPress={() => {}}
+            />
+            <Button
+              title="Upload"
+              color="success"
+              variant="outline"
+              size="md"
+              style={{ flex: 1 }}
+              onPress={() => {}}
+            />
+          </View>
           
           <Button
             title="Logout"
             color="danger"
-            variant="solid"
-            onPress={logout}
+            variant="plain"
+            size="md"
             fullWidth
+            onPress={logout}
           />
         </View>
         
-        <View style={[
-          styles.flex.row,
-          { gap: theme.spacing[4], marginBottom: theme.spacing[8] }
-        ]}>
-          <Link href="/about" asChild>
-            <Button title="About" color="primary" variant="outline" size="sm" />
+        {/* Navigation Links */}
+        <View className="mt-8 gap-2">
+          <Link href="/(protected)/(tabs)/(profile)" asChild>
+            <Button
+              title="Go to Profile"
+              color="neutral"
+              variant="plain"
+              size="sm"
+            />
           </Link>
-          <Link href="/profile" asChild>
-            <Button title="Profile" color="secondary" variant="outline" size="sm" />
+          
+          <Link href="/(protected)/(tabs)/search" asChild>
+            <Button
+              title="Go to Search"
+              color="neutral"
+              variant="plain"
+              size="sm"
+            />
           </Link>
-        </View>
-        
-        <View style={{
-          backgroundColor: theme.colors.card,
-          borderRadius: theme.borderRadius.lg,
-          padding: theme.spacing[4],
-          ...theme.shadows.sm
-        }}>
-          <Text style={{
-            fontSize: theme.typography.fontSize['2xl'],
-            fontWeight: theme.typography.fontWeight.semibold,
-            color: theme.colors.cardForeground,
-            marginBottom: theme.spacing[2]
-          }}>
-            Design System Demo
-          </Text>
-          <Text style={{
-            fontSize: theme.typography.fontSize.base,
-            color: theme.colors.mutedForeground,
-            marginBottom: theme.spacing[2]
-          }}>
-            This screen demonstrates the design system with:
-          </Text>
-          <Text style={{
-            fontSize: theme.typography.fontSize.sm,
-            color: theme.colors.mutedForeground
-          }}>
-            • Consistent colors and typography{'\n'}
-            • Theme switching (light/dark){'\n'}
-            • Responsive spacing{'\n'}
-            • Reusable components{'\n'}
-            • TypeScript support
-          </Text>
         </View>
       </View>
     </ScrollView>

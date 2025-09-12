@@ -1,128 +1,124 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+import { Button } from '../../../../src/components';
 
 export default function Restaurant() {
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <Text style={styles.subtitle}>Manage your account</Text>
-      </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Information</Text>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Name:</Text>
-          <Text style={styles.infoValue}>John Doe</Text>
+    <ScrollView className="flex-1 bg-background">
+      <View className="p-4">
+        <View className="mb-6">
+          <Text className="text-3xl font-bold text-foreground mb-2">Restaurant</Text>
+          <Text className="text-base text-muted-foreground">Restaurant details and reviews</Text>
         </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Email:</Text>
-          <Text style={styles.infoValue}>john@example.com</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-2xl font-bold text-card-foreground mb-2">Mario's Pizza</Text>
+          <Text className="text-sm text-muted-foreground mb-3">Italian • $$ • 0.5 miles away</Text>
+          
+          <View className="flex-row items-center mb-4">
+            <Text className="text-2xl mr-2">⭐⭐⭐⭐⭐</Text>
+            <Text className="text-base text-foreground">4.8 (124 reviews)</Text>
+          </View>
+          
+          <Text className="text-base text-card-foreground mb-4">
+            Authentic Italian pizza made with fresh ingredients and traditional recipes. 
+            Family-owned restaurant serving the community for over 20 years.
+          </Text>
+          
+          <View className="flex-row space-x-2">
+            <Button title="Call" color="primary" variant="outline" size="sm" />
+            <Button title="Directions" color="secondary" variant="outline" size="sm" />
+            <Button title="Website" color="success" variant="outline" size="sm" />
+          </View>
         </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Member since:</Text>
-          <Text style={styles.infoValue}>January 2024</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-4">Hours</Text>
+          
+          <View className="space-y-2">
+            <View className="flex-row justify-between">
+              <Text className="text-base text-foreground">Monday - Thursday</Text>
+              <Text className="text-base text-muted-foreground">11:00 AM - 10:00 PM</Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-base text-foreground">Friday - Saturday</Text>
+              <Text className="text-base text-muted-foreground">11:00 AM - 11:00 PM</Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-base text-foreground">Sunday</Text>
+              <Text className="text-base text-muted-foreground">12:00 PM - 9:00 PM</Text>
+            </View>
+          </View>
         </View>
-      </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
-        <View style={styles.preferenceItem}>
-          <Text style={styles.preferenceLabel}>Notifications</Text>
-          <Text style={styles.preferenceValue}>Enabled</Text>
+        
+        <View className="bg-card rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-semibold text-card-foreground mb-4">Recent Reviews</Text>
+          
+          <View className="space-y-3">
+            <View className="border border-border rounded-lg p-3">
+              <View className="flex-row items-center mb-2">
+                <Text className="text-lg mr-2">⭐⭐⭐⭐⭐</Text>
+                <Text className="text-sm font-semibold text-foreground">Sarah M.</Text>
+                <Text className="text-sm text-muted-foreground ml-2">2 days ago</Text>
+              </View>
+              <Text className="text-sm text-foreground">
+                Best pizza in town! The Margherita is absolutely perfect. 
+                Great atmosphere and friendly service.
+              </Text>
+            </View>
+            
+            <View className="border border-border rounded-lg p-3">
+              <View className="flex-row items-center mb-2">
+                <Text className="text-lg mr-2">⭐⭐⭐⭐</Text>
+                <Text className="text-sm font-semibold text-foreground">Mike R.</Text>
+                <Text className="text-sm text-muted-foreground ml-2">1 week ago</Text>
+              </View>
+              <Text className="text-sm text-foreground">
+                Really good pizza, though it can get busy on weekends. 
+                Worth the wait!
+              </Text>
+            </View>
+            
+            <View className="border border-border rounded-lg p-3">
+              <View className="flex-row items-center mb-2">
+                <Text className="text-lg mr-2">⭐⭐⭐⭐⭐</Text>
+                <Text className="text-sm font-semibold text-foreground">Emma L.</Text>
+                <Text className="text-sm text-muted-foreground ml-2">2 weeks ago</Text>
+              </View>
+              <Text className="text-sm text-foreground">
+                Authentic Italian experience. The pasta is also amazing!
+              </Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.preferenceItem}>
-          <Text style={styles.preferenceLabel}>Location Services</Text>
-          <Text style={styles.preferenceValue}>Enabled</Text>
+        
+        <View className="space-y-3">
+          <Button
+            title="Write a Review"
+            color="primary"
+            size="lg"
+            fullWidth
+            onPress={() => {}}
+          />
+          
+          <Button
+            title="Add to Favorites"
+            color="secondary"
+            variant="outline"
+            fullWidth
+            onPress={() => {}}
+          />
+          
+          <Link href="/(protected)/(tabs)/(home)" asChild>
+            <Button
+              title="← Back to Home"
+              color="neutral"
+              variant="outline"
+              fullWidth
+            />
+          </Link>
         </View>
-      </View>
-      
-      <View style={styles.actions}>
-        <Link href="/" style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>← Back to Home</Text>
-        </Link>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#007AFF',
-    padding: 20,
-    paddingTop: 60,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
-  section: {
-    backgroundColor: 'white',
-    margin: 15,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 15,
-    color: '#333',
-  },
-  infoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: '#666',
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
-  preferenceItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  preferenceLabel: {
-    fontSize: 16,
-    color: '#666',
-  },
-  preferenceValue: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '500',
-  },
-  actions: {
-    padding: 20,
-  },
-  actionButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

@@ -1,95 +1,101 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { Appearance } from 'react-native';
-import type { ColorSchemeName } from 'react-native';
-import { darkTheme, lightTheme } from '../config/theme';
-import type { ThemeVariant } from '../config/theme';
+import { useColorScheme, vars } from "nativewind";
+import type React from "react";
+import { createContext, useContext, useState } from "react";
+import { View } from "react-native";
 
 interface ThemeContextType {
-  theme: ThemeVariant;
-  isDark: boolean;
-  toggleTheme: () => void;
-  setTheme: (isDark: boolean) => void;
+	theme: "light" | "dark" | "system";
+	setTheme: (theme: "light" | "dark" | "system") => void;
+	isDark: boolean;
+	isSystem: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
-  children: ReactNode;
-  initialTheme?: 'light' | 'dark' | 'system';
+	children: React.ReactNode;
+	initialTheme?: "light" | "dark" | "system";
 }
 
-export function ThemeProvider({ children, initialTheme = 'system' }: ThemeProviderProps) {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (initialTheme === 'system') {
-      return Appearance.getColorScheme() === 'dark';
-    }
-    return initialTheme === 'dark';
-  });
+// Define themes using NativeWind's vars()
+const themes = {
+	light: vars({
+		"--color-primary": "194 65 12", // orange-700
+		"--color-primary-foreground": "243 244 246", // gray-100
+		"--color-secondary": "49 46 129", // indigo-900
+		"--color-secondary-foreground": "243 244 246", // gray-100
+		"--color-background": "243 244 246", // gray-100
+		"--color-foreground": "9 9 11", // zinc-950
+		"--color-card": "255 255 255", // white
+		"--color-card-foreground": "24 24 27", // zinc-900
+		"--color-muted": "228 228 231", // zinc-200
+		"--color-muted-foreground": "63 63 70", // zinc-700
+		"--color-accent": "253 186 116", // orange-300
+		"--color-accent-foreground": "255 247 237", // orange-50
+		"--color-destructive": "220 38 38", // red-700
+		"--color-destructive-foreground": "243 244 246", // gray-100
+		"--color-success": "14 118 0", // custom green
+		"--color-success-foreground": "240 253 244", // green-50
+		"--color-border": "154 52 18", // orange-800
+		"--color-input": "229 231 235", // gray-200
+		"--color-input-foreground": "24 24 27", // zinc-900
+		"--color-ring": "234 88 12", // orange-600
+	}),
+	dark: vars({
+		"--color-primary": "249 115 22", // orange-500
+		"--color-primary-foreground": "0 0 0", // black
+		"--color-secondary": "165 180 252", // indigo-300
+		"--color-secondary-foreground": "30 27 75", // indigo-950
+		"--color-background": "9 9 11", // zinc-950
+		"--color-foreground": "243 244 246", // gray-100
+		"--color-card": "24 24 27", // zinc-900
+		"--color-card-foreground": "209 213 219", // gray-300
+		"--color-muted": "229 231 235", // gray-200
+		"--color-muted-foreground": "161 161 170", // zinc-400
+		"--color-accent": "251 146 60", // orange-400
+		"--color-accent-foreground": "255 247 237", // orange-50
+		"--color-destructive": "239 68 68", // red-500
+		"--color-destructive-foreground": "127 29 29", // red-900
+		"--color-success": "20 83 45", // green-800
+		"--color-success-foreground": "6 39 0", // green-950
+		"--color-border": "124 45 18", // orange-900
+		"--color-input": "63 63 70", // zinc-700
+		"--color-input-foreground": "228 228 231", // zinc-200
+		"--color-ring": "251 146 60", // orange-400
+	}),
+};
 
-  const [systemColorScheme, setSystemColorScheme] = useState<ColorSchemeName>(
-    Appearance.getColorScheme()
-  );
+export function ThemeProvider({
+	children,
+	initialTheme = "system",
+}: ThemeProviderProps) {
+	const [theme, setTheme] = useState<"light" | "dark" | "system">(initialTheme);
+	const { colorScheme } = useColorScheme();
 
-  // Listen to system theme changes
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setSystemColorScheme(colorScheme);
-      if (initialTheme === 'system') {
-        setIsDark(colorScheme === 'dark');
-      }
-    });
+	const isSystem = theme === "system";
+	const isDark = isSystem ? colorScheme === "dark" : theme === "dark";
+	const currentTheme = isDark ? "dark" : "light";
 
-    return () => subscription?.remove();
-  }, [initialTheme]);
+	const value: ThemeContextType = {
+		theme,
+		setTheme,
+		isDark,
+		isSystem,
+	};
 
-  const toggleTheme = () => {
-    setIsDark(prev => !prev);
-  };
-
-  const setTheme = (dark: boolean) => {
-    setIsDark(dark);
-  };
-
-  const theme = isDark ? darkTheme : lightTheme;
-
-  const value: ThemeContextType = {
-    theme,
-    isDark,
-    toggleTheme,
-    setTheme,
-  };
-
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+	return (
+		<ThemeContext.Provider value={value}>
+			<View style={themes[currentTheme]} className="flex-1">
+				{children}
+			</View>
+		</ThemeContext.Provider>
+	);
 }
 
-export function useTheme(): ThemeContextType {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-}
-
-// Hook to get current theme colors
-export function useThemeColors() {
-  const { theme } = useTheme();
-  return theme.colors;
-}
-
-// Hook to get current theme spacing
-export function useThemeSpacing() {
-  const { theme } = useTheme();
-  return theme.spacing;
-}
-
-// Hook to get current theme typography
-export function useThemeTypography() {
-  const { theme } = useTheme();
-  return theme.typography;
+export function useTheme() {
+	const context = useContext(ThemeContext);
+	if (context === undefined) {
+		throw new Error("useTheme must be used within a ThemeProvider");
+	}
+	return context;
 }
