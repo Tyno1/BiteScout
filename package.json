@@ -22,6 +22,12 @@
     "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
+    "mobile:dev": "cd apps/mobile && yarn dev",
+    "mobile:start": "cd apps/mobile && yarn start",
+    "mobile:android": "cd apps/mobile && yarn android",
+    "mobile:ios": "cd apps/mobile && yarn ios",
+    "mobile:web": "cd apps/mobile && yarn web",
+    "mobile:build": "cd apps/mobile && yarn build",
     "media:dev": "cd apps/media-service && docker compose up -d",
     "media:dev:build": "cd apps/media-service && docker compose up -d --build",
     "media:down": "cd apps/media-service && docker compose down",
@@ -31,5 +37,16 @@
   },
   "devDependencies": {
     "turbo": "^2.5.5"
+  },
+  "dependencies": {
+    "expo": "~51.0.0"
+  },
+  "resolutions": {
+    "metro": "0.80.11",
+    "metro-resolver": "0.80.11",
+    "metro-runtime": "0.80.11",
+    "metro-config": "0.80.11",
+    "metro-source-map": "0.80.11",
+    "metro-transform-worker": "0.80.11"
   }
 }

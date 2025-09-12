@@ -1,130 +1,168 @@
-import type React from "react";
-import {
-	ActivityIndicator,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-} from "react-native";
-import { BORDER_RADIUS, COLORS, FONT_SIZES, SPACING } from "../utils/constants";
+import React from "react";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import type { TouchableOpacityProps } from "react-native";
+import { cn } from "../lib/utils";
 
-interface ButtonProps {
+interface ButtonProps extends TouchableOpacityProps {
 	title: string;
-	onPress: () => void;
-	variant?: "primary" | "secondary" | "outline";
-	size?: "small" | "medium" | "large";
-	disabled?: boolean;
+	color?: "primary" | "secondary" | "danger" | "success" | "neutral";
+	variant?: "solid" | "outline" | "plain" | "glass";
+	size?: "sm" | "md" | "lg" | "xl";
 	loading?: boolean;
+	disabled?: boolean;
 	fullWidth?: boolean;
+	style?: object;
 }
 
-const Button: React.FC<ButtonProps> = ({
+export function Button({
 	title,
-	onPress,
-	variant = "primary",
-	size = "medium",
-	disabled = false,
+	color = "primary",
+	variant = "solid",
+	size = "md",
 	loading = false,
+	disabled = false,
 	fullWidth = false,
-}) => {
-	const getButtonStyle = () => {
-		const style: any = {
-			alignItems: "center",
-			justifyContent: "center",
-			borderRadius: BORDER_RADIUS.lg,
-		};
-
-		// Size styles
-		switch (size) {
-			case "small":
-				style.paddingVertical = SPACING.sm;
-				style.paddingHorizontal = SPACING.md;
-				break;
-			case "medium":
-				style.paddingVertical = SPACING.md;
-				style.paddingHorizontal = SPACING.lg;
-				break;
-			case "large":
-				style.paddingVertical = SPACING.lg;
-				style.paddingHorizontal = SPACING.xl;
-				break;
-		}
-
-		// Variant styles
-		switch (variant) {
+	style,
+	...props
+}: ButtonProps) {
+	const getColorClasses = () => {
+		switch (color) {
 			case "primary":
-				style.backgroundColor = COLORS.primary;
-				break;
+				return {
+					solid: "bg-primary",
+					outline: "bg-transparent border border-primary",
+					plain: "bg-transparent",
+					glass: "bg-primary/20 border border-primary/40",
+				};
 			case "secondary":
-				style.backgroundColor = COLORS.secondary;
-				break;
-			case "outline":
-				style.backgroundColor = "transparent";
-				style.borderWidth = 2;
-				style.borderColor = COLORS.primary;
-				break;
+				return {
+					solid: "bg-secondary",
+					outline: "bg-transparent border border-secondary",
+					plain: "bg-transparent",
+					glass: "bg-secondary/20 border border-secondary/40",
+				};
+			case "danger":
+				return {
+					solid: "bg-destructive",
+					outline: "bg-transparent border border-destructive",
+					plain: "bg-transparent",
+					glass: "bg-destructive/20 border border-destructive/40",
+				};
+			case "success":
+				return {
+					solid: "bg-success",
+					outline: "bg-transparent border border-success",
+					plain: "bg-transparent",
+					glass: "bg-success/20 border border-success/40",
+				};
+			case "neutral":
+				return {
+					solid: "bg-foreground",
+					outline: "bg-transparent border border-foreground",
+					plain: "bg-transparent",
+					glass: "bg-foreground/20 border border-foreground/40",
+				};
+			default:
+				return {
+					solid: "bg-primary",
+					outline: "bg-transparent border border-primary",
+					plain: "bg-transparent",
+					glass: "bg-primary/20 border border-primary/40",
+				};
 		}
-
-		if (fullWidth) {
-			style.width = "100%";
-		}
-
-		if (disabled) {
-			style.backgroundColor = COLORS.border;
-			style.borderColor = COLORS.border;
-		}
-
-		return style;
 	};
 
-	const getTextStyle = () => {
-		const style: any = {
-			fontWeight: "600",
-		};
-
-		// Size styles
+	const getSizeClasses = () => {
 		switch (size) {
-			case "small":
-				style.fontSize = FONT_SIZES.sm;
-				break;
-			case "medium":
-				style.fontSize = FONT_SIZES.md;
-				break;
-			case "large":
-				style.fontSize = FONT_SIZES.lg;
-				break;
+			case "sm":
+				return "px-3 py-2 min-h-[32px]";
+			case "lg":
+				return "px-6 py-3 min-h-[48px]";
+			case "xl":
+				return "px-8 py-4 min-h-[56px]";
+			default: // md
+				return "px-4 py-2.5 min-h-[40px]";
 		}
-
-		// Color styles
-		if (variant === "outline") {
-			style.color = COLORS.primary;
-		} else {
-			style.color = COLORS.surface;
-		}
-
-		if (disabled) {
-			style.color = COLORS.textLight;
-		}
-
-		return style;
 	};
+
+	const getVariantClasses = () => {
+		const colors = getColorClasses();
+
+		switch (variant) {
+			case "solid":
+				return colors.solid;
+			case "outline":
+				return colors.outline;
+			case "plain":
+				return colors.plain;
+			case "glass":
+				return colors.glass;
+			default:
+				return colors.solid;
+		}
+	};
+
+	const getTextSize = () => {
+		switch (size) {
+			case "sm":
+				return "text-sm";
+			case "lg":
+				return "text-lg";
+			case "xl":
+				return "text-xl";
+			default: // md
+				return "text-base";
+		}
+	};
+
+	const baseClasses = cn(
+		"items-center justify-center rounded-md font-semibold",
+		getSizeClasses(),
+		getVariantClasses(),
+		disabled && "opacity-60",
+		fullWidth && "w-full"
+	);
+
+	const getTextColor = () => {
+		if (disabled) return "text-muted-foreground";
+		
+		switch (variant) {
+			case "solid":
+				return `text-${color}-foreground`;
+			case "outline":
+			case "plain":
+			case "glass":
+				return `text-${color}`;
+			default:
+				return `text-${color}-foreground`;
+		}
+	};
+
+	const textClasses = cn(
+		getTextSize(),
+		variant === "plain" ? "font-medium" : "font-semibold",
+		getTextColor()
+	);
 
 	return (
 		<TouchableOpacity
-			style={getButtonStyle()}
-			onPress={onPress}
+			className={baseClasses}
 			disabled={disabled || loading}
 			activeOpacity={0.8}
+			style={style}
+			{...props}
 		>
 			{loading ? (
-				<ActivityIndicator
-					size="small"
-					color={variant === "outline" ? COLORS.primary : COLORS.surface}
+				<ActivityIndicator 
+					color={variant === "solid" ? "white" : "currentColor"}
+					size="small" 
 				/>
 			) : (
-				<Text style={getTextStyle()}>{title}</Text>
+				<Text className={textClasses}>
+					{title}
+				</Text>
 			)}
 		</TouchableOpacity>
-	);
-};
-
-export default Button;
+	)
+}
+                  
