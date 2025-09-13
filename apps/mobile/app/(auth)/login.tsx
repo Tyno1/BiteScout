@@ -4,11 +4,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert as RNAlert,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import z from "zod";
 import { Alert, Button, Input } from "../../src/components";
 import {
@@ -49,14 +49,13 @@ export default function LoginScreen() {
     }
     const result = payloadSchema.safeParse(payload);
     if (!result.success) {
-      const errors = z.treeifyError(result.error);
       const newFieldErrors: Record<string, string> = {};
       
-      if (errors.properties?.email) {
-        newFieldErrors.email = errors.properties.email.errors[0];
-      }
-        if (errors.properties?.password) {
-        newFieldErrors.password = errors.properties.password.errors[0];
+      for (const issue of result.error.issues) {
+        if (issue.path.length > 0) {
+          const field = issue.path[0] as string;
+          newFieldErrors[field] = issue.message;
+        }
       }
       
       setFieldErrors(newFieldErrors);

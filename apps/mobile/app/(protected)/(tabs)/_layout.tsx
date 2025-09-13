@@ -4,35 +4,35 @@ export default function TabLayout() {
   return (
       <Tabs>
         <Tabs.Screen
-          name="(home)/index"
+          name="(home)"
           options={{
             title: "Home",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="search/index"
+          name="search"
           options={{
             title: "Search",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="upload/index"
+          name="upload"
           options={{
             title: "Upload",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="restaurant/index"
+          name="restaurant"
           options={{
             title: "Restaurant",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="(profile)/index"
+          name="(profile)"
           options={{
             title: "Profile",
             headerShown: false,

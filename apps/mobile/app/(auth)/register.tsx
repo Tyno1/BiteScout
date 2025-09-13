@@ -4,11 +4,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert as RNAlert,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import z from "zod";
 import { Alert, Button, Input } from "../../src/components";
 import {
@@ -68,41 +68,22 @@ export default function RegisterScreen() {
 
     const result = payloadSchema.safeParse(payload);
     if (!result.success) {
-      const errors = z.treeifyError(result.error);
       const newFieldErrors: Record<string, string> = {};
-      if (errors.properties?.firstName) {
-        newFieldErrors.firstName = errors.properties.firstName.errors[0];
+      
+      for (const issue of result.error.issues) {
+        if (issue.path.length > 0) {
+          const field = issue.path[0] as string;
+          newFieldErrors[field] = issue.message;
+        }
       }
-      if (errors.properties?.lastName) {
-        newFieldErrors.lastName = errors.properties.lastName.errors[0];
-      }
-      if (errors.properties?.email) {
-        newFieldErrors.email = errors.properties.email.errors[0];
-      }
-       if (errors.properties?.password) {
-         newFieldErrors.password = errors.properties.password.errors[0];
-       }
-       if (errors.properties?.confirmPassword) {
-         newFieldErrors.confirmPassword = errors.properties.confirmPassword.errors[0];
-       }
-       setFieldErrors(newFieldErrors);
+      
+      setFieldErrors(newFieldErrors);
       return;
     }
     try {
       clearError(); // Clear any previous errors
       await register(payload);
-      
-      // Show success alert
-      RNAlert.alert(
-        "Registration Successful!",
-        "Your account has been created successfully. Please login with your credentials.",
-        [
-          {
-            text: "Go to Login",
-            onPress: () => router.replace("/(auth)/login"),
-          },
-        ]
-      );
+      router.replace("/");
     } catch (error) {
       console.log("error", error);
     }
@@ -133,106 +114,69 @@ export default function RegisterScreen() {
               <View className="flex flex-col gap-4">
                 <View className="flex-row gap-3">
                   <View className="flex-1">
-                     <Input
-                       outline="none"
-                       label="First Name"
-                       placeholder="First name"
-                       value={payload.firstName}
-                       onChangeText={(text) => {
-                         setPayload({ ...payload, firstName: text });
-                         if (fieldErrors.firstName) {
-                           setFieldErrors((prev) => ({
-                             ...prev,
-                             firstName: "",
-                           }));
-                         }
-                       }}
-                       autoCapitalize="words"
-                       autoCorrect={false}
-                       required
-                       error={fieldErrors.firstName}
-                     />
+                    <Input
+                      outline="none"
+                      label="First Name"
+                      placeholder="First name"
+                      value={payload.firstName}
+                      onChangeText={(text) => {
+                        setPayload({ ...payload, firstName: text });
+                        if (fieldErrors.firstName) {
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            firstName: "",
+                          }));
+                        }
+                      }}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                      required
+                    />
                   </View>
                   <View className="flex-1">
-                     <Input
-                       outline="none"
-                       label="Last Name"
-                       placeholder="Last name"
-                       value={payload.lastName}
-                       onChangeText={(text) => {
-                         setPayload({ ...payload, lastName: text });
-                         if (fieldErrors.lastName) {
-                           setFieldErrors((prev) => ({
-                             ...prev,
-                             lastName: "",
-                           }));
-                         }
-                       }}
-                       autoCapitalize="words"
-                       autoCorrect={false}
-                       required
-                       error={fieldErrors.lastName}
-                     />
+                    <Input
+                      outline="none"
+                      label="Last Name"
+                      placeholder="Last name"
+                      value={payload.lastName}
+                      onChangeText={setPayload({ ...payload, lastName: text })}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                      required
+                    />
                   </View>
                 </View>
 
-                 <Input
-                   outline="none"
-                   label="Email"
-                   placeholder="Enter your email"
-                   value={payload.email}
-                   onChangeText={(text) => {
-                     setPayload({ ...payload, email: text });
-                     if (fieldErrors.email) {
-                       setFieldErrors((prev) => ({
-                         ...prev,
-                         email: "",
-                       }));
-                     }
-                   }}
-                   keyboardType="email-address"
-                   autoCapitalize="none"
-                   autoCorrect={false}
-                   required
-                   error={fieldErrors.email}
-                 />
+                <Input
+                  outline="none"
+                  label="Email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  required
+                />
 
                 <Input
                   outline="none"
                   label="Password"
                   placeholder="Create a password"
-                  value={payload.password}
-                  onChangeText={(text) => {
-                    setPayload({ ...payload, password: text });
-                    if (fieldErrors.password) {
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        password: "",
-                      }));
-                    }
-                  }}
+                  value={password}
+                  onChangeText={setPassword}
                   secureTextEntry
                   required
-                  error={fieldErrors.password}
                 />
 
                 <Input
                   outline="none"
                   label="Confirm Password"
                   placeholder="Confirm your password"
-                  value={payload.confirmPassword}
-                  onChangeText={(text) => {
-                    setPayload({ ...payload, confirmPassword: text });
-                    if (fieldErrors.confirmPassword) {
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        confirmPassword: "",
-                      }));
-                    }
-                  }}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
                   secureTextEntry
                   required
-                  error={fieldErrors.confirmPassword}
                 />
 
                 {error && (

@@ -24,35 +24,6 @@ export default function HomeScreen() {
           Hello, {user?.name || 'User'}! 👋
         </Text>
         
-        {/* Color System Demo */}
-        <View className="bg-card rounded-lg p-4 mb-8 shadow-sm">
-          <Text className="text-2xl font-semibold text-card-foreground mb-3">
-            Color System Usage
-          </Text>
-          
-          <View className="flex-row gap-2 mb-3">
-            <View className="flex-1 items-center justify-center bg-primary p-2 rounded-sm">
-              <Text className="text-xs text-primary-foreground">
-                Primary
-              </Text>
-            </View>
-            <View className="flex-1 items-center justify-center bg-secondary p-2 rounded-sm">
-              <Text className="text-xs text-secondary-foreground">
-                Secondary
-              </Text>
-            </View>
-            <View className="flex-1 items-center justify-center bg-success p-2 rounded-sm">
-              <Text className="text-xs text-success-foreground">
-                Success
-              </Text>
-            </View>
-          </View>
-          
-          <Text className="text-sm text-muted-foreground text-center">
-            This demonstrates the design system colors
-          </Text>
-        </View>
-        
         {/* Theme Toggle */}
         <View className="bg-card rounded-lg p-4 mb-8 shadow-sm">
           <Text className="text-lg font-semibold text-card-foreground mb-3 text-center">
@@ -95,25 +66,6 @@ export default function HomeScreen() {
             onPress={() => {}}
           />
           
-          <View className="flex-row gap-3">
-            <Button
-              title="Search"
-              color="secondary"
-              variant="outline"
-              size="md"
-              style={{ flex: 1 }}
-              onPress={() => {}}
-            />
-            <Button
-              title="Upload"
-              color="success"
-              variant="outline"
-              size="md"
-              style={{ flex: 1 }}
-              onPress={() => {}}
-            />
-          </View>
-          
           <Button
             title="Logout"
             color="danger"
@@ -124,26 +76,9 @@ export default function HomeScreen() {
           />
         </View>
         
-        {/* Navigation Links */}
-        <View className="mt-8 gap-2">
-          <Link href="/(protected)/(tabs)/(profile)" asChild>
-            <Button
-              title="Go to Profile"
-              color="neutral"
-              variant="plain"
-              size="sm"
-            />
-          </Link>
-          
-          <Link href="/(protected)/(tabs)/search" asChild>
-            <Button
-              title="Go to Search"
-              color="neutral"
-              variant="plain"
-              size="sm"
-            />
-          </Link>
-        </View>
+        <Text className="text-sm text-muted-foreground text-center mt-4">
+          App is working! 🎉
+        </Text>
       </View>
     </ScrollView>
   );

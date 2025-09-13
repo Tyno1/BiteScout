@@ -39,14 +39,11 @@
     "turbo": "^2.5.5"
   },
   "dependencies": {
-    "expo": "~51.0.0"
+    "expo": "~54.0.0"
   },
   "resolutions": {
-    "metro": "0.80.11",
-    "metro-resolver": "0.80.11",
-    "metro-runtime": "0.80.11",
-    "metro-config": "0.80.11",
-    "metro-source-map": "0.80.11",
-    "metro-transform-worker": "0.80.11"
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.4"
   }
 }
