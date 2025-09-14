@@ -12,6 +12,7 @@ interface ButtonProps extends TouchableOpacityProps {
 	disabled?: boolean;
 	fullWidth?: boolean;
 	style?: object;
+	className?: string;
 }
 
 export function Button({
@@ -23,6 +24,7 @@ export function Button({
 	disabled = false,
 	fullWidth = false,
 	style,
+	className,
 	...props
 }: ButtonProps) {
 	const getColorClasses = () => {
@@ -120,7 +122,8 @@ export function Button({
 		getSizeClasses(),
 		getVariantClasses(),
 		disabled && "opacity-60",
-		fullWidth && "w-full"
+		fullWidth && "w-full",
+		className
 	);
 
 	const getTextColor = () => {
@@ -128,9 +131,11 @@ export function Button({
 		
 		switch (variant) {
 			case "solid":
-				return `text-${color}-foreground`;
+				return `${color === "neutral" ? "text-background" : `text-${color}-foreground`}`;
 			case "outline":
+				return `${color === "neutral" ? "text-foreground" : `text-${color}-foreground`}`;
 			case "plain":
+				return `${color === "neutral" ? "text-foreground" : `text-${color}-foreground`}`;
 			case "glass":
 				return `text-${color}`;
 			default:

@@ -11,6 +11,12 @@
       "./node_modules/react-native/types"
     ]
   },
+  "paths": {
+    "@shared/*": ["../../packages/shared/*"],
+    "@components/*": ["./src/components/*"],
+    "@src/*": ["./src/*"]
+  },
+
   "include": [
     "**/*.ts",
     "**/*.tsx",

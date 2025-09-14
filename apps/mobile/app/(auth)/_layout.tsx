@@ -4,7 +4,7 @@ export default function AuthLayout() {
   const isAuthenticated = useIsAuthenticated();
 
   if (isAuthenticated) {
-    return <Redirect href="/" />;
+    return <Redirect href="/(protected)/(tabs)/(home)" />;
   }
 
   return (

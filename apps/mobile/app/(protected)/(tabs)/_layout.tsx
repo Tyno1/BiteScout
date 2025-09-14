@@ -11,28 +11,28 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="search"
+          name="search/index"
           options={{
             title: "Search",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="upload"
+          name="upload/index"
           options={{
             title: "Upload",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="restaurant"
+          name="restaurant/index"
           options={{
             title: "Restaurant",
             headerShown: false,
           }}
         />
         <Tabs.Screen
-          name="(profile)"
+          name="(profile)/index"
           options={{
             title: "Profile",
             headerShown: false,
