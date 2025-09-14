@@ -2,7 +2,7 @@
   "name": "bitescout",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@1.22.21",
+  "packageManager": "npm@10.8.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -14,36 +14,32 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "docs": "cd packages/shared && yarn serve-docs",
-    "storybook": "cd apps/web && yarn storybook",
+    "docs": "cd packages/shared && npm run serve-docs",
+    "storybook": "cd apps/web && npm run storybook",
     "docker:dev": "docker compose up -d",
     "docker:dev:build": "docker compose up -d --build",
     "docker:prod": "docker compose -f docker-compose.prod.yml up -d",
     "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "mobile:dev": "cd apps/mobile && yarn dev",
-    "mobile:start": "cd apps/mobile && yarn start",
-    "mobile:android": "cd apps/mobile && yarn android",
-    "mobile:ios": "cd apps/mobile && yarn ios",
-    "mobile:web": "cd apps/mobile && yarn web",
-    "mobile:build": "cd apps/mobile && yarn build",
+    "mobile:dev": "cd apps/mobile && npm run dev",
+    "mobile:start": "cd apps/mobile && npm start",
+    "mobile:android": "cd apps/mobile && npm run android",
+    "mobile:ios": "cd apps/mobile && npm run ios",
+    "mobile:web": "cd apps/mobile && npm run web",
+    "mobile:build": "cd apps/mobile && npm run build",
     "media:dev": "cd apps/media-service && docker compose up -d",
     "media:dev:build": "cd apps/media-service && docker compose up -d --build",
     "media:down": "cd apps/media-service && docker compose down",
     "media:logs": "cd apps/media-service && docker compose logs -f",
     "deploy:render": "echo 'Push to GitHub and deploy via Render dashboard'",
-    "predeploy": "yarn build"
+    "predeploy": "npm run build"
   },
   "devDependencies": {
     "turbo": "^2.5.5"
   },
   "dependencies": {
-    "expo": "~54.0.0"
-  },
-  "resolutions": {
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.4"
+    "react-dom": "19.1.0"
   }
 }

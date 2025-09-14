@@ -6,8 +6,6 @@ module.exports =  (api)=> {
       "nativewind/babel",
     ],
     plugins: [
-      // Required for expo-router
-      "expo-router/babel",
       // Reanimated moved its Babel plugin here
       "react-native-worklets/plugin",
     ],

@@ -13,11 +13,11 @@
     "@expo/metro-runtime": "~6.1.2",
     "@radix-ui/react-compose-refs": "^1.1.2",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@react-native/virtualized-lists": "0.76.0",
+    "@react-native/virtualized-lists": "0.81.4",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "expo": "54.0.6",
+    "expo": "54.0.7",
     "expo-build-properties": "~1.0.8",
     "expo-constants": "~18.0.8",
     "expo-image": "~3.0.8",
@@ -47,9 +47,5 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.2"
-  },
-  "resolutions": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
   }
 }
