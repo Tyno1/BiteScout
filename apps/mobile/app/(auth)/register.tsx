@@ -23,13 +23,19 @@ export default function RegisterScreen() {
   const isLoading = useIsLoading();
   const error = useError();
   const clearError = useClearError();
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [payload, setPayload] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState<Record<keyof typeof payload, string>>({ 
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    password: "", 
+    confirmPassword: "" 
   });
 
   const payloadSchema = z
@@ -52,6 +58,7 @@ export default function RegisterScreen() {
   // Clear errors when component mounts
   useEffect(() => {
     clearError();
+    setFieldErrors({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
   }, [clearError]);
 
   const handleRegister = async () => {
@@ -68,18 +75,18 @@ export default function RegisterScreen() {
 
     const result = payloadSchema.safeParse(payload);
     if (!result.success) {
-      const newFieldErrors: Record<string, string> = {};
-      
-      for (const issue of result.error.issues) {
-        if (issue.path.length > 0) {
-          const field = issue.path[0] as string;
-          newFieldErrors[field] = issue.message;
-        }
-      }
-      
-      setFieldErrors(newFieldErrors);
+      const errors = z.treeifyError(result.error);
+      setFieldErrors({
+        firstName: errors.properties?.firstName?.errors[0] || "",
+        lastName: errors.properties?.lastName?.errors[0] || "",
+        email: errors.properties?.email?.errors[0] || "",
+        password: errors.properties?.password?.errors[0] || "",
+        confirmPassword: errors.properties?.confirmPassword?.errors[0] || "",
+      });
       return;
     }
+
+    setFieldErrors({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
     try {
       clearError(); // Clear any previous errors
       await register(payload);
@@ -131,6 +138,7 @@ export default function RegisterScreen() {
                       autoCapitalize="words"
                       autoCorrect={false}
                       required
+                      error={fieldErrors.firstName}
                     />
                   </View>
                   <View className="flex-1">
@@ -139,10 +147,16 @@ export default function RegisterScreen() {
                       label="Last Name"
                       placeholder="Last name"
                       value={payload.lastName}
-                      onChangeText={setPayload({ ...payload, lastName: text })}
+                      onChangeText={(text) => {
+                        setPayload({ ...payload, lastName: text });
+                        if (fieldErrors.lastName) {
+                          setFieldErrors((prev) => ({ ...prev, lastName: "" }));
+                        }
+                      }}
                       autoCapitalize="words"
                       autoCorrect={false}
                       required
+                      error={fieldErrors.lastName}
                     />
                   </View>
                 </View>
@@ -151,32 +165,50 @@ export default function RegisterScreen() {
                   outline="none"
                   label="Email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
+                  value={payload.email}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, email: text });
+                    if (fieldErrors.email) {
+                      setFieldErrors((prev) => ({ ...prev, email: "" }));
+                    }
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
                   required
+                  error={fieldErrors.email}
                 />
 
                 <Input
                   outline="none"
                   label="Password"
                   placeholder="Create a password"
-                  value={password}
-                  onChangeText={setPassword}
+                  value={payload.password}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, password: text });
+                    if (fieldErrors.password) {
+                      setFieldErrors((prev) => ({ ...prev, password: "" }));
+                    }
+                  }}
                   secureTextEntry
                   required
+                  error={fieldErrors.password}
                 />
 
                 <Input
                   outline="none"
                   label="Confirm Password"
                   placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
+                  value={payload.confirmPassword}
+                  onChangeText={(text) => {
+                    setPayload({ ...payload, confirmPassword: text });
+                    if (fieldErrors.confirmPassword) {
+                      setFieldErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                    }
+                  }}
                   secureTextEntry
                   required
+                  error={fieldErrors.confirmPassword}
                 />
 
                 {error && (

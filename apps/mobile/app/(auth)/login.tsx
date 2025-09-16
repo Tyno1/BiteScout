@@ -27,7 +27,9 @@ export default function LoginScreen() {
     email: "",
     password: "",
   });
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Record<keyof typeof payload, string>
+  >({ email: "", password: "" });
 
   // Clear errors when component mounts
   useEffect(() => {
@@ -49,20 +51,15 @@ export default function LoginScreen() {
     }
     const result = payloadSchema.safeParse(payload);
     if (!result.success) {
-      const newFieldErrors: Record<string, string> = {};
-      
-      for (const issue of result.error.issues) {
-        if (issue.path.length > 0) {
-          const field = issue.path[0] as string;
-          newFieldErrors[field] = issue.message;
-        }
-      }
-      
-      setFieldErrors(newFieldErrors);
+      const newFieldErrors = z.treeifyError(result.error);
+      setFieldErrors({
+        email: newFieldErrors.properties?.email?.errors[0] || "",
+        password: newFieldErrors.properties?.password?.errors[0] || "",
+      });
       return;
     }
-    
-    setFieldErrors({});
+
+    setFieldErrors({ email: "", password: "" });
 
     try {
       clearError();
@@ -104,7 +101,7 @@ export default function LoginScreen() {
                   onChangeText={(text) => {
                     setPayload({ ...payload, email: text });
                     if (fieldErrors.email) {
-                      setFieldErrors(prev => ({ ...prev, email: "" }));
+                      setFieldErrors((prev) => ({ ...prev, email: "" }));
                     }
                   }}
                   keyboardType="email-address"
@@ -122,7 +119,7 @@ export default function LoginScreen() {
                   onChangeText={(text) => {
                     setPayload({ ...payload, password: text });
                     if (fieldErrors.password) {
-                      setFieldErrors(prev => ({ ...prev, password: "" }));
+                      setFieldErrors((prev) => ({ ...prev, password: "" }));
                     }
                   }}
                   secureTextEntry

@@ -5,7 +5,7 @@ import { cn } from "../lib/utils";
 
 interface ButtonProps extends TouchableOpacityProps {
 	title: string;
-	color?: "primary" | "secondary" | "danger" | "success" | "neutral";
+	color?: "primary" | "secondary" | "danger" | "success" | "neutral" | "white" | "black";
 	variant?: "solid" | "outline" | "plain" | "glass";
 	size?: "sm" | "md" | "lg" | "xl";
 	loading?: boolean;
@@ -63,6 +63,20 @@ export function Button({
 					outline: "bg-transparent border border-foreground",
 					plain: "bg-transparent",
 					glass: "bg-foreground/20 border border-foreground/40",
+				};
+			case "white":
+				return {
+					solid: "bg-white",
+					outline: "bg-transparent border border-white",
+					plain: "bg-transparent",
+					glass: "bg-white/20 border border-white/40",
+				};
+			case "black":
+				return {
+					solid: "bg-black",
+					outline: "bg-transparent border border-black",
+					plain: "bg-transparent",
+					glass: "bg-black/20 border border-black/40",
 				};
 			default:
 				return {
@@ -131,14 +145,24 @@ export function Button({
 		
 		switch (variant) {
 			case "solid":
+				if (color === "white") return "text-black";
+				if (color === "black") return "text-white";
 				return `${color === "neutral" ? "text-background" : `text-${color}-foreground`}`;
 			case "outline":
-				return `${color === "neutral" ? "text-foreground" : `text-${color}-foreground`}`;
+				if (color === "white") return "text-white";
+				if (color === "black") return "text-black";
+				return `${color === "neutral" ? "text-foreground" : `text-${color}`}`;
 			case "plain":
-				return `${color === "neutral" ? "text-foreground" : `text-${color}-foreground`}`;
+				if (color === "white") return "text-white";
+				if (color === "black") return "text-black";
+				return `${color === "neutral" ? "text-foreground" : `text-${color}`}`;
 			case "glass":
+				if (color === "white") return "text-white";
+				if (color === "black") return "text-black";
 				return `text-${color}`;
 			default:
+				if (color === "white") return "text-black";
+				if (color === "black") return "text-white";
 				return `text-${color}-foreground`;
 		}
 	};
@@ -159,7 +183,11 @@ export function Button({
 		>
 			{loading ? (
 				<ActivityIndicator 
-					color={variant === "solid" ? "white" : "currentColor"}
+					color={
+						variant === "solid" 
+							? (color === "white" ? "black" : "white")
+							: "currentColor"
+					}
 					size="small" 
 				/>
 			) : (

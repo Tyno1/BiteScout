@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { Button } from '../../../../src/components';
 
-export default function Restaurant() {
+export default function Dining() {
   return (
     <ScrollView className="flex-1 bg-background">
       <View className="p-4">
