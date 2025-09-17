@@ -31,9 +31,9 @@ export function CustomTabBar({
     const iconColor = isFocused ? colors.primary : colors.secondary;
     const iconMap: Record<string, React.ReactNode> = {
       "(home)": <HomeIcon size={25} color={iconColor} />,
-      "search/index": <SearchIcon size={25} color={iconColor} />,
+      "(search)": <SearchIcon size={25} color={iconColor} />,
       "upload/index": <UploadIcon size={25} color={iconColor} />,
-      "dining/index": <Utensils size={25} color={iconColor} />,
+      "(dining)": <Utensils size={25} color={iconColor} />,
       "(profile)/index": <User size={25} color={iconColor} />,
     };
     return iconMap[routeName] || <HomeIcon size={25} color={iconColor} />;
@@ -96,9 +96,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "lightgray",
-    marginHorizontal: 30,
+    borderWidth: 0.2,
+    borderColor: "gray",
+    marginHorizontal: 10,
     borderRadius: 40,
     padding: 10,
     elevation: 10,

@@ -29,7 +29,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="search/index"
+          name="(search)"
           options={{
             title: "Search",
             headerShown: false,
@@ -45,7 +45,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="dining/index"
+          name="(dining)"
           options={{
             title: "Dining",
             headerShown: false,

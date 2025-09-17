@@ -1,5 +1,4 @@
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { Heart, MessageCircle, Send, Star } from "lucide-react-native";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { FoodPostCard } from "../../../../src/components";
@@ -9,10 +8,6 @@ const { width } = Dimensions.get("window");
 export default function ImageHome() {
 	return (
 		<ScrollView className="flex-1 bg-background pt-28">
-			<LinearGradient
-				colors={["rgb(0, 0, 0)", "rgba(34, 34, 34, 0.97)"]}
-				style={{ position: "absolute", inset: 0 }}
-			/>
 			{/* Food Post Card */}
 			{Array.from({ length: 10 }).map((_, index) => (
 				<FoodPostCard key={index} />

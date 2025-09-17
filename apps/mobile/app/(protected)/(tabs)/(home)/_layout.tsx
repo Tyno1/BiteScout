@@ -2,8 +2,10 @@ import { router, Stack } from "expo-router";
 import { Bell, Image, Video } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
+import { useTheme } from "../../../../src/providers/ThemeProvider";
 
 export default function HomeLayout() {
+  const { colors } = useTheme();
   const [selectedButton, setSelectedButton] = useState<"image" | "video">(
     "image"
   );
@@ -26,13 +28,13 @@ export default function HomeLayout() {
               className={`p-2 rounded-full ${selectedButton === "image" ? "bg-primary" : "bg-secondary"}`}
               onPress={() => handleSelectButton("image")}
             >
-              <Image size={20} color="black" strokeWidth={1.5} />
+              <Image size={20} color={selectedButton === "image" ? colors.secondary : "black"} strokeWidth={1.5} />
             </Pressable>
             <Pressable
               className={`p-2 bg-primary rounded-full ${selectedButton === "video" ? "bg-primary" : "bg-secondary"}`}
               onPress={() => handleSelectButton("video")}
             >
-              <Video size={20} color="black" strokeWidth={1.5} />
+              <Video size={20} color={selectedButton === "video" ? colors.secondary : "black"} strokeWidth={1.5} />
             </Pressable>
           </View>
         ),
