@@ -5,7 +5,7 @@ const config = {
     // For server-side requests (SSR, API routes)
     server: process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
     // For client-side requests (browser)
-    client: process.env.BACKEND_URL_CLIENT || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
+    client: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
   },
   
   // Media Service URLs
@@ -17,8 +17,8 @@ const config = {
   
   // NextAuth configuration
   auth: {
-    secret: process.env.NEXTAUTH_SECRET,
-    url: process.env.NEXTAUTH_URL,
+    secret: process.env.AUTH_SECRET,
+    url: process.env.AUTH_URL,
   },
   
   // Environment detection
