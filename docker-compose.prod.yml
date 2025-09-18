@@ -27,7 +27,9 @@ services:
       - NODE_ENV=production
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
       - BACKEND_URL_SERVER=${BACKEND_URL_SERVER}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_URL=${AUTH_URL}
+      - NEXT_PUBLIC_MEDIA_SERVICE_URL=${NEXT_PUBLIC_MEDIA_SERVICE_URL}
+
     depends_on:
-      - backend 
+      - backend

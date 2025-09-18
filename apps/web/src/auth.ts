@@ -1,6 +1,6 @@
 import axios from "axios";
-import NextAuth from "next-auth";
 import type { Session, User } from "next-auth";
+import NextAuth from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import type { UserType } from "shared/types/api/schemas";
@@ -14,30 +14,30 @@ import config from "./utils/config";
 
 // Server-side refresh function that uses BACKEND_SERVER
 async function refreshAccessTokenServer(token: { refreshToken: string }) {
-  try {
-    const response = await axios.post(`${BACKEND_SERVER}/api/auth/refresh`, {
-      refreshToken: token.refreshToken
-    });
+	try {
+		const response = await axios.post(`${BACKEND_SERVER}/api/auth/refresh`, {
+			refreshToken: token.refreshToken,
+		});
 
-    const refreshed = response.data;
-    
-    if (!refreshed.accessToken) {
-      throw new Error("No access token returned");
-    }
+		const refreshed = response.data;
 
-    return {
-      ...token,
-      accessToken: refreshed.accessToken,
-      expiresIn: refreshed.expiresIn,
-      refreshToken: refreshed.refreshToken ?? token.refreshToken, // fallback
-    };
-  } catch (error) {
-    console.error("Error refreshing access token (server):", error);
-    return {
-      ...token,
-      error: "RefreshAccessTokenError",
-    };
-  }
+		if (!refreshed.accessToken) {
+			throw new Error("No access token returned");
+		}
+
+		return {
+			...token,
+			accessToken: refreshed.accessToken,
+			expiresIn: refreshed.expiresIn,
+			refreshToken: refreshed.refreshToken ?? token.refreshToken, // fallback
+		};
+	} catch (error) {
+		console.error("Error refreshing access token (server):", error);
+		return {
+			...token,
+			error: "RefreshAccessTokenError",
+		};
+	}
 }
 
 // Use server-side URL for server-side requests, client-side URL for client-side requests
@@ -87,7 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		maxAge: 30 * 24 * 60 * 60, // 30 days
 		updateAge: 0, // Allow immediate session updates for development
 	},
-	secret: process.env.NEXTAUTH_SECRET,
+	secret: process.env.AUTH_SECRET,
 	providers: [
 		Credentials({
 			name: "credentials",
@@ -162,10 +162,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user, trigger, session }: { 
-			token: JWT; 
-			user?: User; 
-			trigger?: "signIn" | "signUp" | "update"; 
+		async jwt({
+			token,
+			user,
+			trigger,
+			session,
+		}: {
+			token: JWT;
+			user?: User;
+			trigger?: "signIn" | "signUp" | "update";
 			session?: Session;
 		}) {
 			try {
@@ -191,7 +196,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 
 				// If the token is expired, try to refresh it (server-side)
-				const refreshedToken = await refreshAccessTokenServer({ refreshToken: token.refreshToken as string });
+				const refreshedToken = await refreshAccessTokenServer({
+					refreshToken: token.refreshToken as string,
+				});
 				return {
 					...token,
 					...refreshedToken,

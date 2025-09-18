@@ -1,22 +1,21 @@
 FROM node:20-alpine
 
-# Enable Corepack to support Yarn
-RUN corepack enable
+# Using npm as package manager
 
 WORKDIR /app
 
 COPY . .
 
-RUN yarn install
+RUN npm install
 
 
 # Build the shared package
 WORKDIR /app/packages/shared
-RUN yarn build
+RUN npm run build
 
 
 EXPOSE 3000
 
 # Set working directory and run web dev command
 WORKDIR /app/apps/web
-CMD ["yarn", "dev"] 
+CMD ["npm", "run", "dev"] 
