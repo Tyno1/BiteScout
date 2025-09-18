@@ -13,9 +13,13 @@ RUN npm install --ignore-engines --network-timeout=100000 --retry=3
 # Copy source code
 COPY . .
 
-# Build all packages using Turbo and ensure workspace linking
-RUN npm run turbo run build --filter=shared --filter=backend && \
-    npm install --ignore-engines --network-timeout=100000 --retry=3
+# Build shared package first
+WORKDIR /app/packages/shared
+RUN npm run build
+
+# Build backend package
+WORKDIR /app/apps/backend
+RUN npm run build
 
 # Backend-specific environment variables
 ENV NODE_ENV=production
