@@ -1,9 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import type { User } from "shared/types/api/schemas";
-import type { LoginPostRequest } from "shared/types/auth/login";
-import type { RegisterPostRequest } from "shared/types/auth/register";
-import type { ApiError } from "shared/types/common/errors";
+import type { LoginPostRequest, RegisterPostRequest, User } from "shared/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import apiClient from "../lib/axios";
@@ -204,5 +201,4 @@ export const useLogout = () => useAuthStore((state) => state.logout);
 export const useRefreshAccessToken = () => useAuthStore((state) => state.refreshAccessToken);
 export const useUpdateUser = () => useAuthStore((state) => state.updateUser);
 export const useClearError = () => useAuthStore((state) => state.clearError);
-
 

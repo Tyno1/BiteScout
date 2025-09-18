@@ -1,20 +1,39 @@
 import { Tabs } from "expo-router";
+import { View } from "react-native";
+import { CustomTabBar } from "../../../src/components";
+import { useTheme } from "../../../src/providers/ThemeProvider";
 
 export default function TabLayout() {
+  const {colors} = useTheme();
+
   return (
-      <Tabs>
+    <View style={{ flex: 1 }}>
+      <Tabs
+        tabBar={(props) => (
+          <CustomTabBar
+            colors={colors}
+            {...props}
+          />
+        )}
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { display: "none" },
+        }}
+      >
         <Tabs.Screen
-          name="(home)/index"
+          name="(home)"
           options={{
             title: "Home",
             headerShown: false,
+            tabBarStyle: { display: "none" },
           }}
         />
         <Tabs.Screen
-          name="search/index"
+          name="(search)"
           options={{
             title: "Search",
             headerShown: false,
+            tabBarStyle: { display: "none" },
           }}
         />
         <Tabs.Screen
@@ -22,22 +41,26 @@ export default function TabLayout() {
           options={{
             title: "Upload",
             headerShown: false,
+            tabBarStyle: { display: "none" },
           }}
         />
         <Tabs.Screen
-          name="restaurant/index"
+          name="(dining)"
           options={{
-            title: "Restaurant",
+            title: "Dining",
             headerShown: false,
+            tabBarStyle: { display: "none" },
           }}
         />
         <Tabs.Screen
-          name="(profile)/index"
+          name="(profile)"
           options={{
             title: "Profile",
             headerShown: false,
+            tabBarStyle: { display: "none" },
           }}
         />
       </Tabs>
+    </View>
   );
 }

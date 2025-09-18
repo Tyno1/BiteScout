@@ -1,13 +1,14 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider } from '../src/providers/ThemeProvider';
+import { ThemeProvider, useTheme } from '../src/providers/ThemeProvider';
 import "../global.css"
 
 function AppContent() {
+  const theme = useTheme();
   
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={theme.isDark ? "light" : "dark"} />
       <Stack>
         <Stack.Screen 
           name="index" 
@@ -31,7 +32,7 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider initialTheme="system">
+    <ThemeProvider initialTheme="dark">
       <AppContent />
     </ThemeProvider>
   );

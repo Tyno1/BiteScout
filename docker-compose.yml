@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Backend API (Development)
   backend:
@@ -15,8 +13,6 @@ services:
       - JWT_SECRET=your-super-secret-jwt-key-for-development-only
       - JWT_REFRESH_SECRET=your-super-secret-jwt-refresh-key-for-development-only
       - ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
-      - MEDIA_SERVICE_URL=${MEDIA_SERVICE_URL:-http://localhost:3002/api/v1}
-      - MEDIA_SERVICE_TIMEOUT=30000
 
   # Web App (Development)
   web:
@@ -29,9 +25,8 @@ services:
       - NODE_ENV=development
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:5002
       - BACKEND_URL_SERVER=http://backend:5001
-      - NEXTAUTH_SECRET=your-super-secret-nextauth-key-for-development-only
-      - NEXTAUTH_URL=http://localhost:3001
-      - BACKEND_URL_CLIENT=http://localhost:5002
+      - AUTH_SECRET=your-super-secret-nextauth-key-for-development-only
+      - AUTH_URL=http://localhost:3001
       - NEXT_PUBLIC_MEDIA_SERVICE_URL=${NEXT_PUBLIC_MEDIA_SERVICE_URL:-http://localhost:3002/api/v1}
     volumes:
       - .:/app

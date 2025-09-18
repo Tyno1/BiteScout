@@ -1,19 +1,16 @@
 FROM node:20-alpine
 
-# Enable Corepack to support Yarn
-RUN corepack enable
-
 WORKDIR /app
 
 # Copy all files first
 COPY . .
 
-# Install dependencies
-RUN yarn install
+# Install dependencies using npm explicitly
+RUN npm install
 
 # Build the shared package
 WORKDIR /app/packages/shared
-RUN yarn build
+RUN npm run build
 
 # Backend-specific environment variables
 ENV NODE_ENV=development
@@ -23,4 +20,4 @@ EXPOSE 5001
 
 # Set working directory and run backend dev command
 WORKDIR /app/apps/backend
-CMD ["yarn", "dev"] 
+CMD ["npm", "run", "dev"] 
