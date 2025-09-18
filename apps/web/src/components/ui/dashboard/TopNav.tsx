@@ -1,7 +1,7 @@
 "use client";
 
 import { IconButton } from "@/components/atoms";
-import { NotificationBadge } from "@/components/atoms/Badges";
+import { NotificationBadge } from "@/components/atoms/badges";
 import type { User } from "@/types";
 import { Bell, Menu } from "lucide-react";
 import Image from "next/image";
