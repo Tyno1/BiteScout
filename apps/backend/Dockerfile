@@ -8,14 +8,14 @@ COPY apps/backend/package.json ./apps/backend/
 COPY packages/shared/package.json ./packages/shared/
 
 # Install dependencies from root (resolves workspace dependencies)
-RUN npm install --ignore-engines --network-timeout 100000 --retry 3
+RUN npm install --ignore-engines --network-timeout=100000 --retry=3
 
 # Copy source code
 COPY . .
 
 # Build all packages using Turbo and ensure workspace linking
 RUN npm run turbo run build --filter=shared --filter=backend && \
-    npm install --ignore-engines --network-timeout 100000 --retry 3
+    npm install --ignore-engines --network-timeout=100000 --retry=3
 
 # Backend-specific environment variables
 ENV NODE_ENV=production
