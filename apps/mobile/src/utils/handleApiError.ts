@@ -1,5 +1,9 @@
 import axios from "axios";
-import type { ApiError } from "shared/types/common/errors";
+
+// Local type definition
+type ApiError = {
+  message: string;
+};
 
 /**
  * Helper function to handle API errors consistently across all stores

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { AlertModal, type AlertModalProps } from "./AlertModal";
 

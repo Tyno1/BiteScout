@@ -3,14 +3,25 @@
   "compilerOptions": {
     "strict": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/react-native/types"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/react-native/types"
+    ]
   },
+  "paths": {
+    "@shared/*": ["../../packages/shared/*"],
+    "@components/*": ["./src/components/*"],
+    "@src/*": ["./src/*"]
+  },
+
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ]
 }
