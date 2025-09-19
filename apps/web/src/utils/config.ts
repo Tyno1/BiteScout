@@ -1,4 +1,10 @@
 // Configuration utility for handling different environments
+console.log('Environment variables:', {
+  BACKEND_URL_SERVER: process.env.BACKEND_URL_SERVER,
+  NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  NODE_ENV: process.env.NODE_ENV
+});
+
 const config = {
   // Backend URLs
   backend: {
