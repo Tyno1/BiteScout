@@ -1,11 +1,17 @@
 // Configuration utility for handling different environments
+console.log('Environment variables:', {
+  BACKEND_URL_SERVER: process.env.BACKEND_URL_SERVER,
+  NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  NODE_ENV: process.env.NODE_ENV
+});
+
 const config = {
   // Backend URLs
   backend: {
     // For server-side requests (SSR, API routes)
-    server: process.env.BACKEND_URL_SERVER || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
+    server: process.env.BACKEND_URL_SERVER || "https://bitescout-69t9.onrender.com",
     // For client-side requests (browser)
-    client: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001",
+    client: process.env.NEXT_PUBLIC_BACKEND_URL || "https://bitescout-69t9.onrender.com",
   },
 
   // Media Service URLs

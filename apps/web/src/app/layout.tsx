@@ -30,10 +30,11 @@ export default async function RootLayout({
         {/* Preconnect to external domains for faster loading */}
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://s3.amazonaws.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://s3.amazonaws.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-
         {/* Prevent theme flash */}
         <script src="/theme-script.js" defer />
       </head>
