@@ -33,7 +33,7 @@ export default function Reviews() {
     resolved: false,
     tags: [],
   };
-const reviews = [
+  const reviews = [
     {
       id: 1,
       user: {
@@ -43,8 +43,7 @@ const reviews = [
       },
       dish: "Margherita Pizza",
       rating: 8.5,
-      reviewText:
-        "Delicious pizza with fresh ingredients. Loved the crispy crust!",
+      reviewText: "Delicious pizza with fresh ingredients. Loved the crispy crust!",
       media: [
         { type: "image", url: "/placeholder-pizza.jpg" },
         { type: "video", url: "/placeholder-video.mp4" },
@@ -62,8 +61,7 @@ const reviews = [
       },
       dish: "Seafood Paella",
       rating: 7.2,
-      reviewText:
-        "Good flavor, but found some shells in the dish. Service was attentive.",
+      reviewText: "Good flavor, but found some shells in the dish. Service was attentive.",
       media: [{ type: "image", url: "/placeholder-paella.jpg" }],
       date: "2024-02-10",
       resolved: true,
@@ -71,8 +69,7 @@ const reviews = [
     },
   ] as reviewProps[];
 
-  const [selectedReview, setSelectedReview] =
-    useState<reviewProps>(defaultReview);
+  const [selectedReview, setSelectedReview] = useState<reviewProps>(defaultReview);
 
   const handleReviewSelect = (review: reviewProps) => {
     setSelectedReview(review);
@@ -127,8 +124,8 @@ const reviews = [
                       review.rating >= 8
                         ? "text-green-600"
                         : review.rating >= 5
-                        ? "text-yellow-600"
-                        : "text-red-600"
+                          ? "text-yellow-600"
+                          : "text-red-600"
                     }`}
                   >
                     {review.rating}/10
@@ -160,15 +157,13 @@ const reviews = [
                       selectedReview.rating >= 8
                         ? "text-green-600"
                         : selectedReview.rating >= 5
-                        ? "text-yellow-600"
-                        : "text-red-600"
+                          ? "text-yellow-600"
+                          : "text-red-600"
                     }`}
                   >
                     {selectedReview.rating}/10
                   </span>
-                  <span className="text-gray-600">
-                    on {selectedReview.date}
-                  </span>
+                  <span className="text-gray-600">on {selectedReview.date}</span>
                 </div>
               </div>
               <span

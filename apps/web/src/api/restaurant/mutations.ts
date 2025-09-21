@@ -6,22 +6,36 @@ import type {
   RestaurantDetailPutRequest,
   RestaurantDetailPutResponse,
 } from "shared/types/restaurant";
-import type { RestaurantAssignedImagesPutRequest, RestaurantAssignedImagesPutResponse } from "shared/types/restaurant/detail";
+import type {
+  RestaurantAssignedImagesPutRequest,
+  RestaurantAssignedImagesPutResponse,
+} from "shared/types/restaurant/detail";
 
 // Restaurant Mutations
-export const createRestaurant = async (data: CreateRestaurantRequest): Promise<CreateRestaurantResponse> => {
+export const createRestaurant = async (
+  data: CreateRestaurantRequest
+): Promise<CreateRestaurantResponse> => {
   const response = await apiClient.post<CreateRestaurantResponse>("/restaurants", data);
   return response.data;
 };
 
-export const updateRestaurant = async (id: string, data: RestaurantDetailPutRequest): Promise<RestaurantDetailPutResponse> => {
+export const updateRestaurant = async (
+  id: string,
+  data: RestaurantDetailPutRequest
+): Promise<RestaurantDetailPutResponse> => {
   const response = await apiClient.put<RestaurantDetailPutResponse>(`/restaurants/${id}`, data);
   return response.data;
 };
 
 // Delivery Links Mutations
-export const addDeliveryLink = async (restaurantId: string, data: Partial<DeliveryLink>): Promise<DeliveryLink> => {
-  const response = await apiClient.post<DeliveryLink>(`/restaurants/${restaurantId}/delivery-links`, data);
+export const addDeliveryLink = async (
+  restaurantId: string,
+  data: Partial<DeliveryLink>
+): Promise<DeliveryLink> => {
+  const response = await apiClient.post<DeliveryLink>(
+    `/restaurants/${restaurantId}/delivery-links`,
+    data
+  );
   return response.data;
 };
 
@@ -30,7 +44,10 @@ export const updateDeliveryLink = async (
   linkId: string,
   data: Partial<DeliveryLink>
 ): Promise<DeliveryLink> => {
-  const response = await apiClient.put<DeliveryLink>(`/restaurants/${restaurantId}/delivery-links/${linkId}`, data);
+  const response = await apiClient.put<DeliveryLink>(
+    `/restaurants/${restaurantId}/delivery-links/${linkId}`,
+    data
+  );
   return response.data;
 };
 
@@ -50,4 +67,4 @@ export const updateAssignedImages = async (
     data
   );
   return response.data;
-}; 
+};

@@ -1,7 +1,5 @@
 "use client";
 
-import { NavItem } from "@/components/ui";
-import { usePlatform } from "@/hooks";
 import {
   AudioLines,
   BellDot,
@@ -20,6 +18,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
+import { NavItem } from "@/components/ui";
+import { usePlatform } from "@/hooks";
 import { AccessManager } from "../general";
 import { RestaurantContextBanner } from "./RestaurantContextBanner";
 
@@ -31,7 +31,6 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
   const router = useRouter();
   const { isTablet } = usePlatform();
 
-
   // Simple navigation handler
   const handleNav = (navName: string) => {
     router.push(navName);
@@ -40,21 +39,16 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
 
   return (
     <div className="h-[100vh] w-full bg-background border-r border-foreground/10 flex flex-col">
-      <div className={`p-6 flex gap-2 justify-center  mb-2 hidden md:flex ${isTablet ? "justify-center" : "justify-start"}`}>
+      <div
+        className={`p-6 flex gap-2 justify-center  mb-2 hidden md:flex ${isTablet ? "justify-center" : "justify-start"}`}
+      >
         <ChefHat size={30} className="text-primary" />
-        {!isTablet && (
-          <h2 className="text-xl font-bold text-primary">BiteScout</h2>
-        )}
+        {!isTablet && <h2 className="text-xl font-bold text-primary">BiteScout</h2>}
       </div>
 
       <nav className="flex-1 p-4 w-full overflow-y-auto">
         <ul className="w-full space-y-1">
-          <NavItem
-            handleNav={handleNav}
-            icon={<Home />}
-            text="Dashboard"
-            path="/dashboard"
-          />
+          <NavItem handleNav={handleNav} icon={<Home />} text="Dashboard" path="/dashboard" />
           <NavItem
             handleNav={handleNav}
             icon={<UtensilsCrossed />}
@@ -101,12 +95,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             text="Analytics"
             path="/dashboard/analytics"
           />
-          <NavItem
-            handleNav={handleNav}
-            icon={<Star />}
-            text="Reviews"
-            path="/dashboard/reviews"
-          />
+          <NavItem handleNav={handleNav} icon={<Star />} text="Reviews" path="/dashboard/reviews" />
           <NavItem
             handleNav={handleNav}
             icon={<AudioLines />}
@@ -120,7 +109,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             path="/dashboard/customer-insight"
           />
 
-          <li className="border-t border-foreground/10 w-full mt-auto">
+          <li className="border-t border-foreground/10 w-full mt-auto flex-shrink-0">
             <ul className="w-full">
               <NavItem
                 handleNav={handleNav}
@@ -128,12 +117,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
                 text="Settings"
                 path="/dashboard/settings"
               />
-              <NavItem
-                handleNav={handleNav}
-                icon={<House />}
-                text="Home"
-                path="/"
-              />
+              <NavItem handleNav={handleNav} icon={<House />} text="Home" path="/" />
               <NavItem handleNav={handleNav} icon={<LogOut />} text="Logout" />
             </ul>
           </li>
@@ -141,7 +125,7 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
       </nav>
 
       {/* Restaurant Context Banner - Bottom of SideNav */}
-      <div className="p-4 border-t border-border border-foreground/10">
+      <div className="p-4 border-t border-border border-foreground/10 flex-shrink-0">
         <RestaurantContextBanner />
       </div>
     </div>

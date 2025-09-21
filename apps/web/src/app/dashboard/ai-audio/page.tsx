@@ -1,5 +1,3 @@
- 
 export default function AiAudio() {
-  return     <main className="w-full mx-auto px-10 py-10 space-y-6">
-AI Audio Review </main>;
+  return <main className="w-full mx-auto px-10 py-10 space-y-6">AI Audio Review </main>;
 }

@@ -53,22 +53,22 @@ export default function RestaurantProfile() {
   const displayData = editableData || restaurantData;
 
   // Get the hero image from assigned images only
-  const heroImageId = 
+  const heroImageId =
     restaurantData?.assignedImages?.profileImage?.mediaId?._id ||
     restaurantData?.assignedImages?.logo?.mediaId?._id;
-  
+
   const { data: mediaData } = useMediaWithOptimizedUrl(heroImageId || "", "large");
 
   const heroImage = (() => {
     // Only use URLs that are valid
     const optimizedUrl = mediaData?.optimizedUrl;
     const mediaUrl = mediaData?.media?.url;
-    
+
     if (optimizedUrl && isValidUrl(optimizedUrl)) return optimizedUrl;
     if (mediaUrl && isValidUrl(mediaUrl)) return mediaUrl;
     if (heroImageId && isValidUrl(heroImageId)) return heroImageId;
-    
-    return null; 
+
+    return null;
   })();
 
   // Merge business hours from restaurant data with defaults
@@ -76,9 +76,9 @@ export default function RestaurantProfile() {
     return restaurantData?.businessHours?.length
       ? restaurantData.businessHours.map((hour: BusinessHour) => ({
           day: hour.day,
-                  open: hour.open,
-        close: hour.close,
-        closed: hour.isClosed,
+          open: hour.open,
+          close: hour.close,
+          closed: hour.isClosed,
         }))
       : DEFAULT_BUSINESS_HOURS;
   }, [restaurantData?.businessHours]);
@@ -196,11 +196,7 @@ export default function RestaurantProfile() {
   );
 
   const handleBusinessHoursChange = useCallback(
-    (
-      index: number,
-      field: keyof BusinessHour,
-      value: BusinessHour[keyof BusinessHour]
-    ) => {
+    (index: number, field: keyof BusinessHour, value: BusinessHour[keyof BusinessHour]) => {
       setEditableData((prev) => {
         if (!prev?.businessHours) return prev;
 
@@ -227,11 +223,18 @@ export default function RestaurantProfile() {
   useEffect(() => {
     if (isEditing && editableData && restaurantData) {
       // Only update if assignedImages actually changed to avoid infinite loops
-      if (JSON.stringify(editableData.assignedImages) !== JSON.stringify(restaurantData.assignedImages)) {
-        setEditableData(prev => prev ? {
-          ...prev,
-          assignedImages: restaurantData.assignedImages,
-        } : null);
+      if (
+        JSON.stringify(editableData.assignedImages) !==
+        JSON.stringify(restaurantData.assignedImages)
+      ) {
+        setEditableData((prev) =>
+          prev
+            ? {
+                ...prev,
+                assignedImages: restaurantData.assignedImages,
+              }
+            : null
+        );
       }
     }
   }, [isEditing, editableData, restaurantData]);
@@ -251,9 +254,7 @@ export default function RestaurantProfile() {
   // Handle different user scenarios
   if (!restaurantData?._id) {
     // Check if user has any approved restaurant access
-    const hasApprovedAccess = restaurantAccessList.some(
-      (access) => access.status === "approved"
-    );
+    const hasApprovedAccess = restaurantAccessList.some((access) => access.status === "approved");
 
     if (isOwner) {
       return (
@@ -329,9 +330,7 @@ export default function RestaurantProfile() {
 
         <BusinessHours
           businessHours={
-            isEditing
-              ? editableData?.businessHours || mergedBusinessHours
-              : mergedBusinessHours
+            isEditing ? editableData?.businessHours || mergedBusinessHours : mergedBusinessHours
           }
           isEditing={isEditing}
           handleBusinessHoursChange={handleBusinessHoursChange}
@@ -345,8 +344,6 @@ export default function RestaurantProfile() {
           displayData={displayData}
           handleInputChange={handleInputChange}
         />
-
-
 
         <DeliveryLinks
           isEditing={isEditing}

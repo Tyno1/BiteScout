@@ -1,4 +1,3 @@
-
 import { Badge, Button } from "@/components/atoms";
 import { DataGrid } from "@/components/organisms/DataGrid";
 import { DataGridFilter } from "@/components/organisms/DataGridFilter/DataGridFilter";
@@ -52,12 +51,7 @@ export const FoodCatalogueList = ({
       cell: ({ getValue }) => (
         <div className="flex gap-1 overflow-x-auto">
           {(getValue() as string[]).map((ingredient) => (
-            <Badge
-              key={ingredient}
-              size="xs"
-              variant="glass"
-              color="neutral"
-            >
+            <Badge key={ingredient} size="xs" variant="glass" color="neutral">
               {ingredient}
             </Badge>
           ))}
@@ -110,7 +104,7 @@ export const FoodCatalogueList = ({
 
     return foodDatas.filter((food) => {
       const searchTerm = searchValue.toLowerCase().trim();
-      
+
       switch (filterField) {
         case "name":
           return food.name?.toLowerCase().includes(searchTerm);
@@ -119,7 +113,7 @@ export const FoodCatalogueList = ({
         case "course":
           return food.course?.name?.toLowerCase().includes(searchTerm);
         case "ingredients":
-          return food.ingredients?.some(ingredient =>
+          return food.ingredients?.some((ingredient) =>
             ingredient.toLowerCase().includes(searchTerm)
           );
         default:
@@ -128,9 +122,7 @@ export const FoodCatalogueList = ({
             food.name?.toLowerCase().includes(searchTerm) ||
             food.cuisineType?.name?.toLowerCase().includes(searchTerm) ||
             food.course?.name?.toLowerCase().includes(searchTerm) ||
-            food.ingredients?.some(ingredient =>
-              ingredient.toLowerCase().includes(searchTerm)
-            )
+            food.ingredients?.some((ingredient) => ingredient.toLowerCase().includes(searchTerm))
           );
       }
     });
@@ -193,4 +185,4 @@ export const FoodCatalogueList = ({
       </div>
     </div>
   );
-}; 
+};

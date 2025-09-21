@@ -65,9 +65,7 @@ export function Modal({
 
       if (focusableElements && focusableElements.length > 0) {
         const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[
-          focusableElements.length - 1
-        ] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
         if (e.shiftKey) {
           // Shift + Tab
@@ -118,9 +116,7 @@ export function Modal({
               <div className="flex-1 min-w-0 text-card-foreground">
                 <h2 className="text-xl font-bold">{modalTitle}</h2>
                 {modalDescription && (
-                  <div className="mt-2 text-sm break-words">
-                    {modalDescription}
-                  </div>
+                  <div className="mt-2 text-sm break-words">{modalDescription}</div>
                 )}
               </div>
               <IconButton

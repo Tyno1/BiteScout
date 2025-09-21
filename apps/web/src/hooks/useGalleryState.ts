@@ -12,7 +12,7 @@ interface UseGalleryStateReturn {
   filteredImages: Media[];
   hasUnsavedChanges: boolean;
   isUploading: boolean;
-  
+
   // Actions
   addImages: (newImages: Media[]) => void;
   removeImage: (imageId: string) => void;
@@ -21,14 +21,14 @@ interface UseGalleryStateReturn {
   saveChanges: () => Promise<{ success: boolean; error?: unknown }>;
   discardChanges: () => void;
   resetUploadState: () => void;
-  
+
   // Upload state
   setUploading: (uploading: boolean) => void;
 }
 
-export const useGalleryState = ({ 
-  initialImages, 
-  onImagesChange 
+export const useGalleryState = ({
+  initialImages,
+  onImagesChange,
 }: UseGalleryStateProps): UseGalleryStateReturn => {
   // Core state
   const [images, setImages] = useState<Media[]>(initialImages);
@@ -36,7 +36,7 @@ export const useGalleryState = ({
   const [filteredImages, setFilteredImages] = useState<Media[]>(initialImages);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  
+
   // Filter state
   const [currentCategory, setCurrentCategory] = useState<string>("");
   const [currentTags, setCurrentTags] = useState<string[]>([]);
@@ -61,21 +61,21 @@ export const useGalleryState = ({
         }
         return true; // Show all images when no category and no tags selected
       }
-      
+
       // If category is selected, filter by category first
       if (image.associatedWith?.type !== currentCategory) {
         return false;
       }
-      
+
       // Then apply tag filtering if tags are selected
       if (currentTags.length > 0) {
         const hasMatchingTag = image.tags?.some((tag) => currentTags.includes(tag)) ?? false;
         return hasMatchingTag;
       }
-      
+
       return true;
     });
-    
+
     setFilteredImages(filtered);
   }, [images, currentCategory, currentTags]);
 
@@ -89,25 +89,27 @@ export const useGalleryState = ({
 
   // Add new images (from uploads)
   const addImages = useCallback((newImages: Media[]) => {
-    setImages(prev => [...prev, ...newImages]);
+    setImages((prev) => [...prev, ...newImages]);
   }, []);
 
   // Remove image
   const removeImage = useCallback((imageId: string) => {
-    setImages(prev => prev.filter(img => img._id !== imageId));
+    setImages((prev) => prev.filter((img) => img._id !== imageId));
   }, []);
 
   // Update image metadata
   const updateImageMetadata = useCallback((imageId: string, field: string, value: string) => {
-    setImages(prev => prev.map(img => {
-      if (img._id === imageId) {
-        return {
-          ...img,
-          [field]: field === 'tags' ? value.split(',').map(tag => tag.trim()) : value,
-        };
-      }
-      return img;
-    }));
+    setImages((prev) =>
+      prev.map((img) => {
+        if (img._id === imageId) {
+          return {
+            ...img,
+            [field]: field === "tags" ? value.split(",").map((tag) => tag.trim()) : value,
+          };
+        }
+        return img;
+      })
+    );
   }, []);
 
   // Filter images
@@ -121,7 +123,7 @@ export const useGalleryState = ({
     if (!hasUnsavedChanges) {
       return { success: true };
     }
-    
+
     try {
       setOriginalImages(images);
       setHasUnsavedChanges(false);
@@ -148,7 +150,7 @@ export const useGalleryState = ({
     filteredImages,
     hasUnsavedChanges,
     isUploading,
-    
+
     // Actions
     addImages,
     removeImage,
@@ -157,7 +159,7 @@ export const useGalleryState = ({
     saveChanges,
     discardChanges,
     resetUploadState,
-    
+
     // Upload state
     setUploading: setIsUploading,
   };

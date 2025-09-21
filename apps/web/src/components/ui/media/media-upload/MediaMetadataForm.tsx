@@ -20,7 +20,7 @@ export const MediaMetadataForm = ({
           placeholder="Enter a title for your media"
           fullWidth
         />
-        
+
         <Textarea
           name={`description-${index}`}
           fullWidth
@@ -30,7 +30,7 @@ export const MediaMetadataForm = ({
           placeholder="Enter a description (optional)"
           rows={2}
         />
-        
+
         <Input
           name={`tags-${index}`}
           type="text"
@@ -59,4 +59,4 @@ export const MediaMetadataForm = ({
       </div>
     </div>
   );
-}; 
+};

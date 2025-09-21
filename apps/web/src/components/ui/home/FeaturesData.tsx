@@ -19,8 +19,7 @@ export const featuresData: FeaturesProp[] = [
   {
     icon: <TrendingUp className="w-12 h-12 text-orange-600" />,
     title: "Discover Trends",
-    description:
-      "Stay updated with the latest food trends and popular dining spots",
+    description: "Stay updated with the latest food trends and popular dining spots",
     featureType: "Mobile User",
   },
   {
@@ -44,8 +43,7 @@ export const featuresData: FeaturesProp[] = [
   {
     icon: <Utensils className="w-12 h-12 text-orange-600" />,
     title: "Restaurant Profile",
-    description:
-      "Customize your restaurant details, photos, and special offerings",
+    description: "Customize your restaurant details, photos, and special offerings",
     featureType: "Restaurant Admin",
   },
 ];

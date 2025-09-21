@@ -9,10 +9,13 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import type { Media } from "shared/types/api/schemas";
 
-const Gallery = dynamic(() => import("@/components/ui/dashboard").then(mod => ({ default: mod.Gallery })), {
-  loading: () => <GallerySkeleton count={8} />,
-  ssr: false
-});
+const Gallery = dynamic(
+  () => import("@/components/ui/dashboard").then((mod) => ({ default: mod.Gallery })),
+  {
+    loading: () => <GallerySkeleton count={8} />,
+    ssr: false,
+  }
+);
 
 export default function GalleryPage() {
   const { restaurantData, isLoading } = useRestaurantAccess();
@@ -44,13 +47,14 @@ export default function GalleryPage() {
           gallery: galleryImages,
         },
       });
-      
+
       setOriginalImages(galleryImages);
       setHasUnsavedChanges(false);
       setSaveError(null);
       toast.success("Gallery updated successfully!");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update gallery. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update gallery. Please try again.";
       setSaveError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -60,7 +64,9 @@ export default function GalleryPage() {
 
   const handleCancel = useCallback(() => {
     if (hasUnsavedChanges) {
-      const confirmed = window.confirm("You have unsaved changes. Are you sure you want to discard them?");
+      const confirmed = window.confirm(
+        "You have unsaved changes. Are you sure you want to discard them?"
+      );
       if (!confirmed) return;
     }
 
@@ -112,8 +118,6 @@ export default function GalleryPage() {
     );
   }
 
-
-
   return (
     <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
       <div className="mb-3">
@@ -124,9 +128,7 @@ export default function GalleryPage() {
       </div>
 
       <Suspense fallback={<GallerySkeleton count={8} />}>
-        <Gallery
-          restaurantId={restaurantData?._id || ''}
-        />
+        <Gallery restaurantId={restaurantData?._id || ""} />
       </Suspense>
 
       {hasUnsavedChanges && (
@@ -135,17 +137,22 @@ export default function GalleryPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Save Failed
-                  </h3>
-                  <p className="text-sm text-red-700 mt-1">
-                    {saveError}
-                  </p>
+                  <h3 className="text-sm font-medium text-red-800">Save Failed</h3>
+                  <p className="text-sm text-red-700 mt-1">{saveError}</p>
                 </div>
               </div>
             </div>
@@ -166,7 +173,7 @@ export default function GalleryPage() {
             </div>
 
             <div className="flex items-center space-x-3">
-              <Button 
+              <Button
                 text="Discard Changes"
                 onClick={handleCancel}
                 disabled={isSaving}
@@ -175,7 +182,7 @@ export default function GalleryPage() {
                 size="sm"
               />
               <Button
-                text={isSaving ? 'Saving...' : 'Save Changes'}
+                text={isSaving ? "Saving..." : "Save Changes"}
                 onClick={handleSave}
                 disabled={isSaving}
                 variant="solid"

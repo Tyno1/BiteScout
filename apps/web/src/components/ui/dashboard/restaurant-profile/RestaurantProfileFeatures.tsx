@@ -6,13 +6,7 @@ import {
   FEATURE_CATEGORIES,
   categorizeFeatures,
 } from "@/utils";
-import {
-  CheckCircle,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  Tag,
-} from "lucide-react";
+import { CheckCircle, ChevronDown, ChevronRight, Plus, Tag } from "lucide-react";
 import { useState } from "react";
 import type { Restaurant, RestaurantFeature } from "shared/types/api/schemas";
 
@@ -22,10 +16,7 @@ type RestaurantProfileFeaturesProps = {
   setNewFeature: (value: RestaurantFeature) => void;
   addFeature: (feature: RestaurantFeature) => void;
   displayData: Restaurant | undefined;
-  handleInputChange?: (
-    field: keyof Restaurant,
-    value: Restaurant[keyof Restaurant]
-  ) => void;
+  handleInputChange?: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
 };
 
 export function RestaurantProfileFeatures({
@@ -36,12 +27,8 @@ export function RestaurantProfileFeatures({
   displayData,
   handleInputChange,
 }: RestaurantProfileFeaturesProps) {
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set()
-  );
-  const [viewMode, setViewMode] = useState<"categorized" | "list">(
-    "categorized"
-  );
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<"categorized" | "list">("categorized");
 
   // Get features from flat array
   const getFeatures = (): RestaurantFeature[] => {
@@ -97,9 +84,7 @@ export function RestaurantProfileFeatures({
                 <h2 id="features-heading" className="text-lg font-semibold">
                   Restaurant Features
                 </h2>
-                <p className="text-sm text-primary">
-                  {getSelectedCount()} features selected
-                </p>
+                <p className="text-sm text-primary">{getSelectedCount()} features selected</p>
               </div>
             </div>
             {isEditing && (
@@ -126,8 +111,8 @@ export function RestaurantProfileFeatures({
           </div>
           {isEditing && (
             <Alert status="information">
-              Pro tip: Select features that best describe your restaurant to
-              help customers find you and understand what to expect!
+              Pro tip: Select features that best describe your restaurant to help customers find you
+              and understand what to expect!
             </Alert>
           )}
         </div>
@@ -137,30 +122,24 @@ export function RestaurantProfileFeatures({
       {isEditing && viewMode === "categorized" && (
         <div className="space-y-4">
           <Alert status="information">
-            Click on categories to expand and select features. This helps
-            organize your restaurant&apos;s amenities.
+            Click on categories to expand and select features. This helps organize your
+            restaurant&apos;s amenities.
           </Alert>
 
           {Object.entries(FEATURE_CATEGORIES).map(
             ([category, availableFeatures]: [string, RestaurantFeature[]]) => {
               const selectedFeatures =
-                categorizedFeatures.find((cat) => cat.category === category)
-                  ?.features || [];
+                categorizedFeatures.find((cat) => cat.category === category)?.features || [];
 
               return (
-                <div
-                  key={category}
-                  className="border border-primary/20 rounded-lg"
-                >
+                <div key={category} className="border border-primary/20 rounded-lg">
                   <button
                     type="button"
                     onClick={() => toggleCategory(category)}
                     className="w-full px-4 py-3 flex justify-between items-center bg-background hover:bg-background/20 rounded-t-lg transition-colors"
                   >
                     <div className="flex items-center gap-6 ">
-                      <span className="font-medium text-sm text-foreground">
-                        {category}
-                      </span>
+                      <span className="font-medium text-sm text-foreground">{category}</span>
                       {selectedFeatures.length > 0 && (
                         <span className="bg-primary/10 border-1 border-primary text-primary px-3 py-1 rounded-full text-xs font-sm">
                           {selectedFeatures.length} selected
@@ -209,8 +188,8 @@ export function RestaurantProfileFeatures({
       {isEditing && viewMode === "list" && (
         <div className="space-y-4">
           <Alert status="information">
-            Use the dropdown to add specific features or check the boxes below
-            to select multiple features at once.
+            Use the dropdown to add specific features or check the boxes below to select multiple
+            features at once.
           </Alert>
 
           <div className="flex gap-2 items-center">
@@ -224,9 +203,7 @@ export function RestaurantProfileFeatures({
                 label: feature,
               }))}
               value={newFeature || ""}
-              onChange={(e) =>
-                setNewFeature((e.target.value as RestaurantFeature) || null)
-              }
+              onChange={(e) => setNewFeature((e.target.value as RestaurantFeature) || null)}
               placeholder="Select a feature to add"
             />
             <IconButton
@@ -268,9 +245,7 @@ export function RestaurantProfileFeatures({
           {categorizedFeatures.length > 0 ? (
             categorizedFeatures.map((category) => (
               <div key={category.category} className="space-y-2 mb-6">
-                <h3 className="font-medium text-foreground">
-                  {category.category}
-                </h3>
+                <h3 className="font-medium text-foreground">{category.category}</h3>
                 <div className="flex flex-wrap gap-2">
                   {category.features.map((feature) => (
                     <div

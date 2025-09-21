@@ -8,22 +8,12 @@ export function CallToAction() {
           Ready to Start Your Food Journey?
         </h2>
         <p className="text-foreground mb-8 max-w-2xl">
-          Join thousands of food enthusiasts and discover the best dining
-          experiences in your area. Download our app today and start exploring!
+          Join thousands of food enthusiasts and discover the best dining experiences in your area.
+          Download our app today and start exploring!
         </p>
         <div className="flex gap-4">
-          <Button
-            text="Download iOS App"
-            variant="solid"
-            color="secondary"
-            size="sm"
-          />
-          <Button
-            text="Download Android App"
-            variant="solid"
-            color="secondary"
-            size="lg"
-          />
+          <Button text="Download iOS App" variant="solid" color="secondary" size="sm" />
+          <Button text="Download Android App" variant="solid" color="secondary" size="lg" />
         </div>
       </div>
     </section>

@@ -11,10 +11,7 @@ type BasicInformation = {
   editableData: Restaurant | null;
   setEditableData: (value: Restaurant) => void;
   displayData: Restaurant | undefined;
-  handleInputChange: (
-    field: keyof Restaurant,
-    value: Restaurant[keyof Restaurant]
-  ) => void;
+  handleInputChange: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
   removeCuisine: (cuisine: Cuisine) => void;
 };
 
@@ -61,18 +58,12 @@ export function BasicInformation({
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
               <ChefHat className="w-4 h-4 text-primary" />
-              <label
-                htmlFor="cuisine-type"
-                id="cuisine-type"
-                className="font-medium"
-              >
+              <label htmlFor="cuisine-type" id="cuisine-type" className="font-medium">
                 Cuisine Type
               </label>
             </div>
             {isEditing && (
-              <p className="text-sm">
-                Select cuisine types to help customers find you
-              </p>
+              <p className="text-sm">Select cuisine types to help customers find you</p>
             )}
             <div className="flex gap-4 mt-2">
               {isEditing && (
@@ -111,27 +102,22 @@ export function BasicInformation({
               )}
             </div>
             <div>
-              {isEditing &&
-                displayData?.cuisine &&
-                displayData.cuisine.length > 0 && (
-                  <div className="text-xs text-primary px-2 py-1 rounded mb-2">
-                    ✓ {displayData.cuisine.length} cuisine
-                    {displayData.cuisine.length > 1 ? "s" : ""} added
-                  </div>
-                )}
+              {isEditing && displayData?.cuisine && displayData.cuisine.length > 0 && (
+                <div className="text-xs text-primary px-2 py-1 rounded mb-2">
+                  ✓ {displayData.cuisine.length} cuisine
+                  {displayData.cuisine.length > 1 ? "s" : ""} added
+                </div>
+              )}
               <div className="mt-2">
                 {displayData?.cuisine && displayData.cuisine.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
                     {displayData.cuisine.map((cuisine) => (
                       <div
-                        key={cuisine._id || ''}
+                        key={cuisine._id || ""}
                         className="bg-foreground text-background px-2.5 py-1 rounded-md flex items-center gap-1.5 text-sm border border-gray/20 transition-colors"
                       >
-                        <span
-                          className="font-medium truncate max-w-20"
-                          title={cuisine.name || ''}
-                        >
-                          {cuisine.name || ''}
+                        <span className="font-medium truncate max-w-20" title={cuisine.name || ""}>
+                          {cuisine.name || ""}
                         </span>
                         {isEditing && (
                           <IconButton
@@ -140,7 +126,7 @@ export function BasicInformation({
                             size="xs"
                             icon={<X size={12} />}
                             onClick={() => removeCuisine(cuisine)}
-                            aria-label={`Remove ${cuisine.name || ''}`}
+                            aria-label={`Remove ${cuisine.name || ""}`}
                             className=" flex-shrink-0"
                           />
                         )}
@@ -151,11 +137,7 @@ export function BasicInformation({
                   <div className="text-foreground text-sm bg-background p-3 rounded-lg italic border border-dashed border-gray/20">
                     <div className="flex items-center gap-2">
                       <span>No cuisines added</span>
-                      {isEditing && (
-                        <span>
-                          ← Select above
-                        </span>
-                      )}
+                      {isEditing && <span>← Select above</span>}
                     </div>
                   </div>
                 )}
@@ -166,7 +148,9 @@ export function BasicInformation({
           <div className="space-y-2 flex flex-col">
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-primary" />
-              <label htmlFor="price-range" className="font-medium">Price Range</label>
+              <label htmlFor="price-range" className="font-medium">
+                Price Range
+              </label>
             </div>
             {isEditing && (
               <p className="text-sm text-gray-foreground">
@@ -197,12 +181,12 @@ export function BasicInformation({
         <div className="space-y-2 flex flex-col">
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-primary" />
-            <label htmlFor="description-label" className="font-medium">Full Description</label>
+            <label htmlFor="description-label" className="font-medium">
+              Full Description
+            </label>
           </div>
           {isEditing && (
-            <p className="text-sm text-gray-foreground">
-              Tell customers about your restaurant
-            </p>
+            <p className="text-sm text-gray-foreground">Tell customers about your restaurant</p>
           )}
           <Textarea
             fullWidth

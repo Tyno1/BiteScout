@@ -82,21 +82,14 @@ export function Input({
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx(
-            `block ${!labelRow && "mb-3"} font-medium text-foreground`,
-            labelStyle
-          )}
+          className={clsx(`block ${!labelRow && "mb-3"} font-medium text-foreground`, labelStyle)}
         >
           {label}
         </label>
       )}
 
       {errorMessage && (
-        <p
-          id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
-          role="alert"
-        >
+        <p id={`${uniqueId}-error`} className="text-sm text-red-500 mt-1" role="alert">
           {errorMessage}
         </p>
       )}

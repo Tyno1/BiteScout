@@ -25,7 +25,7 @@ export const MediaCard = ({
         className="absolute -top-3 -right-4 rounded-full"
         icon={<X size={12} />}
       />
-      
+
       {/* Landscape Card Layout */}
       <div className="flex h-32">
         {/* Left: Preview Image/Video */}
@@ -80,13 +80,13 @@ export const MediaCard = ({
                 {fileWithPreview.file.name}
               </h4>
             </div>
-            
+
             {/* File Info */}
             <div className="text-xs text-foreground space-y-0.5">
               <div className="flex justify-between">
                 <span>Type:</span>
                 <span className="text-foreground font-medium">
-                  {fileWithPreview.file.type.split('/')[1]?.toUpperCase()}
+                  {fileWithPreview.file.type.split("/")[1]?.toUpperCase()}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -119,4 +119,4 @@ export const MediaCard = ({
       )}
     </div>
   );
-}; 
+};

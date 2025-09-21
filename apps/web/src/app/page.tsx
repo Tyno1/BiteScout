@@ -1,5 +1,3 @@
-"use client"
-
 import { Footer, Navbar } from "@/components/molecules";
 import {
   CallToAction,

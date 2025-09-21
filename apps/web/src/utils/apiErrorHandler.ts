@@ -9,12 +9,12 @@ import axios from "axios";
 export function handleApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     // Handle the new standardized error format
-    if (error.response?.data && typeof error.response.data === 'object') {
+    if (error.response?.data && typeof error.response.data === "object") {
       const errorData = error.response.data as ApiError;
-      return errorData.message || 'An error occurred';
+      return errorData.message || "An error occurred";
     }
     // Fallback to legacy error format
     return error.response?.data?.message || error.response?.data?.error || error.message;
   }
   return error instanceof Error ? error.message : "An error has occurred";
-} 
+}

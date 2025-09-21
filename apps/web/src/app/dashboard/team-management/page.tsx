@@ -7,21 +7,13 @@ import { Ban, CheckCircle, Trash2, User } from "lucide-react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
-  const { 
-    restaurantAccessList, 
-    deleteAccess, 
-    grantAccess, 
-    suspendAccess
-  } = useRestaurantAccess();
+  const { restaurantAccessList, deleteAccess, grantAccess, suspendAccess } = useRestaurantAccess();
 
   // ✅ REMOVED: Redundant restaurant access validation
   // Middleware and RouteProtection already handle this validation
   // No need for client-side useEffect validation
 
-  const handleStatusChange = async (
-    accessId: string,
-    status: RestaurantAccess["status"]
-  ) => {
+  const handleStatusChange = async (accessId: string, status: RestaurantAccess["status"]) => {
     try {
       switch (status) {
         // case where button is clicked to approve access
@@ -92,8 +84,7 @@ export default function TeamManagement() {
             Managing team for:{" "}
             <span className="font-bold">
               {typeof restaurantAccessList[0]?.restaurantId === "object"
-                ? (restaurantAccessList[0]?.restaurantId as { name: string })
-                    ?.name
+                ? (restaurantAccessList[0]?.restaurantId as { name: string })?.name
                 : ""}
             </span>
           </h2>
@@ -103,9 +94,7 @@ export default function TeamManagement() {
       {restaurantAccessList.length === 0 ? (
         <div className="text-center py-12 bg-card text-card-foreground rounded-lg shadow">
           <User className="mx-auto h-12 w-12 " />
-          <h3 className="mt-2 text-lg font-medium text-card-foreground">
-            No team members yet
-          </h3>
+          <h3 className="mt-2 text-lg font-medium text-card-foreground">No team members yet</h3>
           <p className="mt-1 text-sm">
             Team access will appear here once users have requested access.
           </p>
@@ -136,9 +125,7 @@ export default function TeamManagement() {
                           variant="plain"
                           color="success"
                           size="sm"
-                          onClick={() =>
-                            handleStatusChange(access?._id ?? "", "approved")
-                          }
+                          onClick={() => handleStatusChange(access?._id ?? "", "approved")}
                           ariaLabel="Activate access"
                         />
                       )}
@@ -148,9 +135,7 @@ export default function TeamManagement() {
                           variant="plain"
                           color="secondary"
                           size="sm"
-                          onClick={() =>
-                            handleStatusChange(access._id ?? "", "suspended")
-                          }
+                          onClick={() => handleStatusChange(access._id ?? "", "suspended")}
                           ariaLabel="Suspend access"
                         />
                       )}
@@ -159,9 +144,7 @@ export default function TeamManagement() {
                         variant="plain"
                         color="danger"
                         size="sm"
-                        onClick={() =>
-                          handleStatusChange(access._id ?? "", "innactive")
-                        }
+                        onClick={() => handleStatusChange(access._id ?? "", "innactive")}
                         ariaLabel="Remove access"
                       />
                     </div>

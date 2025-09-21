@@ -3,7 +3,7 @@
 import { Alert, Button } from "@/components/atoms";
 import { AlertModal } from "@/components/molecules";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
-import {  Modal } from "@/components/organisms";
+import { Modal } from "@/components/organisms";
 import { AddNewFood } from "@/components/ui";
 import { FoodCatalogueList } from "@/components/ui/dashboard/food-catalogue/FoodCatalogueList";
 import { MediaUpload } from "@/components/ui/media";
@@ -52,9 +52,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
   const [activeTab, setActiveTab] = useState<string>("food-data");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [formMode, setFormMode] = useState<"create" | "update">("create");
-  const [editingFood, setEditingFood] = useState<FoodCatalogue | undefined>(
-    undefined
-  );
+  const [editingFood, setEditingFood] = useState<FoodCatalogue | undefined>(undefined);
 
   // Delete confirmation modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -178,8 +176,6 @@ export default function FoodCatalogueManagement(): React.ReactElement {
     }
   }, [itemToDelete, restaurantData?._id, deleteFoodMutation]);
 
-  
-
   const tabs: TabItem[] = [
     {
       key: "food-data",
@@ -251,7 +247,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         <h1 className="text-2xl font-bold">Food Catalogue</h1>
 
         {foodDatas && foodDatas.length > 0 ? (
-          <Button size="sm"  variant="solid" text="Create New" onClick={handleAddFood} />
+          <Button size="sm" variant="solid" text="Create New" onClick={handleAddFood} />
         ) : null}
       </div>
 
@@ -331,8 +327,8 @@ export default function FoodCatalogueManagement(): React.ReactElement {
                 Welcome to your Food Catalogue!
               </h3>
               <p className="text-foreground/80 mb-6">
-                Start building your menu by adding your first food item. You can
-                include ingredients, allergens, pricing, and images.
+                Start building your menu by adding your first food item. You can include
+                ingredients, allergens, pricing, and images.
               </p>
               <Button
                 variant="solid"
@@ -359,12 +355,9 @@ export default function FoodCatalogueManagement(): React.ReactElement {
         isLoading={deleteFoodMutation.isPending}
       >
         <div>
-          <p className="mb-2">
-            Are you sure you want to delete this food item?
-          </p>
+          <p className="mb-2">Are you sure you want to delete this food item?</p>
           <p className="text-sm text-red-600">
-            This action cannot be undone and will remove the item from your
-            menu.
+            This action cannot be undone and will remove the item from your menu.
           </p>
         </div>
       </AlertModal>
@@ -378,9 +371,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-secondary">Uploading images...</span>
-                <span className="text-secondary font-medium">
-                  {uploadProgress}%
-                </span>
+                <span className="text-secondary font-medium">{uploadProgress}%</span>
               </div>
               <div className="w-full bg-secondary/20 rounded-full h-2">
                 <div
@@ -413,9 +404,7 @@ export default function FoodCatalogueManagement(): React.ReactElement {
             handleSubmitFood();
           } else {
             if (validateForm()) {
-              const currentIndex = tabs.findIndex(
-                (tab) => tab.key === activeTab
-              );
+              const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
               setActiveTab(tabs[currentIndex + 1].key);
             }
           }

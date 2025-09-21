@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Spinner } from './Spinners';
+import type { Meta, StoryObj } from "@storybook/react";
+import { Spinner } from "./Spinners";
 
 const meta: Meta<typeof Spinner> = {
-  title: 'Atoms/Spinner',
+  title: "Atoms/Spinner",
   component: Spinner,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -35,7 +35,7 @@ export const WithText: Story = {
 
 export const InButton: Story = {
   render: () => (
-    <button 
+    <button
       type="button"
       className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
       disabled
@@ -62,4 +62,4 @@ export const InCard: Story = {
       </div>
     </div>
   ),
-}; 
+};

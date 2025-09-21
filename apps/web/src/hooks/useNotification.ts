@@ -13,12 +13,10 @@ type useNotificationReturn = {
   isLoading: boolean;
 };
 
-export const useNotifications = ({
-  userId,
-}: useNotificationProps): useNotificationReturn => {
+export const useNotifications = ({ userId }: useNotificationProps): useNotificationReturn => {
   const { fetchNotifications, notifications, unreadCount, isLoading, addNotification } =
     useNotificationStore();
-    
+
   useEffect(() => {
     if (userId) {
       // 1. Initialize socket connection for real-time updates
@@ -35,4 +33,4 @@ export const useNotifications = ({
   }, [userId, addNotification, fetchNotifications]);
 
   return { notifications, unreadCount, isLoading };
-}; 
+};

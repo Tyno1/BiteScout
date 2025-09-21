@@ -83,14 +83,7 @@ export function TopMeals() {
       location: "Harbor District",
     },
   ];
-  const restaurantType = [
-    "Fine Dinning",
-    "Casual",
-    "Cafe",
-    "Pub",
-    "Lounge",
-    "Bar",
-  ];
+  const restaurantType = ["Fine Dinning", "Casual", "Cafe", "Pub", "Lounge", "Bar"];
   return (
     <section className="py-10 md:py-20 bg-background w-full">
       <div className="flex flex-col items-center px-2 md:px-20 w-full">
@@ -139,9 +132,7 @@ export function TopMeals() {
                   </div>
 
                   <div className="mt-2">
-                    <p className="text-xs italic text-foreground line-clamp-2">
-                      {meal.topReview}
-                    </p>
+                    <p className="text-xs italic text-foreground line-clamp-2">{meal.topReview}</p>
                     <div className="flex items-center mt-1 text-xs text-secondary">
                       <MapPin className="w-3 h-3 mr-1" />
                       {meal.location}
@@ -150,10 +141,7 @@ export function TopMeals() {
                 </div>
                 <div className="flex flex-col justify-between">
                   <div className="flex items-center bg-primary/10 px-1.5 py-0.5 rounded">
-                    <Star
-                      className="w-3 h-3 text-primary mr-0.5"
-                      fill="currentColor"
-                    />
+                    <Star className="w-3 h-3 text-primary mr-0.5" fill="currentColor" />
                     <span className="text-xs font-semibold">{meal.rating}</span>
                   </div>
                   <button type="button" className="flex items-center gap-2">

@@ -18,7 +18,7 @@ export function Badge({
   fullWidth = false,
   className = "",
 }: BadgeProps) {
-  const baseStyles = `${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center rounded-full font-medium transition-colors duration-200`;
+  const baseStyles = `${fullWidth ? "flex w-full" : "inline-flex"} items-center justify-center rounded-full font-medium transition-colors duration-200`;
 
   const colorStyles = {
     primary: `${
@@ -83,16 +83,7 @@ export function Badge({
     md: "px-3 py-1.5 text-sm",
   };
 
-  const combinedClassName = cn(
-    baseStyles,
-    colorStyles[color],
-    sizeStyles[size],
-    className
-  );
+  const combinedClassName = cn(baseStyles, colorStyles[color], sizeStyles[size], className);
 
-  return (
-    <span className={combinedClassName}>
-      {children}
-    </span>
-  );
-} 
+  return <span className={combinedClassName}>{children}</span>;
+}

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import {  ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { ChangeEvent, ReactNode, SelectHTMLAttributes } from "react";
 
 interface Option {
@@ -100,23 +100,14 @@ export function Select({
           {label}
         </label>
       )}
-    {errorMessage && (
-        <p
-          id={`${uniqueId}-error`}
-          className="text-sm text-danger mt-1"
-          role="alert"
-        >
+      {errorMessage && (
+        <p id={`${uniqueId}-error`} className="text-sm text-danger mt-1" role="alert">
           {errorMessage}
         </p>
       )}
       <div className="relative">
         {icon && (
-          <div
-            className={clsx(
-              "absolute top-1/2 left-3 transform -translate-y-1/2",
-              iconStyle
-            )}
-          >
+          <div className={clsx("absolute top-1/2 left-3 transform -translate-y-1/2", iconStyle)}>
             {icon}
           </div>
         )}
@@ -166,8 +157,6 @@ export function Select({
           </button>
         )}
       </div>
-
-  
 
       {helperText && !errorMessage && (
         <p id={`${uniqueId}-helper`} className="text-sm text-gray-500 mt-1">

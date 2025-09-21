@@ -16,12 +16,7 @@ export function RegisterForm() {
   }, [state?.success, router]);
 
   return (
-    <form
-      action={formAction}
-      className="w-full flex flex-col items-center gap-2"
-    >
-    
-
+    <form action={formAction} className="w-full flex flex-col items-center gap-2">
       <Input
         inputSize="md"
         type="text"

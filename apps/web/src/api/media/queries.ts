@@ -1,11 +1,8 @@
-import apiClient from '@/utils/authClient';
-import config from '@/utils/config';
-import { buildQueryParams } from '@/utils/mediaUtils';
-import type { 
-  GetMediaResponse,
-  PaginatedResponse, 
-} from '@shared/types';
-import axios from 'axios';
+import apiClient from "@/utils/authClient";
+import config from "@/utils/config";
+import { buildQueryParams } from "@/utils/mediaUtils";
+import type { GetMediaResponse, PaginatedResponse } from "@shared/types";
+import axios from "axios";
 
 // Get media by ID
 export const getMedia = async (mediaId: string): Promise<GetMediaResponse> => {
@@ -17,10 +14,10 @@ export const getMedia = async (mediaId: string): Promise<GetMediaResponse> => {
 export const getMediaWithOptimizedUrl = async (
   mediaId: string,
   size = "medium",
-  networkSpeed?: "slow" | "medium" | "fast",
+  networkSpeed?: "slow" | "medium" | "fast"
 ): Promise<{ media: GetMediaResponse; optimizedUrl: string }> => {
   const media = await getMedia(mediaId);
-  
+
   try {
     const mediaServiceId = (media as { mediaServiceId?: string }).mediaServiceId;
     if (!mediaServiceId) {
@@ -34,8 +31,8 @@ export const getMediaWithOptimizedUrl = async (
       {
         timeout: 5000,
         headers: {
-          'Accept': 'application/json',
-        }
+          Accept: "application/json",
+        },
       }
     );
 
@@ -48,7 +45,7 @@ export const getMediaWithOptimizedUrl = async (
     console.error("Error getting optimized URL:", error);
     return {
       media,
-      optimizedUrl: media.url || '',
+      optimizedUrl: media.url || "",
     };
   }
 };
@@ -57,22 +54,26 @@ export const getMediaWithOptimizedUrl = async (
 export const getUserMedia = async (
   userId: string,
   page = 1,
-  limit = 10,
+  limit = 10
 ): Promise<PaginatedResponse<GetMediaResponse>> => {
   const params = buildQueryParams({ page, limit });
-  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(`/media/user/${userId}?${params}`);
+  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(
+    `/media/user/${userId}?${params}`
+  );
   return response.data;
 };
 
 // Get associated media with pagination
 export const getAssociatedMedia = async (
-  type: string, 
-  id: string, 
-  page = 1, 
+  type: string,
+  id: string,
+  page = 1,
   limit = 10
 ): Promise<PaginatedResponse<GetMediaResponse>> => {
   const params = buildQueryParams({ page, limit });
-  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(`/media/associated/${type}/${id}?${params}`);
+  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(
+    `/media/associated/${type}/${id}?${params}`
+  );
   return response.data;
 };
 
@@ -80,9 +81,11 @@ export const getAssociatedMedia = async (
 export const getVerifiedMedia = async (
   page = 1,
   limit = 10,
-  type?: "image" | "video",
+  type?: "image" | "video"
 ): Promise<PaginatedResponse<GetMediaResponse>> => {
   const params = buildQueryParams({ page, limit, ...(type && { type }) });
-  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(`/media/verified?${params}`);
+  const response = await apiClient.get<PaginatedResponse<GetMediaResponse>>(
+    `/media/verified?${params}`
+  );
   return response.data;
-}; 
+};

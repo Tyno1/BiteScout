@@ -6,27 +6,23 @@ import { AlertCircle, Bell, Shield, UserCheck, UserX } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import type { Notification  } from "shared/types/api/schemas";
+import type { Notification } from "shared/types/api/schemas";
 
 // Define notification categories based on the API spec types
 type FilteredNotificationType = {
-  accessRequest: Notification[];    // access_request
-  accessGranted: Notification[];    // access_granted
-  accessDenied: Notification[];     // access_denied
-  accessSuspended: Notification[];  // access_suspended
+  accessRequest: Notification[]; // access_request
+  accessGranted: Notification[]; // access_granted
+  accessDenied: Notification[]; // access_denied
+  accessSuspended: Notification[]; // access_suspended
   restaurantUpdate: Notification[]; // restaurant_update
-  system: Notification[];           // system
+  system: Notification[]; // system
 };
 
 export default function Notifications() {
   const { data: session } = useSession();
   const router = useRouter();
-  const {
-    fetchNotifications,
-    notifications,
-    markAllNotificationsAsRead,
-    markNotificationAsRead,
-  } = useNotificationStore();
+  const { fetchNotifications, notifications, markAllNotificationsAsRead, markNotificationAsRead } =
+    useNotificationStore();
   const [selectedType, setSelectedType] = useState("accessRequest");
 
   // Group notifications by type for better organization
@@ -78,9 +74,7 @@ export default function Notifications() {
 
   // Format the type name for display (e.g., "accessRequest" -> "Access Request")
   const formatTypeName = (type: string) => {
-    return type
-      .replace(/([a-z])([A-Z])/g, "$1 $2")
-      .replace(/^\w/, (c) => c.toUpperCase());
+    return type.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^\w/, (c) => c.toUpperCase());
   };
 
   // Get appropriate action buttons based on notification type
@@ -100,15 +94,17 @@ export default function Notifications() {
             variant="outline"
             size="sm"
             text="Mark as Read"
-            onClick={() =>
-              notification._id && handleMarkAsRead(notification._id)
-            }
+            onClick={() => notification._id && handleMarkAsRead(notification._id)}
           />
         </div>
       );
     }
 
-    if (notification.type === "access_granted" || notification.type === "access_denied" || notification.type === "access_suspended") {
+    if (
+      notification.type === "access_granted" ||
+      notification.type === "access_denied" ||
+      notification.type === "access_suspended"
+    ) {
       return (
         <div className="flex space-x-2 items-center">
           <Button
@@ -123,23 +119,19 @@ export default function Notifications() {
             variant="outline"
             size="sm"
             text="Mark as Read"
-            onClick={() =>
-              notification._id && handleMarkAsRead(notification._id)
-            }
+            onClick={() => notification._id && handleMarkAsRead(notification._id)}
           />
         </div>
       );
     }
 
     return (
-      <Button 
-        color="primary" 
-        variant="outline" 
-        size="sm" 
+      <Button
+        color="primary"
+        variant="outline"
+        size="sm"
         text="Mark as Read"
-        onClick={() =>
-          notification._id && handleMarkAsRead(notification._id)
-        }
+        onClick={() => notification._id && handleMarkAsRead(notification._id)}
       />
     );
   };
@@ -177,82 +169,70 @@ export default function Notifications() {
 
   return (
     <main className="w-full mx-auto px-10 py-10 space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold mb-6">Notifications</h1>
-          <Button
-            color="primary"
-            variant="solid"
-            size="sm"
-            text="Mark All as Read"
-            onClick={handlemarkAllAsRead}
-          />
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold mb-6">Notifications</h1>
+        <Button
+          color="primary"
+          variant="solid"
+          size="sm"
+          text="Mark All as Read"
+          onClick={handlemarkAllAsRead}
+        />
+      </div>
 
-        {filteredNotifications && (
-          <>
-            {/* Notification category tabs */}
-            <div className="flex flex-col md:flex-row justify-between mb-6 w-full md:w-[70%]">
-              {Object.entries(filteredNotifications).map(
-                ([type, notification]) => (
-                  <button
-                    type="button"
-                    key={type}
-                    onClick={() => setSelectedType(type)}
-                    className={`flex items-center justify-center ${
-                      selectedType === type
-                        ? "text-orange-500 border-b-2 border-orange-500 font-medium"
-                        : "text-gray-600 hover:text-gray-800"
-                    } py-3 px-4 text-sm mb-2 transition-all duration-200 ease-in-out relative`}
-                  >
-                    <span className="mr-2">
-                      {
-                        notificationIcons[
-                          type as keyof typeof notificationIcons
-                        ]
-                      }
-                    </span>
-                    {formatTypeName(type)}
-                    {readNotification(notification) > 0 && (
-                      <span className="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {readNotification(notification)}
-                      </span>
-                    )}
-                  </button>
-                )
-              )}
-            </div>
-            {/* Notification list */}
-            <div className="mt-4">
-              {filteredNotifications[
-                selectedType as keyof FilteredNotificationType
-              ]?.length > 0 ? (
-                filteredNotifications[
-                  selectedType as keyof FilteredNotificationType
-                ].map((notification) => (
+      {filteredNotifications && (
+        <>
+          {/* Notification category tabs */}
+          <div className="flex flex-col md:flex-row justify-between mb-6 w-full md:w-[70%]">
+            {Object.entries(filteredNotifications).map(([type, notification]) => (
+              <button
+                type="button"
+                key={type}
+                onClick={() => setSelectedType(type)}
+                className={`flex items-center justify-center ${
+                  selectedType === type
+                    ? "text-orange-500 border-b-2 border-orange-500 font-medium"
+                    : "text-gray-600 hover:text-gray-800"
+                } py-3 px-4 text-sm mb-2 transition-all duration-200 ease-in-out relative`}
+              >
+                <span className="mr-2">
+                  {notificationIcons[type as keyof typeof notificationIcons]}
+                </span>
+                {formatTypeName(type)}
+                {readNotification(notification) > 0 && (
+                  <span className="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {readNotification(notification)}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          {/* Notification list */}
+          <div className="mt-4">
+            {filteredNotifications[selectedType as keyof FilteredNotificationType]?.length > 0 ? (
+              filteredNotifications[selectedType as keyof FilteredNotificationType].map(
+                (notification) => (
                   <NotificationCard
                     key={notification._id}
                     notification={notification}
                     renderActionButtons={renderActionButtons}
                   />
-                ))
-              ) : (
-                <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-                  <div className="flex justify-center mb-4">
-                    {
-                      notificationIcons[
-                        selectedType as keyof typeof notificationIcons
-                      ]
-                    }
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-700">
-                    No {formatTypeName(selectedType)} Notifications
-                  </h3>
-                  <p className="text-gray-500 mt-2">You&apos;re all caught up!</p>
+                )
+              )
+            ) : (
+              <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+                <div className="flex justify-center mb-4">
+                  {notificationIcons[selectedType as keyof typeof notificationIcons]}
                 </div>
-              )}
-            </div>
-          </>
-        )}
+                <h3 className="text-lg font-medium text-gray-700">
+                  No {formatTypeName(selectedType)} Notifications
+                </h3>
+                <p className="text-gray-500 mt-2">You&apos;re all caught up!</p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </main>
   );
 }

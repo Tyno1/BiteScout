@@ -138,14 +138,10 @@ export function AlertModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2
-            id="alert-modal-title"
-            className="text-lg font-semibold text-card-foreground"
-          >
+          <h2 id="alert-modal-title" className="text-lg font-semibold text-card-foreground">
             {title}
           </h2>
           {!disableBackdropClose && (
-
             <IconButton
               variant="plain"
               size="sm"
@@ -158,10 +154,7 @@ export function AlertModal({
         </div>
 
         {/* Content */}
-        <div
-          id="alert-modal-description"
-          className="text-foreground mb-6 leading-relaxed"
-        >
+        <div id="alert-modal-description" className="text-foreground mb-6 leading-relaxed">
           {children}
         </div>
 
@@ -189,4 +182,4 @@ export function AlertModal({
       </div>
     </dialog>
   );
-} 
+}

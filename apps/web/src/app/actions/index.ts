@@ -2,16 +2,13 @@
 
 import { signIn, signOut } from "@/auth";
 import config from "@/utils/config";
-import type {
-  RegisterPostRequest,
-  RegisterPostResponse,
-} from "@shared/types/auth/register";
+import type { RegisterPostRequest, RegisterPostResponse } from "@shared/types/auth/register";
 import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import { z } from "zod";
 import type { RegisterFormState, SignInResponse } from "./types";
 
-const API_URL = config.backend.server ;
+const API_URL = config.backend.server;
 
 // Enhanced password validation with better security
 const passwordSchema = z
@@ -30,29 +27,18 @@ const passwordSchema = z
   .trim();
 
 const loginSchema = z.object({
-  email: z
-    .string()
-    .email({ message: "Invalid email address" })
-    .trim()
-    .toLowerCase(),
+  email: z.string().email({ message: "Invalid email address" }).trim().toLowerCase(),
   password: z.string().min(1, { message: "Password is required" }).trim(),
 });
 
 const registerSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
-  email: z
-    .string()
-    .email({ message: "Invalid email address" })
-    .trim()
-    .toLowerCase(),
+  email: z.string().email({ message: "Invalid email address" }).trim().toLowerCase(),
   password: passwordSchema,
 });
 
-export async function doCredentialLogin(
-  prevState: unknown,
-  formData: FormData
-) {
+export async function doCredentialLogin(prevState: unknown, formData: FormData) {
   try {
     const result = loginSchema.safeParse(Object.fromEntries(formData));
 
@@ -92,8 +78,7 @@ export async function doCredentialLogin(
     console.error(error);
     return {
       success: false,
-      systemError:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      systemError: error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }
@@ -130,8 +115,7 @@ export async function credentialRegister(
         // Map API error codes to user-friendly messages (focus on business logic errors)
         const errorMessages: Record<string, string> = {
           CONFLICT_ERROR: "An account with this email already exists",
-          RATE_LIMIT_EXCEEDED:
-            "Too many registration attempts. Please try again later.",
+          RATE_LIMIT_EXCEEDED: "Too many registration attempts. Please try again later.",
           INTERNAL_SERVER_ERROR: "Server error. Please try again later.",
         };
 
@@ -139,7 +123,6 @@ export async function credentialRegister(
           errorMessages[apiError.code] ||
           apiError.message ||
           "Registration failed. Please try again.";
-
 
         return {
           errors: {
@@ -164,15 +147,13 @@ export async function credentialRegister(
 
       // Fallback for unknown errors
       return {
-        systemError:
-          "An unexpected error occurred during registration. Please try again.",
+        systemError: "An unexpected error occurred during registration. Please try again.",
       };
     }
   } catch (error: unknown) {
     return {
       success: false,
-      systemError:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      systemError: error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

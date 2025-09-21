@@ -1,7 +1,7 @@
 // API and error handling utilities
 export { handleApiError as handleApiErrorLegacy } from "./apiErrorHandler";
 export * from "./authClient";
-export { 
+export {
   isValidationError,
   isAuthenticationError,
   isAuthorizationError,
@@ -15,7 +15,7 @@ export {
   getRedirectPath,
   handleApiError,
   isLegacyError,
-  convertLegacyError
+  convertLegacyError,
 } from "./errorHandler";
 
 // Media utilities
@@ -27,8 +27,6 @@ export * from "./refreshAccessToken";
 // Route and navigation utilities
 export * from "./getMatchingRoute";
 export * from "./getRoleFromSession";
-
-
 
 // Socket utilities
 export * from "./socketService";

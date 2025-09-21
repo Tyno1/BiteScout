@@ -1,15 +1,26 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
-import { Camera, MapPin, Monitor, Search, Shield, Smartphone, Star, TrendingUp, Users, Zap } from "lucide-react";
+import {
+  Camera,
+  MapPin,
+  Monitor,
+  Search,
+  Shield,
+  Smartphone,
+  Star,
+  TrendingUp,
+  Users,
+  Zap,
+} from "lucide-react";
 
 export default function Services() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-black via-gray-900 to-black text-white">
         <div className="max-w-5xl mx-auto text-center">
@@ -17,7 +28,8 @@ export default function Services() {
             Our <span className="text-primary">Services</span>
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            Discover how BiteScout serves both food lovers and restaurants with our comprehensive platform
+            Discover how BiteScout serves both food lovers and restaurants with our comprehensive
+            platform
           </p>
         </div>
       </section>
@@ -30,13 +42,13 @@ export default function Services() {
               Core Services
             </h2>
             <p className="text-xl text-card-foreground max-w-4xl mx-auto font-light leading-relaxed">
-              BiteScout brings together food discovery, restaurant management, and community building 
-              in one beautifully designed platform.
+              BiteScout brings together food discovery, restaurant management, and community
+              building in one beautifully designed platform.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card 
+            <Card
               className="border-l-4 border-l-primary"
               containerClassName="bg-background"
               padding="lg"
@@ -49,14 +61,14 @@ export default function Services() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Visual Food Discovery</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    Immersive TikTok-style scrolling through trending dishes, personalized suggestions, 
-                    and infinite food exploration for food lovers everywhere.
+                    Immersive TikTok-style scrolling through trending dishes, personalized
+                    suggestions, and infinite food exploration for food lovers everywhere.
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card 
+            <Card
               className="border-l-4 border-l-accent"
               containerClassName="bg-background"
               padding="lg"
@@ -69,7 +81,7 @@ export default function Services() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Restaurant Management</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    Complete control over your restaurant&apos;s presence with powerful admin tools, 
+                    Complete control over your restaurant&apos;s presence with powerful admin tools,
                     food catalogue management, and customer engagement features.
                   </p>
                 </div>
@@ -92,7 +104,7 @@ export default function Services() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -103,11 +115,12 @@ export default function Services() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Visual Discovery Feed</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Immersive TikTok-style scrolling through trending dishes, personalized suggestions, and infinite food exploration
+                Immersive TikTok-style scrolling through trending dishes, personalized suggestions,
+                and infinite food exploration
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -118,11 +131,12 @@ export default function Services() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Smart Search & Filters</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Find dishes by name, cuisine, restaurant, dietary needs, allergens, price, and location
+                Find dishes by name, cuisine, restaurant, dietary needs, allergens, price, and
+                location
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -133,11 +147,12 @@ export default function Services() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Content Creation</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Upload images/videos, add food details, tag restaurants, and share your culinary adventures
+                Upload images/videos, add food details, tag restaurants, and share your culinary
+                adventures
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -152,7 +167,7 @@ export default function Services() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -167,7 +182,7 @@ export default function Services() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -198,7 +213,7 @@ export default function Services() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <Card 
+            <Card
               className=""
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -215,32 +230,42 @@ export default function Services() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">Manage food catalogue with detailed information</span>
+                  <span className="text-card-foreground font-light">
+                    Manage food catalogue with detailed information
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">Upload verified images and videos</span>
+                  <span className="text-card-foreground font-light">
+                    Upload verified images and videos
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">Set pricing, cuisine types, and course categories</span>
+                  <span className="text-card-foreground font-light">
+                    Set pricing, cuisine types, and course categories
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">Manage allergen information and dietary tags</span>
+                  <span className="text-card-foreground font-light">
+                    Manage allergen information and dietary tags
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">Pin featured dishes for maximum visibility</span>
+                  <span className="text-card-foreground font-light">
+                    Pin featured dishes for maximum visibility
+                  </span>
                 </div>
               </div>
             </Card>
 
-            <Card 
+            <Card
               className=""
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -257,19 +282,25 @@ export default function Services() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">View and manage user-tagged posts</span>
+                  <span className="text-card-foreground font-light">
+                    View and manage user-tagged posts
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">Monitor customer engagement and feedback</span>
+                  <span className="text-card-foreground font-light">
+                    Monitor customer engagement and feedback
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">Respond to customer interactions</span>
+                  <span className="text-card-foreground font-light">
+                    Respond to customer interactions
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-secondary rounded-full" />
@@ -294,7 +325,7 @@ export default function Services() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -309,7 +340,7 @@ export default function Services() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -324,7 +355,7 @@ export default function Services() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -339,7 +370,7 @@ export default function Services() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -350,7 +381,8 @@ export default function Services() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Performance Optimized</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Fast loading, smooth scrolling, and efficient image handling for the best user experience
+                Fast loading, smooth scrolling, and efficient image handling for the best user
+                experience
               </p>
             </Card>
           </div>
@@ -361,16 +393,14 @@ export default function Services() {
       <section className="py-24 px-4 bg-foreground text-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">
-              Pricing Plans
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Pricing Plans</h2>
             <p className="text-xl text-background/80 max-w-3xl mx-auto font-light">
               Simple, transparent pricing for everyone
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card 
+            <Card
               className="text-center text-foreground"
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -406,7 +436,7 @@ export default function Services() {
               />
             </Card>
 
-            <Card 
+            <Card
               className="text-center text-primary-foreground relative"
               containerClassName="bg-primary hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -416,7 +446,9 @@ export default function Services() {
                 Most Popular
               </div>
               <h3 className="text-2xl font-bold mb-6">Pro</h3>
-              <div className="text-4xl font-bold mb-8">$9.99<span className="text-lg">/month</span></div>
+              <div className="text-4xl font-bold mb-8">
+                $9.99<span className="text-lg">/month</span>
+              </div>
               <ul className="space-y-4 mb-10 text-left">
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-primary-foreground rounded-full" />
@@ -445,14 +477,16 @@ export default function Services() {
               />
             </Card>
 
-            <Card 
+            <Card
               className="text-center text-foreground"
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
               shadow="lg"
             >
               <h3 className="text-2xl font-bold mb-6">Restaurant</h3>
-              <div className="text-4xl font-bold mb-8">$29<span className="text-lg">/month</span></div>
+              <div className="text-4xl font-bold mb-8">
+                $29<span className="text-lg">/month</span>
+              </div>
               <ul className="space-y-4 mb-10 text-left">
                 <li className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-success rounded-full" />
@@ -491,7 +525,8 @@ export default function Services() {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Join thousands of users and restaurants already using BiteScout to discover and share amazing food
+            Join thousands of users and restaurants already using BiteScout to discover and share
+            amazing food
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button

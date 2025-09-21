@@ -19,9 +19,7 @@ export default function UnauthorizedPage() {
 
         {/* Title */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">
-            Access Denied
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
           <p className="text-muted-foreground">
             You don&apos;t have permission to access this restaurant.
           </p>
@@ -32,9 +30,7 @@ export default function UnauthorizedPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div className="text-left">
-              <p className="text-sm font-medium text-yellow-800">
-                Restaurant Access Required
-              </p>
+              <p className="text-sm font-medium text-yellow-800">Restaurant Access Required</p>
               <p className="text-sm text-yellow-700 mt-1">
                 Contact your restaurant administrator to request access or verify your permissions.
               </p>
@@ -52,7 +48,7 @@ export default function UnauthorizedPage() {
             onClick={() => router.push("/dashboard")}
             IconBefore={<Home size={16} />}
           />
-          
+
           <Button
             text="Go to Onboarding"
             variant="outline"

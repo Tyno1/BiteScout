@@ -1,3 +1,3 @@
-export * from './useFoodCatalogue';
-export * from './mutations/useFoodCatalogueMutations';
-export * from './useFoodCatalogueForm'; 
+export * from "./useFoodCatalogue";
+export * from "./mutations/useFoodCatalogueMutations";
+export * from "./useFoodCatalogueForm";

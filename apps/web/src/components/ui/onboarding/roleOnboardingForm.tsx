@@ -37,27 +37,19 @@ export function RoleOnboardingForm({
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-xl">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-xl p-8 md:p-10"
-        >
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
           <div className="space-y-8">
             {/* Header */}
             <div className="space-y-2">
               <h1 className="text-3xl text-black">
-                Welcome{" "}
-                <span className="font-bold">{session.data?.user?.name}</span>
+                Welcome <span className="font-bold">{session.data?.user?.name}</span>
               </h1>
-              <p className="text-gray-900">
-                Please tell us about your role and restaurant
-              </p>
+              <p className="text-gray-900">Please tell us about your role and restaurant</p>
             </div>
 
             {/* Role Selection */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Select your role:
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-700">Select your role:</h2>
               <div className="flex gap-3 w-full">
                 <Button
                   variant="outline"
@@ -105,11 +97,7 @@ export function RoleOnboardingForm({
                 variant="solid"
                 type="submit"
                 disabled={!restaurantData.name || isSubmitting}
-                text={
-                  isSubmitting
-                    ? "Creating your restaurant"
-                    : "Create Restaurant Profile"
-                }
+                text={isSubmitting ? "Creating your restaurant" : "Create Restaurant Profile"}
                 fullWidth
               />
             ) : (

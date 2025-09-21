@@ -69,7 +69,8 @@ export const DataGridFilter = ({
                 className="items-left"
                 onClick={() => {
                   onPopoverChange(false);
-                  onFilterFieldChange(option.id)}}
+                  onFilterFieldChange(option.id);
+                }}
               />
             ))}
           </div>
@@ -80,10 +81,10 @@ export const DataGridFilter = ({
         <p>Current Filter:</p>
         <p className="text-primary font-bold">
           {filterField
-            ? filterOptions.find(opt => opt.id === filterField)?.label || "None"
+            ? filterOptions.find((opt) => opt.id === filterField)?.label || "None"
             : "None"}
         </p>
       </div>
     </div>
   );
-}; 
+};

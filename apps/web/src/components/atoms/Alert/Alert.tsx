@@ -74,7 +74,6 @@ export const Alert = ({
 
         {dismissible && (
           <div className="ml-auto pl-3 flex-shrink-0">
-
             <IconButton
               variant="plain"
               color="danger"

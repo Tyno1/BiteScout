@@ -21,14 +21,11 @@ import { useSession } from "next-auth/react";
 import { useCallback, useMemo } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
 
-
 interface UseRestaurantAccessOptions {
   includeDeliveryLinks?: boolean;
 }
 
-export const useRestaurantAccess = (
-  options: UseRestaurantAccessOptions = {}
-) => {
+export const useRestaurantAccess = (options: UseRestaurantAccessOptions = {}) => {
   const { includeDeliveryLinks = false } = options;
   const { data: session, status: sessionStatus } = useSession();
 
@@ -37,11 +34,9 @@ export const useRestaurantAccess = (
     if (session?.user?.userType === "moderator") {
       return false;
     }
-    
+
     // Only admins and root users with restaurants are considered owners
-    return Boolean(
-      session?.user?.restaurantCount && session.user.restaurantCount > 0
-    );
+    return Boolean(session?.user?.restaurantCount && session.user.restaurantCount > 0);
   }, [session?.user?.restaurantCount, session?.user?.userType]);
 
   // Restaurant mutations
@@ -111,9 +106,7 @@ export const useRestaurantAccess = (
     data: ownerRestaurantData,
     isLoading: ownerRestaurantLoading,
     refetch: refetchOwnerRestaurant,
-  } = useRestaurantByOwner(
-    isOwner() ? (session?.user?._id || "") : ""
-  );
+  } = useRestaurantByOwner(isOwner() ? session?.user?._id || "" : "");
 
   // Restaurant query - fetch by restaurant ID for non-owners with approved access
   const {
@@ -123,15 +116,9 @@ export const useRestaurantAccess = (
   } = useRestaurant(approvedRestaurantId || "");
 
   // Combine restaurant data based on user role
-  const restaurantData = isOwner()
-    ? ownerRestaurantData
-    : approvedRestaurantData;
-  const restaurantLoading = isOwner()
-    ? ownerRestaurantLoading
-    : approvedRestaurantLoading;
-  const refetchRestaurant = isOwner()
-    ? refetchOwnerRestaurant
-    : refetchApprovedRestaurant;
+  const restaurantData = isOwner() ? ownerRestaurantData : approvedRestaurantData;
+  const restaurantLoading = isOwner() ? ownerRestaurantLoading : approvedRestaurantLoading;
+  const refetchRestaurant = isOwner() ? refetchOwnerRestaurant : refetchApprovedRestaurant;
 
   // Delivery links query - only if requested
   const {
@@ -225,9 +212,7 @@ export const useRestaurantAccess = (
   // Helper function to get restaurant access by status
   const getRestaurantAccessByStatus = useCallback(
     (status: string) => {
-      return restaurantAccessList.filter(
-        (access: RestaurantAccess) => access.status === status
-      );
+      return restaurantAccessList.filter((access: RestaurantAccess) => access.status === status);
     },
     [restaurantAccessList]
   );
