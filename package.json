@@ -17,6 +17,8 @@
     "docs": "cd packages/shared && npm run serve-docs",
     "storybook": "cd apps/web && npm run storybook",
     "docker:dev": "docker compose up -d",
+    "docker:dev:clean": "docker compose down && docker compose up -d",
+    "docker:dev:clean:build": "docker compose down && docker compose build --no-cache && docker compose up -d",
     "docker:dev:build": "docker compose up -d --build",
     "docker:prod": "docker compose -f docker-compose.prod.yml up -d",
     "docker:prod:build": "docker compose -f docker-compose.prod.yml up -d --build",
