@@ -3,12 +3,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Performance optimizations
-  compress: true,
-  poweredByHeader: false,
-  generateEtags: false,
+  // Essential performance fixes
+  compress: true,  // Fixes slow CSS loading (5.4KB → faster)
   
-  // Image optimization
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
@@ -17,22 +14,10 @@ const nextConfig = {
       { protocol: "https", hostname: "*.s3.amazonaws.com" },
       { protocol: "https", hostname: "*.s3.*.amazonaws.com" },
     ],
-    formats: ['image/webp', 'image/avif'],
-  },
-  
-  // Compiler optimizations
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  
-  // Experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
   },
   
   serverExternalPackages: ['axios'],
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config) => {
     config.resolve.fallback = {
       crypto: false,
       assert: false,
@@ -40,21 +25,6 @@ const nextConfig = {
       net: false,
       tls: false,
     };
-    
-    // Optimize for production
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      };
-    }
-    
     return config;
   },
 };
