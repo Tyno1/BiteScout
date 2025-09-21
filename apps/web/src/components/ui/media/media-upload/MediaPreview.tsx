@@ -30,4 +30,4 @@ export const MediaPreview = ({
       </div>
     </div>
   );
-}; 
+};

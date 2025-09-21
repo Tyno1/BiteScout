@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import {  ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { ChangeEvent, ReactNode, SelectHTMLAttributes } from "react";
 
 interface Option {
@@ -72,8 +72,8 @@ export function Select({
         ...e,
         target: {
           ...e.target,
-          value: e.target.value
-        }
+          value: e.target.value,
+        },
       };
       onChange(syntheticEvent);
     }
@@ -108,31 +108,19 @@ export function Select({
       {useLabel && (
         <label
           htmlFor={uniqueId}
-          className={clsx(
-            `block ${!labelRow && "mb-3"} font-medium text-gray-700`,
-            labelStyle
-          )}
+          className={clsx(`block ${!labelRow && "mb-3"} font-medium text-gray-700`, labelStyle)}
         >
           {label}
         </label>
       )}
-    {errorMessage && (
-        <p
-          id={`${uniqueId}-error`}
-          className="text-sm text-red-500 mt-1"
-          role="alert"
-        >
+      {errorMessage && (
+        <p id={`${uniqueId}-error`} className="text-sm text-red-500 mt-1" role="alert">
           {errorMessage}
         </p>
       )}
       <div className="relative">
         {icon && (
-          <div
-            className={clsx(
-              "absolute top-1/2 left-3 transform -translate-y-1/2",
-              iconStyle
-            )}
-          >
+          <div className={clsx("absolute top-1/2 left-3 transform -translate-y-1/2", iconStyle)}>
             {icon}
           </div>
         )}
@@ -183,8 +171,6 @@ export function Select({
         )}
       </div>
 
-  
-
       {helperText && !errorMessage && (
         <p id={`${uniqueId}-helper`} className="text-sm text-gray-500 mt-1">
           {helperText}
@@ -192,4 +178,4 @@ export function Select({
       )}
     </div>
   );
-} 
+}

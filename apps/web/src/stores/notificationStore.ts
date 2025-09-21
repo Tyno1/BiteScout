@@ -10,9 +10,7 @@ type NotificationStore = {
   isLoading: boolean;
 
   // Actions
-  fetchNotifications: (
-    userId: string
-  ) => Promise<{ success: boolean; error: string | null }>;
+  fetchNotifications: (userId: string) => Promise<{ success: boolean; error: string | null }>;
   markNotificationAsRead: (
     notificationId: string,
     userId: string
@@ -33,18 +31,14 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
   fetchNotifications: async (userId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiClient.get(`/notifications/${userId}`);      
+      const response = await apiClient.get(`/notifications/${userId}`);
       set({
         notifications: response.data,
-        unreadCount: response.data.filter((item: Notification) => !item.isRead)
-          .length,
+        unreadCount: response.data.filter((item: Notification) => !item.isRead).length,
       });
       return { success: true, error: null };
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch notifications";
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch notifications";
       set({ error: errorMessage });
       return { success: false, error: errorMessage };
     } finally {
@@ -54,10 +48,7 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
 
   markNotificationAsRead: async (notificationId, userId) => {
     try {
-      const response = await apiClient.patch(
-        `/notifications/${userId}/${notificationId}/read`,
-        {}
-      );
+      const response = await apiClient.patch(`/notifications/${userId}/${notificationId}/read`, {});
       const updatedNotification = response.data;
       const notifications = get().notifications.map((item) =>
         item._id === updatedNotification._id ? updatedNotification : item
@@ -67,9 +58,7 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
       return { success: true, error: null };
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to mark notification as read";
+        error instanceof Error ? error.message : "Failed to mark notification as read";
       set({ error: errorMessage });
       return { success: false, error: errorMessage };
     } finally {
@@ -88,9 +77,7 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
       return { success: true, error: null };
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to mark all notifications as read";
+        error instanceof Error ? error.message : "Failed to mark all notifications as read";
       set({ error: errorMessage });
       return { success: false, error: errorMessage };
     } finally {
@@ -100,9 +87,7 @@ const useNotificationStore = create<NotificationStore>((set, get) => ({
 
   addNotification: (notification) => {
     const notifications = [notification, ...get().notifications];
-    const unreadCount = notification.isRead
-      ? get().unreadCount
-      : get().unreadCount + 1;
+    const unreadCount = notification.isRead ? get().unreadCount : get().unreadCount + 1;
     set({ notifications, unreadCount });
   },
 

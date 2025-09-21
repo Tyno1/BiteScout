@@ -1,1 +1,1 @@
-export * from './useRestaurantAccessMutations'; 
+export * from "./useRestaurantAccessMutations";

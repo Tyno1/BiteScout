@@ -33,18 +33,15 @@ const BRAND_ASSET_TAGS = [
   { value: "food", label: "Food" },
 ];
 
-export function Gallery({
-  restaurantId,
-  onImageSelect,
-}: GalleryProps) {
+export function Gallery({ restaurantId, onImageSelect }: GalleryProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLocalEditing, setIsLocalEditing] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<Media | null>(null);
-  
+
   // Add local gallery loading state
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
-  
+
   // Virtual scrolling and lazy loading
   const [visibleCount, setVisibleCount] = useState(8); // Reduced from 12 to 8 for faster initial load
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -60,13 +57,12 @@ export function Gallery({
   } = usePaginatedRestaurantGallery(restaurantId, true);
 
   // Flatten all pages into a single array
-  const allImages = useMemo(() => 
-    paginatedMediaData?.pages.flatMap((page) => (page as { media?: Media[] }).media || []) || [], 
+  const allImages = useMemo(
+    () =>
+      paginatedMediaData?.pages.flatMap((page) => (page as { media?: Media[] }).media || []) || [],
     [paginatedMediaData?.pages]
   );
 
-
-  
   // Apply local filtering to the loaded images
   const [filteredImages, setFilteredImages] = useState<Media[]>([]);
   const [currentCategory, setCurrentCategory] = useState<string>("");
@@ -79,26 +75,28 @@ export function Gallery({
       if (!currentCategory) {
         // Only apply tag filtering if tags are selected
         if (currentTags.length > 0) {
-          const hasMatchingTag = image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
+          const hasMatchingTag =
+            image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
           return hasMatchingTag;
         }
         return true; // Show all images when no category and no tags selected
       }
-      
+
       // If category is selected, filter by category first
       if (image.associatedWith?.type !== currentCategory) {
         return false;
       }
-      
+
       // Then apply tag filtering if tags are selected
       if (currentTags.length > 0) {
-        const hasMatchingTag = image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
+        const hasMatchingTag =
+          image.tags?.some((tag: string) => currentTags.includes(tag)) ?? false;
         return hasMatchingTag;
       }
-      
+
       return true;
     });
-    
+
     setFilteredImages(filtered);
   }, [allImages, currentCategory, currentTags]);
 
@@ -164,7 +162,7 @@ export function Gallery({
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
-    
+
     if (loadingRef.current) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
@@ -199,7 +197,7 @@ export function Gallery({
         if (observerRef.current) {
           observerRef.current.disconnect();
         }
-        
+
         observerRef.current = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
@@ -226,24 +224,20 @@ export function Gallery({
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleUploadSuccess = useCallback(
-    (result: CreateMediaResponse | CreateMediaResponse[]) => {
-      // Handle both single and array responses
-      const results = Array.isArray(result) ? result : [result];
-      
-      // Extract media from each response and add to gallery
-      const newImages: Media[] = results
-        .filter((media): media is Media => media !== undefined);
-      
-      if (newImages.length > 0) {
-        // For pagination, we need to refetch the data to get the new images
-        // This will trigger a refetch of the current page
-        // TODO: Implement optimistic updates or refetch strategy
-        console.log('New images uploaded:', newImages);
-      }
-    },
-    []
-  );
+  const handleUploadSuccess = useCallback((result: CreateMediaResponse | CreateMediaResponse[]) => {
+    // Handle both single and array responses
+    const results = Array.isArray(result) ? result : [result];
+
+    // Extract media from each response and add to gallery
+    const newImages: Media[] = results.filter((media): media is Media => media !== undefined);
+
+    if (newImages.length > 0) {
+      // For pagination, we need to refetch the data to get the new images
+      // This will trigger a refetch of the current page
+      // TODO: Implement optimistic updates or refetch strategy
+      console.log("New images uploaded:", newImages);
+    }
+  }, []);
 
   const handleRemoveUploadedFile = useCallback(
     (index: number) => {
@@ -253,7 +247,7 @@ export function Gallery({
       if (imageToRemove?._id) {
         // For pagination, we need to refetch the data to reflect the removal
         // TODO: Implement optimistic updates or refetch strategy
-        console.log('Image removed:', imageToRemove._id);
+        console.log("Image removed:", imageToRemove._id);
       }
     },
     [canEditCurrentCategory, filteredImages]
@@ -266,7 +260,7 @@ export function Gallery({
 
       // For pagination, we need to refetch the data to reflect the metadata update
       // TODO: Implement optimistic updates or refetch strategy
-      console.log('Image metadata updated:', { id: imageToUpdate._id, field, value });
+      console.log("Image metadata updated:", { id: imageToUpdate._id, field, value });
     },
     [filteredImages]
   );
@@ -280,7 +274,7 @@ export function Gallery({
   }, []);
 
   return (
-    <Card component="section" padding="sm"  aria-labelledby="gallery-heading">
+    <Card component="section" padding="sm" aria-labelledby="gallery-heading">
       {/* Image Category Filter */}
       <div className="mb-6 p-4">
         <div className="flex flex-wrap gap-2">
@@ -328,9 +322,7 @@ export function Gallery({
         {/* Tag Filter for All Images - Hidden in edit mode */}
         {!isLocalEditing && (
           <div className="mt-3">
-            <div className="text-sm font-medium text-gray-foreground mb-2">
-              Filter by tags:
-            </div>
+            <div className="text-sm font-medium text-gray-foreground mb-2">Filter by tags:</div>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -367,31 +359,26 @@ export function Gallery({
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {/* Show skeleton only while gallery data is loading */}
           {isGalleryLoading && <GallerySkeleton count={8} />}
-          
+
           {/* Show images when gallery data has loaded */}
-          {!isGalleryLoading && filteredImages.slice(0, visibleCount).map((image, index) => (
-            <GalleryCard
-              key={image._id || `image-${image.url}`}
-              image={image}
-              onFullscreen={handleFullscreen}
-              priority={index < 2} // Priority load first 2 images for better LCP
-              onUseImage={onImageSelect}
-            />
-          ))}
-          
+          {!isGalleryLoading &&
+            filteredImages.slice(0, visibleCount).map((image, index) => (
+              <GalleryCard
+                key={image._id || `image-${image.url}`}
+                image={image}
+                onFullscreen={handleFullscreen}
+                priority={index < 2} // Priority load first 2 images for better LCP
+                onUseImage={onImageSelect}
+              />
+            ))}
+
           {/* Loading indicator and intersection observer target */}
           {!isGalleryLoading && hasNextPage && (
-            <div 
-              ref={loadingRef}
-              className="col-span-full flex justify-center py-8"
-            >
+            <div ref={loadingRef} className="col-span-full flex justify-center py-8">
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 <span>
-                  {isFetchingNextPage 
-                    ? "Loading more images..." 
-                    : "Scroll to load more images..."
-                  }
+                  {isFetchingNextPage ? "Loading more images..." : "Scroll to load more images..."}
                 </span>
               </div>
             </div>
@@ -406,9 +393,7 @@ export function Gallery({
           onUploadError={() => {
             // Error handling is managed by the MediaUpload component internally
           }}
-          onRemoveUploadedFile={
-            canEditCurrentCategory ? handleRemoveUploadedFile : undefined
-          }
+          onRemoveUploadedFile={canEditCurrentCategory ? handleRemoveUploadedFile : undefined}
           onUpdateUploadedFileMetadata={
             canEditCurrentCategory ? handleUpdateImageMetadata : undefined
           }
@@ -420,9 +405,7 @@ export function Gallery({
           multiple={false}
           uploadedFiles={filteredImages}
           editMode={canEditCurrentCategory}
-          className={
-            canEditCurrentCategory ? "" : "pointer-events-none opacity-75"
-          }
+          className={canEditCurrentCategory ? "" : "pointer-events-none opacity-75"}
         />
       )}
 
@@ -431,19 +414,15 @@ export function Gallery({
         <div className="text-center py-8 text-gray-foreground">
           <p>No images found.</p>
           <p className="text-sm mt-2">
-            {allImages.length === 0 
+            {allImages.length === 0
               ? "No images have been added to the gallery yet. Switch to edit mode to upload images."
-              : "No images match the current filters. Try adjusting your category or tag selection."
-            }
+              : "No images match the current filters. Try adjusting your category or tag selection."}
           </p>
         </div>
       )}
 
       {/* Fullscreen Modal */}
-      <ImageFullscreen
-        image={fullscreenImage}
-        onClose={closeFullscreen}
-      />
+      <ImageFullscreen image={fullscreenImage} onClose={closeFullscreen} />
     </Card>
   );
 }

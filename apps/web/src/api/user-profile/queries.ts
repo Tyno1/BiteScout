@@ -16,10 +16,7 @@ export const updateUserProfile = async (
   userId: string,
   data: UpdateUserProfileRequest
 ): Promise<UpdateUserProfileResponse> => {
-  const response = await apiClient.put<UpdateUserProfileResponse>(
-    `/user-profile/${userId}`,
-    data
-  );
+  const response = await apiClient.put<UpdateUserProfileResponse>(`/user-profile/${userId}`, data);
   return response.data;
 };
 

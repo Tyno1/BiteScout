@@ -23,9 +23,7 @@ export default function Onboarding() {
   const { updateUser } = useUpdateUser();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState<Restaurant>(
-    DEFAULT_RESTAURANT_DATA
-  );
+  const [restaurantData, setRestaurantData] = useState<Restaurant>(DEFAULT_RESTAURANT_DATA);
   const [apiError, setApiError] = useState("");
   const [message, setMessage] = useState("");
   const [formError, setFormError] = useState<FormErrorState>({
@@ -88,9 +86,7 @@ export default function Onboarding() {
 
     // Validate user session
     if (!session.data?.user?._id) {
-      setApiError(
-        "User profile not found. Please refresh the page or contact support."
-      );
+      setApiError("User profile not found. Please refresh the page or contact support.");
       setIsSubmitting(false);
       return;
     }
@@ -103,8 +99,7 @@ export default function Onboarding() {
       await createRestaurantMutation.mutateAsync(preparedData);
       await handleSuccessfulCreation();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       handleCreationError(errorMessage);
     }
   };
@@ -119,23 +114,23 @@ export default function Onboarding() {
   };
 
   const handleSuccessfulCreation = async () => {
-    setMessage("Restaurant created successfully! User role updated. Please log in again to access your new permissions.");
+    setMessage(
+      "Restaurant created successfully! User role updated. Please log in again to access your new permissions."
+    );
 
-          try {
-        if (session?.data?.user?._id) {
-          await updateUser(session.data.user._id);
-          
-          // Force logout to get fresh session with new role
-          await signOut({ redirect: false });
-        
+    try {
+      if (session?.data?.user?._id) {
+        await updateUser(session.data.user._id);
+
+        // Force logout to get fresh session with new role
+        await signOut({ redirect: false });
+
         // Redirect to login page
         router.push("/login");
       }
     } catch (updateError) {
       console.error("Failed to update user restaurant count:", updateError);
-      toast.warning(
-        "Restaurant created, but profile update incomplete. Please log in again."
-      );
+      toast.warning("Restaurant created, but profile update incomplete. Please log in again.");
       router.push("/login");
     }
   };
@@ -150,8 +145,7 @@ export default function Onboarding() {
   };
 
   const handleSubmissionError = (error: unknown) => {
-    const errorMessage =
-      error instanceof Error ? error.message : "An unexpected error occurred";
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
     console.error("Form submission error:", error);
     setFormError((prev: FormErrorState) => ({
       ...prev,
@@ -167,15 +161,15 @@ export default function Onboarding() {
         setShouldRender(true);
         return false;
       }
-      
-      await getRestaurantListAccess(); 
+
+      await getRestaurantListAccess();
       const approvedRestaurantId = getFirstApprovedRestaurantId();
-      
+
       if (approvedRestaurantId) {
         router.push("/dashboard");
         return true;
       }
-      
+
       // If no approved restaurant, stay on the page
       setShouldRender(true);
       return false;
@@ -189,7 +183,7 @@ export default function Onboarding() {
   useEffect(() => {
     // Show loading immediately while we check
     setShouldRender(false);
-    
+
     const checkAccess = async () => {
       try {
         if (isOwner) {
@@ -202,7 +196,7 @@ export default function Onboarding() {
         setShouldRender(true);
       }
     };
-    
+
     checkAccess();
   }, [router, isOwner, checkRestaurantAccess]);
 

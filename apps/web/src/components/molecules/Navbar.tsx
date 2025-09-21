@@ -49,11 +49,7 @@ export function Navbar({ theme }: NavTheme) {
         return linkTheme === "dark" ? "text-white" : "text-black";
       }
       // Use parent theme as fallback
-      return theme === "dark"
-        ? "text-white"
-        : theme === "light"
-          ? "text-black"
-          : "text-foreground";
+      return theme === "dark" ? "text-white" : theme === "light" ? "text-black" : "text-foreground";
     };
 
     const getHoverStyles = () => {
@@ -86,11 +82,7 @@ export function Navbar({ theme }: NavTheme) {
         return linkTheme === "dark" ? "text-white" : "text-black";
       }
       // Use parent theme as fallback
-      return theme === "dark"
-        ? "text-white"
-        : theme === "light"
-          ? "text-black"
-          : "text-foreground";
+      return theme === "dark" ? "text-white" : theme === "light" ? "text-black" : "text-foreground";
     };
 
     const getHoverStyles = () => {
@@ -170,12 +162,7 @@ export function Navbar({ theme }: NavTheme) {
                 />
               </li>
               <li>
-                <Image
-                  alt="profile_image"
-                  src={ProfileImg}
-                  width={30}
-                  height={30}
-                />
+                <Image alt="profile_image" src={ProfileImg} width={30} height={30} />
               </li>
             </ul>
           ) : (

@@ -5,7 +5,7 @@ import type { CreateCuisineRequest, UpdateCuisineRequest } from "shared/types/cu
 // Cuisine Mutations
 export const useCreateCuisine = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (cuisine: CreateCuisineRequest) => createCuisine(cuisine),
     onSuccess: () => {
@@ -17,7 +17,7 @@ export const useCreateCuisine = () => {
 
 export const useUpdateCuisine = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, cuisine }: { id: string; cuisine: UpdateCuisineRequest }) =>
       updateCuisine(id, cuisine),
@@ -31,7 +31,7 @@ export const useUpdateCuisine = () => {
 
 export const useDeleteCuisine = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => deleteCuisine(id),
     onSuccess: (_, variables) => {
@@ -40,4 +40,4 @@ export const useDeleteCuisine = () => {
       queryClient.invalidateQueries({ queryKey: ["cuisine", variables] });
     },
   });
-}; 
+};

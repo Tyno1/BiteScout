@@ -94,8 +94,8 @@ export function DeliveryLinks({
           </div>
           {isEditing && (
             <Alert status="information" size={isMobile ? "xs" : "sm"}>
-              Boost your reach: Add delivery platform links so customers can
-              order from your restaurant through their favorite apps!
+              Boost your reach: Add delivery platform links so customers can order from your
+              restaurant through their favorite apps!
             </Alert>
           )}
         </div>
@@ -114,7 +114,6 @@ export function DeliveryLinks({
                 <div className="text-xs text-primary">{link.platform}</div>
               </div>
               <div className="flex items-center space-x-2">
-
                 <IconButton
                   variant="outline"
                   color="primary"
@@ -143,8 +142,8 @@ export function DeliveryLinks({
         <form onSubmit={handleAdd}>
           <div className="border-t pt-4 space-y-4">
             <Alert status="information" size={isMobile ? "xs" : "sm"}>
-              Add your restaurant&apos;s delivery platform links. Include the
-              platform name, link name, and URL.
+              Add your restaurant&apos;s delivery platform links. Include the platform name, link
+              name, and URL.
             </Alert>
 
             <h3 className="text-md font-medium mb-3">Add New Delivery Link</h3>
@@ -155,9 +154,7 @@ export function DeliveryLinks({
                 type="text"
                 placeholder="Link Name"
                 value={newLink.name}
-                onChange={(e) =>
-                  setNewLink((prev) => ({ ...prev, name: e.target.value }))
-                }
+                onChange={(e) => setNewLink((prev) => ({ ...prev, name: e.target.value }))}
                 disabled={isLoading}
               />
               <Select
@@ -177,9 +174,7 @@ export function DeliveryLinks({
                 type="url"
                 placeholder="https://..."
                 value={newLink.url}
-                onChange={(e) =>
-                  setNewLink((prev) => ({ ...prev, url: e.target.value }))
-                }
+                onChange={(e) => setNewLink((prev) => ({ ...prev, url: e.target.value }))}
                 disabled={isLoading}
               />
             </div>

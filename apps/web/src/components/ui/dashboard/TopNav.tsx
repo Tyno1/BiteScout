@@ -1,10 +1,10 @@
 "use client";
 
+import { Bell, Menu } from "lucide-react";
+import Image from "next/image";
 import { IconButton } from "@/components/atoms";
 import { NotificationBadge } from "@/components/atoms/badges";
 import type { User } from "@/types";
-import { Bell, Menu } from "lucide-react";
-import Image from "next/image";
 import { ThemeToggle } from "../ThemeToggle";
 
 type TopNavProps = {
@@ -25,16 +25,10 @@ export function TopNav({ onMenuClick, user }: TopNavProps) {
             className="md:hidden"
             ariaLabel="Toggle menu"
           />
-          
+
           {/* Logo - only on mobile */}
           <div className="md:hidden">
-            <Image 
-              src="/logo.png" 
-              alt="Bite Scout" 
-              width={70} 
-              height={20} 
-              className="h-5 w-auto"
-            />
+            <Image src="/logo.png" alt="Bite Scout" width={70} height={20} className="h-5 w-auto" />
           </div>
         </div>
 

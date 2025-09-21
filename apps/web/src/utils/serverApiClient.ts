@@ -16,7 +16,7 @@ serverApiClient.interceptors.request.use(
     try {
       // Get session from server action
       const session = await getCurrentSession();
-      
+
       // If session exists and has a token, add it to the request
       if (session?.user?.accessToken) {
         const token = session.user.accessToken;
@@ -25,9 +25,9 @@ serverApiClient.interceptors.request.use(
         }
       }
     } catch (error) {
-      console.error('Error getting session for server API client:', error);
+      console.error("Error getting session for server API client:", error);
     }
-    
+
     return config;
   },
   (error) => {
@@ -43,9 +43,9 @@ serverApiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       console.error("Server API client authentication error:", error);
     }
-    
+
     return Promise.reject(error);
   }
 );
 
-export default serverApiClient; 
+export default serverApiClient;

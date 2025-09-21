@@ -29,10 +29,10 @@ export const MediaGallery = ({
 
   // Use React Query hooks for each media item
   const currentMediaId = mediaIds[currentIndex];
-  const { 
-    data: currentMediaData, 
-    isLoading: currentLoading, 
-    error: currentError 
+  const {
+    data: currentMediaData,
+    isLoading: currentLoading,
+    error: currentError,
   } = useMediaWithOptimizedUrl(currentMediaId, "medium");
 
   // Auto-play functionality
@@ -86,8 +86,10 @@ export const MediaGallery = ({
     );
   }
 
-  const currentUrl = currentMediaData?.optimizedUrl || currentMediaData?.media?.url || "/api/placeholder/400/300";
-  const currentAlt = currentMediaData?.media?.title || currentMediaData?.media?.description || altText;
+  const currentUrl =
+    currentMediaData?.optimizedUrl || currentMediaData?.media?.url || "/api/placeholder/400/300";
+  const currentAlt =
+    currentMediaData?.media?.title || currentMediaData?.media?.description || altText;
 
   return (
     <div className={`relative ${className}`}>
@@ -102,12 +104,7 @@ export const MediaGallery = ({
             <p className="text-red-600 text-sm">Failed to load image</p>
           </div>
         ) : (
-          <Image
-            src={currentUrl}
-            alt={currentAlt}
-            fill
-            className="object-cover"
-          />
+          <Image src={currentUrl} alt={currentAlt} fill className="object-cover" />
         )}
 
         {/* Navigation Controls */}
@@ -122,10 +119,10 @@ export const MediaGallery = ({
               className="absolute left-2 top-1/2 transform -translate-y-1/2"
               icon={<ChevronLeft size={20} />}
             />
-            
+
             {/* Next Button */}
             <IconButton
-              variant="glass" 
+              variant="glass"
               color="neutral"
               size="sm"
               onClick={goToNext}
@@ -178,12 +175,12 @@ export const MediaGallery = ({
 };
 
 // Separate component for thumbnails to use React Query hooks
-const ThumbnailItem = ({ 
-  mediaId, 
-  index, 
-  currentIndex, 
-  altText, 
-  onClick 
+const ThumbnailItem = ({
+  mediaId,
+  index,
+  currentIndex,
+  altText,
+  onClick,
 }: {
   mediaId: string;
   index: number;
@@ -191,22 +188,18 @@ const ThumbnailItem = ({
   altText: string;
   onClick: () => void;
 }) => {
-  const { 
-    data: mediaData, 
-    isLoading, 
-    error 
-  } = useMediaWithOptimizedUrl(mediaId, "small");
+  const { data: mediaData, isLoading, error } = useMediaWithOptimizedUrl(mediaId, "small");
 
-  const thumbnailUrl = mediaData?.optimizedUrl || mediaData?.media?.url || "/api/placeholder/400/300";
-  const thumbnailAlt = mediaData?.media?.title || mediaData?.media?.description || `${altText} thumbnail ${index + 1}`;
+  const thumbnailUrl =
+    mediaData?.optimizedUrl || mediaData?.media?.url || "/api/placeholder/400/300";
+  const thumbnailAlt =
+    mediaData?.media?.title || mediaData?.media?.description || `${altText} thumbnail ${index + 1}`;
 
   return (
     <button
       type="button"
       className={`relative flex-shrink-0 cursor-pointer transition-all duration-200 ${
-        index === currentIndex
-          ? "ring-2 ring-blue-500 ring-offset-2"
-          : "hover:opacity-80"
+        index === currentIndex ? "ring-2 ring-blue-500 ring-offset-2" : "hover:opacity-80"
       }`}
       onClick={onClick}
     >
@@ -220,17 +213,10 @@ const ThumbnailItem = ({
             <div className="w-4 h-4 bg-red-300 rounded" />
           </div>
         ) : (
-          <Image
-            src={thumbnailUrl}
-            alt={thumbnailAlt}
-            fill
-            className="object-cover"
-          />
+          <Image src={thumbnailUrl} alt={thumbnailAlt} fill className="object-cover" />
         )}
       </div>
-      {index === currentIndex && (
-        <div className="absolute inset-0 bg-blue-500/20 rounded-lg" />
-      )}
+      {index === currentIndex && <div className="absolute inset-0 bg-blue-500/20 rounded-lg" />}
     </button>
   );
 };

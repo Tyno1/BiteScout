@@ -32,8 +32,8 @@ export function BusinessHours({
           </div>
           {isEditing && (
             <Alert status="warning" className="mb-2">
-              Important: Set accurate business hours so customers know when
-              you&apos;re open and can plan their visits!
+              Important: Set accurate business hours so customers know when you&apos;re open and can
+              plan their visits!
             </Alert>
           )}
         </div>
@@ -42,36 +42,23 @@ export function BusinessHours({
     >
       {isEditing && (
         <Alert status="information" className="mb-4">
-          Set your opening and closing times for each day. Check
-          &quot;Closed&quot; if you don&apos;t operate on that day.
+          Set your opening and closing times for each day. Check &quot;Closed&quot; if you
+          don&apos;t operate on that day.
         </Alert>
       )}
       <table className="w-full border-collapse" aria-label="Business hours">
         <thead>
           <tr className="border-b border-foreground text-primary">
-            <th className="text-left py-3 px-4 font-medium ">
-              Day
-            </th>
-            <th className="text-left py-3 px-4 font-medium ">
-              Opening Time
-            </th>
-            <th className="text-left py-3 px-4 font-medium ">
-              Closing Time
-            </th>
-            <th className="text-left py-3 px-4 font-medium ">
-              Closed
-            </th>
+            <th className="text-left py-3 px-4 font-medium ">Day</th>
+            <th className="text-left py-3 px-4 font-medium ">Opening Time</th>
+            <th className="text-left py-3 px-4 font-medium ">Closing Time</th>
+            <th className="text-left py-3 px-4 font-medium ">Closed</th>
           </tr>
         </thead>
         <tbody>
           {businessHours.map((hours: BusinessHour, index: number) => (
-            <tr
-              key={hours.day}
-              className="border-b border-primary/10"
-            >
-              <td className="py-3 px-4 font-medium ">
-                {hours.day}
-              </td>
+            <tr key={hours.day} className="border-b border-primary/10">
+              <td className="py-3 px-4 font-medium ">{hours.day}</td>
 
               <td className="py-3 px-4">
                 <Input
@@ -81,9 +68,7 @@ export function BusinessHours({
                   label="Opening Time"
                   disabled={!isEditing || hours.isClosed}
                   value={hours.open}
-                  onChange={(e) =>
-                    handleBusinessHoursChange(index, "open", e.target.value)
-                  }
+                  onChange={(e) => handleBusinessHoursChange(index, "open", e.target.value)}
                 />
               </td>
 
@@ -95,9 +80,7 @@ export function BusinessHours({
                   label="Closing Time"
                   disabled={!isEditing || hours.isClosed}
                   value={hours.close}
-                  onChange={(e) =>
-                    handleBusinessHoursChange(index, "close", e.target.value)
-                  }
+                  onChange={(e) => handleBusinessHoursChange(index, "close", e.target.value)}
                 />
               </td>
 
@@ -106,22 +89,13 @@ export function BusinessHours({
                   <input
                     type="checkbox"
                     checked={hours.isClosed}
-                    onChange={(e) =>
-                      handleBusinessHoursChange(
-                        index,
-                        "isClosed",
-                        e.target.checked
-                      )
-                    }
+                    onChange={(e) => handleBusinessHoursChange(index, "isClosed", e.target.checked)}
                     disabled={!isEditing}
                     className="mr-2"
                     aria-label={`${hours.day} closed`}
                     id={`closed-${hours.day}`}
                   />
-                  <label
-                    htmlFor={`closed-${hours.day}`}
-                    className="text-sm"
-                  >
+                  <label htmlFor={`closed-${hours.day}`} className="text-sm">
                     Closed
                   </label>
                 </div>

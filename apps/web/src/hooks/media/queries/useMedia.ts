@@ -9,7 +9,7 @@ export const mediaKeys = {
   list: (filters: Record<string, unknown>) => [...mediaKeys.lists(), filters] as const,
   details: () => [...mediaKeys.all, "detail"] as const,
   detail: (id: string) => [...mediaKeys.details(), id] as const,
-  optimized: (id: string, size: string, networkSpeed?: string) => 
+  optimized: (id: string, size: string, networkSpeed?: string) =>
     [...mediaKeys.detail(id), "optimized", size, networkSpeed] as const,
 };
 
@@ -42,12 +42,15 @@ export const useMediaWithOptimizedUrl = (
 // Hook for prefetching media (useful for navigation)
 export const usePrefetchMedia = () => {
   const queryClient = useQueryClient();
-  
-  return useCallback((mediaId: string) => {
-    queryClient.prefetchQuery({
-      queryKey: mediaKeys.detail(mediaId),
-      queryFn: () => getMedia(mediaId),
-      staleTime: 5 * 60 * 1000,
-    });
-  }, [queryClient]);
-}; 
+
+  return useCallback(
+    (mediaId: string) => {
+      queryClient.prefetchQuery({
+        queryKey: mediaKeys.detail(mediaId),
+        queryFn: () => getMedia(mediaId),
+        staleTime: 5 * 60 * 1000,
+      });
+    },
+    [queryClient]
+  );
+};

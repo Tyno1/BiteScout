@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Accordion, Button, Input, Select, Textarea } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
@@ -12,13 +12,13 @@ export default function Contact() {
     { value: "partnership", label: "Restaurant Partnership" },
     { value: "feedback", label: "Feedback & Suggestions" },
     { value: "bug", label: "Report a Bug" },
-    { value: "other", label: "Other" }
+    { value: "other", label: "Other" },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-black via-gray-900 to-black text-white">
         <div className="max-w-5xl mx-auto text-center">
@@ -26,8 +26,8 @@ export default function Contact() {
             Get in <span className="text-primary">Touch</span>
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            Have questions about BiteScout? We&apos;d love to hear from you. 
-            Our team is here to help with any inquiries or support you need.
+            Have questions about BiteScout? We&apos;d love to hear from you. Our team is here to
+            help with any inquiries or support you need.
           </p>
         </div>
       </section>
@@ -45,7 +45,7 @@ export default function Contact() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card 
+            <Card
               className="text-center"
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -61,26 +61,35 @@ export default function Contact() {
               <div className="space-y-3">
                 <div>
                   <p className="font-semibold text-foreground">General Inquiries</p>
-                  <a href="mailto:hello@bitescout.com" className="text-primary hover:text-primary/80 transition-colors">
+                  <a
+                    href="mailto:hello@bitescout.com"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
                     hello@bitescout.com
                   </a>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Support</p>
-                  <a href="mailto:support@bitescout.com" className="text-primary hover:text-primary/80 transition-colors">
+                  <a
+                    href="mailto:support@bitescout.com"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
                     support@bitescout.com
                   </a>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Restaurants</p>
-                  <a href="mailto:partners@bitescout.com" className="text-primary hover:text-primary/80 transition-colors">
+                  <a
+                    href="mailto:partners@bitescout.com"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
                     partners@bitescout.com
                   </a>
                 </div>
               </div>
             </Card>
 
-            <Card 
+            <Card
               className="text-center"
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -96,15 +105,20 @@ export default function Contact() {
               <div className="space-y-3">
                 <div>
                   <p className="font-semibold text-foreground">Customer Support</p>
-                  <a href="tel:+44123456789" className="text-secondary hover:text-secondary/80 text-xl font-semibold transition-colors">
+                  <a
+                    href="tel:+44123456789"
+                    className="text-secondary hover:text-secondary/80 text-xl font-semibold transition-colors"
+                  >
                     +44 (0) 123 456 789
                   </a>
                 </div>
-                <p className="text-sm text-card-foreground">Monday - Friday, 9:00 AM - 6:00 PM GMT</p>
+                <p className="text-sm text-card-foreground">
+                  Monday - Friday, 9:00 AM - 6:00 PM GMT
+                </p>
               </div>
             </Card>
 
-            <Card 
+            <Card
               className="text-center"
               containerClassName="bg-background hover:shadow-xl transition-all duration-300"
               padding="lg"
@@ -146,7 +160,7 @@ export default function Contact() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -161,7 +175,7 @@ export default function Contact() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -176,7 +190,7 @@ export default function Contact() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -191,7 +205,7 @@ export default function Contact() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -221,12 +235,7 @@ export default function Contact() {
             </p>
           </div>
 
-          <Card 
-            className=""
-            containerClassName="bg-background"
-            padding="lg"
-            shadow="lg"
-          >
+          <Card className="" containerClassName="bg-background" padding="lg" shadow="lg">
             <form className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Input
@@ -333,23 +342,35 @@ export default function Contact() {
           <p className="text-xl text-background/80 mb-12 font-light leading-relaxed">
             When you can expect to hear back from us
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-2xl mx-auto">
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-6 text-primary">Customer Support</h3>
               <div className="space-y-3 text-background/80">
-                <p><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM GMT</p>
-                <p><strong>Saturday:</strong> 10:00 AM - 4:00 PM GMT</p>
-                <p><strong>Sunday:</strong> Closed</p>
+                <p>
+                  <strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM GMT
+                </p>
+                <p>
+                  <strong>Saturday:</strong> 10:00 AM - 4:00 PM GMT
+                </p>
+                <p>
+                  <strong>Sunday:</strong> Closed
+                </p>
               </div>
             </div>
-            
+
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-6 text-primary">Email Response</h3>
               <div className="space-y-3 text-background/80">
-                <p><strong>General Inquiries:</strong> Within 24 hours</p>
-                <p><strong>Support Issues:</strong> Within 4 hours</p>
-                <p><strong>Partnership:</strong> Within 48 hours</p>
+                <p>
+                  <strong>General Inquiries:</strong> Within 24 hours
+                </p>
+                <p>
+                  <strong>Support Issues:</strong> Within 4 hours
+                </p>
+                <p>
+                  <strong>Partnership:</strong> Within 48 hours
+                </p>
               </div>
             </div>
           </div>
@@ -365,49 +386,55 @@ export default function Contact() {
           <p className="text-xl text-card-foreground mb-12 max-w-2xl mx-auto font-light leading-relaxed">
             Can&apos;t find what you&apos;re looking for? Check out our comprehensive FAQ section
           </p>
-          
+
           <div className="max-w-3xl mx-auto">
             <Accordion
               items={[
                 {
-                  id: 'faq-1',
-                  title: 'How do I reset my password?',
-                  content: 'You can reset your password through the login screen or contact our support team for assistance. We\'ll guide you through the process step by step.',
+                  id: "faq-1",
+                  title: "How do I reset my password?",
+                  content:
+                    "You can reset your password through the login screen or contact our support team for assistance. We'll guide you through the process step by step.",
                 },
                 {
-                  id: 'faq-2',
-                  title: 'How do I report inappropriate content?',
-                  content: 'Use the report button on any post or contact our moderation team directly. We take content moderation seriously and respond to reports within 24 hours.',
+                  id: "faq-2",
+                  title: "How do I report inappropriate content?",
+                  content:
+                    "Use the report button on any post or contact our moderation team directly. We take content moderation seriously and respond to reports within 24 hours.",
                 },
                 {
-                  id: 'faq-3',
-                  title: 'How can restaurants join BiteScout?',
-                  content: 'Restaurants can apply through our partnership portal or contact our business development team. We\'ll help you get set up and start reaching new customers.',
+                  id: "faq-3",
+                  title: "How can restaurants join BiteScout?",
+                  content:
+                    "Restaurants can apply through our partnership portal or contact our business development team. We'll help you get set up and start reaching new customers.",
                 },
                 {
-                  id: 'faq-4',
-                  title: 'Is BiteScout available internationally?',
-                  content: 'Currently launching in Cardiff, Wales with plans to expand to other UK cities and internationally. Stay tuned for updates on new locations.',
+                  id: "faq-4",
+                  title: "Is BiteScout available internationally?",
+                  content:
+                    "Currently launching in Cardiff, Wales with plans to expand to other UK cities and internationally. Stay tuned for updates on new locations.",
                 },
                 {
-                  id: 'faq-5',
-                  title: 'What payment methods do you accept?',
-                  content: 'We accept all major credit cards, PayPal, and Apple Pay. All payments are processed securely through our trusted payment partners.',
+                  id: "faq-5",
+                  title: "What payment methods do you accept?",
+                  content:
+                    "We accept all major credit cards, PayPal, and Apple Pay. All payments are processed securely through our trusted payment partners.",
                 },
                 {
-                  id: 'faq-6',
-                  title: 'How do I contact customer support?',
-                  content: 'You can reach our customer support team via email at support@bitescout.com, phone at +44 (0) 123 456 789, or through our live chat during business hours.',
+                  id: "faq-6",
+                  title: "How do I contact customer support?",
+                  content:
+                    "You can reach our customer support team via email at support@bitescout.com, phone at +44 (0) 123 456 789, or through our live chat during business hours.",
                 },
               ]}
               variant="default"
               size="md"
               allowMultiple={true}
-              defaultOpen={['faq-1']}
+              defaultOpen={["faq-1"]}
               containerClassName="text-left"
             />
           </div>
-          
+
           <div className="mt-12">
             <Button
               text="View All FAQs"

@@ -11,7 +11,12 @@ interface GalleryCardProps {
   onUseImage?: (image: Media) => void;
 }
 
-export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage }: GalleryCardProps) => {
+export const GalleryCard = ({
+  image,
+  onFullscreen,
+  priority = false,
+  onUseImage,
+}: GalleryCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -22,13 +27,13 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
   // Detect if device supports touch
   useEffect(() => {
     const checkTouchDevice = () => {
-      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
     };
-    
+
     checkTouchDevice();
     // Also check on resize in case device orientation changes
-    window.addEventListener('resize', checkTouchDevice);
-    return () => window.removeEventListener('resize', checkTouchDevice);
+    window.addEventListener("resize", checkTouchDevice);
+    return () => window.removeEventListener("resize", checkTouchDevice);
   }, []);
 
   // Handle tap to reveal buttons on touch devices
@@ -41,7 +46,7 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
   return (
     <div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
       {/* Image Preview */}
-      <button 
+      <button
         type="button"
         className="aspect-square rounded-t-xl overflow-hidden relative group cursor-pointer w-full border-0 p-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary"
         onClick={handleImageTap}
@@ -57,7 +62,7 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
                 <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
               </div>
             )}
-            
+
             {/* Error Placeholder */}
             {imageError && (
               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
@@ -71,11 +76,11 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
             )}
 
             <Image
-              src={image.url || ''}
+              src={image.url || ""}
               alt={image.title || "Gallery image"}
               fill
               className={`object-cover transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
+                imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
               onLoad={() => setImageLoaded(true)}
@@ -98,12 +103,12 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
               }}
               className={`absolute top-2 right-2 transition-opacity duration-200 ${
                 isCardFocused || (isTouchDevice && showButtons)
-                  ? 'opacity-100'
-                  : 'opacity-0 group-hover:opacity-100'
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
               }`}
               ariaLabel="View fullscreen"
             />
-            
+
             {/* Use This Image Button */}
             {onUseImage && (
               <Button
@@ -117,8 +122,8 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
                 }}
                 className={`absolute bottom-2 left-2 transition-opacity duration-200 ${
                   isCardFocused || (isTouchDevice && showButtons)
-                    ? 'opacity-100'
-                    : 'opacity-0 group-hover:opacity-100'
+                    ? "opacity-100"
+                    : "opacity-0 group-hover:opacity-100"
                 }`}
                 ariaLabel="Use this image"
               />
@@ -160,17 +165,12 @@ export const GalleryCard = ({ image, onFullscreen, priority = false, onUseImage 
           {image.title || "Untitled"}
         </p>
         {image.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-            {image.description}
-          </p>
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{image.description}</p>
         )}
         {image.tags && image.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {image.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full"
-              >
+              <span key={tag} className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full">
                 {tag}
               </span>
             ))}

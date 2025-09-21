@@ -4,11 +4,7 @@ import type { PaginatedResponse } from "@shared/types/common";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 // Hook for fetching verified media with pagination
-export const useVerifiedMedia = (
-  page = 1,
-  limit = 10,
-  type?: "image" | "video"
-) => {
+export const useVerifiedMedia = (page = 1, limit = 10, type?: "image" | "video") => {
   return useQuery({
     queryKey: ["media", "verified", page, limit, type],
     queryFn: () => getVerifiedMedia(page, limit, type),
@@ -32,4 +28,4 @@ export const useVerifiedMediaInfinite = (limit = 10, type?: "image" | "video") =
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
-}; 
+};

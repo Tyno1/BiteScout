@@ -14,8 +14,7 @@ import { getRoleFromToken } from "./utils/getRoleFromSession";
 // Helper function to extract restaurant ID from query parameters
 function extractRestaurantId(request: NextRequest): string | null {
   const { searchParams } = request.nextUrl;
-  const restaurantId =
-    searchParams.get("restaurantId") || searchParams.get("id");
+  const restaurantId = searchParams.get("restaurantId") || searchParams.get("id");
 
   if (restaurantId) {
     return restaurantId;
@@ -95,20 +94,14 @@ export async function middleware(request: NextRequest) {
     const allowedRoles = Permissions[matchingRoute];
 
     if (allowedRoles && !allowedRoles.includes(role)) {
-      console.warn(
-        `Access denied: User role ${role} not allowed for route ${pathname}`
-      );
+      console.warn(`Access denied: User role ${role} not allowed for route ${pathname}`);
       const nextUrl = request.nextUrl.clone();
       nextUrl.pathname = "/dashboard/unauthorized";
       return NextResponse.rewrite(nextUrl);
     }
 
     // 🎯 RESTAURANT ACCESS: Validate access for all dashboard routes
-    if (
-      Object.values(Routes.dashboard).some((route) =>
-        pathname.startsWith(route)
-      )
-    ) {
+    if (Object.values(Routes.dashboard).some((route) => pathname.startsWith(route))) {
       const restaurantId = extractRestaurantId(request);
 
       if (!restaurantId) {

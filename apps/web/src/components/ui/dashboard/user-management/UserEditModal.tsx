@@ -59,40 +59,35 @@ export function UserEditModal({
 
   const [newDietaryPreference, setNewDietaryPreference] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   // Profile image state
   const [profileImage, setProfileImage] = useState<CreateMediaResponse | null>(
-    user.imageUrl ? {
-      _id: user._id || "",
-      url: user.imageUrl,
-      type: "image" as const,
-      title: "Profile Image",
-      description: "User profile image",
-      uploadedBy: { id: "", name: "", username: "", imageUrl: "" },
-      associatedWith: { type: "user", id: user._id || "" },
-      verified: false,
-      fileSize: 0,
-      mimeType: "image/jpeg",
-      dimensions: { width: 100, height: 100 },
-      providerId: "",
-      mediaServiceId: "",
-      provider: "cloudinary" as const,
-      variants: [],
-      tags: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    } : null
+    user.imageUrl
+      ? {
+          _id: user._id || "",
+          url: user.imageUrl,
+          type: "image" as const,
+          title: "Profile Image",
+          description: "User profile image",
+          uploadedBy: { id: "", name: "", username: "", imageUrl: "" },
+          associatedWith: { type: "user", id: user._id || "" },
+          verified: false,
+          fileSize: 0,
+          mimeType: "image/jpeg",
+          dimensions: { width: 100, height: 100 },
+          providerId: "",
+          mediaServiceId: "",
+          provider: "cloudinary" as const,
+          variants: [],
+          tags: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      : null
   );
 
-  const {
-    mutate: deleteUser,
-    isPending: isDeleting,
-    isSuccess: isDeleted,
-  } = useDeleteUser();
-  const {
-    mutate: updateUser,
-    isPending: isUpdating,
-  } = useUpdateUser();
+  const { mutate: deleteUser, isPending: isDeleting, isSuccess: isDeleted } = useDeleteUser();
+  const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
   useEffect(() => {
     setFormData({
@@ -109,7 +104,7 @@ export function UserEditModal({
       dietaryPreferences: user.dietaryPreferences || [],
       imageUrl: user.imageUrl || "",
     });
-    
+
     // Update profile image state when user changes
     if (user.imageUrl) {
       setProfileImage({
@@ -154,10 +149,7 @@ export function UserEditModal({
     ) {
       setFormData((prev) => ({
         ...prev,
-        dietaryPreferences: [
-          ...(prev.dietaryPreferences || []),
-          newDietaryPreference.trim(),
-        ],
+        dietaryPreferences: [...(prev.dietaryPreferences || []), newDietaryPreference.trim()],
       }));
       setNewDietaryPreference("");
     }
@@ -166,8 +158,7 @@ export function UserEditModal({
   const handleDietaryPreferenceRemove = useCallback((preference: string) => {
     setFormData((prev) => ({
       ...prev,
-      dietaryPreferences:
-        prev.dietaryPreferences?.filter((p) => p !== preference) || [],
+      dietaryPreferences: prev.dietaryPreferences?.filter((p) => p !== preference) || [],
     }));
   }, []);
 
@@ -188,7 +179,7 @@ export function UserEditModal({
         setIsRemovingImage(false);
       }
     }
-    
+
     // Update local state
     setProfileImage(null);
     setFormData((prev) => ({
@@ -214,9 +205,9 @@ export function UserEditModal({
             }, 1500); // Show for 1.5 seconds
           },
           onError: (error) => {
-            console.error('Failed to update user:', error);
+            console.error("Failed to update user:", error);
             // You could add error handling here (e.g., show error toast)
-          }
+          },
         }
       );
     }
@@ -235,9 +226,7 @@ export function UserEditModal({
       <div className="space-y-6">
         {/* Basic Information */}
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            Basic Information
-          </h3>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Basic Information</h3>
           <div className="flex items-center justify-start gap-4 mb-4">
             <div>
               {user?.imageUrl ? (
@@ -301,12 +290,9 @@ export function UserEditModal({
           </div>
         </div>
 
-       
         {/* Bio */}
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            Bio
-          </h3>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Bio</h3>
           <Textarea
             name="bio"
             label="Bio"
@@ -319,9 +305,7 @@ export function UserEditModal({
 
         {/* Location Information */}
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            Location Information
-          </h3>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Location Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               name="address"
@@ -360,9 +344,7 @@ export function UserEditModal({
 
         {/* Dietary Preferences */}
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            Dietary Preferences
-          </h3>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Dietary Preferences</h3>
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <Input
@@ -378,29 +360,23 @@ export function UserEditModal({
                   }
                 }}
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDietaryPreferenceAdd}
-                text="Add"
-              />
+              <Button variant="outline" size="sm" onClick={handleDietaryPreferenceAdd} text="Add" />
             </div>
 
-            {formData.dietaryPreferences &&
-              formData.dietaryPreferences.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.dietaryPreferences.map((preference) => (
-                    <button
-                      key={preference}
-                      type="button"
-                      className="inline-flex items-center justify-center rounded-full font-medium transition-colors duration-200 px-2 py-0.5 text-xs bg-secondary/10 backdrop-blur-sm border border-secondary/20 text-secondary cursor-pointer hover:bg-destructive/20"
-                      onClick={() => handleDietaryPreferenceRemove(preference)}
-                    >
-                      {preference} ×
-                    </button>
-                  ))}
-                </div>
-              )}
+            {formData.dietaryPreferences && formData.dietaryPreferences.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formData.dietaryPreferences.map((preference) => (
+                  <button
+                    key={preference}
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-full font-medium transition-colors duration-200 px-2 py-0.5 text-xs bg-secondary/10 backdrop-blur-sm border border-secondary/20 text-secondary cursor-pointer hover:bg-destructive/20"
+                    onClick={() => handleDietaryPreferenceRemove(preference)}
+                  >
+                    {preference} ×
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -419,9 +395,7 @@ export function UserEditModal({
     () => (
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            Profile Image
-          </h3>
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Profile Image</h3>
           <div className="flex items-center justify-start gap-4 mb-4">
             <div className="relative">
               {profileImage?.url ? (
@@ -440,9 +414,7 @@ export function UserEditModal({
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-sm text-muted-foreground">
-                {profileImage?.url
-                  ? "Current profile image"
-                  : "No profile image set"}
+                {profileImage?.url ? "Current profile image" : "No profile image set"}
               </div>
               {profileImage?.url && (
                 <Button
@@ -464,7 +436,7 @@ export function UserEditModal({
               onUploadSuccess={(result: CreateMediaResponse | CreateMediaResponse[]) => {
                 console.log("Profile image upload success:", result);
                 if (Array.isArray(result)) return;
-                
+
                 // Update both the profile image state and form data
                 const imageUrl = result.url;
                 if (imageUrl) {
@@ -479,7 +451,7 @@ export function UserEditModal({
               onUploadError={(error: string) => {
                 console.error("Profile image upload error:", error);
               }}
-			  onRemoveUploadedFile={handleRemoveProfileImage}
+              onRemoveUploadedFile={handleRemoveProfileImage}
               associatedWith={{
                 type: "user",
                 id: user._id || "",
@@ -488,8 +460,8 @@ export function UserEditModal({
               multiple={false}
               singleUpload={true}
             />
-            
-                        {/* Upload Status Messages */}
+
+            {/* Upload Status Messages */}
             {isUpdating && (
               <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-center">
@@ -497,31 +469,35 @@ export function UserEditModal({
                     <Spinner />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-blue-800">
-                      Updating profile...
-                    </p>
+                    <p className="text-sm text-blue-800">Updating profile...</p>
                   </div>
                 </div>
               </div>
             )}
-            
+
             {showSuccessMessage && (
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-green-800">
-                      Profile updated successfully!
-                    </p>
+                    <p className="text-sm text-green-800">Profile updated successfully!</p>
                   </div>
                 </div>
               </div>
             )}
-            
           </div>
         </div>
       </div>

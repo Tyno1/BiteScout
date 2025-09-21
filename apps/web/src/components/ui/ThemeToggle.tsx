@@ -20,7 +20,7 @@ export function ThemeToggle() {
       >
         <Sun className="h-4 w-4" />
       </button>
-      
+
       <button
         type="button"
         onClick={() => setTheme("dark")}
@@ -33,7 +33,7 @@ export function ThemeToggle() {
       >
         <Moon className="h-4 w-4" />
       </button>
-      
+
       <button
         type="button"
         onClick={() => setTheme("system")}
@@ -48,4 +48,4 @@ export function ThemeToggle() {
       </button>
     </div>
   );
-} 
+}

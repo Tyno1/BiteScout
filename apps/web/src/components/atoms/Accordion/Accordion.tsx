@@ -35,7 +35,7 @@ export function Accordion({
   const toggleItem = (itemId: string) => {
     if (allowMultiple) {
       const newOpenItems = openItems.includes(itemId)
-        ? openItems.filter(id => id !== itemId)
+        ? openItems.filter((id) => id !== itemId)
         : [...openItems, itemId];
       setOpenItems(newOpenItems);
       onItemToggle?.(itemId, !openItems.includes(itemId));
@@ -82,11 +82,7 @@ export function Accordion({
         return (
           <div
             key={item.id}
-            className={cn(
-              "transition-all duration-200",
-              variantStyles[variant],
-              className
-            )}
+            className={cn("transition-all duration-200", variantStyles[variant], className)}
           >
             <button
               type="button"
@@ -148,4 +144,4 @@ export function Accordion({
       })}
     </div>
   );
-} 
+}

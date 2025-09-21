@@ -8,8 +8,8 @@ export function PopularDestinations() {
           Popular Destinations
         </h2>
         <p className="text-foreground mb-16 text-center max-w-2xl">
-          Explore the most sought-after dining experiences in your area,
-          carefully curated by our community of food enthusiasts
+          Explore the most sought-after dining experiences in your area, carefully curated by our
+          community of food enthusiasts
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {[1, 2, 3, 4, 5, 6].map((item) => (

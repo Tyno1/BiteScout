@@ -18,13 +18,13 @@ export type UploadProgressCallback = (progress: number) => void;
 // Hook for uploading media with progress tracking
 export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ 
-      file, 
-      metadata 
-    }: { 
-      file: File; 
+    mutationFn: async ({
+      file,
+      metadata,
+    }: {
+      file: File;
       metadata?: UploadMetadata;
     }): Promise<CreateMediaResponse> => {
       // Create a custom upload function with progress tracking
@@ -36,57 +36,57 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
             setTimeout(() => onProgress(i), i * 50);
           }
         }
-        
+
         const result = await uploadFile(file, metadata);
-        
+
         // Complete the progress
         if (onProgress) {
           onProgress(100);
         }
-        
+
         return result;
       };
-      
+
       return uploadWithProgress();
     },
-    
+
     onSuccess: (data, variables) => {
       // Invalidate and refetch relevant queries
       queryClient.invalidateQueries({ queryKey: ["media"] });
-      
+
       // If associated with an entity, invalidate associated media queries
       if (variables.metadata?.associatedWith) {
         const { type, id } = variables.metadata.associatedWith;
-        queryClient.invalidateQueries({ 
-          queryKey: ["media", "associated", type, id] 
+        queryClient.invalidateQueries({
+          queryKey: ["media", "associated", type, id],
         });
-        
+
         // If associated with a restaurant, also invalidate restaurant queries
         // that contain gallery data so the gallery gets updated with the new image
         if (type === "restaurant") {
           // Invalidate specific restaurant queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant", id] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant", id],
           });
           // Invalidate restaurant by owner queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant", "owner"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant", "owner"],
           });
           // Invalidate restaurant search queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurants", "search"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurants", "search"],
           });
           // Invalidate restaurant filter queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurants", "filter"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurants", "filter"],
           });
           // Invalidate restaurant-by-owner queries (used by useAssignedImages)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant-by-owner"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant-by-owner"],
           });
         }
       }
-      
+
       // Optimistically update user media if we have user context
       // This would require user context from your auth system
       // queryClient.invalidateQueries({ queryKey: ["media", "user"] });
@@ -104,13 +104,13 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
 // Hook for batch uploading multiple files
 export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ 
-      files, 
-      metadata 
-    }: { 
-      files: File[]; 
+    mutationFn: async ({
+      files,
+      metadata,
+    }: {
+      files: File[];
       metadata?: UploadMetadata;
     }): Promise<CreateMediaResponse[]> => {
       const uploadPromises = files.map((file, index) => {
@@ -118,52 +118,52 @@ export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
           ...metadata,
           title: metadata?.title ? `${metadata.title} ${index + 1}` : undefined,
         };
-        
+
         return uploadFile(file, fileMetadata);
       });
-      
+
       const results = await Promise.all(uploadPromises);
-      
+
       // Report overall progress
       if (onProgress) {
         onProgress(100);
       }
-      
+
       return results;
     },
     onSuccess: (data, variables) => {
       // Invalidate all media queries
       queryClient.invalidateQueries({ queryKey: ["media"] });
-      
+
       // If associated with an entity, invalidate associated media queries
       if (variables.metadata?.associatedWith) {
         const { type, id } = variables.metadata.associatedWith;
-        queryClient.invalidateQueries({ 
-          queryKey: ["media", "associated", type, id] 
+        queryClient.invalidateQueries({
+          queryKey: ["media", "associated", type, id],
         });
-        
+
         // If associated with a restaurant, also invalidate restaurant queries
         // that contain gallery data so the gallery gets updated with the new image
         if (type === "restaurant") {
           // Invalidate specific restaurant queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant", id] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant", id],
           });
           // Invalidate restaurant by owner queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant", "owner"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant", "owner"],
           });
           // Invalidate restaurant search queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurants", "search"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurants", "search"],
           });
           // Invalidate restaurant filter queries (contains gallery)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurants", "filter"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurants", "filter"],
           });
           // Invalidate restaurant-by-owner queries (used by useAssignedImages)
-          queryClient.invalidateQueries({ 
-            queryKey: ["restaurant-by-owner"] 
+          queryClient.invalidateQueries({
+            queryKey: ["restaurant-by-owner"],
           });
         }
       }
@@ -175,4 +175,4 @@ export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
       }
     },
   });
-}; 
+};

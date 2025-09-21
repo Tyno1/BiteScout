@@ -16,4 +16,4 @@ export type {
   MediaPreviewProps,
   MediaCardProps,
   MediaMetadataFormProps,
-} from "./types"; 
+} from "./types";

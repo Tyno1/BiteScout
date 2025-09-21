@@ -7,10 +7,7 @@ import { Button, Input } from "@/components/atoms";
 import { useRouter } from "next/navigation";
 
 export function LoginForm() {
-  const [state, loginAction, isPending] = useActionState(
-    doCredentialLogin,
-    undefined
-  );
+  const [state, loginAction, isPending] = useActionState(doCredentialLogin, undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,12 +17,7 @@ export function LoginForm() {
   }, [state, router]);
 
   return (
-    <form
-      action={loginAction}
-      className="w-full flex flex-col items-center gap-2"
-    >
-     
-
+    <form action={loginAction} className="w-full flex flex-col items-center gap-2">
       <Input
         required
         inputSize="md"
@@ -50,7 +42,6 @@ export function LoginForm() {
       />
 
       <Button
-      
         disabled={isPending}
         type="submit"
         fullWidth

@@ -6,10 +6,7 @@ type NotificationCardType = {
   renderActionButtons: (notification: Notification) => React.ReactNode;
 };
 
-export function NotificationCard({
-  notification,
-  renderActionButtons,
-}: NotificationCardType) {
+export function NotificationCard({ notification, renderActionButtons }: NotificationCardType) {
   return (
     <div
       className={`shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg p-5 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center ${
@@ -20,9 +17,7 @@ export function NotificationCard({
         <h2 className="text-lg font-semibold text-gray-800">
           {notification.title || "Notification"}
         </h2>
-        <p className="text-sm text-gray-600 mt-1">
-          {notification.message}
-        </p>
+        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
         <p className="text-xs text-gray-400 mt-2">
           {new Date(notification.createdAt || "").toLocaleString(undefined, {
             dateStyle: "medium",
@@ -30,9 +25,7 @@ export function NotificationCard({
           })}
         </p>
       </div>
-      <div className="flex space-x-2 w-full md:w-auto">
-        {renderActionButtons(notification)}
-      </div>
+      <div className="flex space-x-2 w-full md:w-auto">{renderActionButtons(notification)}</div>
     </div>
   );
 }

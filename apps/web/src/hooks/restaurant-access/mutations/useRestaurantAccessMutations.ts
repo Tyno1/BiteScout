@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 // Restaurant Access Mutations
 export const useCreateRestaurantAccess = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ restaurantId, userId }: { restaurantId: string; userId: string }) =>
       createRestaurantAccess(restaurantId, userId),
@@ -24,7 +24,7 @@ export const useCreateRestaurantAccess = () => {
 
 export const useGrantRestaurantAccess = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (accessId: string) => grantRestaurantAccess(accessId),
     onSuccess: () => {
@@ -36,7 +36,7 @@ export const useGrantRestaurantAccess = () => {
 
 export const useDeleteRestaurantAccess = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (accessId: string) => deleteRestaurantAccess(accessId),
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useDeleteRestaurantAccess = () => {
 
 export const useSuspendRestaurantAccess = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (accessId: string) => suspendRestaurantAccess(accessId),
     onSuccess: () => {
@@ -60,7 +60,7 @@ export const useSuspendRestaurantAccess = () => {
 
 export const useUpdateRestaurantAccessRole = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (accessId: string) => updateRestaurantAccessRole(accessId),
     onSuccess: () => {
@@ -68,4 +68,4 @@ export const useUpdateRestaurantAccessRole = () => {
       queryClient.invalidateQueries({ queryKey: ["restaurantAccess"] });
     },
   });
-}; 
+};

@@ -3,12 +3,7 @@ import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm"
 import { X } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
-import type {
-  Allergen,
-  Course,
-  Cuisine,
-  FoodCatalogue,
-} from "shared/types/api/schemas";
+import type { Allergen, Course, Cuisine, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
 
 type FoodCatalogueModalType = {
@@ -67,9 +62,7 @@ export function AddNewFood({
             useLabel
             outlineType="round"
             name="ingredients"
-            onKeyDown={(e) =>
-              e.key === "Enter" ? handleAddIngredients(ingredient) : null
-            }
+            onKeyDown={(e) => (e.key === "Enter" ? handleAddIngredients(ingredient) : null)}
             id="ingredient"
             type="text"
             placeholder="List ingredients"
@@ -84,9 +77,7 @@ export function AddNewFood({
                 size="sm"
               />
             }
-            errorMessage={
-              formError.ingredients && FormWarning(formError.ingredients)
-            }
+            errorMessage={formError.ingredients && FormWarning(formError.ingredients)}
           />
 
           <div className="flex gap-2 mt-2 overflow-x-auto">
@@ -134,9 +125,7 @@ export function AddNewFood({
               cuisineType: selectedCuisine as Cuisine,
             }));
           }}
-          errorMessage={
-            formError.cuisineType && FormWarning(formError.cuisineType)
-          }
+          errorMessage={formError.cuisineType && FormWarning(formError.cuisineType)}
         />
 
         <Select
@@ -229,9 +218,7 @@ export function AddNewFood({
             name="isAvailable"
             type="checkbox"
             checked={newFood.isAvailable ?? true}
-            onChange={(e) =>
-              setNewFood((prev) => ({ ...prev, isAvailable: e.target.checked }))
-            }
+            onChange={(e) => setNewFood((prev) => ({ ...prev, isAvailable: e.target.checked }))}
           />
 
           <Input
@@ -241,9 +228,7 @@ export function AddNewFood({
             name="isFeatured"
             type="checkbox"
             checked={newFood.isFeatured ?? false}
-            onChange={(e) =>
-              setNewFood((prev) => ({ ...prev, isFeatured: e.target.checked }))
-            }
+            onChange={(e) => setNewFood((prev) => ({ ...prev, isFeatured: e.target.checked }))}
           />
         </div>
       </div>
@@ -259,11 +244,7 @@ export function AddNewFood({
             <Button
               size="sm"
               color="neutral"
-              variant={
-                newFood.allergens?.some((a) => a._id === allergen._id)
-                  ? "solid"
-                  : "outline"
-              }
+              variant={newFood.allergens?.some((a) => a._id === allergen._id) ? "solid" : "outline"}
               text={allergen.name}
               key={allergen._id}
               onClick={() => toggleAllergen(allergen)}

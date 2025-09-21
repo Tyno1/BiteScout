@@ -36,9 +36,7 @@ export default function FoodDetailPage() {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">
-            Error loading food data
-          </h1>
+          <h1 className="text-2xl font-bold text-red-600">Error loading food data</h1>
           <p className="text-foreground">{error.message}</p>
         </div>
       </div>
@@ -52,8 +50,7 @@ export default function FoodDetailPage() {
         <div className="text-center text-foreground">
           <h1 className="text-2xl font-bold ">Food item not found</h1>
           <p className="mt-2">
-            The food item you&apos;re looking for doesn&apos;t exist or has been
-            removed.
+            The food item you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <Button
             text="Back to Food Catalogue"
@@ -85,9 +82,7 @@ export default function FoodDetailPage() {
             {CapitalizeFirstCharacter(foodData?.name || "")}
           </h1>
         </div>
-        <p className="text-xs text-foreground/30 mt-1 font-mono">
-          ID: {foodData?._id}
-        </p>
+        <p className="text-xs text-foreground/30 mt-1 font-mono">ID: {foodData?._id}</p>
       </div>
 
       <div className="grid md:grid-cols-5 gap-4 items-start">
@@ -127,17 +122,13 @@ export default function FoodDetailPage() {
             </h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2 border-b border-foreground/50">
-                <span className="font-medium text-foreground text-sm">
-                  Cuisine Type
-                </span>
+                <span className="font-medium text-foreground text-sm">Cuisine Type</span>
                 <span className="text-foreground font-semibold text-sm">
                   {foodData.cuisineType?.name}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-foreground/50">
-                <span className="font-medium text-foreground text-sm">
-                  Course
-                </span>
+                <span className="font-medium text-foreground text-sm">Course</span>
                 <span className="text-foreground font-semibold text-sm">
                   {foodData.course?.name}
                 </span>
@@ -151,7 +142,7 @@ export default function FoodDetailPage() {
               Ingredients
             </h2>
             <div className="flex flex-wrap gap-2">
-              {foodData.ingredients?.map((ingredient: string, index: number) => ( 
+              {foodData.ingredients?.map((ingredient: string, index: number) => (
                 <span
                   key={`ingredient-${index}-${ingredient}`}
                   className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium border border-primary/20 hover:bg-primary/20 transition-colors"
@@ -189,12 +180,8 @@ export default function FoodDetailPage() {
               </h2>
               <div className="space-y-2">
                 <div className="flex items-center justify-between py-2 border-b border-foreground/50">
-                  <span className="font-medium text-foreground text-sm">
-                    Restaurant ID
-                  </span>
-                  <span className="text-foreground font-mono text-xs">
-                    {foodData.restaurant}
-                  </span>
+                  <span className="font-medium text-foreground text-sm">Restaurant ID</span>
+                  <span className="text-foreground font-mono text-xs">{foodData.restaurant}</span>
                 </div>
               </div>
             </div>

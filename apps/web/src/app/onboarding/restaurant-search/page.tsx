@@ -23,8 +23,7 @@ const RestaurantSearch = () => {
     error: searchError,
   } = useRestaurantsByName(searchTerm);
 
-  const { restaurantAccessList, createRestaurantAccess } =
-    useRestaurantAccess();
+  const { restaurantAccessList, createRestaurantAccess } = useRestaurantAccess();
 
   // Handle search input changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,9 +82,7 @@ const RestaurantSearch = () => {
     if (searchError) {
       return (
         <div className="p-4 bg-red-50 border border-red-100 rounded-md">
-          <p className="text-center text-red-700">
-            Error: {searchError.message}
-          </p>
+          <p className="text-center text-red-700">Error: {searchError.message}</p>
         </div>
       );
     }
@@ -94,8 +91,8 @@ const RestaurantSearch = () => {
       return (
         <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-md">
           <p className="text-center text-yellow-700">
-            No restaurants found matching &apos;{searchTerm}&apos;. Please try a
-            different search term.
+            No restaurants found matching &apos;{searchTerm}&apos;. Please try a different search
+            term.
           </p>
         </div>
       );
@@ -123,9 +120,7 @@ const RestaurantSearch = () => {
           className="bg-white rounded-2xl shadow-xl p-8 md:p-10 space-y-6"
         >
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Search Restaurant
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Search Restaurant</h1>
             <p className="text-sm text-gray-500">
               Enter your restaurant&apos;s name in the search bar below.
             </p>
@@ -152,9 +147,7 @@ const RestaurantSearch = () => {
               disabled={isSearchLoading}
             />
 
-            {formError && (
-              <p className="text-center text-red-500">{formError}</p>
-            )}
+            {formError && <p className="text-center text-red-500">{formError}</p>}
             <div className="mt-6 space-y-4">{renderSearchResults()}</div>
           </div>
         </form>

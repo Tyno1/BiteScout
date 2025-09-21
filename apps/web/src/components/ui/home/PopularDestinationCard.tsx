@@ -10,8 +10,8 @@ export function PopularDestinationCard({ item }: DestinationCardType) {
     <>
       <div key={item} className="relative group cursor-pointer">
         <div className="relative h-80 w-full rounded-xl overflow-hidden">
-          <Image 
-            src={RestImg} 
+          <Image
+            src={RestImg}
             alt={`image${item}`}
             width={400}
             height={320}

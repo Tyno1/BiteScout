@@ -45,4 +45,3 @@ export const Success: Story = {
     children: "This is a success alert",
   },
 };
-  

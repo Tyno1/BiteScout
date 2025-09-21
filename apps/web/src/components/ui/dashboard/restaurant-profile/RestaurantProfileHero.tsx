@@ -7,10 +7,7 @@ type RestaurantProfileHeroProps = {
   image1: string | null;
   isEditing: boolean;
   displayData: Restaurant | undefined;
-  handleInputChange: (
-    field: keyof Restaurant,
-    value: Restaurant[keyof Restaurant]
-  ) => void;
+  handleInputChange: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
   handleSave: () => void;
   handleEdit: () => void;
   handleCancel: () => void;
@@ -66,11 +63,7 @@ export function RestaurantProfileHero({
             </h1>
           )}
         </div>
-        <div
-          className="flex gap-2 flex-2"
-          role="toolbar"
-          aria-label="Profile actions"
-        >
+        <div className="flex gap-2 flex-2" role="toolbar" aria-label="Profile actions">
           {isEditing ? (
             <div className="flex gap-2 ml-auto flex-wrap">
               <IconButton

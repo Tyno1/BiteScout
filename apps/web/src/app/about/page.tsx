@@ -1,15 +1,27 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
-import { Camera, Heart, MapPin, Palette, Salad, Smartphone, Star, TrendingUp, Trophy, Type, Zap } from "lucide-react";
+import {
+  Camera,
+  Heart,
+  MapPin,
+  Palette,
+  Salad,
+  Smartphone,
+  Star,
+  TrendingUp,
+  Trophy,
+  Type,
+  Zap,
+} from "lucide-react";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-black via-gray-900 to-black text-white">
         <div className="max-w-5xl mx-auto text-center">
@@ -17,8 +29,9 @@ export default function About() {
             Follow the <span className="text-primary">Flavor</span>
           </h1>
           <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            BiteScout reimagines food discovery through immersive visuals. Instead of star ratings and endless reviews, 
-            explore dishes by scrolling through photos and videos of real food from real people.
+            BiteScout reimagines food discovery through immersive visuals. Instead of star ratings
+            and endless reviews, explore dishes by scrolling through photos and videos of real food
+            from real people.
           </p>
         </div>
       </section>
@@ -31,13 +44,13 @@ export default function About() {
               Our Vision
             </h2>
             <p className="text-xl text-card-foreground max-w-4xl mx-auto font-light leading-relaxed">
-              BiteScout brings together the joy of eating, the power of community, and the ease of discovery 
-              in one beautifully curated platform.
+              BiteScout brings together the joy of eating, the power of community, and the ease of
+              discovery in one beautifully curated platform.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card 
+            <Card
               className="border-l-4 border-l-primary"
               containerClassName="bg-background"
               padding="lg"
@@ -50,14 +63,14 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Visual Discovery</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    We don&apos;t ask users to read reviews. We show them exactly what they could eat next — 
-                    via vibrant, full-screen food content that makes your mouth water.
+                    We don&apos;t ask users to read reviews. We show them exactly what they could
+                    eat next — via vibrant, full-screen food content that makes your mouth water.
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card 
+            <Card
               className="border-l-4 border-l-accent"
               containerClassName="bg-background"
               padding="lg"
@@ -70,8 +83,9 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Real Taste</h3>
                   <p className="text-card-foreground leading-relaxed font-light">
-                    It&apos;s not about ratings. It&apos;s about recognition — great food, beautifully captured, 
-                    socially shared, and effortlessly discovered by food lovers everywhere.
+                    It&apos;s not about ratings. It&apos;s about recognition — great food,
+                    beautifully captured, socially shared, and effortlessly discovered by food
+                    lovers everywhere.
                   </p>
                 </div>
               </div>
@@ -93,7 +107,7 @@ export default function About() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -104,11 +118,12 @@ export default function About() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Discover Visually</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Immersive TikTok-style feed with trending dishes, suggestions, and infinite food exploration
+                Immersive TikTok-style feed with trending dishes, suggestions, and infinite food
+                exploration
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -123,7 +138,7 @@ export default function About() {
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -134,11 +149,12 @@ export default function About() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-4">Share Your Food</h3>
               <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Upload images/videos, add food details, tag restaurants, and share your culinary adventures
+                Upload images/videos, add food details, tag restaurants, and share your culinary
+                adventures
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-card/90 transition-all duration-300"
               containerClassName="bg-card hover:shadow-xl"
               padding="lg"
@@ -164,12 +180,13 @@ export default function About() {
               Built for Food Lovers
             </h2>
             <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Whether you&apos;re a visual foodie, fast explorer, or dietary seeker, BiteScout has you covered
+              Whether you&apos;re a visual foodie, fast explorer, or dietary seeker, BiteScout has
+              you covered
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <Card 
+            <Card
               className="text-center hover:bg-background/90 transition-all duration-300"
               containerClassName="bg-background hover:shadow-xl"
               padding="lg"
@@ -181,12 +198,12 @@ export default function About() {
               <h3 className="text-2xl font-bold text-foreground mb-4">The Visual Foodie</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 18-35</p>
               <p className="text-card-foreground font-light leading-relaxed">
-                Loves TikTok and Instagram, but craves real food inspiration. 
-                Wants to discover new dishes through beautiful visuals and authentic content.
+                Loves TikTok and Instagram, but craves real food inspiration. Wants to discover new
+                dishes through beautiful visuals and authentic content.
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-background/90 transition-all duration-300"
               containerClassName="bg-background hover:shadow-xl"
               padding="lg"
@@ -198,12 +215,12 @@ export default function About() {
               <h3 className="text-2xl font-bold text-foreground mb-4">The Fast Explorer</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 25-45</p>
               <p className="text-card-foreground font-light leading-relaxed">
-                Wants to find exactly what to eat nearby, without reading endless reviews. 
-                Values quick, visual decision-making for food choices.
+                Wants to find exactly what to eat nearby, without reading endless reviews. Values
+                quick, visual decision-making for food choices.
               </p>
             </Card>
 
-            <Card 
+            <Card
               className="text-center hover:bg-background/90 transition-all duration-300"
               containerClassName="bg-background hover:shadow-xl"
               padding="lg"
@@ -215,8 +232,8 @@ export default function About() {
               <h3 className="text-2xl font-bold text-foreground mb-4">The Dietary Seeker</h3>
               <p className="text-card-foreground mb-4 font-medium">Ages 21-50</p>
               <p className="text-card-foreground font-light leading-relaxed">
-                Filters food based on specific needs: vegan, gluten-free, nut-free, and more. 
-                Needs reliable, visual confirmation of dietary compliance.
+                Filters food based on specific needs: vegan, gluten-free, nut-free, and more. Needs
+                reliable, visual confirmation of dietary compliance.
               </p>
             </Card>
           </div>
@@ -231,7 +248,8 @@ export default function About() {
               Our Brand Identity
             </h2>
             <p className="text-xl text-background/80 max-w-3xl mx-auto font-light">
-              Modern, playful, classy, and inclusive — just like the food community we&apos;re building
+              Modern, playful, classy, and inclusive — just like the food community we&apos;re
+              building
             </p>
           </div>
 
@@ -241,7 +259,9 @@ export default function About() {
                 <span className="text-3xl font-bold text-primary-foreground">B</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Name</h3>
-              <p className="text-background/70 font-light">BiteScout – &quot;Follow the Flavor&quot;</p>
+              <p className="text-background/70 font-light">
+                BiteScout – &quot;Follow the Flavor&quot;
+              </p>
             </div>
 
             <div className="text-center">
@@ -249,7 +269,9 @@ export default function About() {
                 <Palette className="w-16 h-16 text-accent-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Colors</h3>
-              <p className="text-background/70 font-light">Deep black, toasted gold, warm red, cool cream</p>
+              <p className="text-background/70 font-light">
+                Deep black, toasted gold, warm red, cool cream
+              </p>
             </div>
 
             <div className="text-center">
@@ -257,7 +279,9 @@ export default function About() {
                 <Type className="w-16 h-16 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-bold mb-3">Typography</h3>
-              <p className="text-background/70 font-light">Contemporary sans serif with personality</p>
+              <p className="text-background/70 font-light">
+                Contemporary sans serif with personality
+              </p>
             </div>
 
             <div className="text-center">
@@ -278,7 +302,8 @@ export default function About() {
             Ready to Follow the Flavor?
           </h2>
           <p className="text-xl text-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Join thousands of food lovers discovering, sharing, and exploring the world&apos;s most delicious dishes
+            Join thousands of food lovers discovering, sharing, and exploring the world&apos;s most
+            delicious dishes
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button
