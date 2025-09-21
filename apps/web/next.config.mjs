@@ -3,6 +3,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Essential performance fixes
+  compress: true,  // Fixes slow CSS loading (5.4KB → faster)
+  
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
@@ -12,6 +15,7 @@ const nextConfig = {
       { protocol: "https", hostname: "*.s3.*.amazonaws.com" },
     ],
   },
+  
   serverExternalPackages: ['axios'],
   webpack: (config) => {
     config.resolve.fallback = {
