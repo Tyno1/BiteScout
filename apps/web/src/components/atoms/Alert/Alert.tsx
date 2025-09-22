@@ -1,3 +1,5 @@
+"use client";
+
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { useState } from "react";
 import { IconButton } from "../IconButton";
