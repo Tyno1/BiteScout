@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "motion/react";
 import Image from "next/image";
 import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";

@@ -1,8 +1,11 @@
-import { Button, IconButton } from "@/components/atoms";
+"use client";
+
 import { X } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
+import { Button, IconButton } from "@/components/atoms";
+
 
 type ModalType = {
   isModalOpen: boolean;
