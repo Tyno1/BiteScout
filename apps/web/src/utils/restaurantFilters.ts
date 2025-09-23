@@ -36,9 +36,9 @@ export interface FilterResponse {
  */
 export function categoriesToFeatures(categories: string[]): string[] {
   const features: string[] = [];
-  categories.forEach(category => {
+  categories.forEach((category) => {
     if (FEATURE_CATEGORIES[category]) {
-      features.push(...FEATURE_CATEGORIES[category] as string[]);
+      features.push(...(FEATURE_CATEGORIES[category] as string[]));
     }
   });
   return features;
@@ -49,7 +49,7 @@ export function categoriesToFeatures(categories: string[]): string[] {
  */
 export function featuresToCategories(features: string[]): string[] {
   const categories = new Set<string>();
-  features.forEach(feature => {
+  features.forEach((feature) => {
     for (const [category, categoryFeatures] of Object.entries(FEATURE_CATEGORIES)) {
       if ((categoryFeatures as string[]).includes(feature)) {
         categories.add(category);
@@ -88,14 +88,11 @@ export function buildFilterQuery(options: FilterOptions): Record<string, string>
 /**
  * Check if a restaurant matches specific feature categories
  */
-export function restaurantMatchesCategories(
-  restaurant: Restaurant,
-  categories: string[]
-): boolean {
+export function restaurantMatchesCategories(restaurant: Restaurant, categories: string[]): boolean {
   if (!categories.length || !restaurant.features) return true;
 
   const requiredFeatures = categoriesToFeatures(categories);
-  return requiredFeatures.some(feature => 
+  return requiredFeatures.some((feature) =>
     restaurant.features?.includes(feature as RestaurantFeature)
   );
 }
@@ -109,16 +106,14 @@ export function filterRestaurantsByCategories(
 ): Restaurant[] {
   if (!categories.length) return restaurants;
 
-  return restaurants.filter(restaurant => 
-    restaurantMatchesCategories(restaurant, categories)
-  );
+  return restaurants.filter((restaurant) => restaurantMatchesCategories(restaurant, categories));
 }
 
 /**
  * Get available categories from a list of restaurants
  */
 export function getAvailableCategories(restaurants: Restaurant[]): string[] {
-  const allFeatures = restaurants.flatMap(r => r.features || []);
+  const allFeatures = restaurants.flatMap((r) => r.features || []);
   return featuresToCategories(allFeatures);
 }
 
@@ -131,7 +126,7 @@ export function filterRestaurantsByFeatures(
 ): Restaurant[] {
   if (!features.length) return restaurants;
 
-  return restaurants.filter(restaurant => 
-    features.some(feature => restaurant.features?.includes(feature as RestaurantFeature))
+  return restaurants.filter((restaurant) =>
+    features.some((feature) => restaurant.features?.includes(feature as RestaurantFeature))
   );
-} 
+}

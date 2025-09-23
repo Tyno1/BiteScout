@@ -1,5 +1,3 @@
-
-
 import { IconButton } from "@/components/atoms";
 import { Card } from "@/components/organisms";
 import {
@@ -9,13 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowDownUp,
-  ArrowDownWideNarrow,
-  ArrowUpNarrowWide,
-} from "lucide-react";
-
-
+import { ArrowDownUp, ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 
 type DataGridProps<TData> = {
   data: TData[];
@@ -26,13 +18,12 @@ type DataGridProps<TData> = {
   emptyMessage?: string;
 };
 
-export function DataGrid<TData>({ 
-  data, 
-  columns, 
-  handleRowClick, 
-  emptyMessage = "No data found."
+export function DataGrid<TData>({
+  data,
+  columns,
+  handleRowClick,
+  emptyMessage = "No data found.",
 }: DataGridProps<TData>) {
-
   const table = useReactTable({
     data,
     columns,
@@ -44,9 +35,7 @@ export function DataGrid<TData>({
     <Card shadow="sm" className="overflow-hidden">
       <div className="max-h-[60vh] overflow-y-auto">
         {data.length === 0 ? (
-          <div className="p-8 text-center text-card-foreground">
-            {emptyMessage}
-          </div>
+          <div className="p-8 text-center text-card-foreground">{emptyMessage}</div>
         ) : (
           <table className="w-full table-fixed border-collapse">
             <thead className="bg-card sticky top-0 z-10">
@@ -60,10 +49,7 @@ export function DataGrid<TData>({
                       }`}
                     >
                       <div className="flex items-center gap-1">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
                           <IconButton
                             name="sort-item"
@@ -80,15 +66,9 @@ export function DataGrid<TData>({
                           />
                         )}
                         {header.column.getIsSorted() === "asc" ? (
-                          <ArrowUpNarrowWide
-                            className="text-foreground"
-                            size={17}
-                          />
+                          <ArrowUpNarrowWide className="text-foreground" size={17} />
                         ) : header.column.getIsSorted() === "desc" ? (
-                          <ArrowDownWideNarrow
-                            className="text-foreground"
-                            size={17}
-                          />
+                          <ArrowDownWideNarrow className="text-foreground" size={17} />
                         ) : null}
                       </div>
                     </th>
@@ -115,16 +95,13 @@ export function DataGrid<TData>({
                   tabIndex={0}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td 
-                      key={cell.id} 
+                    <td
+                      key={cell.id}
                       className={`p-4 text-sm text-card-foreground truncate max-w-[150px] ${
                         cell.column.id === "images" ? "hidden xl:table-cell" : ""
                       }`}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>

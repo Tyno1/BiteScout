@@ -5,8 +5,8 @@ export const DEFAULT_FOOD_DATA: FoodCatalogue = {
   _id: "",
   name: "",
   ingredients: [],
-  cuisineType: {_id: "", name: "", description: ""},
-  course: {_id: "", name: "", description: ""},
+  cuisineType: { _id: "", name: "", description: "" },
+  course: { _id: "", name: "", description: "" },
   price: {
     currency: "GBP" as Currency,
     amount: 0,
@@ -16,4 +16,4 @@ export const DEFAULT_FOOD_DATA: FoodCatalogue = {
   restaurant: "",
   isAvailable: true,
   isFeatured: false,
-}; 
+};

@@ -1,15 +1,11 @@
 "use client";
 
-import { RouteProtection, SideNav, TopNav } from "@/components/ui";
-import { usePlatform } from "@/hooks";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { RouteProtection, SideNav, TopNav } from "@/components/ui";
+import { usePlatform } from "@/hooks";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isTablet } = usePlatform();
   const { data: session } = useSession();
@@ -29,12 +25,13 @@ export default function DashboardLayout({
 
         <div className="flex-1 relative overflow-y-auto overflow-x-hidden">
           {session?.user && (
-            <TopNav onMenuClick={() => setIsMenuOpen((prev: boolean) => !prev)} user={session.user} />
+            <TopNav
+              onMenuClick={() => setIsMenuOpen((prev: boolean) => !prev)}
+              user={session.user}
+            />
           )}
           <div className="mt-14">
-            <RouteProtection>
-              {children}
-            </RouteProtection>
+            <RouteProtection>{children}</RouteProtection>
           </div>
         </div>
       </div>

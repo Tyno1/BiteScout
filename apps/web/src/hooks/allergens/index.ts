@@ -1,2 +1,2 @@
-export * from './useAllergens';
-export * from './mutations/useAllergenMutations'; 
+export * from "./useAllergens";
+export * from "./mutations/useAllergenMutations";

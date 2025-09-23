@@ -66,9 +66,7 @@ const UserManagement = () => {
         />
       ) : (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">
-            No users found for this restaurant.
-          </p>
+          <p className="text-muted-foreground">No users found for this restaurant.</p>
         </div>
       )}
     </main>

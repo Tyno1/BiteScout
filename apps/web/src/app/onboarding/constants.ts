@@ -1,4 +1,4 @@
-import type { BusinessHour, Restaurant } from "shared/types/api/schemas"
+import type { BusinessHour, Restaurant } from "shared/types/api/schemas";
 
 export const DEFAULT_BUSINESS_HOURS: BusinessHour[] = [
   { day: "monday", open: "09:00", close: "17:00", isClosed: false },
@@ -27,5 +27,4 @@ export const DEFAULT_RESTAURANT_DATA: Restaurant = {
   meta: {},
   owner: false,
   ownerId: "",
-}
-
+};

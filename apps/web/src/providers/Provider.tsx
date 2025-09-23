@@ -14,9 +14,7 @@ const Provider = ({ children, session }: ProviderProps) => {
   return (
     <QueryProvider>
       <SessionProvider session={session}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </SessionProvider>
     </QueryProvider>
   );

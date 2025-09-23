@@ -10,9 +10,7 @@ const ACTIVITIES = [
 
 export const RecentActivityPanel = () => {
   return (
-    <Card
-      header={<h2 className="text-2xl font-bold">Recent Activity Panel</h2>}
-    >
+    <Card header={<h2 className="text-2xl font-bold">Recent Activity Panel</h2>}>
       <Card className="h-[10vh] overflow-y-auto">
         {ACTIVITIES.map((activity, index) => (
           <React.Fragment key={activity}>

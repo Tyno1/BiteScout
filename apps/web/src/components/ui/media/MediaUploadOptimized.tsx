@@ -47,64 +47,68 @@ export const MediaUploadOptimized = ({
   });
 
   // Handle file selection
-  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    
-    // Validate file count
-    if (selectedFiles.length + files.length > maxFiles) {
-      onUploadError?.(new Error(`Maximum ${maxFiles} files allowed`));
-      return;
-    }
+  const handleFileSelect = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(event.target.files || []);
 
-    // Validate file types and sizes
-    const validFiles: FileWithPreview[] = [];
-    
-    for (const file of files) {
-      // Check file type
-      const isValidType = acceptedFileTypes.some(type => {
-        if (type.endsWith("/*")) {
-          const baseType = type.replace("/*", "");
-          return file.type.startsWith(baseType);
+      // Validate file count
+      if (selectedFiles.length + files.length > maxFiles) {
+        onUploadError?.(new Error(`Maximum ${maxFiles} files allowed`));
+        return;
+      }
+
+      // Validate file types and sizes
+      const validFiles: FileWithPreview[] = [];
+
+      for (const file of files) {
+        // Check file type
+        const isValidType = acceptedFileTypes.some((type) => {
+          if (type.endsWith("/*")) {
+            const baseType = type.replace("/*", "");
+            return file.type.startsWith(baseType);
+          }
+          return file.type === type;
+        });
+
+        if (!isValidType) {
+          onUploadError?.(new Error(`Invalid file type: ${file.type}`));
+          continue;
         }
-        return file.type === type;
-      });
 
-      if (!isValidType) {
-        onUploadError?.(new Error(`Invalid file type: ${file.type}`));
-        continue;
+        // Check file size
+        if (file.size > maxFileSize) {
+          onUploadError?.(new Error(`File too large: ${file.name}`));
+          continue;
+        }
+
+        // Create preview URL for images
+        const previewUrl = file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined;
+
+        validFiles.push({
+          file,
+          previewUrl: previewUrl || "",
+          title: file.name,
+          description: "",
+          tags: "",
+          uploading: false,
+          progress: 0,
+          expanded: false,
+        });
       }
 
-      // Check file size
-      if (file.size > maxFileSize) {
-        onUploadError?.(new Error(`File too large: ${file.name}`));
-        continue;
-      }
-
-      // Create preview URL for images
-      const previewUrl = file.type.startsWith("image/") 
-        ? URL.createObjectURL(file) 
-        : undefined;
-
-      validFiles.push({
-        file,
-        previewUrl: previewUrl || "",
-        title: file.name,
-        description: "",
-        tags: "",
-        uploading: false,
-        progress: 0,
-        expanded: false,
-      });
-    }
-
-    onSelectedFilesChange?.([...selectedFiles, ...validFiles]);
-  }, [selectedFiles, maxFiles, acceptedFileTypes, maxFileSize, onSelectedFilesChange, onUploadError]);
+      onSelectedFilesChange?.([...selectedFiles, ...validFiles]);
+    },
+    [selectedFiles, maxFiles, acceptedFileTypes, maxFileSize, onSelectedFilesChange, onUploadError]
+  );
 
   // Handle file removal
-  const handleFileRemove = useCallback((index: number) => {
-    const newFiles = selectedFiles.filter((_, i) => i !== index);
-    onSelectedFilesChange?.(newFiles);
-  }, [selectedFiles, onSelectedFilesChange]);
+  const handleFileRemove = useCallback(
+    (index: number) => {
+      const newFiles = selectedFiles.filter((_, i) => i !== index);
+      onSelectedFilesChange?.(newFiles);
+    },
+    [selectedFiles, onSelectedFilesChange]
+  );
 
   // Handle upload
   const handleUpload = useCallback(async () => {
@@ -125,7 +129,7 @@ export const MediaUploadOptimized = ({
         onUploadSuccess?.(result);
       } else {
         const result = await batchUploadMutation.mutateAsync({
-          files: selectedFiles.map(f => f.file),
+          files: selectedFiles.map((f) => f.file),
           metadata,
         });
         onUploadSuccess?.(result);
@@ -163,10 +167,7 @@ export const MediaUploadOptimized = ({
           className="hidden"
           id="media-upload-input"
         />
-        <label
-          htmlFor="media-upload-input"
-          className="cursor-pointer block"
-        >
+        <label htmlFor="media-upload-input" className="cursor-pointer block">
           <div className="space-y-2">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
@@ -234,20 +235,23 @@ export const MediaUploadOptimized = ({
                     </div>
                   )}
                 </div>
-                                 <button
-                   type="button"
-                   onClick={() => handleFileRemove(index)}
-                   disabled={isUploading}
-                   className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                 >
-                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                     <title>Remove file</title>
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                   </svg>
+                <button
+                  type="button"
+                  onClick={() => handleFileRemove(index)}
+                  disabled={isUploading}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <title>Remove file</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
-                <p className="mt-1 text-xs text-gray-500 truncate">
-                  {fileWithPreview.title}
-                </p>
+                <p className="mt-1 text-xs text-gray-500 truncate">{fileWithPreview.title}</p>
               </div>
             ))}
           </div>
@@ -270,14 +274,14 @@ export const MediaUploadOptimized = ({
         </div>
       )}
 
-             {/* Upload Button */}
-       {selectedFiles.length > 0 && !isUploading && (
-         <button
-           type="button"
-           onClick={handleUpload}
-           disabled={singleUploadMutation.isPending || batchUploadMutation.isPending}
-           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-         >
+      {/* Upload Button */}
+      {selectedFiles.length > 0 && !isUploading && (
+        <button
+          type="button"
+          onClick={handleUpload}
+          disabled={singleUploadMutation.isPending || batchUploadMutation.isPending}
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {uploadMode === "single" ? "Upload File" : "Upload Files"}
         </button>
       )}
@@ -292,4 +296,4 @@ export const MediaUploadOptimized = ({
       )}
     </div>
   );
-}; 
+};

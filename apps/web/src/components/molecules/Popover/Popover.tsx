@@ -1,8 +1,4 @@
-import {
-  PopoverContent,
-  PopoverTrigger,
-  Popover as ShadcnPopover,
-} from "@/components/ui/popover";
+import { PopoverContent, PopoverTrigger, Popover as ShadcnPopover } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -88,19 +84,19 @@ export function Popover({
       <PopoverTrigger asChild className={triggerClassName}>
         {trigger}
       </PopoverTrigger>
-      <PopoverContent 
+      <PopoverContent
         className={cn(
           baseStyles,
           colorStyles[color],
           "animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
           className
-        )} 
-        align={align} 
-        side={side} 
+        )}
+        align={align}
+        side={side}
         sideOffset={sideOffset}
       >
         {children}
       </PopoverContent>
     </ShadcnPopover>
   );
-} 
+}

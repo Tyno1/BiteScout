@@ -16,12 +16,15 @@ export const useAssociatedMedia = (type: string, id: string) => {
 // Hook for prefetching associated media
 export const usePrefetchAssociatedMedia = () => {
   const queryClient = useQueryClient();
-  
-  return useCallback((type: string, id: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ["media", "associated", type, id],
-      queryFn: () => getAssociatedMedia(type, id),
-      staleTime: 3 * 60 * 1000,
-    });
-  }, [queryClient]);
-}; 
+
+  return useCallback(
+    (type: string, id: string) => {
+      queryClient.prefetchQuery({
+        queryKey: ["media", "associated", type, id],
+        queryFn: () => getAssociatedMedia(type, id),
+        staleTime: 3 * 60 * 1000,
+      });
+    },
+    [queryClient]
+  );
+};

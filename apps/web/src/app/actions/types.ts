@@ -13,4 +13,4 @@ export type RegisterFormState = {
     password?: string[];
   };
   systemError?: string;
-}; 
+};

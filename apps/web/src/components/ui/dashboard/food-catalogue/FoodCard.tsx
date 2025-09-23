@@ -17,9 +17,7 @@ export const FoodCard = ({ food, onRowClick, onEdit, onDelete }: FoodCardProps) 
       header={
         <div className="flex justify-between items-start">
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-card-foreground truncate text-base">
-              {food.name}
-            </p>
+            <p className="font-medium text-card-foreground truncate text-base">{food.name}</p>
             <p className="text-sm text-card-foreground mt-1">
               {food.cuisineType?.name} • {food.course?.name}
             </p>
@@ -65,9 +63,7 @@ export const FoodCard = ({ food, onRowClick, onEdit, onDelete }: FoodCardProps) 
         {food.images && food.images.length > 0 && (
           <div className="flex justify-between items-center">
             <span className="text-sm text-card-foreground">Images:</span>
-            <span className="text-sm text-card-foreground">
-              {food.images.length}
-            </span>
+            <span className="text-sm text-card-foreground">{food.images.length}</span>
           </div>
         )}
 
@@ -76,8 +72,7 @@ export const FoodCard = ({ food, onRowClick, onEdit, onDelete }: FoodCardProps) 
             <p className="text-xs text-card-foreground">
               <span className="font-medium">Ingredients: </span>
               {food.ingredients.slice(0, 3).join(", ")}
-              {food.ingredients.length > 3 &&
-                ` +${food.ingredients.length - 3} more`}
+              {food.ingredients.length > 3 && ` +${food.ingredients.length - 3} more`}
             </p>
           </div>
         )}
@@ -90,12 +85,11 @@ export const FoodCard = ({ food, onRowClick, onEdit, onDelete }: FoodCardProps) 
                 .map((allergen) => allergen.name)
                 .slice(0, 2)
                 .join(", ")}
-              {food.allergens.length > 2 &&
-                ` +${food.allergens.length - 2} more`}
+              {food.allergens.length > 2 && ` +${food.allergens.length - 2} more`}
             </p>
           </div>
         )}
       </div>
     </Card>
   );
-}; 
+};

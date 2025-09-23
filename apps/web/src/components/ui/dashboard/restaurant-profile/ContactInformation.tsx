@@ -6,10 +6,7 @@ import type { Restaurant } from "shared/types/api/schemas";
 type ContactInformationProps = {
   isEditing: boolean;
   displayData: Restaurant | undefined;
-  handleInputChange: (
-    field: keyof Restaurant,
-    value: Restaurant[keyof Restaurant]
-  ) => void;
+  handleInputChange: (field: keyof Restaurant, value: Restaurant[keyof Restaurant]) => void;
 };
 
 export function ContactInformation({
@@ -33,9 +30,8 @@ export function ContactInformation({
             <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
               <Sparkles className="w-4 h-4" />
               <span>
-                <strong>Help customers reach you:</strong> Provide accurate
-                contact details so customers can call, email, or visit your
-                website!
+                <strong>Help customers reach you:</strong> Provide accurate contact details so
+                customers can call, email, or visit your website!
               </span>
             </div>
           )}
@@ -44,15 +40,15 @@ export function ContactInformation({
       aria-labelledby="contact-info-heading"
     >
       {isEditing && (
-          <Alert status="warning" className="mb-4">
-            Fill in your contact details. The more information you provide, the
-            easier it is for customers to reach you.
-          </Alert>
+        <Alert status="warning" className="mb-4">
+          Fill in your contact details. The more information you provide, the easier it is for
+          customers to reach you.
+        </Alert>
       )}
       <div className="space-y-6">
         <Input
           placeholder="Enter your address"
-          icon={<MapPin size={18}  />}
+          icon={<MapPin size={18} />}
           outlineType={isEditing ? "round" : "none"}
           type="text"
           name="address"

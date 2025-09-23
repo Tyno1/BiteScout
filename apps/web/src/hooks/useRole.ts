@@ -26,8 +26,7 @@ export const useRole = (): ReturnType => {
     try {
       const response = await getCurrentSession();
 
-      if (!response?.user?.accessToken)
-        throw new Error("User session and token not found");
+      if (!response?.user?.accessToken) throw new Error("User session and token not found");
 
       setSession(response);
 
@@ -39,9 +38,7 @@ export const useRole = (): ReturnType => {
 
       setUserRole(role);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -58,4 +55,4 @@ export const useRole = (): ReturnType => {
     userRole,
     refreshRole: fetchUserRole,
   };
-}; 
+};

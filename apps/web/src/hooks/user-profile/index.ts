@@ -1,1 +1,1 @@
-export * from './mutations/useUserProfileMutations';
+export * from "./mutations/useUserProfileMutations";

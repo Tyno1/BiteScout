@@ -7,14 +7,15 @@ import { useCallback, useEffect, useState } from "react";
 import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
 import type { CreateMediaResponse } from "shared/types/media/create";
 import { z } from "zod";
-import { useCreateFoodCatalogue, useUpdateFoodCatalogue } from "./mutations/useFoodCatalogueMutations";
+import {
+  useCreateFoodCatalogue,
+  useUpdateFoodCatalogue,
+} from "./mutations/useFoodCatalogueMutations";
 
 // Zod validation schema
 const foodCatalogueSchema = z.object({
   name: z.string().min(1, "Food name is required"),
-  ingredients: z
-    .array(z.string())
-    .min(1, "At least one ingredient is required"),
+  ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
   cuisineType: z.object({
     name: z.string().min(1, "Please select a cuisine type"),
     description: z.string().optional(),
@@ -28,8 +29,19 @@ const foodCatalogueSchema = z.object({
   price: z.object({
     amount: z.number().min(0.01, "Price must be greater than 0"),
     currency: z.enum([
-      "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "KRW",
-      "MYR", "TWD", "VND", "THB", "ZAR",
+      "USD",
+      "EUR",
+      "GBP",
+      "CAD",
+      "AUD",
+      "JPY",
+      "CNY",
+      "KRW",
+      "MYR",
+      "TWD",
+      "VND",
+      "THB",
+      "ZAR",
     ]),
   }),
   restaurant: z.string().min(1, "Restaurant is required"),
@@ -50,7 +62,7 @@ export type FormErrorType = Partial<{
 
 interface UseFoodCatalogueFormProps {
   restaurantId: string;
-  mode: 'create' | 'update';
+  mode: "create" | "update";
   initialData?: FoodCatalogue;
   foodId?: string;
   onSuccess?: () => void;
@@ -67,17 +79,16 @@ const DEFAULT_FORM_ERROR: FormErrorType = {
   restaurant: "",
 };
 
-export const useFoodCatalogueForm = ({ 
-  restaurantId, 
+export const useFoodCatalogueForm = ({
+  restaurantId,
   mode,
   initialData,
   foodId,
-  onSuccess 
+  onSuccess,
 }: UseFoodCatalogueFormProps) => {
-
   // State - Initialize with existing data for update mode
   const [newFood, setNewFood] = useState<FoodCatalogue>(() => {
-    if (mode === 'update' && initialData) {
+    if (mode === "update" && initialData) {
       return { ...initialData };
     }
     return {
@@ -101,7 +112,7 @@ export const useFoodCatalogueForm = ({
 
   // Update form data when initialData changes (for update mode)
   useEffect(() => {
-    if (mode === 'update' && initialData) {
+    if (mode === "update" && initialData) {
       setNewFood({ ...initialData });
     }
   }, [mode, initialData]);
@@ -109,7 +120,7 @@ export const useFoodCatalogueForm = ({
   // Update restaurant ID when it becomes available
   useEffect(() => {
     if (restaurantId && newFood.restaurant !== restaurantId) {
-      setNewFood(prev => ({ ...prev, restaurant: restaurantId }));
+      setNewFood((prev) => ({ ...prev, restaurant: restaurantId }));
     }
   }, [restaurantId, newFood.restaurant]);
 
@@ -122,15 +133,15 @@ export const useFoodCatalogueForm = ({
 
     setIsLoadingExistingImages(true);
     try {
-      const imagePromises = imageIds.map(id => getMedia(id));
+      const imagePromises = imageIds.map((id) => getMedia(id));
       const images = await Promise.all(imagePromises);
-      
+
       // Convert GetMediaResponse to CreateMediaResponse format (they're the same now)
       const uploadResponseImages: CreateMediaResponse[] = images;
-      
+
       setExistingImages(uploadResponseImages);
     } catch (error) {
-      console.error('Failed to fetch existing images:', error);
+      console.error("Failed to fetch existing images:", error);
       setExistingImages([]);
     } finally {
       setIsLoadingExistingImages(false);
@@ -139,7 +150,7 @@ export const useFoodCatalogueForm = ({
 
   // Load existing images when initialData changes in update mode
   useEffect(() => {
-    if (mode === 'update' && initialData?.images) {
+    if (mode === "update" && initialData?.images) {
       fetchExistingImages(initialData.images);
     } else {
       setExistingImages([]);
@@ -165,7 +176,7 @@ export const useFoodCatalogueForm = ({
   }, [newFood]);
 
   const resetForm = useCallback(() => {
-    if (mode === 'update' && initialData) {
+    if (mode === "update" && initialData) {
       setNewFood({ ...initialData });
       // Re-fetch existing images for update mode
       if (initialData.images) {
@@ -220,16 +231,14 @@ export const useFoodCatalogueForm = ({
               file: fileWithPreview.file,
               metadata,
             });
-            
+
             completedUploads++;
             setUploadProgress(Math.round((completedUploads / totalUploads) * 100));
             return result._id;
           });
 
           const results = await Promise.all(uploadPromises);
-          uploadedImageIds.push(
-            ...(results.filter((id: string | undefined) => id) as string[])
-          );
+          uploadedImageIds.push(...(results.filter((id: string | undefined) => id) as string[]));
         } catch (uploadError) {
           console.error("Failed to upload images:", uploadError);
         } finally {
@@ -243,21 +252,22 @@ export const useFoodCatalogueForm = ({
       const foodDataForBackend = {
         ...newFood,
         restaurant: restaurantId,
-        images: mode === 'update' 
-          ? [...(newFood.images || []), ...uploadedImageIds]  // Current images (after removals) + new uploads
-          : uploadedImageIds,  // Only new uploads for create
+        images:
+          mode === "update"
+            ? [...(newFood.images || []), ...uploadedImageIds] // Current images (after removals) + new uploads
+            : uploadedImageIds, // Only new uploads for create
       };
 
       // Call appropriate API based on mode
       let result: FoodCatalogue;
-      if (mode === 'create') {
+      if (mode === "create") {
         result = await createFoodDataMutation.mutateAsync(foodDataForBackend);
       } else {
-        if (!foodId) throw new Error('Food ID required for update');
+        if (!foodId) throw new Error("Food ID required for update");
         result = await updateFoodDataMutation.mutateAsync({
           restaurantId,
           foodId,
-          foodData: foodDataForBackend
+          foodData: foodDataForBackend,
         });
       }
 
@@ -296,21 +306,24 @@ export const useFoodCatalogueForm = ({
     }));
   }, []);
 
-  const handleAddIngredients = useCallback((ingredient: string) => {
-    if (!ingredient) return;
-    
-    if (newFood.ingredients?.includes(ingredient)) {
-      setFormError(prev => ({ ...prev, ingredients: "ingredient already included" }));
-      return;
-    }
+  const handleAddIngredients = useCallback(
+    (ingredient: string) => {
+      if (!ingredient) return;
 
-    setNewFood((prev) => ({
-      ...prev,
-      ingredients: [...(prev.ingredients || []), ingredient],
-    }));
-    setIngredient("");
-    setFormError((prev) => ({ ...prev, ingredients: "" }));
-  }, [newFood.ingredients]);
+      if (newFood.ingredients?.includes(ingredient)) {
+        setFormError((prev) => ({ ...prev, ingredients: "ingredient already included" }));
+        return;
+      }
+
+      setNewFood((prev) => ({
+        ...prev,
+        ingredients: [...(prev.ingredients || []), ingredient],
+      }));
+      setIngredient("");
+      setFormError((prev) => ({ ...prev, ingredients: "" }));
+    },
+    [newFood.ingredients]
+  );
 
   const handleRemoveIngredients = useCallback((ingredient: string): void => {
     setNewFood((prev) => ({
@@ -321,18 +334,18 @@ export const useFoodCatalogueForm = ({
 
   // Handle removal of existing uploaded images
   const handleRemoveExistingImage = useCallback((index: number) => {
-    setExistingImages(prev => {
+    setExistingImages((prev) => {
       const updated = prev.filter((_, i) => i !== index);
-      
+
       // Also update newFood.images to reflect the removal
-              const removedImageId = prev[index]?._id;
+      const removedImageId = prev[index]?._id;
       if (removedImageId) {
-        setNewFood(current => ({
+        setNewFood((current) => ({
           ...current,
-          images: current.images?.filter(id => id !== removedImageId) || []
+          images: current.images?.filter((id) => id !== removedImageId) || [],
         }));
       }
-      
+
       return updated;
     });
   }, []);
@@ -349,7 +362,7 @@ export const useFoodCatalogueForm = ({
     isUploadingImages,
     uploadProgress,
     mode,
-    
+
     // Actions
     setNewFood,
     setIngredient,
@@ -361,10 +374,10 @@ export const useFoodCatalogueForm = ({
     handleRemoveIngredients,
     resetForm,
     validateForm,
-    
+
     // Computed
-    hasFormErrors: Object.values(formError).some(error => error && error.length > 0),
-    submitButtonText: mode === 'create' ? 'Add Food' : 'Update Food',
-    modalTitle: mode === 'create' ? 'Add New Food Item' : 'Update Food Item',
+    hasFormErrors: Object.values(formError).some((error) => error && error.length > 0),
+    submitButtonText: mode === "create" ? "Add Food" : "Update Food",
+    modalTitle: mode === "create" ? "Add New Food Item" : "Update Food Item",
   };
-}; 
+};

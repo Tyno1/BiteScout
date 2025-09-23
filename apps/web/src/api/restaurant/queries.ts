@@ -12,8 +12,12 @@ export const getRestaurantById = async (id: string): Promise<RestaurantDetailGet
   return response.data;
 };
 
-export const getRestaurantByOwnerId = async (ownerId: string): Promise<GetRestaurantByOwnerResponse> => {
-  const response = await apiClient.get<GetRestaurantByOwnerResponse>(`/restaurants/owner/${ownerId}`);
+export const getRestaurantByOwnerId = async (
+  ownerId: string
+): Promise<GetRestaurantByOwnerResponse> => {
+  const response = await apiClient.get<GetRestaurantByOwnerResponse>(
+    `/restaurants/owner/${ownerId}`
+  );
   return response.data;
 };
 
@@ -24,6 +28,8 @@ export const getRestaurantsByName = async (name: string): Promise<SearchRestaura
 
 // Delivery Links Queries
 export const getDeliveryLinks = async (restaurantId: string): Promise<DeliveryLink[]> => {
-  const response = await apiClient.get<DeliveryLink[]>(`/restaurants/${restaurantId}/delivery-links`);
+  const response = await apiClient.get<DeliveryLink[]>(
+    `/restaurants/${restaurantId}/delivery-links`
+  );
   return response.data;
-}; 
+};

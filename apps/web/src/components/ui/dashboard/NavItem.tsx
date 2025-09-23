@@ -19,7 +19,6 @@ export function NavItem({ icon, text, path, handleNav }: NavItemProps) {
   const pathname = usePathname();
   const { isTablet } = usePlatform();
 
-
   const isActive = path
     ? path !== "/dashboard"
       ? pathname === path || pathname.startsWith(`${path}/`)

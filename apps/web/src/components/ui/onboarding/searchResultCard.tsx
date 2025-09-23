@@ -1,7 +1,9 @@
-import { Button, RefreshButton } from "@/components/atoms";
+"use client";
+
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { RestaurantAccess } from "shared/types/api/schemas";
+import { Button, RefreshButton } from "@/components/atoms";
 
 type RestaurantData = {
 	_id: string;

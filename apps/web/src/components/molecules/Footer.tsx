@@ -40,9 +40,7 @@ export function Footer() {
               <li>Instagram</li>
             </ul>
           </div>
-          <p className="text-sm mt-10 md:mt-0">
-            © 2024 Anthony Ukutegbe. All rights reserved.
-          </p>
+          <p className="text-sm mt-10 md:mt-0">© 2024 Anthony Ukutegbe. All rights reserved.</p>
         </div>
         <Button
           text="Back to Top"

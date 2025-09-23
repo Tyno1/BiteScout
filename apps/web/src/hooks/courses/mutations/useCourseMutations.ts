@@ -5,7 +5,7 @@ import type { CreateCourseRequest, UpdateCourseRequest } from "shared/types/cour
 // Course Mutations
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (course: CreateCourseRequest) => createCourse(course),
     onSuccess: () => {
@@ -17,7 +17,7 @@ export const useCreateCourse = () => {
 
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, course }: { id: string; course: UpdateCourseRequest }) =>
       updateCourse(id, course),
@@ -31,7 +31,7 @@ export const useUpdateCourse = () => {
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => deleteCourse(id),
     onSuccess: (data, variables) => {
@@ -40,4 +40,4 @@ export const useDeleteCourse = () => {
       queryClient.invalidateQueries({ queryKey: ["course", variables] });
     },
   });
-}; 
+};

@@ -13,7 +13,7 @@ export const FileDropZone = ({
   uploading,
   multiple,
   fileInputRef,
-  uploadMode = 'manual',
+  uploadMode = "manual",
   singleUpload = false,
 }: FileDropZoneProps) => {
   return (
@@ -54,9 +54,13 @@ export const FileDropZone = ({
               />
             </svg>
           </div>
-          
+
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {singleUpload ? "Upload Profile Image" : multiple ? "Upload Multiple Files" : "Upload Media"}
+            {singleUpload
+              ? "Upload Profile Image"
+              : multiple
+                ? "Upload Multiple Files"
+                : "Upload Media"}
           </h3>
           <p className="text-base text-gray-600 mb-4">
             Drag and drop your {singleUpload ? "image" : "files"} here, or{" "}
@@ -91,10 +95,11 @@ export const FileDropZone = ({
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {files.length} file{files.length > 1 ? 's' : ''} selected
+            {files.length} file{files.length > 1 ? "s" : ""} selected
           </h3>
           <p className="text-base text-gray-600 mb-3">
-            Total size: {(files.reduce((sum, f) => sum + f.file.size, 0) / 1024 / 1024).toFixed(2)} MB
+            Total size: {(files.reduce((sum, f) => sum + f.file.size, 0) / 1024 / 1024).toFixed(2)}{" "}
+            MB
           </p>
           <div className="flex justify-center space-x-3">
             {(!singleUpload || files.length === 0) && (
@@ -105,7 +110,7 @@ export const FileDropZone = ({
                 {files.length === 0 ? "Select Files" : "Select More Files"}
               </label>
             )}
-            {files.length > 0 && uploadMode === 'manual' && (
+            {files.length > 0 && uploadMode === "manual" && (
               <>
                 <Button
                   variant="solid"
@@ -113,7 +118,11 @@ export const FileDropZone = ({
                   onClick={onUpload}
                   disabled={uploading}
                   className="bg-green-600 hover:bg-green-700 text-white"
-                  text={uploading ? "Uploading..." : `Upload ${files.length} file${files.length > 1 ? 's' : ''}`}
+                  text={
+                    uploading
+                      ? "Uploading..."
+                      : `Upload ${files.length} file${files.length > 1 ? "s" : ""}`
+                  }
                 />
                 <Button
                   variant="outline"
@@ -125,7 +134,7 @@ export const FileDropZone = ({
                 />
               </>
             )}
-            {files.length > 0 && uploadMode === 'auto' && (
+            {files.length > 0 && uploadMode === "auto" && (
               <Button
                 variant="outline"
                 size="sm"
@@ -140,4 +149,4 @@ export const FileDropZone = ({
       )}
     </div>
   );
-}; 
+};

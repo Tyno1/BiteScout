@@ -1,5 +1,5 @@
 // Restaurant feature types and utilities
-export type RestaurantFeature = 
+export type RestaurantFeature =
   // Seating & Dining
   | "Outdoor seating"
   | "Indoor dining"
@@ -186,7 +186,7 @@ export const FEATURE_CATEGORIES: Record<string, RestaurantFeature[]> = {
     "Counter service",
     "Buffet service",
   ],
-  "Accessibility": [
+  Accessibility: [
     "Wheelchair accessible",
     "Accessible parking",
     "Accessible restrooms",
@@ -318,17 +318,17 @@ export const ALL_FEATURES: RestaurantFeature[] = Object.values(FEATURE_CATEGORIE
  */
 export const categorizeFeatures = (features: RestaurantFeature[]): CategorizedFeature[] => {
   const categorized: CategorizedFeature[] = [];
-  
+
   Object.entries(FEATURE_CATEGORIES).forEach(([category, availableFeatures]) => {
-    const categoryFeatures = features.filter(feature => availableFeatures.includes(feature));
+    const categoryFeatures = features.filter((feature) => availableFeatures.includes(feature));
     if (categoryFeatures.length > 0) {
       categorized.push({
         category,
-        features: categoryFeatures
+        features: categoryFeatures,
       });
     }
   });
-  
+
   return categorized;
 };
 
@@ -356,4 +356,4 @@ export const getFeaturesByCategory = (category: string): RestaurantFeature[] => 
  */
 export const getCategoryNames = (): string[] => {
   return Object.keys(FEATURE_CATEGORIES);
-}; 
+};

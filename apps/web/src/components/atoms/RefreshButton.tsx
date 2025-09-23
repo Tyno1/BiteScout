@@ -8,11 +8,11 @@ interface RefreshButtonProps {
   className?: string;
 }
 
-export const RefreshButton = ({ 
-  text = "Refresh Session", 
+export const RefreshButton = ({
+  text = "Refresh Session",
   variant = "outline",
   size = "md",
-  className = ""
+  className = "",
 }: RefreshButtonProps) => {
   const { forceSignOut, isSigningOut } = useForceSignOut();
 

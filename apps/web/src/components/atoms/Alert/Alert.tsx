@@ -1,3 +1,5 @@
+"use client";
+
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { useState } from "react";
 import { IconButton } from "../IconButton";
@@ -74,7 +76,6 @@ export const Alert = ({
 
         {dismissible && (
           <div className="ml-auto pl-3 flex-shrink-0">
-
             <IconButton
               variant="plain"
               color="danger"

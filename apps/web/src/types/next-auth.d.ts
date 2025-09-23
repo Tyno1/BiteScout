@@ -29,7 +29,6 @@ declare module "next-auth" {
       accessToken?: string; // Add the accessToken property
       refreshToken?: string;
     };
-    
   }
 }
 

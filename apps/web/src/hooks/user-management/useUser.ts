@@ -1,8 +1,4 @@
-import {
-  getAllUsers,
-  getUserById,
-  getUserStats,
-} from "@/api/user-management/queries";
+import { getAllUsers, getUserById, getUserStats } from "@/api/user-management/queries";
 import { useQuery } from "@tanstack/react-query";
 
 export const useUsers = (
@@ -47,4 +43,3 @@ export const useUserStats = () => {
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
-

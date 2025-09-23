@@ -111,9 +111,7 @@ export const DeleteConfirmation: Story = {
     children: (
       <div>
         <p className="mb-2">Are you sure you want to delete this item?</p>
-        <p className="text-sm text-red-600 font-medium">
-          This action cannot be undone.
-        </p>
+        <p className="text-sm text-red-600 font-medium">This action cannot be undone.</p>
       </div>
     ),
     confirmText: "Delete",
@@ -143,9 +141,7 @@ export const NoBackdropClose: Story = {
     children: (
       <div>
         <p className="mb-2">This is a critical action that requires your attention.</p>
-        <p className="text-sm text-amber-600">
-          You must choose an action to continue.
-        </p>
+        <p className="text-sm text-amber-600">You must choose an action to continue.</p>
       </div>
     ),
     confirmText: "I Understand",
@@ -186,23 +182,19 @@ export const LongContent: Story = {
     children: (
       <div className="space-y-3 max-h-48 overflow-y-auto">
         <p>
-          By continuing, you agree to our terms and conditions. Please read the
-          following carefully:
+          By continuing, you agree to our terms and conditions. Please read the following carefully:
         </p>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-          veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-          commodo consequat.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+          ullamco laboris nisi ut aliquip ex ea commodo consequat.
         </p>
         <p>
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+          nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+          deserunt mollit anim id est laborum.
         </p>
-        <p className="font-medium">
-          Do you accept these terms and conditions?
-        </p>
+        <p className="font-medium">Do you accept these terms and conditions?</p>
       </div>
     ),
     confirmText: "I Accept",
@@ -210,4 +202,4 @@ export const LongContent: Story = {
     confirmVariant: "primary",
     cancelVariant: "secondary",
   },
-}; 
+};

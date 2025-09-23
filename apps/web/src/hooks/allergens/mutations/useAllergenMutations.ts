@@ -5,7 +5,7 @@ import type { CreateAllergenRequest, UpdateAllergenRequest } from "shared/types/
 // Allergen Mutations
 export const useCreateAllergen = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (allergen: CreateAllergenRequest) => createAllergen(allergen),
     onSuccess: () => {
@@ -17,7 +17,7 @@ export const useCreateAllergen = () => {
 
 export const useUpdateAllergen = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, allergen }: { id: string; allergen: UpdateAllergenRequest }) =>
       updateAllergen(id, allergen),
@@ -31,7 +31,7 @@ export const useUpdateAllergen = () => {
 
 export const useDeleteAllergen = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => deleteAllergen(id),
     onSuccess: (data, variables) => {
@@ -40,4 +40,4 @@ export const useDeleteAllergen = () => {
       queryClient.invalidateQueries({ queryKey: ["allergen", variables] });
     },
   });
-}; 
+};

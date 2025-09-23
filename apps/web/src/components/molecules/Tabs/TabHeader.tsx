@@ -35,9 +35,7 @@ export const TabHeader = ({
         disabled={disabled}
       />
 
-      <div
-        className={`w-full h-0.5 ${isSelected ? "bg-primary" : "bg-gray-200"}`}
-      />
+      <div className={`w-full h-0.5 ${isSelected ? "bg-primary" : "bg-gray-200"}`} />
     </div>
   );
 };

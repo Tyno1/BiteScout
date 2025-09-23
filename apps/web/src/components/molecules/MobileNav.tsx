@@ -4,13 +4,7 @@ import { Button } from "../atoms";
 
 type NavProp = {
   toggleMenu: () => void;
-  MobileLinkItem: ({
-    path,
-    text,
-  }: {
-    path: string;
-    text: string;
-  }) => React.JSX.Element;
+  MobileLinkItem: ({ path, text }: { path: string; text: string }) => React.JSX.Element;
   session: Session | null;
   handleRoute: (path: string) => void;
 };
