@@ -15,6 +15,20 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Install dependencies for each service
+WORKDIR /app/apps/media-service
+RUN npm ci
+
+WORKDIR /app/apps/backend
+RUN npm ci
+
+WORKDIR /app/apps/web
+RUN npm ci
+
+# Install turbo globally for the build
+WORKDIR /app
+RUN npm install -g turbo
+
 # Build the application
 RUN npm run build
 
