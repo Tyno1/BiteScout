@@ -10,7 +10,7 @@ COPY apps/*/package*.json ./apps/
 COPY packages/*/package*.json ./packages/
 
 # Install dependencies
-RUN npm ci --include=dev
+RUN npm ci
 
 # Copy source code
 COPY . .

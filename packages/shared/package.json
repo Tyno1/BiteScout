@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "generate-types": "openapi-typescript openapi/spec.yaml -o types/api.ts",
+    "generate-types": "npx openapi-typescript openapi/spec.yaml -o types/api.ts",
     "build": "npm run generate-types && tsc",
     "dev": "npm run generate-types -- --watch",
     "clean": "rm -rf dist types/api.ts",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "js-yaml": "^4.1.0",
-    "openapi-typescript": "^6.7.0",
+    "openapi-typescript": "^6.7.6",
     "swagger-ui-express": "^5.0.1"
   }
 }
