@@ -15,7 +15,18 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Install dependencies for each service
+WORKDIR /app/apps/media-service
+RUN npm ci
+
+WORKDIR /app/apps/backend
+RUN npm ci
+
+WORKDIR /app/apps/web
+RUN npm ci
+
 # Build the application
+WORKDIR /app
 RUN npm run build
 
 # Production stage
