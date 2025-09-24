@@ -15,6 +15,9 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Debug: Check if public directory exists
+RUN ls -la /app/apps/web/ | grep public || echo "Public directory not found"
+
 # Install dependencies for each workspace (needed for TypeScript types and Next.js)
 WORKDIR /app/apps/backend
 RUN npm install
@@ -41,7 +44,8 @@ COPY --from=builder /app/apps/web/.next ./.next
 COPY --from=builder /app/apps/backend/node_modules ./node_modules
 COPY --from=builder /app/apps/backend/package*.json ./
 
-# Copy web app public directory
+# Copy web app public directory if it exists
+RUN mkdir -p ./public
 COPY --from=builder /app/apps/web/public ./public
 
 # Create non-root user
