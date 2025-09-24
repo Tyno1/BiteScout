@@ -15,11 +15,20 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Install CLI tools and type definitions globally for the build
+
+# Install dependencies for each workspace (needed for TypeScript types and Next.js)
+WORKDIR /app/apps/backend
+RUN npm install
+
+WORKDIR /app/apps/web
+RUN npm install
+
+# Install CLI tools globally for the build
 WORKDIR /app
-RUN npm install -g turbo @nestjs/cli next typescript @types/node
+RUN npm install -g turbo @nestjs/cli next typescript
 
 # Build the application (excluding media-service which has its own Docker setup)
+WORKDIR /app
 RUN turbo run build --filter='!media-service'
 
 # Production stage
@@ -28,9 +37,12 @@ FROM node:20.19.0-alpine AS production
 WORKDIR /app
 
 # Copy built application
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/apps/backend/dist ./dist
+COPY --from=builder /app/apps/web/.next ./.next
+COPY --from=builder /app/apps/backend/node_modules ./node_modules
+COPY --from=builder /app/apps/backend/package*.json ./
+
+# Note: Public directory not needed for backend service
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -43,5 +55,5 @@ USER nextjs
 # Expose port
 EXPOSE 5001
 
-# Start the application
-CMD ["npm", "start"] 
+# Start the backend application
+CMD ["node", "dist/index.js"] 
