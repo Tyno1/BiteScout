@@ -38,9 +38,11 @@ WORKDIR /app
 # Copy built application
 COPY --from=builder /app/apps/backend/dist ./dist
 COPY --from=builder /app/apps/web/.next ./.next
-COPY --from=builder /app/apps/web/public ./public
 COPY --from=builder /app/apps/backend/node_modules ./node_modules
 COPY --from=builder /app/apps/backend/package*.json ./
+
+# Copy web app public directory
+COPY --from=builder /app/apps/web/public ./public
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -53,5 +55,5 @@ USER nextjs
 # Expose port
 EXPOSE 5001
 
-# Start the application
-CMD ["npm", "start"] 
+# Start the backend application
+CMD ["node", "dist/index.js"] 
