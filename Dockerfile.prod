@@ -15,9 +15,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Install dependencies for backend (needed for TypeScript types)
+# Install dependencies for backend and web (needed for TypeScript types and Next.js)
 WORKDIR /app/apps/backend
-RUN npm ci
+RUN npm ci --include=dev
+
+WORKDIR /app/apps/web
+RUN npm ci --include=dev
 
 # Install CLI tools and type definitions globally for the build
 WORKDIR /app
