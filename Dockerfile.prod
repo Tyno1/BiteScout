@@ -15,22 +15,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Install dependencies for each service
-WORKDIR /app/apps/media-service
-RUN npm ci
-
-WORKDIR /app/apps/backend
-RUN npm ci
-
-WORKDIR /app/apps/web
-RUN npm ci
-
 # Install turbo and nest CLI globally for the build
 WORKDIR /app
 RUN npm install -g turbo @nestjs/cli
 
-# Build the application
-RUN npm run build
+# Build the application (excluding media-service which has its own Docker setup)
+RUN turbo run build --filter='!media-service'
 
 # Production stage
 FROM node:20.19.0-alpine AS production
