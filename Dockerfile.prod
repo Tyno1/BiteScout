@@ -17,11 +17,11 @@ COPY . .
 
 # Install dependencies for each workspace (needed for TypeScript types and Next.js)
 WORKDIR /app/apps/backend
-RUN npm ci --include=dev
+RUN npm install
 RUN ls -la node_modules/@types/ || echo "No @types directory found"
 
 WORKDIR /app/apps/web
-RUN npm ci --include=dev
+RUN npm install
 
 # Install CLI tools globally for the build
 WORKDIR /app
