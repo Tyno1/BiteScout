@@ -18,6 +18,7 @@ COPY . .
 # Install dependencies for each workspace (needed for TypeScript types and Next.js)
 WORKDIR /app/apps/backend
 RUN npm ci --include=dev
+RUN ls -la node_modules/@types/ || echo "No @types directory found"
 
 WORKDIR /app/apps/web
 RUN npm ci --include=dev
@@ -26,7 +27,14 @@ RUN npm ci --include=dev
 WORKDIR /app
 RUN npm install -g turbo @nestjs/cli next typescript
 
+# Debug: Check what's in the backend directory before build
+WORKDIR /app/apps/backend
+RUN echo "=== Backend directory contents ===" && ls -la
+RUN echo "=== Backend node_modules/@types ===" && ls -la node_modules/@types/ || echo "No @types directory"
+RUN echo "=== Backend tsconfig.json ===" && cat tsconfig.json
+
 # Build the application (excluding media-service which has its own Docker setup)
+WORKDIR /app
 RUN turbo run build --filter='!media-service'
 
 # Production stage
