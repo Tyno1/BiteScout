@@ -15,16 +15,16 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Install CLI tools and type definitions globally for the build
-WORKDIR /app
-RUN npm install -g turbo @nestjs/cli next typescript @types/node
-
-# Install dependencies for backend and web (needed for TypeScript types and Next.js)
+# Install dependencies for each workspace (needed for TypeScript types and Next.js)
 WORKDIR /app/apps/backend
 RUN npm ci --include=dev
 
 WORKDIR /app/apps/web
 RUN npm ci --include=dev
+
+# Install CLI tools globally for the build
+WORKDIR /app
+RUN npm install -g turbo @nestjs/cli next typescript
 
 # Build the application (excluding media-service which has its own Docker setup)
 RUN turbo run build --filter='!media-service'
