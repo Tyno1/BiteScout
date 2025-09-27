@@ -28,29 +28,36 @@ export function ThemeProvider({
   storageKey = "bite-scout-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check if we're in the browser before accessing localStorage
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [mounted, setMounted] = useState(false);
+
+  // Only access localStorage after component mounts to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+    const storedTheme = localStorage.getItem(storageKey) as Theme;
+    if (storedTheme) {
+      setTheme(storedTheme);
     }
-    return defaultTheme;
-  });
+  }, [storageKey]);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const root = window.document.documentElement;
 
     // Remove any existing theme attributes
     root.removeAttribute("data-theme");
 
     if (theme === "system") {
-      // For system theme, let CSS media queries handle it
-      // No data-theme attribute needed
+      // For system theme, detect the actual system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute("data-theme", prefersDark ? "dark" : "light");
       return;
     }
 
     // Set the data-theme attribute for user preference
     root.setAttribute("data-theme", theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const value = {
     theme,
