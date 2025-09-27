@@ -50,12 +50,19 @@ export const GalleryCard = ({
 	return (
 		<div className="bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 relative group">
 			{/* Image Preview */}
-			<button
-				type="button"
-				className="aspect-square rounded-t-xl overflow-hidden relative group cursor-pointer w-full border-0 p-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary"
-				onClick={handleImageTap}
+			{/* biome-ignore lint/a11y/useValidAnchor: Need anchor to avoid nested button issues */}
+			<a
+				href="#"
+				className="aspect-square rounded-t-xl overflow-hidden relative group cursor-pointer w-full border-0 p-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary block"
+				onClick={(e) => {
+					console.log('Anchor clicked');
+					e.preventDefault();
+					handleImageTap();
+				}}
 				onFocus={() => setIsCardFocused(true)}
 				onBlur={() => setIsCardFocused(false)}
+				onMouseEnter={() => setIsCardFocused(true)}
+				onMouseLeave={() => setIsCardFocused(false)}
 				aria-label="Tap to reveal image options"
 			>
 				{image.type === "image" ? (
@@ -161,7 +168,7 @@ export const GalleryCard = ({
 						</div>
 					</div>
 				)}
-			</button>
+			</a>
 
 			{/* Image Info */}
 			<div className="p-3">

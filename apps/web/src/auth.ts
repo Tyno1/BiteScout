@@ -78,6 +78,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     updateAge: 0, // Allow immediate session updates for development
   },
   secret: process.env.AUTH_SECRET,
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   providers: [
     Credentials({
       name: "credentials",

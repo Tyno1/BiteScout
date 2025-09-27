@@ -1,10 +1,22 @@
+import bundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
   // Essential performance fixes
-  compress: true,  // Fixes slow CSS loading (5.4KB → faster)
+  compress: true,
+  
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@tanstack/react-query'],
+  },
   
   images: {
     remotePatterns: [
@@ -14,6 +26,8 @@ const nextConfig = {
       { protocol: "https", hostname: "*.s3.amazonaws.com" },
       { protocol: "https", hostname: "*.s3.*.amazonaws.com" },
     ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
   },
   
   serverExternalPackages: ['axios'],
@@ -29,4 +43,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig)
