@@ -22,7 +22,7 @@ export const RefreshButton = ({
       size={size}
       onClick={forceSignOut}
       disabled={isSigningOut}
-      text={isSigningOut ? "Refreshing..." : text}
+      text={isSigningOut ? "Refreshing..." : (text || "Refresh Session")}
       className={className}
     />
   );
