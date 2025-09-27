@@ -13,7 +13,15 @@ const config: Config = {
 	// Add more setup options before each test is run
 	setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
 	preset: "ts-jest",
+	moduleNameMapper: {
+		"^@/(.*)$": "<rootDir>/src/$1",
+		// Mock ESM packages
+		"^use-key-match$": "<rootDir>/__mocks__/use-key-match.js",
+		"^next-auth$": "<rootDir>/__mocks__/next-auth.js",
+		"^@auth/core$": "<rootDir>/__mocks__/@auth-core.js",
+		"^motion$": "<rootDir>/__mocks__/motion.js",
+	},
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config);
+module.exports = createJestConfig(config);
