@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { useId } from "react";
 import { Select } from "./Select";
 
 describe("Select", () => {
@@ -39,7 +38,7 @@ describe("Select", () => {
   });
 
   test("uses custom id when provided", () => {
-    const customId = useId();
+    const customId = "custom-select-id";
     render(<Select {...defaultProps} id={customId} useLabel />);
     const select = screen.getByRole("combobox");
     expect(select).toHaveAttribute("id", customId);
@@ -115,7 +114,7 @@ describe("Select", () => {
 
   test("applies fullWidth style when fullWidth is true", () => {
     render(<Select {...defaultProps} fullWidth />);
-    const container = screen.getByRole("combobox").closest("div").parentElement;
+    const container = screen.getByRole("combobox").closest("div")?.parentElement;
     expect(container).toHaveClass("w-full");
   });
 
@@ -164,7 +163,7 @@ describe("Select", () => {
 
   test("applies custom className to container", () => {
     render(<Select {...defaultProps} className="custom-container" />);
-    const container = screen.getByRole("combobox").closest("div").parentElement;
+    const container = screen.getByRole("combobox").closest("div")?.parentElement;
     expect(container).toHaveClass("custom-container");
   });
 
@@ -221,7 +220,7 @@ describe("Select", () => {
 
   test("applies labelRow layout", () => {
     render(<Select {...defaultProps} useLabel labelRow />);
-    const container = screen.getByRole("combobox").closest("div").parentElement;
+    const container = screen.getByRole("combobox").closest("div")?.parentElement;
     expect(container).toHaveClass("flex", "flex-row", "gap-4", "items-center", "mb-3");
   });
 
