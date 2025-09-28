@@ -1,7 +1,7 @@
+import Image from "next/image";
+import { useCallback, useId, useState } from "react";
 import { useBatchMediaUpload, useMediaUpload } from "@/hooks/media";
 import type { UploadMetadata } from "@/hooks/media/mutations/useMediaUpload";
-import Image from "next/image";
-import { useCallback, useState } from "react";
 import type { FileWithPreview } from "./media-upload/types";
 
 interface MediaUploadOptimizedProps {
@@ -33,6 +33,7 @@ export const MediaUploadOptimized = ({
 }: MediaUploadOptimizedProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const mediaUploadId = useId();
 
   // Single file upload mutation
   const singleUploadMutation = useMediaUpload((progress) => {
@@ -165,9 +166,9 @@ export const MediaUploadOptimized = ({
           onChange={handleFileSelect}
           disabled={isUploading}
           className="hidden"
-          id="media-upload-input"
+          id={mediaUploadId}
         />
-        <label htmlFor="media-upload-input" className="cursor-pointer block">
+        <label htmlFor={mediaUploadId} className="cursor-pointer block">
           <div className="space-y-2">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"

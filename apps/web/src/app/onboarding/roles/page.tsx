@@ -1,223 +1,107 @@
 "use client";
 
-import type React from "react";
-
-import { Spinner } from "@/components/atoms/loaders/Spinner/Spinners";
-import { type FormErrorState, RoleOnboardingForm } from "@/components/ui";
-import { useCreateRestaurant } from "@/hooks/restaurant";
-import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { useUpdateUser } from "@/hooks/useUpdateUser";
-import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { signOut } from "next-auth/react";
+import type React from "react";
+import { useCallback, useState } from "react";
 import type { Restaurant } from "shared/types/api/schemas";
+import { RoleOnboardingForm } from "@/components/ui";
+import { useCreateRestaurant } from "@/hooks/restaurant";
+import { useGetSession } from "@/hooks/useGetSession";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { DEFAULT_RESTAURANT_DATA } from "../constants";
 
 export default function Onboarding() {
-  const createRestaurantMutation = useCreateRestaurant();
-  const { isOwner, getRestaurantListAccess, getFirstApprovedRestaurantId } = useRestaurantAccess();
+	const createRestaurantMutation = useCreateRestaurant();
+	const router = useRouter();
+	const { updateUser } = useUpdateUser();
+	const session = useGetSession();
 
-  const session = useSession();
-  const router = useRouter();
-  const { updateUser } = useUpdateUser();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [restaurantData, setRestaurantData] = useState<Restaurant>(
+		DEFAULT_RESTAURANT_DATA,
+	);
+	const [isOwner, setIsOwner] = useState(false);
+	const [error, setError] = useState("");
+	const [message, setMessage] = useState("");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [restaurantData, setRestaurantData] = useState<Restaurant>(DEFAULT_RESTAURANT_DATA);
-  const [apiError, setApiError] = useState("");
-  const [message, setMessage] = useState("");
-  const [formError, setFormError] = useState<FormErrorState>({
-    name: "",
-    restaurantCount: "",
-    submission: "",
-  });
-  const [shouldRender, setShouldRender] = useState(false);
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+		setError("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setRestaurantData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+		try {
+			if (isOwner) {
+				await handleOwnerSubmission();
+			} else {
+				handleEmployeeSubmission();
+			}
+		} catch (error) {
+			setError(error instanceof Error ? error.message : "Something went wrong");
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
-  const handleRoleSelection = (isOwner: boolean) => {
-    setRestaurantData((prev) => ({ ...prev, owner: isOwner }));
-  };
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.name === "name") {
+			setRestaurantData({ ...restaurantData, name: e.target.value });
+		}
+	};
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    resetErrors();
+	const handleRoleSelection = (owner: boolean) => {
+		setIsOwner(owner);
+	};
 
-    try {
-      if (restaurantData.owner) {
-        await handleOwnerSubmission();
-      } else {
-        handleEmployeeSubmission();
-      }
-    } catch (error) {
-      handleSubmissionError(error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+	const handleSuccessfulCreation = useCallback(async () => {
+		setMessage(
+			"Restaurant created successfully! Please log in again to access your new permissions.",
+		);
 
-  const resetErrors = () => {
-    setApiError("");
-    setFormError({
-      name: "",
-      restaurantCount: "",
-      submission: "",
-    });
-  };
+		if (session?.user?._id) {
+			await updateUser(session.user._id);
+			await signOut({ redirect: false });
+			router.push("/onboarding/refresh/owner");
+		}
+	}, [session?.user?._id, updateUser, router]);
 
-  const handleOwnerSubmission = async () => {
-    // Validate restaurant name
-    if (!restaurantData.name?.trim()) {
-      setFormError((prev) => ({
-        ...prev,
-        name: "Restaurant name is required",
-      }));
-      setRestaurantData((prev) => ({ ...prev, name: "" }));
-      setIsSubmitting(false);
-      return;
-    }
+	const handleOwnerSubmission = useCallback(async () => {
+		if (!restaurantData.name?.trim()) {
+			setError("Restaurant name is required");
+			return;
+		}
+		if (!session?.user?._id) {
+			setError("User ID is required");
+			return;
+		}
 
-    // Validate user session
-    if (!session.data?.user?._id) {
-      setApiError("User profile not found. Please refresh the page or contact support.");
-      setIsSubmitting(false);
-      return;
-    }
+		await createRestaurantMutation.mutateAsync({
+			...restaurantData,
+			ownerId: session?.user?._id,
+		});
+		await handleSuccessfulCreation();
+	}, [
+		restaurantData,
+		session?.user?._id,
+		createRestaurantMutation,
+		handleSuccessfulCreation,
+	]);
 
-    // Prepare restaurant data
-    const preparedData = prepareRestaurantData();
+	const handleEmployeeSubmission = () => {
+		router.push("/onboarding/restaurant-search");
+	};
 
-    // Create restaurant
-    try {
-      await createRestaurantMutation.mutateAsync(preparedData);
-      await handleSuccessfulCreation();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred";
-      handleCreationError(errorMessage);
-    }
-  };
-
-  const prepareRestaurantData = (): Restaurant => {
-    return {
-      ...restaurantData,
-      ownerId: session?.data?.user?._id || "",
-      ...restaurantData.businessHours,
-      priceRange: restaurantData.priceRange || "$",
-    };
-  };
-
-  const handleSuccessfulCreation = async () => {
-    setMessage(
-      "Restaurant created successfully! User role updated. Please log in again to access your new permissions."
-    );
-
-    try {
-      if (session?.data?.user?._id) {
-        await updateUser(session.data.user._id);
-
-        // Force logout to get fresh session with new role
-        await signOut({ redirect: false });
-
-        // Redirect to login page
-        router.push("/login");
-      }
-    } catch (updateError) {
-      console.error("Failed to update user restaurant count:", updateError);
-      toast.warning("Restaurant created, but profile update incomplete. Please log in again.");
-      router.push("/login");
-    }
-  };
-
-  const handleCreationError = (error: string | undefined) => {
-    setApiError(error || "An error occurred");
-  };
-
-  const handleEmployeeSubmission = () => {
-    setMessage("Redirecting to restaurant search...");
-    router.push("/onboarding/restaurant-search");
-  };
-
-  const handleSubmissionError = (error: unknown) => {
-    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
-    console.error("Form submission error:", error);
-    setFormError((prev: FormErrorState) => ({
-      ...prev,
-      submission: errorMessage,
-    }));
-    toast.error("Something went wrong. Please try again later.");
-  };
-
-  const checkRestaurantAccess = useCallback(async () => {
-    try {
-      // Only fetch if we have a user ID
-      if (!session.data?.user?._id) {
-        setShouldRender(true);
-        return false;
-      }
-
-      await getRestaurantListAccess();
-      const approvedRestaurantId = getFirstApprovedRestaurantId();
-
-      if (approvedRestaurantId) {
-        router.push("/dashboard");
-        return true;
-      }
-
-      // If no approved restaurant, stay on the page
-      setShouldRender(true);
-      return false;
-    } catch (error) {
-      console.error("Error checking restaurant access:", error);
-      setShouldRender(true);
-      return false;
-    }
-  }, [getFirstApprovedRestaurantId, getRestaurantListAccess, session.data?.user?._id, router]);
-
-  useEffect(() => {
-    // Show loading immediately while we check
-    setShouldRender(false);
-
-    const checkAccess = async () => {
-      try {
-        if (isOwner) {
-          router.push("/dashboard");
-          return;
-        }
-        await checkRestaurantAccess();
-      } catch (error) {
-        console.error("Error in access check:", error);
-        setShouldRender(true);
-      }
-    };
-
-    checkAccess();
-  }, [router, isOwner, checkRestaurantAccess]);
-
-  if (!shouldRender)
-    return (
-      <div className="h-screen w-screen flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-
-  return (
-    <RoleOnboardingForm
-      session={session}
-      restaurantData={restaurantData}
-      isSubmitting={isSubmitting}
-      message={message}
-      apiError={apiError}
-      formError={formError}
-      handleInputChange={handleInputChange}
-      handleRoleSelection={handleRoleSelection}
-      handleSubmit={handleSubmit}
-    />
-  );
+	return (
+		<RoleOnboardingForm
+			session={{ data: session }}
+			restaurantData={restaurantData}
+			isOwner={isOwner}
+			isSubmitting={isSubmitting}
+			message={message}
+			apiError={error}
+			handleInputChange={handleInputChange}
+			handleRoleSelection={handleRoleSelection}
+			handleSubmit={handleSubmit}
+		/>
+	);
 }

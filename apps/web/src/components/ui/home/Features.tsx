@@ -1,6 +1,6 @@
-import { Card } from "@/components/organisms";
 import { MoveRight } from "lucide-react";
 import Link from "next/link";
+import { Card } from "@/components/organisms";
 import { type FeaturesProp, featuresData } from "./FeaturesData";
 
 export function Features() {

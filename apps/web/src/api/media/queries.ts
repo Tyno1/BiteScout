@@ -1,8 +1,8 @@
+import type { GetMediaResponse, PaginatedResponse } from "@shared/types";
+import axios from "axios";
 import apiClient from "@/utils/authClient";
 import config from "@/utils/config";
 import { buildQueryParams } from "@/utils/mediaUtils";
-import type { GetMediaResponse, PaginatedResponse } from "@shared/types";
-import axios from "axios";
 
 // Get media by ID
 export const getMedia = async (mediaId: string): Promise<GetMediaResponse> => {

@@ -1,12 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 import mongoose from "mongoose";
-import { ErrorCodes, createError } from "../middleware/errorHandler.js";
-import RestaurantAccess from "../models/RestaurantAccess.js";
-import User from "../models/User.js";
-
 import type { ApiError } from "shared/types/common/errors";
-
 import type {
 	DeleteUserResponse,
 	GetAllUsersResponse,
@@ -14,7 +9,10 @@ import type {
 	GetUserStatsResponse,
 	UpdateUserResponse,
 } from "shared/types/user-management";
+import { createError, ErrorCodes } from "../middleware/errorHandler.js";
+import RestaurantAccess from "../models/RestaurantAccess.js";
 import RestaurantData from "../models/RestaurantData.js";
+import User from "../models/User.js";
 
 // Helper function to get user permissions based on userType and context
 const getUserPermissions = (userType: string, isOwner: boolean) => {
@@ -202,13 +200,9 @@ export const getAllUsers = async (
 				restaurantAccess: 1, // User has access to this restaurant
 				activeRestaurants: record.status === "approved" ? 1 : 0,
 			};
-			
 
-			
 			return userData;
 		});
-
-
 
 		res.status(200).json({
 			users: usersWithAccess,
@@ -295,7 +289,7 @@ export const getUserById = async (
 		}
 
 		const isOwner = currentUser.userId === restaurant.ownerId?.toString();
-		
+
 		if (!currentUserRestaurantAccess && !isOwner) {
 			return next(
 				createError(
@@ -312,9 +306,12 @@ export const getUserById = async (
 		if (restaurantAccess) {
 			status = restaurantAccess.status;
 			accessId = restaurantAccess._id.toString();
-			
+
 			// Set approval date when status changes to approved
-			if (restaurantAccess.status === 'approved' && !restaurantAccess.approvedAt) {
+			if (
+				restaurantAccess.status === "approved" &&
+				!restaurantAccess.approvedAt
+			) {
 				restaurantAccess.approvedAt = new Date();
 				await restaurantAccess.save();
 			}
@@ -325,7 +322,8 @@ export const getUserById = async (
 		}
 
 		// Calculate permissions based on userType and context
-		const targetIsOwner = user._id.toString() === restaurant.ownerId?.toString();
+		const targetIsOwner =
+			user._id.toString() === restaurant.ownerId?.toString();
 		const permissions = getUserPermissions(user.userType, targetIsOwner);
 
 		const userWithAccess = {
@@ -333,14 +331,15 @@ export const getUserById = async (
 			status,
 			accessId,
 			restaurantAccess: restaurantAccess ? 1 : 0,
-			activeRestaurants: restaurantAccess && restaurantAccess.status === "approved" ? 1 : 0,
+			activeRestaurants:
+				restaurantAccess && restaurantAccess.status === "approved" ? 1 : 0,
 			restaurantAccessDetails: restaurantAccess ? [restaurantAccess] : [],
 			// Map new fields for frontend
 			lastLoginAt: user.lastLogin,
 			approvedAt: restaurantAccess?.approvedAt,
 			accessExpiresAt: restaurantAccess?.expiresAt,
 			maxRestaurants: restaurantAccess?.maxRestaurants || 1,
-			accessLevel: restaurantAccess?.accessLevel || 'basic',
+			accessLevel: restaurantAccess?.accessLevel || "basic",
 			// Use unified permissions instead of separate role
 			permissions,
 		};
@@ -389,11 +388,16 @@ export const updateUser = async (
 		if (currentUser.userId === userId) {
 			// Self-modification: Only allow non-sensitive personal fields
 			const personalFields = [
-				"name", "username", "phone", "bio", 
-				"dietaryPreferences", "location", "imageUrl", 
-				"notificationSettings"
+				"name",
+				"username",
+				"phone",
+				"bio",
+				"dietaryPreferences",
+				"location",
+				"imageUrl",
+				"notificationSettings",
 			];
-			
+
 			// Filter to only allow personal fields for self-editing
 			const filteredUpdateData: Record<string, unknown> = {};
 			for (const key of Object.keys(updateData)) {
@@ -401,13 +405,15 @@ export const updateUser = async (
 					filteredUpdateData[key] = updateData[key];
 				}
 			}
-			
+
 			// Replace updateData with filtered version
 			Object.assign(updateData, filteredUpdateData);
-			
+
 			// Log the self-modification for audit purposes
-			console.log(`User ${currentUser.userId} modified their own profile fields:`, Object.keys(filteredUpdateData));
-			
+			console.log(
+				`User ${currentUser.userId} modified their own profile fields:`,
+				Object.keys(filteredUpdateData),
+			);
 		} else if (!canModifyUser(currentUser.userType, targetUser.userType)) {
 			// For other users, check admin privileges
 			return next(
@@ -421,7 +427,12 @@ export const updateUser = async (
 		// Additional field filtering for admin users (prevent privilege escalation)
 		if (currentUser.userType !== "root") {
 			// Non-root users (including admins) cannot modify critical fields
-			const criticalFields = ["userType", "password", "securitySettings", "systemFlags"];
+			const criticalFields = [
+				"userType",
+				"password",
+				"securitySettings",
+				"systemFlags",
+			];
 			for (const field of criticalFields) {
 				if (field in updateData) {
 					delete updateData[field];
@@ -440,38 +451,40 @@ export const updateUser = async (
 			}
 		}
 
-		// Handle phone field updates - convert empty strings to null for sparse indexing
+		// Handle phone field updates - allow empty strings
 		if (updateData.phone !== undefined) {
-			if (updateData.phone === "") {
-				updateData.phone = null;
-			} else if (updateData.phone) {
+			if (updateData.phone && updateData.phone.trim() !== "") {
 				// Check uniqueness for non-empty phone numbers
-				const existingUser = await User.findOne({ 
+				const existingUser = await User.findOne({
 					phone: updateData.phone,
-					_id: { $ne: userId }
+					_id: { $ne: userId },
 				});
-				
+
 				if (existingUser) {
-					return next(createError(ErrorCodes.CONFLICT, "Phone number already registered"));
+					return next(
+						createError(ErrorCodes.CONFLICT, "Phone number already registered"),
+					);
 				}
 			}
+			// Allow empty strings - no conversion to null needed
 		}
 
-		// Handle username field updates - convert empty strings to null for sparse indexing
+		// Handle username field updates - allow empty strings
 		if (updateData.username !== undefined) {
-			if (updateData.username === "") {
-				updateData.username = null;
-			} else if (updateData.username) {
+			if (updateData.username && updateData.username.trim() !== "") {
 				// Check uniqueness for non-empty usernames
-				const existingUser = await User.findOne({ 
+				const existingUser = await User.findOne({
 					username: updateData.username,
-					_id: { $ne: userId }
+					_id: { $ne: userId },
 				});
-				
+
 				if (existingUser) {
-					return next(createError(ErrorCodes.CONFLICT, "Username already taken"));
+					return next(
+						createError(ErrorCodes.CONFLICT, "Username already taken"),
+					);
 				}
 			}
+			// Allow empty strings - no conversion to null needed
 		}
 
 		// Update the user

@@ -1,4 +1,4 @@
-export { GalleryCard } from "./GalleryCard";
-export { ImageFullscreen } from "./ImageFullscreen";
 export { Gallery } from "./Gallery";
+export { GalleryCard } from "./GalleryCard";
 export { GallerySkeleton } from "./GallerySkeleton";
+export { ImageFullscreen } from "./ImageFullscreen";

@@ -1,6 +1,6 @@
-import { getAssociatedMedia } from "@/api/media/queries";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { getAssociatedMedia } from "@/api/media/queries";
 
 // Hook for fetching media associated with a specific entity
 export const useAssociatedMedia = (type: string, id: string) => {

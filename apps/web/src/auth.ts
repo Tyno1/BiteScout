@@ -161,9 +161,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         // Handle update trigger first (before expiration check)
         if (trigger === "update" && session) {
-          token.restaurantCount = session.user.restaurantCount;
-          token.userType = session.user.userType;
-          return token;
+          return {
+            ...token,
+            ...session.user,
+            // Preserve token-specific fields
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
+            expiresIn: token.expiresIn,
+          };
         }
 
         // Only update token when user is provided (on sign in)
@@ -203,8 +208,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           session.user.accessToken = token.accessToken as string;
           session.user.refreshToken = token.refreshToken as string;
         }
-        // Add token data to session
-        session.user._id = token._id as string;
+        
+        // Update session user with all token data
+        session.user = {
+          ...session.user,
+          ...token,
+          // Ensure required fields are present
+          _id: token._id as string,
+        };
 
         // Use token values for userType and restaurantCount if they exist
         if (token.userType) {

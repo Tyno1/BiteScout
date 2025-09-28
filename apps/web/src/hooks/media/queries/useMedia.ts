@@ -1,6 +1,6 @@
-import { getMedia, getMediaWithOptimizedUrl } from "@/api/media/queries";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { getMedia, getMediaWithOptimizedUrl } from "@/api/media/queries";
 
 // Query key factory for media queries
 export const mediaKeys = {

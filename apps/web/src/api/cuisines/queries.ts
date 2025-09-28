@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type {
   CreateCuisineRequest,
   CreateCuisineResponse,
@@ -8,6 +7,7 @@ import type {
   UpdateCuisineRequest,
   UpdateCuisineResponse,
 } from "shared/types/cuisines";
+import apiClient from "@/utils/authClient";
 
 // Cuisine Queries
 export const getAllCuisines = async (): Promise<GetAllCuisinesResponse> => {

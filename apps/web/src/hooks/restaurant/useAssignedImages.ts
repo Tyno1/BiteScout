@@ -1,7 +1,7 @@
-import { updateAssignedImages } from "@/api/restaurant/mutations";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import type { RestaurantAssignedImagesPutRequest } from "shared/types/restaurant/detail";
+import { updateAssignedImages } from "@/api/restaurant/mutations";
 
 export const useAssignedImages = (restaurantId: string) => {
   const queryClient = useQueryClient();

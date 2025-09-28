@@ -1,11 +1,10 @@
 "use client";
 
-import { Button, IconButton } from "@/components/atoms";
-import { Input, Textarea } from "@/components/atoms";
 import { Edit3, ExternalLink, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import type { CreateMediaResponse } from "shared/types";
+import { Button, IconButton, Input, Textarea } from "@/components/atoms";
 
 interface UploadedFilesListProps {
   uploadedFiles: CreateMediaResponse[];

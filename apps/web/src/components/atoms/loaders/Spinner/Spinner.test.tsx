@@ -30,10 +30,10 @@ describe("Spinner", () => {
   test("renders consistently", () => {
     const { rerender } = render(<Spinner />);
     const firstRender = screen.getByTestId("spinner-container");
-    
+
     rerender(<Spinner />);
     const secondRender = screen.getByTestId("spinner-container");
-    
+
     expect(firstRender).toBeInTheDocument();
     expect(secondRender).toBeInTheDocument();
   });
@@ -42,7 +42,7 @@ describe("Spinner", () => {
     render(<Spinner />);
     const container = screen.getByTestId("spinner-container");
     const icon = container.querySelector("svg");
-    
+
     expect(container).toBeInTheDocument();
     expect(icon).toBeInTheDocument();
     expect(container).toContainElement(icon);
@@ -104,11 +104,11 @@ describe("Spinner", () => {
     const { rerender } = render(<Spinner />);
     const firstContainer = screen.getByTestId("spinner-container");
     const firstClasses = firstContainer.className;
-    
+
     rerender(<Spinner />);
     const secondContainer = screen.getByTestId("spinner-container");
     const secondClasses = secondContainer.className;
-    
+
     expect(firstClasses).toBe(secondClasses);
   });
 
@@ -120,7 +120,7 @@ describe("Spinner", () => {
         <Spinner />
       </div>
     );
-    
+
     const spinners = screen.getAllByTestId("spinner-container");
     expect(spinners).toHaveLength(3);
   });
@@ -132,7 +132,7 @@ describe("Spinner", () => {
         <Spinner />
       </div>
     );
-    
+
     const spinners = screen.getAllByRole("generic");
     expect(spinners[0]).not.toBe(spinners[1]);
     expect(spinners[0]).toBeInTheDocument();
@@ -143,7 +143,7 @@ describe("Spinner", () => {
     render(<Spinner />);
     const container = screen.getByTestId("spinner-container");
     const icon = container.querySelector("svg");
-    
+
     // Container should contain exactly one icon
     expect(container.children).toHaveLength(1);
     expect(icon).toBeInTheDocument();
@@ -153,15 +153,15 @@ describe("Spinner", () => {
     render(<Spinner />);
     const container = screen.getByTestId("spinner-container");
     const icon = container.querySelector("svg");
-    
+
     const expectedContainerClasses = ["flex", "items-center", "justify-center", "p-4"];
     const expectedIconClasses = ["animate-spin", "text-gray-600", "h-6", "w-6"];
-    
-    expectedContainerClasses.forEach(className => {
+
+    expectedContainerClasses.forEach((className) => {
       expect(container).toHaveClass(className);
     });
-    
-    expectedIconClasses.forEach(className => {
+
+    expectedIconClasses.forEach((className) => {
       expect(icon).toHaveClass(className);
     });
   });

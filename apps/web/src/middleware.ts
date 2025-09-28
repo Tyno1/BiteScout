@@ -1,8 +1,9 @@
 import type { Session } from "@auth/core/types";
+
 // middleware.ts
 
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import type { AccessRoles } from "shared/types/api/schemas";
 import { checkRestaurantAccessAction } from "./app/actions/checkRestaurantAccessAction";
 import { getCurrentSession } from "./app/actions/getSessionAction";
@@ -48,6 +49,8 @@ export async function middleware(request: NextRequest) {
       "/about",
       "services",
       "/contact",
+      "/onboarding/refresh/owner",
+      "/onboarding/refresh/admin",
     ];
 
     // Check if the request is for a public path and skip

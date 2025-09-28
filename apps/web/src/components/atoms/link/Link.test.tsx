@@ -146,20 +146,25 @@ describe("Link", () => {
   });
 
   test("renders with long text", () => {
-    const longText = "This is a very long link text that should be handled properly by the component";
+    const longText =
+      "This is a very long link text that should be handled properly by the component";
     render(<NewLink text={longText} to="/long" />);
     const link = screen.getByRole("link");
     expect(link).toHaveTextContent(longText);
   });
 
   test("handles multiple custom classes", () => {
-    render(<NewLink text="Multi Class" to="/multi" className="text-blue-500 bg-gray-100 rounded" />);
+    render(
+      <NewLink text="Multi Class" to="/multi" className="text-blue-500 bg-gray-100 rounded" />
+    );
     const link = screen.getByRole("link");
     expect(link).toHaveClass("text-blue-500", "bg-gray-100", "rounded");
   });
 
   test("handles className with spaces", () => {
-    render(<NewLink text="Spaced Class" to="/spaced" className="  text-red-500   bg-yellow-100  " />);
+    render(
+      <NewLink text="Spaced Class" to="/spaced" className="  text-red-500   bg-yellow-100  " />
+    );
     const link = screen.getByRole("link");
     expect(link).toHaveClass("text-red-500", "bg-yellow-100");
   });
@@ -189,15 +194,22 @@ describe("Link", () => {
   test("applies all base styles consistently", () => {
     render(<NewLink text="Consistent Link" to="/consistent" />);
     const link = screen.getByRole("link");
-    
+
     // Check all base styles are applied
     const expectedClasses = [
-      "px-3", "py-2", "text-sm", "font-medium",
-      "hover:border-b-2", "hover:border-orange-500",
-      "focus:ring-orange-500", "focus:outline-none", "focus:ring-1", "focus:ring-offset-0"
+      "px-3",
+      "py-2",
+      "text-sm",
+      "font-medium",
+      "hover:border-b-2",
+      "hover:border-orange-500",
+      "focus:ring-orange-500",
+      "focus:outline-none",
+      "focus:ring-1",
+      "focus:ring-offset-0",
     ];
-    
-    expectedClasses.forEach(className => {
+
+    expectedClasses.forEach((className) => {
       expect(link).toHaveClass(className);
     });
   });

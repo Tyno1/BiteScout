@@ -1,12 +1,12 @@
+import { useCallback, useEffect, useState } from "react";
+import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
+import type { CreateMediaResponse } from "shared/types/media/create";
+import { z } from "zod";
 import { getMedia } from "@/api/media/queries";
 import type { FileWithPreview } from "@/components/ui/media/media-upload/types";
 import { MediaFolder } from "@/components/ui/media/media-upload/types";
 import { DEFAULT_FOOD_DATA } from "@/constants/foodData";
 import { useMediaUpload } from "@/hooks/media";
-import { useCallback, useEffect, useState } from "react";
-import type { Allergen, FoodCatalogue } from "shared/types/api/schemas";
-import type { CreateMediaResponse } from "shared/types/media/create";
-import { z } from "zod";
 import {
   useCreateFoodCatalogue,
   useUpdateFoodCatalogue,

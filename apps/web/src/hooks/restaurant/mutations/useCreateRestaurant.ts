@@ -1,6 +1,6 @@
-import { createRestaurant } from "@/api/restaurant";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateRestaurantRequest } from "shared/types/restaurant";
+import { createRestaurant } from "@/api/restaurant";
 
 export const useCreateRestaurant = () => {
   const queryClient = useQueryClient();

@@ -1,5 +1,5 @@
-import { getAllAllergens, getAllergenById } from "@/api/allergens/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getAllAllergens, getAllergenById } from "@/api/allergens/queries";
 
 // Allergen Query Hooks
 export const useAllergens = (enabled = true) => {

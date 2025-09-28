@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type {
   CreateCourseRequest,
   CreateCourseResponse,
@@ -8,6 +7,7 @@ import type {
   UpdateCourseRequest,
   UpdateCourseResponse,
 } from "shared/types/courses";
+import apiClient from "@/utils/authClient";
 
 // Course Queries
 export const getAllCourses = async (): Promise<GetAllCoursesResponse> => {

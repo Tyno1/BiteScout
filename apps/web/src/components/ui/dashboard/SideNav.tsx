@@ -12,6 +12,7 @@ import {
   LogOut,
   Settings,
   Star,
+  User,
   UserCog,
   Users,
   UtensilsCrossed,
@@ -66,6 +67,12 @@ export function SideNav({ setIsMenuOpen }: SideNavProp) {
             icon={<Images />}
             text="Gallery"
             path="/dashboard/gallery"
+          />
+          <NavItem
+            handleNav={handleNav}
+            icon={<User />}
+            text="My Profile"
+            path="/dashboard/profile"
           />
           <NavItem
             handleNav={handleNav}

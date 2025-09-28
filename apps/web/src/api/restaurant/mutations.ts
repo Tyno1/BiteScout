@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type { DeliveryLink } from "shared/types/api/schemas";
 import type {
   CreateRestaurantRequest,
@@ -10,6 +9,7 @@ import type {
   RestaurantAssignedImagesPutRequest,
   RestaurantAssignedImagesPutResponse,
 } from "shared/types/restaurant/detail";
+import apiClient from "@/utils/authClient";
 
 // Restaurant Mutations
 export const createRestaurant = async (

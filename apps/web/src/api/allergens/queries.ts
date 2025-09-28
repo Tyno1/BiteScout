@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type {
   CreateAllergenRequest,
   CreateAllergenResponse,
@@ -8,6 +7,7 @@ import type {
   UpdateAllergenRequest,
   UpdateAllergenResponse,
 } from "shared/types/allergens";
+import apiClient from "@/utils/authClient";
 
 // Allergen Queries
 export const getAllAllergens = async (): Promise<GetAllAllergensResponse> => {

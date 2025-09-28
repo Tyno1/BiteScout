@@ -1,10 +1,12 @@
+import type { ColumnDef } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useMemo, useState } from "react";
+import type { AccessRoles } from "shared/types/api/schemas";
 import { Badge } from "@/components/atoms";
 import { DataGrid } from "@/components/organisms/DataGrid";
 import { DataGridFilter } from "@/components/organisms/DataGridFilter/DataGridFilter";
-import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import type React from "react";
-import type { AccessRoles } from "shared/types/api/schemas";
+import { useGetSession } from "@/hooks/useGetSession";
 import { UserCard } from "./UserCard";
 
 type UserHeaderType = {
@@ -55,7 +57,12 @@ const columns: ColumnDef<UserHeaderType>[] = [
     header: "Status",
     cell: ({ getValue }) => {
       const status = getValue() as string;
-      const color = status === "approved" ? "success" : status === "pending" ? "warning" : "danger";
+      const color =
+        status === "approved"
+          ? "success"
+          : status === "pending"
+            ? "warning"
+            : "danger";
       return (
         <Badge size="xs" variant="glass" color={color}>
           {status}
@@ -66,7 +73,9 @@ const columns: ColumnDef<UserHeaderType>[] = [
   {
     accessorKey: "accessId",
     header: "Access ID",
-    cell: ({ getValue }) => <p className="font-mono text-sm">{getValue() as string}</p>,
+    cell: ({ getValue }) => (
+      <p className="font-mono text-sm">{getValue() as string}</p>
+    ),
   },
 ];
 
@@ -77,9 +86,24 @@ export const UserList: React.FC<UserListProps> = ({
   onUserDelete,
   onUserEdit,
 }) => {
+  const session = useGetSession();
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
   const [filterField, setFilterField] = useState("name");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Handle user click with routing logic
+  const handleUserClick = (userId: string) => {
+    const currentUserId = session?.user?._id;
+
+    if (currentUserId === userId) {
+      // Route to profile page for current user
+      router.push("/dashboard/profile");
+    } else {
+      // Route to user management page for other users
+      onUserClick(userId);
+    }
+  };
 
   // Filter users based on search and filter field
   const filteredUsers = useMemo(() => {
@@ -112,7 +136,9 @@ export const UserList: React.FC<UserListProps> = ({
   if (!users || users.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">No users found for this restaurant.</p>
+        <p className="text-muted-foreground">
+          No users found for this restaurant.
+        </p>
       </div>
     );
   }
@@ -155,7 +181,7 @@ export const UserList: React.FC<UserListProps> = ({
               _id: user._id,
             }))}
           columns={columns}
-          handleRowClick={onUserClick}
+          handleRowClick={handleUserClick}
           handleDelete={onUserDelete}
           handleEdit={onUserEdit}
           emptyMessage="No users found."
@@ -169,7 +195,7 @@ export const UserList: React.FC<UserListProps> = ({
             <UserCard
               key={user._id}
               user={user}
-              onUserClick={onUserClick}
+              onUserClick={handleUserClick}
               onUserEdit={onUserEdit}
               onUserDelete={onUserDelete}
             />
@@ -177,7 +203,9 @@ export const UserList: React.FC<UserListProps> = ({
         ) : (
           <div className="text-center py-8">
             <p className="text-muted-foreground">
-              {searchValue.trim() ? "No users match your search." : "No users found."}
+              {searchValue.trim()
+                ? "No users match your search."
+                : "No users found."}
             </p>
           </div>
         )}

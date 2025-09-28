@@ -1,8 +1,8 @@
 "use client";
 
-import { Button, IconButton } from "@/components/atoms";
 import { X } from "lucide-react";
 import Image from "next/image";
+import { Button, IconButton } from "@/components/atoms";
 import { MediaMetadataForm } from "./MediaMetadataForm";
 import type { MediaCardProps } from "./types";
 

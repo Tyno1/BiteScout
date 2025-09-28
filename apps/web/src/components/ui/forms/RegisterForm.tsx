@@ -1,13 +1,19 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useId } from "react";
 import { credentialRegister } from "@/app/actions";
 import { Button, Input } from "@/components/atoms";
-import { useRouter } from "next/navigation";
-import React, { useActionState, useEffect } from "react";
 
 export function RegisterForm() {
   const [state, formAction] = useActionState(credentialRegister, undefined);
   const router = useRouter();
+
+  // Generate unique IDs for form fields
+  const firstNameId = useId();
+  const lastNameId = useId();
+  const emailId = useId();
+  const passwordId = useId();
 
   useEffect(() => {
     if (state?.success) {
@@ -21,7 +27,7 @@ export function RegisterForm() {
         inputSize="md"
         type="text"
         placeholder="First Name"
-        id="first-name"
+        id={firstNameId}
         name="firstName"
         label="First Name"
         fullWidth
@@ -32,7 +38,7 @@ export function RegisterForm() {
         inputSize="md"
         type="text"
         placeholder="Last Name"
-        id="last-name"
+        id={lastNameId}
         name="lastName"
         label="Last Name"
         fullWidth
@@ -42,7 +48,7 @@ export function RegisterForm() {
         inputSize="md"
         type="email"
         placeholder="Email"
-        id="email"
+        id={emailId}
         name="email"
         label="Email"
         fullWidth
@@ -52,7 +58,7 @@ export function RegisterForm() {
         inputSize="md"
         type="password"
         placeholder="Password"
-        id="password"
+        id={passwordId}
         name="password"
         label="Password"
         fullWidth

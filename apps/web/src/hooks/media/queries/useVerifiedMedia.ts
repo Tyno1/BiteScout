@@ -1,7 +1,7 @@
-import { getVerifiedMedia } from "@/api/media/queries";
 import type { GetMediaResponse } from "@shared/types";
 import type { PaginatedResponse } from "@shared/types/common";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { getVerifiedMedia } from "@/api/media/queries";
 
 // Hook for fetching verified media with pagination
 export const useVerifiedMedia = (page = 1, limit = 10, type?: "image" | "video") => {

@@ -22,12 +22,12 @@ type MediaServiceResponse = {
   };
   variants: components["schemas"]["MediaVariant"][];
 };
+
+import type { CreateMediaResponse, GetMediaResponse, Media } from "@shared/types";
+import axios from "axios";
 import apiClient from "@/utils/authClient";
 import config from "@/utils/config";
 import { createUploadFormData } from "@/utils/mediaUtils";
-import type { CreateMediaResponse, GetMediaResponse } from "@shared/types";
-import type { Media } from "@shared/types";
-import axios from "axios";
 
 // Upload file
 export const uploadFile = async (

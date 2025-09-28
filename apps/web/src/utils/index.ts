@@ -2,40 +2,33 @@
 export { handleApiError as handleApiErrorLegacy } from "./apiErrorHandler";
 export * from "./authClient";
 export {
-  isValidationError,
+  convertLegacyError,
+  getRedirectPath,
+  getUserFriendlyMessage,
+  getValidationErrors,
+  handleApiError,
   isAuthenticationError,
   isAuthorizationError,
-  isResourceNotFoundError,
   isConflictError,
-  isRateLimitError,
-  isServerError,
-  getValidationErrors,
-  getUserFriendlyMessage,
-  shouldRedirect,
-  getRedirectPath,
-  handleApiError,
   isLegacyError,
-  convertLegacyError,
+  isRateLimitError,
+  isResourceNotFoundError,
+  isServerError,
+  isValidationError,
+  shouldRedirect,
 } from "./errorHandler";
-
-// Media utilities
-export * from "./mediaUtils";
-
-// Authentication utilities
-export * from "./refreshAccessToken";
-
+// Feature utilities
+export * from "./featureUtils";
 // Route and navigation utilities
 export * from "./getMatchingRoute";
 export * from "./getRoleFromSession";
-
-// Socket utilities
-export * from "./socketService";
-
-// Typography utilities
-export * from "./typography";
-
-// Feature utilities
-export * from "./featureUtils";
-
+// Media utilities
+export * from "./mediaUtils";
+// Authentication utilities
+export * from "./refreshAccessToken";
 // Restaurant filtering utilities
 export * from "./restaurantFilters";
+// Socket utilities
+export * from "./socketService";
+// Typography utilities
+export * from "./typography";
