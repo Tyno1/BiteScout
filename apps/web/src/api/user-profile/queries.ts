@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type {
   ChangePasswordRequest,
   ChangePasswordResponse,
@@ -6,6 +5,7 @@ import type {
   UpdateUserProfileRequest,
   UpdateUserProfileResponse,
 } from "shared/types/user-profile";
+import apiClient from "@/utils/authClient";
 
 export const getUserProfile = async (): Promise<GetUserProfileResponse> => {
   const response = await apiClient.get<GetUserProfileResponse>("/user-profile");

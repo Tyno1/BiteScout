@@ -1,11 +1,11 @@
+import type { GetMediaResponse } from "@shared/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   deleteMedia,
   updateMedia,
   updateMediaAssociation,
   verifyMedia,
 } from "@/api/media/mutations";
-import type { GetMediaResponse } from "@shared/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Hook for updating media
 export const useUpdateMedia = () => {

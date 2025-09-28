@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createRestaurantAccess,
   deleteRestaurantAccess,
@@ -5,7 +6,6 @@ import {
   suspendRestaurantAccess,
   updateRestaurantAccessRole,
 } from "@/api/restaurant-access/queries";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Restaurant Access Mutations
 export const useCreateRestaurantAccess = () => {

@@ -1,15 +1,7 @@
-"use client";
-
-import { Button, Input } from "@/components/atoms";
-import type { Restaurant } from "shared/types/api/schemas";
 import type { Session } from "next-auth";
 import type React from "react";
-
-export type FormErrorState = {
-  name: string;
-  restaurantCount: string;
-  submission: string;
-};
+import type { Restaurant } from "shared/types/api/schemas";
+import { Button, Input } from "@/components/atoms";
 
 type RoleOnboardingFormProps = {
   session: { data?: Session | null };
@@ -17,10 +9,10 @@ type RoleOnboardingFormProps = {
   isSubmitting: boolean;
   message: string;
   apiError: string;
-  formError: FormErrorState;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleRoleSelection: (isOwner: boolean) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isOwner: boolean;
 };
 
 export function RoleOnboardingForm({
@@ -29,27 +21,25 @@ export function RoleOnboardingForm({
   isSubmitting,
   message,
   apiError,
-  formError,
   handleInputChange,
   handleRoleSelection,
   handleSubmit,
+  isOwner,
 }: RoleOnboardingFormProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-xl">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
+        <form onSubmit={handleSubmit} className="bg-card rounded-2xl shadow-xl p-8 md:p-10">
           <div className="space-y-8">
-            {/* Header */}
             <div className="space-y-2">
-              <h1 className="text-3xl text-black">
+              <h1 className="text-3xl text-foreground">
                 Welcome <span className="font-bold">{session.data?.user?.name}</span>
               </h1>
-              <p className="text-gray-900">Please tell us about your role and restaurant</p>
+              <p className="text-muted-foreground">Please tell us about your role and restaurant</p>
             </div>
 
-            {/* Role Selection */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-700">Select your role:</h2>
+              <h2 className="text-lg font-semibold text-foreground">Select your role:</h2>
               <div className="flex gap-3 w-full">
                 <Button
                   variant="outline"
@@ -66,8 +56,7 @@ export function RoleOnboardingForm({
               </div>
             </div>
 
-            {/* Restaurant Name Input */}
-            {restaurantData.owner && (
+            {isOwner && (
               <Input
                 label="Restaurant Name"
                 name="name"
@@ -75,13 +64,12 @@ export function RoleOnboardingForm({
                 useLabel
                 value={restaurantData.name}
                 onChange={handleInputChange}
-                id="restaurant-name"
                 placeholder="Enter your restaurant name"
                 type="text"
                 fullWidth
                 labelStyle="text-lg"
                 inputSize="md"
-                errorMessage={formError.name}
+                errorMessage={apiError}
               />
             )}
 
@@ -91,8 +79,7 @@ export function RoleOnboardingForm({
               </div>
             )}
 
-            {/* Submit Button */}
-            {restaurantData.owner ? (
+            {isOwner ? (
               <Button
                 variant="solid"
                 type="submit"
@@ -114,14 +101,6 @@ export function RoleOnboardingForm({
             {apiError && (
               <div className="space-y-2">
                 <p className="text-sm text-red-500">{apiError}</p>
-              </div>
-            )}
-
-            {(formError.submission || formError.restaurantCount) && (
-              <div className="space-y-2">
-                <p className="text-sm text-red-500">
-                  {formError.submission || formError.restaurantCount}
-                </p>
               </div>
             )}
           </div>

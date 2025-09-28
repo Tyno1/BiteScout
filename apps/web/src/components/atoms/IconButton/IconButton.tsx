@@ -1,5 +1,5 @@
-import React from "react";
 import type { ButtonHTMLAttributes } from "react";
+import React from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: React.ReactNode;

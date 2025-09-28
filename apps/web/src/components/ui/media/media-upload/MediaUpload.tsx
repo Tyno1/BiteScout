@@ -1,11 +1,11 @@
 "use client";
 
-import { useMediaUpload } from "@/hooks/media";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMediaUpload } from "@/hooks/media";
 import { FileDropZone } from "./FileDropZone";
 import { MediaPreview } from "./MediaPreview";
-import { UploadedFilesList } from "./UploadedFilesList";
 import type { FileWithPreview, MediaUploadProps } from "./types";
+import { UploadedFilesList } from "./UploadedFilesList";
 
 export const MediaUpload = ({
   onUploadSuccess,

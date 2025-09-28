@@ -1,5 +1,4 @@
 import { useNotifications } from "@/hooks/useNotification";
-import React from "react";
 
 type NotificationBadgeProps = {
   userId: string | undefined;

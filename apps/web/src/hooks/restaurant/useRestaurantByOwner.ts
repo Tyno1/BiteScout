@@ -1,5 +1,5 @@
-import { getRestaurantByOwnerId } from "@/api/restaurant";
 import { useQuery } from "@tanstack/react-query";
+import { getRestaurantByOwnerId } from "@/api/restaurant";
 
 export const useRestaurantByOwner = (ownerId: string) => {
   return useQuery({

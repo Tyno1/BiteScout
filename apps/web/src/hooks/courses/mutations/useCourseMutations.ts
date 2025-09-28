@@ -1,6 +1,6 @@
-import { createCourse, deleteCourse, updateCourse } from "@/api/courses/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateCourseRequest, UpdateCourseRequest } from "shared/types/courses";
+import { createCourse, deleteCourse, updateCourse } from "@/api/courses/queries";
 
 // Course Mutations
 export const useCreateCourse = () => {
@@ -21,7 +21,7 @@ export const useUpdateCourse = () => {
   return useMutation({
     mutationFn: ({ id, course }: { id: string; course: UpdateCourseRequest }) =>
       updateCourse(id, course),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate and refetch courses queries
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       queryClient.invalidateQueries({ queryKey: ["course", variables.id] });
@@ -34,7 +34,7 @@ export const useDeleteCourse = () => {
 
   return useMutation({
     mutationFn: (id: string) => deleteCourse(id),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate and refetch courses queries
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       queryClient.invalidateQueries({ queryKey: ["course", variables] });

@@ -51,25 +51,41 @@ describe("Badge", () => {
   });
 
   test("applies correct variant styles for solid", () => {
-    render(<Badge variant="solid" color="primary">Solid</Badge>);
+    render(
+      <Badge variant="solid" color="primary">
+        Solid
+      </Badge>
+    );
     const badge = screen.getByText("Solid");
     expect(badge).toHaveClass("bg-primary", "text-primary-foreground");
   });
 
   test("applies correct variant styles for outline", () => {
-    render(<Badge variant="outline" color="primary">Outline</Badge>);
+    render(
+      <Badge variant="outline" color="primary">
+        Outline
+      </Badge>
+    );
     const badge = screen.getByText("Outline");
     expect(badge).toHaveClass("border", "border-primary", "text-primary");
   });
 
   test("applies correct variant styles for plain", () => {
-    render(<Badge variant="plain" color="primary">Plain</Badge>);
+    render(
+      <Badge variant="plain" color="primary">
+        Plain
+      </Badge>
+    );
     const badge = screen.getByText("Plain");
     expect(badge).toHaveClass("text-primary");
   });
 
   test("applies correct variant styles for glass", () => {
-    render(<Badge variant="glass" color="primary">Glass</Badge>);
+    render(
+      <Badge variant="glass" color="primary">
+        Glass
+      </Badge>
+    );
     const badge = screen.getByText("Glass");
     expect(badge).toHaveClass("bg-primary/10", "backdrop-blur-sm", "border", "border-primary/20");
   });
@@ -109,19 +125,31 @@ describe("Badge", () => {
   });
 
   test("applies hover states for plain variant", () => {
-    render(<Badge variant="plain" color="primary">Hoverable</Badge>);
+    render(
+      <Badge variant="plain" color="primary">
+        Hoverable
+      </Badge>
+    );
     const badge = screen.getByText("Hoverable");
     expect(badge).toHaveClass("hover:bg-primary/10");
   });
 
   test("applies hover states for outline variant", () => {
-    render(<Badge variant="outline" color="primary">Hoverable</Badge>);
+    render(
+      <Badge variant="outline" color="primary">
+        Hoverable
+      </Badge>
+    );
     const badge = screen.getByText("Hoverable");
     expect(badge).toHaveClass("hover:bg-primary/10");
   });
 
   test("applies hover states for glass variant", () => {
-    render(<Badge variant="glass" color="primary">Hoverable</Badge>);
+    render(
+      <Badge variant="glass" color="primary">
+        Hoverable
+      </Badge>
+    );
     const badge = screen.getByText("Hoverable");
     expect(badge).toHaveClass("bg-primary/10", "backdrop-blur-sm", "border-primary/20");
   });
@@ -140,13 +168,7 @@ describe("Badge", () => {
 
   test("combines multiple props correctly", () => {
     render(
-      <Badge 
-        color="success" 
-        variant="outline" 
-        size="md" 
-        fullWidth 
-        className="custom-class"
-      >
+      <Badge color="success" variant="outline" size="md" fullWidth className="custom-class">
         Combined Props
       </Badge>
     );

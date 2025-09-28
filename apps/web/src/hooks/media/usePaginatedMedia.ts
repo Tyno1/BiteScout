@@ -1,6 +1,6 @@
-import { getAssociatedMedia } from "@/api/media/queries";
 import type { Media, PaginatedResponse } from "@shared/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { getAssociatedMedia } from "@/api/media/queries";
 
 interface UsePaginatedMediaOptions {
   type: string;

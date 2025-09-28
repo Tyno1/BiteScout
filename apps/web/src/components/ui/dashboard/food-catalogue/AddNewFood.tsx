@@ -1,10 +1,11 @@
-import { Button, IconButton, Input, Select } from "@/components/atoms";
-import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm";
 import { X } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
+import { useId } from "react";
 import type { Allergen, Course, Cuisine, FoodCatalogue } from "shared/types/api/schemas";
 import type { Currency } from "shared/types/common";
+import { Button, IconButton, Input, Select } from "@/components/atoms";
+import type { FormErrorType } from "@/hooks/food-catalogue/useFoodCatalogueForm";
 
 type FoodCatalogueModalType = {
   setNewFood: React.Dispatch<React.SetStateAction<FoodCatalogue>>;
@@ -36,6 +37,7 @@ export function AddNewFood({
   formError,
   FormWarning,
 }: FoodCatalogueModalType) {
+  const ingredientId = useId();
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">
@@ -63,7 +65,7 @@ export function AddNewFood({
             outlineType="round"
             name="ingredients"
             onKeyDown={(e) => (e.key === "Enter" ? handleAddIngredients(ingredient) : null)}
-            id="ingredient"
+            id={ingredientId}
             type="text"
             placeholder="List ingredients"
             value={ingredient}

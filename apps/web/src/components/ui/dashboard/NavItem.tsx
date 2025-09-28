@@ -1,12 +1,10 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import type React from "react";
 import { Button, IconButton } from "@/components/atoms";
 import { usePlatform } from "@/hooks";
-
-import { signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
-
-import type React from "react";
 
 type NavItemProps = {
   icon: React.ReactElement;

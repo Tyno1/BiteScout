@@ -1,7 +1,7 @@
-import useNotificationStore from "@/stores/notificationStore";
-import { disconnectSocket, initializeSocket } from "@/utils/socketService";
 import { useEffect } from "react";
 import type { Notification } from "shared/types/api/schemas";
+import useNotificationStore from "@/stores/notificationStore";
+import { disconnectSocket, initializeSocket } from "@/utils/socketService";
 
 type useNotificationProps = {
   userId: string | undefined;

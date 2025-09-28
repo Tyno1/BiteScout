@@ -1,8 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   getRestaurantAccessByOwnerId,
   getRestaurantAccessByUserId,
 } from "@/api/restaurant-access/queries";
-import { useQuery } from "@tanstack/react-query";
 
 // Restaurant Access Query Hooks
 export const useRestaurantAccessByUserId = (userId: string, enabled = true) => {

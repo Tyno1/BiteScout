@@ -1,10 +1,10 @@
 "use client";
 
-import { Button, IconButton } from "@/components/atoms";
-import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button, IconButton } from "@/components/atoms";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import { ImageFullscreen } from "../dashboard";
 
 interface MediaGalleryProps {

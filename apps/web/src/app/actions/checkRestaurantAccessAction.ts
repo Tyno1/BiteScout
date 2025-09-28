@@ -1,5 +1,5 @@
-import serverApiClient from "@/utils/serverApiClient";
 import type { AccessRoles, RestaurantAccess } from "shared/types";
+import serverApiClient from "@/utils/serverApiClient";
 
 export async function checkRestaurantAccessAction(
   userId: string,

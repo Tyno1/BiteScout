@@ -221,7 +221,7 @@ describe("NotificationBadge", () => {
 
   test("updates when unreadCount changes", () => {
     const { rerender } = render(<NotificationBadge userId="user123" />);
-    
+
     // Initially 3 unread
     mockUseNotifications.mockReturnValue({
       notifications: [],
@@ -273,8 +273,17 @@ describe("NotificationBadge", () => {
 
     render(<NotificationBadge userId="user123" />);
     const badge = screen.getByText("4");
-    
-    expect(badge).toHaveClass("absolute", "-top-1", "-right-1", "flex", "h-5", "w-5", "items-center", "justify-center");
+
+    expect(badge).toHaveClass(
+      "absolute",
+      "-top-1",
+      "-right-1",
+      "flex",
+      "h-5",
+      "w-5",
+      "items-center",
+      "justify-center"
+    );
   });
 
   test("handles loading state", () => {
@@ -293,7 +302,7 @@ describe("NotificationBadge", () => {
       { id: "1", message: "Test 1", read: false },
       { id: "2", message: "Test 2", read: false },
     ];
-    
+
     mockUseNotifications.mockReturnValue({
       notifications: mockNotifications,
       unreadCount: 2,

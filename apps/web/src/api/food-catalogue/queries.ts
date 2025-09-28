@@ -1,5 +1,5 @@
-import apiClient from "@/utils/authClient";
 import type { FoodCatalogue } from "shared/types/api/schemas";
+import apiClient from "@/utils/authClient";
 
 // Food Catalogue Queries
 export const getFoodCatalogueByRestaurant = async (

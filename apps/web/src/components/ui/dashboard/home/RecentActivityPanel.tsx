@@ -1,5 +1,5 @@
-import { Card } from "@/components/organisms";
 import React from "react";
+import { Card } from "@/components/organisms";
 
 const ACTIVITIES = [
   "you were tagged in a post",

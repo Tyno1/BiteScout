@@ -1,8 +1,9 @@
 import { Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import type { Media } from "shared/types/api/schemas";
 import type { RestaurantDetailGetResponse } from "shared/types/restaurant/detail";
-import { Alert, Button, Spinner } from "@/components/atoms";
+import { Alert, Button } from "@/components/atoms";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms/Modal";
 import { Gallery } from "@/components/ui/dashboard/gallery";
@@ -23,7 +24,7 @@ export const RestaurantImageModal: React.FC<RestaurantImageModalProps> = ({
   onClose,
   restaurantId,
   assignedImages,
-  gallery,
+  gallery: _gallery,
 }) => {
   const [activeTab, setActiveTab] = useState("upload");
   const { updateLogo, updateProfileImage, isLoading } = useAssignedImages(restaurantId);
@@ -59,10 +60,10 @@ export const RestaurantImageModal: React.FC<RestaurantImageModalProps> = ({
           <MediaUpload
             uploadMode="manual"
             uploadedFiles={[]}
-            onSelectedFilesChange={(files) => {
+            onSelectedFilesChange={(_files) => {
               // Files selected - could be used for future functionality
             }}
-            onUploadSuccess={(media) => {
+            onUploadSuccess={(_media) => {
               // Switch to gallery tab so user can see the new image
               setActiveTab("gallery");
 
@@ -104,9 +105,11 @@ export const RestaurantImageModal: React.FC<RestaurantImageModalProps> = ({
 
               {assignedImages?.logo?.mediaId?.url ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={assignedImages.logo.mediaId.url}
                     alt="Restaurant Logo"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-lg border"
                   />
                   <div className="mt-2 text-sm text-muted-foreground">
@@ -142,9 +145,11 @@ export const RestaurantImageModal: React.FC<RestaurantImageModalProps> = ({
 
               {assignedImages?.profileImage?.mediaId?.url ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={assignedImages.profileImage.mediaId.url}
                     alt="Restaurant Profile"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-lg border"
                   />
                   <div className="mt-2 text-sm text-muted-foreground">
@@ -205,14 +210,7 @@ export const RestaurantImageModal: React.FC<RestaurantImageModalProps> = ({
         </div>
       </div>
     );
-  }, [
-    assignedImages,
-    gallery,
-    handleLogoChange,
-    handleProfileImageChange,
-    restaurantId,
-    isLoading,
-  ]);
+  }, [assignedImages, handleLogoChange, handleProfileImageChange, restaurantId, isLoading]);
 
   const tabs: TabItem[] = [
     {

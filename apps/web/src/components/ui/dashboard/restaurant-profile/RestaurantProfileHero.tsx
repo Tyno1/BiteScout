@@ -1,7 +1,7 @@
-import { IconButton, Input } from "@/components/atoms";
 import { Edit, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import type { Restaurant } from "shared/types/api/schemas";
+import { IconButton, Input } from "@/components/atoms";
 
 type RestaurantProfileHeroProps = {
   image1: string | null;

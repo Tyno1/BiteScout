@@ -39,7 +39,11 @@ describe("Alert", () => {
   });
 
   test("Should render with custom className", () => {
-    render(<Alert status="warning" className="custom-class">Test</Alert>);
+    render(
+      <Alert status="warning" className="custom-class">
+        Test
+      </Alert>
+    );
     const alertElement = screen.getByRole("alert");
     expect(alertElement).toHaveClass("custom-class");
   });
