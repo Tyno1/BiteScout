@@ -10,5 +10,5 @@ type AccessManagerProps = {
 export function AccessManager({ children, roles }: AccessManagerProps) {
   const { isLoading, userRole } = useRole();
 
-  return !isLoading && userRole && roles.includes(userRole) ? { children } : null;
+  return !isLoading && userRole && roles.includes(userRole) ? children : null;
 }

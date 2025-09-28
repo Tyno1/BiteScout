@@ -61,7 +61,7 @@ export function Select({
   options,
   ...props
 }: SelectProps) {
-  const uniqueId = id || `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  const uniqueId = id || `select-${label?.toLowerCase().replace(/\s+/g, "-") || "field"}`;
 
   const sizeMap = {
     sm: "text-sm px-2 py-3",
