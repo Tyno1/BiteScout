@@ -2,6 +2,7 @@ import type { Session } from "next-auth";
 import type React from "react";
 import type { Restaurant } from "shared/types/api/schemas";
 import { Button, Input } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 
 type RoleOnboardingFormProps = {
   session: { data?: Session | null };
@@ -29,82 +30,97 @@ export function RoleOnboardingForm({
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-xl">
-        <form onSubmit={handleSubmit} className="bg-card rounded-2xl shadow-xl p-8 md:p-10">
-          <div className="space-y-8">
+        <Card
+          padding="lg"
+          shadow="lg"
+          header={
             <div className="space-y-2">
               <h1 className="text-3xl text-foreground">
-                Welcome <span className="font-bold">{session.data?.user?.name}</span>
+                Welcome{" "}
+                <span className="font-bold">{session.data?.user?.name}</span>
               </h1>
-              <p className="text-muted-foreground">Please tell us about your role and restaurant</p>
+              <p className="text-muted-foreground">
+                Please tell us about your role and restaurant
+              </p>
             </div>
+          }
+        >
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Select your role:
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <Button
+                    variant="outline"
+                    text="Restaurant Owner"
+                    onClick={() => handleRoleSelection(true)}
+                    fullWidth
+                  />
+                  <Button
+                    variant="outline"
+                    text="Employee"
+                    onClick={() => handleRoleSelection(false)}
+                    fullWidth
+                  />
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-foreground">Select your role:</h2>
-              <div className="flex gap-3 w-full">
+              {isOwner && (
+                <Input
+                  label="Restaurant Name"
+                  name="name"
+                  outlineType="round"
+                  useLabel
+                  value={restaurantData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter your restaurant name"
+                  type="text"
+                  fullWidth
+                  labelStyle="text-lg"
+                  inputSize="md"
+                  errorMessage={apiError}
+                />
+              )}
+
+              {message && (
+                <div className="space-y-2">
+                  <p className="text-sm text-green-500">{message}</p>
+                </div>
+              )}
+
+              {isOwner ? (
                 <Button
-                  variant="outline"
-                  text="Restaurant Owner"
-                  onClick={() => handleRoleSelection(true)}
+                  variant="solid"
+                  type="submit"
+                  disabled={!restaurantData.name || isSubmitting}
+                  text={
+                    isSubmitting
+                      ? "Creating your restaurant"
+                      : "Create Restaurant Profile"
+                  }
                   fullWidth
                 />
+              ) : (
                 <Button
-                  variant="outline"
-                  text="Employee"
-                  onClick={() => handleRoleSelection(false)}
+                  variant="solid"
+                  type="submit"
+                  disabled={isSubmitting}
+                  text={isSubmitting ? "Processing..." : "Find Your Restaurant"}
                   fullWidth
                 />
-              </div>
+              )}
+
+              {/* Error Messages */}
+              {apiError && (
+                <div className="space-y-2">
+                  <p className="text-sm text-red-500">{apiError}</p>
+                </div>
+              )}
             </div>
-
-            {isOwner && (
-              <Input
-                label="Restaurant Name"
-                name="name"
-                outlineType="round"
-                useLabel
-                value={restaurantData.name}
-                onChange={handleInputChange}
-                placeholder="Enter your restaurant name"
-                type="text"
-                fullWidth
-                labelStyle="text-lg"
-                inputSize="md"
-                errorMessage={apiError}
-              />
-            )}
-
-            {message && (
-              <div className="space-y-2">
-                <p className="text-sm text-green-500">{message}</p>
-              </div>
-            )}
-
-            {isOwner ? (
-              <Button
-                variant="solid"
-                type="submit"
-                disabled={!restaurantData.name || isSubmitting}
-                text={isSubmitting ? "Creating your restaurant" : "Create Restaurant Profile"}
-                fullWidth
-              />
-            ) : (
-              <Button
-                variant="solid"
-                type="submit"
-                disabled={isSubmitting}
-                text={isSubmitting ? "Processing..." : "Find Your Restaurant"}
-                fullWidth
-              />
-            )}
-
-            {/* Error Messages */}
-            {apiError && (
-              <div className="space-y-2">
-                <p className="text-sm text-red-500">{apiError}</p>
-              </div>
-            )}
-          </div>
-        </form>
+          </form>
+        </Card>
       </div>
     </div>
   );

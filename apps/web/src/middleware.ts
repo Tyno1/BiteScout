@@ -49,6 +49,8 @@ export async function middleware(request: NextRequest) {
       "/about",
       "services",
       "/contact",
+      "/onboarding/refresh/owner",
+      "/onboarding/refresh/admin",
     ];
 
     // Check if the request is for a public path and skip

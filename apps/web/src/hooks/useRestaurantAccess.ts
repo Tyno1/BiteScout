@@ -152,10 +152,6 @@ export const useRestaurantAccess = (options: UseRestaurantAccessOptions = {}) =>
     session?.user?.restaurantCount,
   ]);
 
-  // ✅ REMOVED: Redundant restaurant access validation functions
-  // These are now handled by middleware and RouteProtection
-  // No need for client-side validation that duplicates server-side logic
-
   // Helper function to get the first approved restaurant access
   const getFirstApprovedRestaurantId = useCallback(() => {
     const approvedAccess = restaurantAccessList.find(

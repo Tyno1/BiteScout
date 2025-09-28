@@ -51,7 +51,7 @@ export const updateUserProfile = async (
     }
 
     // If updating username, check for uniqueness
-    if (filteredUpdateData.username) {
+    if (filteredUpdateData.username && typeof filteredUpdateData.username === 'string' && filteredUpdateData.username.trim() !== "") {
       const existingUser = await User.findOne({ 
         username: filteredUpdateData.username,
         _id: { $ne: userId }
@@ -66,10 +66,7 @@ export const updateUserProfile = async (
 
     // If updating phone, check for uniqueness
     if (filteredUpdateData.phone !== undefined) {
-      // Convert empty string to null for sparse indexing
-      if (filteredUpdateData.phone === "") {
-        filteredUpdateData.phone = null;
-      } else if (filteredUpdateData.phone) {
+      if (filteredUpdateData.phone && typeof filteredUpdateData.phone === 'string' && filteredUpdateData.phone.trim() !== "") {
         // Only check uniqueness for non-empty phone numbers
         const existingUser = await User.findOne({ 
           phone: filteredUpdateData.phone,
@@ -82,6 +79,7 @@ export const updateUserProfile = async (
           });
         }
       }
+      // Allow empty strings - no conversion to null needed
     }
 
     // Update the user
@@ -115,6 +113,8 @@ export const getUserProfile = async (
   next: NextFunction,
 ) => {
   try {
+    console.log("currentUser", req.user);
+
     const currentUser = req.user as { userId: string; userType: string };
     if (!currentUser) {
       return res.status(401).json({ message: "Authentication required" });

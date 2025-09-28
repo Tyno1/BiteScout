@@ -1,6 +1,16 @@
 "use client";
 
-import { ArrowLeft, Building, Edit, Mail, MapPin, Phone, Shield, Trash2, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Building,
+  Edit,
+  Mail,
+  MapPin,
+  Phone,
+  Shield,
+  Trash2,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -11,7 +21,6 @@ import { Card } from "@/components/organisms";
 import { UserEditModal } from "@/components/ui/dashboard/user-management/UserEditModal";
 import { useUserById } from "@/hooks";
 
-// Extend the existing User type from the API response
 type ExtendedUser = NonNullable<GetUserByIdResponse["user"]> & {
   // Additional fields that the backend controller adds
   lastLoginAt?: string;
@@ -53,7 +62,10 @@ function UserManagementPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const restaurantId = searchParams.get("restaurantId");
-  const { data, isLoading, error } = useUserById(id as string, restaurantId || undefined);
+  const { data, isLoading, error } = useUserById(
+    id as string,
+    restaurantId || undefined
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   if (isLoading) {
@@ -72,7 +84,9 @@ function UserManagementPageContent() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="text-muted-foreground text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Error Loading User</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Error Loading User
+          </h1>
           <p className="text-muted-foreground mb-4">{error.message}</p>
           <Button
             variant="outline"
@@ -90,8 +104,12 @@ function UserManagementPageContent() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="text-muted-foreground text-6xl mb-4">👤</div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">User Not Found</h1>
-          <p className="text-muted-foreground mb-4">The requested user could not be found.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            User Not Found
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            The requested user could not be found.
+          </p>
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -151,7 +169,6 @@ function UserManagementPageContent() {
 
   return (
     <main className="w-full mx-auto px-4 md:px-10 py-10 space-y-6">
-      {/* Header */}
       <div className="mb-8">
         <Button
           variant="outline"
@@ -163,8 +180,12 @@ function UserManagementPageContent() {
         />
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">User Details</h1>
-            <p className="text-muted-foreground">Manage user details and restaurant access</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              User Details
+            </h1>
+            <p className="text-muted-foreground">
+              Manage user details and restaurant access
+            </p>
           </div>
           <div className="flex gap-3">
             <Button
@@ -205,9 +226,15 @@ function UserManagementPageContent() {
 
           {/* User Info */}
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-2xl font-bold text-card-foreground">{user.name}</h2>
-              <Badge size="xs" variant="outline" color={getUserTypeColor(user.userType || "guest")}>
+            <div className="flex flex-col-reverse md:flex-row items-start md:items-center gap-3 mb-4">
+              <h2 className="text-2xl font-bold text-card-foreground">
+                {user.name}
+              </h2>
+              <Badge
+                size="xs"
+                variant="outline"
+                color={getUserTypeColor(user.userType || "guest")}
+              >
                 {user.userType || "guest"}
               </Badge>
             </div>
@@ -220,17 +247,23 @@ function UserManagementPageContent() {
 
               <div className="flex items-center gap-3">
                 <Phone size={16} className="text-muted-foreground" />
-                <span className="text-card-foreground">{user?.phone || "Not set"}</span>
+                <span className="text-card-foreground">
+                  {user?.phone || "Not set"}
+                </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <User size={16} className="text-muted-foreground" />
-                <span className="text-muted-foreground">@{user?.username || "Not set"}</span>
+                <span className="text-muted-foreground">
+                  @{user?.username || "Not set"}
+                </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <MapPin size={16} className="text-muted-foreground" />
-                <span className="text-muted-foreground">{user?.address || "Not set"}</span>
+                <span className="text-muted-foreground">
+                  {user?.address || "Not set"}
+                </span>
               </div>
 
               <div className="flex items-center gap-3">
@@ -245,24 +278,32 @@ function UserManagementPageContent() {
 
             <div className="mt-4 p-3 bg-muted/30 rounded-lg">
               <span className="text-sm text-muted-foreground">Bio:</span>
-              <p className="text-sm text-muted-foreground">{user?.bio || "Not set"}</p>
+              <p className="text-sm text-muted-foreground">
+                {user?.bio || "Not set"}
+              </p>
             </div>
 
             {/* Dietary Preferences */}
-            {user?.dietaryPreferences && user?.dietaryPreferences.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-sm font-medium text-card-foreground mb-2">
-                  Dietary Preferences
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {user?.dietaryPreferences?.map((preference) => (
-                    <Badge key={preference} size="xs" variant="glass" color="secondary">
-                      {preference}
-                    </Badge>
-                  ))}
+            {user?.dietaryPreferences &&
+              user?.dietaryPreferences.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-card-foreground mb-2">
+                    Dietary Preferences
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {user?.dietaryPreferences?.map((preference) => (
+                      <Badge
+                        key={preference}
+                        size="xs"
+                        variant="glass"
+                        color="secondary"
+                      >
+                        {preference}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </Card>
@@ -276,11 +317,17 @@ function UserManagementPageContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-card-foreground mb-2">Access Details</h4>
+            <h4 className="font-medium text-card-foreground mb-2">
+              Access Details
+            </h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status:</span>
-                <Badge size="xs" variant="outline" color={getStatusColor(user.status || "pending")}>
+                <Badge
+                  size="xs"
+                  variant="outline"
+                  color={getStatusColor(user.status || "pending")}
+                >
                   {user.status || "pending"}
                 </Badge>
               </div>
@@ -291,18 +338,28 @@ function UserManagementPageContent() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Restaurant Access:</span>
-                <span className="text-card-foreground">{user.restaurantAccess || 0}</span>
+                <span className="text-muted-foreground">
+                  Restaurant Access:
+                </span>
+                <span className="text-card-foreground">
+                  {user.restaurantAccess || 0}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Active Restaurants:</span>
-                <span className="text-card-foreground">{user.activeRestaurants || 0}</span>
+                <span className="text-muted-foreground">
+                  Active Restaurants:
+                </span>
+                <span className="text-card-foreground">
+                  {user.activeRestaurants || 0}
+                </span>
               </div>
             </div>
           </div>
 
           <div>
-            <h4 className="font-medium text-card-foreground mb-2">Access Timestamps</h4>
+            <h4 className="font-medium text-card-foreground mb-2">
+              Access Timestamps
+            </h4>
             <div className="space-y-2 text-sm">
               {/* Show approval date if status is approved */}
               {user.status === "approved" && user.approvedAt && (
@@ -335,11 +392,17 @@ function UserManagementPageContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-card-foreground mb-2">Account Status</h4>
+            <h4 className="font-medium text-card-foreground mb-2">
+              Account Status
+            </h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Verification Status:</span>
-                <span className={`${user.isVerified ? "text-success" : "text-muted-foreground"}`}>
+                <span className="text-muted-foreground">
+                  Verification Status:
+                </span>
+                <span
+                  className={`${user.isVerified ? "text-success" : "text-muted-foreground"}`}
+                >
                   {user.isVerified ? "Verified" : "Not Verified"}
                 </span>
               </div>
@@ -353,11 +416,15 @@ function UserManagementPageContent() {
           </div>
 
           <div>
-            <h4 className="font-medium text-card-foreground mb-2">Account Timestamps</h4>
+            <h4 className="font-medium text-card-foreground mb-2">
+              Account Timestamps
+            </h4>
             <div className="space-y-2 text-sm">
               {user.createdAt && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Account Created:</span>
+                  <span className="text-muted-foreground">
+                    Account Created:
+                  </span>
                   <span className="text-card-foreground">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </span>
@@ -386,18 +453,24 @@ function UserManagementPageContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">Location Details</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                Location Details
+              </h4>
               <div className="space-y-2 text-sm">
                 {user.hometown && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Hometown:</span>
-                    <span className="text-card-foreground">{user.hometown}</span>
+                    <span className="text-card-foreground">
+                      {user.hometown}
+                    </span>
                   </div>
                 )}
                 {user.currentCity && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Current City:</span>
-                    <span className="text-card-foreground">{user.currentCity}</span>
+                    <span className="text-card-foreground">
+                      {user.currentCity}
+                    </span>
                   </div>
                 )}
                 {user.country && (
@@ -413,7 +486,9 @@ function UserManagementPageContent() {
       )}
 
       {/* Account Activity & Security */}
-      {(user.lastLoginAt || user.twoFactorEnabled !== undefined || user.isLocked !== undefined) && (
+      {(user.lastLoginAt ||
+        user.twoFactorEnabled !== undefined ||
+        user.isLocked !== undefined) && (
         <Card className="mb-6">
           <h3 className="text-lg font-semibold text-card-foreground mb-4 flex items-center gap-2">
             <Shield size={20} className="text-muted-foreground" />
@@ -422,7 +497,9 @@ function UserManagementPageContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">Activity</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                Activity
+              </h4>
               <div className="space-y-2 text-sm">
                 {user.lastLoginAt && (
                   <div className="flex justify-between">
@@ -434,7 +511,9 @@ function UserManagementPageContent() {
                 )}
                 {user.lastActivity && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Last Activity:</span>
+                    <span className="text-muted-foreground">
+                      Last Activity:
+                    </span>
                     <span className="text-card-foreground">
                       {new Date(user.lastActivity).toLocaleDateString()}
                     </span>
@@ -443,18 +522,24 @@ function UserManagementPageContent() {
                 {user.timezone && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Timezone:</span>
-                    <span className="text-card-foreground">{user.timezone}</span>
+                    <span className="text-card-foreground">
+                      {user.timezone}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">Security</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                Security
+              </h4>
               <div className="space-y-2 text-sm">
                 {user.twoFactorEnabled !== undefined && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Two-Factor Auth:</span>
+                    <span className="text-muted-foreground">
+                      Two-Factor Auth:
+                    </span>
                     <span
                       className={`${user.twoFactorEnabled ? "text-success" : "text-muted-foreground"}`}
                     >
@@ -464,16 +549,24 @@ function UserManagementPageContent() {
                 )}
                 {user.isLocked !== undefined && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Account Locked:</span>
-                    <span className={`${user.isLocked ? "text-destructive" : "text-success"}`}>
+                    <span className="text-muted-foreground">
+                      Account Locked:
+                    </span>
+                    <span
+                      className={`${user.isLocked ? "text-destructive" : "text-success"}`}
+                    >
                       {user.isLocked ? "Yes" : "No"}
                     </span>
                   </div>
                 )}
                 {user.failedLoginAttempts !== undefined && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Failed Logins:</span>
-                    <span className="text-card-foreground">{user.failedLoginAttempts}</span>
+                    <span className="text-muted-foreground">
+                      Failed Logins:
+                    </span>
+                    <span className="text-card-foreground">
+                      {user.failedLoginAttempts}
+                    </span>
                   </div>
                 )}
               </div>
@@ -492,10 +585,14 @@ function UserManagementPageContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">Platform Permissions</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                Platform Permissions
+              </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Admin Panel Access:</span>
+                  <span className="text-muted-foreground">
+                    Admin Panel Access:
+                  </span>
                   <span
                     className={`${user.permissions.canAccessAdminPanel ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -503,7 +600,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can Create Restaurants:</span>
+                  <span className="text-muted-foreground">
+                    Can Create Restaurants:
+                  </span>
                   <span
                     className={`${user.permissions.canCreateRestaurants ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -511,7 +610,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can Manage All Users:</span>
+                  <span className="text-muted-foreground">
+                    Can Manage All Users:
+                  </span>
                   <span
                     className={`${user.permissions.canManageAllUsers ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -519,7 +620,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Platform Analytics:</span>
+                  <span className="text-muted-foreground">
+                    Platform Analytics:
+                  </span>
                   <span
                     className={`${user.permissions.canViewPlatformAnalytics ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -530,10 +633,14 @@ function UserManagementPageContent() {
             </div>
 
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">Restaurant Permissions</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                Restaurant Permissions
+              </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can Edit Restaurant:</span>
+                  <span className="text-muted-foreground">
+                    Can Edit Restaurant:
+                  </span>
                   <span
                     className={`${user.permissions.canEditRestaurant ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -541,7 +648,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can Manage Users:</span>
+                  <span className="text-muted-foreground">
+                    Can Manage Users:
+                  </span>
                   <span
                     className={`${user.permissions.canManageUsers ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -549,7 +658,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can View Analytics:</span>
+                  <span className="text-muted-foreground">
+                    Can View Analytics:
+                  </span>
                   <span
                     className={`${user.permissions.canViewAnalytics ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -565,7 +676,9 @@ function UserManagementPageContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Can Delete Content:</span>
+                  <span className="text-muted-foreground">
+                    Can Delete Content:
+                  </span>
                   <span
                     className={`${user.permissions.canDeleteContent ? "text-success" : "text-muted-foreground"}`}
                   >
@@ -588,18 +701,24 @@ function UserManagementPageContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-card-foreground mb-2">System Preferences</h4>
+              <h4 className="font-medium text-card-foreground mb-2">
+                System Preferences
+              </h4>
               <div className="space-y-2 text-sm">
                 {user.theme && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Theme:</span>
-                    <span className="text-card-foreground capitalize">{user.theme}</span>
+                    <span className="text-card-foreground capitalize">
+                      {user.theme}
+                    </span>
                   </div>
                 )}
                 {user.language && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Language:</span>
-                    <span className="text-card-foreground">{user.language}</span>
+                    <span className="text-card-foreground">
+                      {user.language}
+                    </span>
                   </div>
                 )}
               </div>

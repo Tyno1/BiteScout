@@ -1,7 +1,7 @@
 import type React from "react";
 import type { ComponentProps } from "react";
 
-type ButtonProps = ComponentProps<"button"> & {
+export type ButtonProps = ComponentProps<"button"> & {
   text?: string;
   IconAfter?: React.ReactNode;
   IconBefore?: React.ReactNode;
