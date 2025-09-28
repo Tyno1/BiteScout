@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useId } from "react";
 import { doCredentialLogin } from "@/app/actions";
 import { Button, Input } from "@/components/atoms";
-import { useRouter } from "next/navigation";
 
 export function LoginForm() {
   const [state, loginAction, isPending] = useActionState(doCredentialLogin, undefined);
   const router = useRouter();
+
+  // Generate unique IDs for form fields
+  const emailId = useId();
+  const passwordId = useId();
 
   useEffect(() => {
     if (state?.success) {
@@ -23,7 +26,7 @@ export function LoginForm() {
         inputSize="md"
         type="email"
         placeholder="Email"
-        id="email"
+        id={emailId}
         name="email"
         label="Email"
         fullWidth
@@ -34,9 +37,9 @@ export function LoginForm() {
         inputSize="md"
         type="password"
         placeholder="Password"
-        id="password"
+        id={passwordId}
         name="password"
-        label="password"
+        label="Password"
         fullWidth
         errorMessage={state?.errors?.password?.[0]}
       />

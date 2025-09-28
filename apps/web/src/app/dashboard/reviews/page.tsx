@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface reviewProps {
   id: number;
@@ -110,12 +110,13 @@ export default function Reviews() {
           </div>
           <div className="divide-y">
             {reviews.map((review) => (
-              <div
+              <button
                 key={review.id}
                 onClick={() => handleReviewSelect(review)}
-                className={`p-4 cursor-pointer hover:bg-gray-100 ${
+                className={`w-full text-left p-4 hover:bg-gray-100 ${
                   selectedReview?.id === review.id ? "bg-blue-50" : ""
                 }`}
+                type="button"
               >
                 <div className="flex justify-between">
                   <span className="font-medium">{review.user.name}</span>
@@ -140,7 +141,7 @@ export default function Reviews() {
                     </div>
                   )}
                 </div> */}
-              </div>
+              </button>
             ))}
           </div>
         </div>

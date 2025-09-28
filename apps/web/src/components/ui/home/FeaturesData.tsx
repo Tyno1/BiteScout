@@ -1,4 +1,4 @@
-import { TrendingUp, Utensils, Camera } from "lucide-react";
+import { Camera, TrendingUp, Utensils } from "lucide-react";
 import { ReactNode } from "react";
 
 export type FeaturesProp = {

@@ -1,11 +1,11 @@
 "use server";
 
-import { signIn, signOut } from "@/auth";
-import config from "@/utils/config";
 import type { RegisterPostRequest, RegisterPostResponse } from "@shared/types/auth/register";
 import type { ApiError } from "@shared/types/common/errors";
 import axios from "axios";
 import { z } from "zod";
+import { signIn, signOut } from "@/auth";
+import config from "@/utils/config";
 import type { RegisterFormState, SignInResponse } from "./types";
 
 const API_URL = config.backend.server;
@@ -38,7 +38,7 @@ const registerSchema = z.object({
   password: passwordSchema,
 });
 
-export async function doCredentialLogin(prevState: unknown, formData: FormData) {
+export async function doCredentialLogin(_prevState: unknown, formData: FormData) {
   try {
     const result = loginSchema.safeParse(Object.fromEntries(formData));
 
@@ -84,7 +84,7 @@ export async function doCredentialLogin(prevState: unknown, formData: FormData) 
 }
 
 export async function credentialRegister(
-  prevState: unknown,
+  _prevState: unknown,
   formData: FormData
 ): Promise<RegisterFormState> {
   try {

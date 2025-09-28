@@ -1,19 +1,18 @@
 // Main MediaUpload component
-export { MediaUpload } from "./MediaUpload";
 
 // Individual components
 export { FileDropZone } from "./FileDropZone";
-export { MediaPreview } from "./MediaPreview";
 export { MediaCard } from "./MediaCard";
 export { MediaMetadataForm } from "./MediaMetadataForm";
-export { UploadedFilesList } from "./UploadedFilesList";
-
+export { MediaPreview } from "./MediaPreview";
+export { MediaUpload } from "./MediaUpload";
 // Types
 export type {
-  MediaUploadProps,
-  FileWithPreview,
   FileDropZoneProps,
-  MediaPreviewProps,
+  FileWithPreview,
   MediaCardProps,
   MediaMetadataFormProps,
+  MediaPreviewProps,
+  MediaUploadProps,
 } from "./types";
+export { UploadedFilesList } from "./UploadedFilesList";

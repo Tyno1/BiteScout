@@ -1,6 +1,6 @@
-import { updateUserProfile } from "@/api/user-profile/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UpdateUserProfileRequest } from "shared/types";
+import { updateUserProfile } from "@/api/user-profile/queries";
 
 export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient();

@@ -50,7 +50,7 @@ export function ThemeProvider({
 
     if (theme === "system") {
       // For system theme, detect the actual system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       root.setAttribute("data-theme", prefersDark ? "dark" : "light");
       return;
     }

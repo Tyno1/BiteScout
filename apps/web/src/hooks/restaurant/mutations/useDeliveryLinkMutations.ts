@@ -1,6 +1,6 @@
-import { addDeliveryLink, deleteDeliveryLink, updateDeliveryLink } from "@/api/restaurant";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DeliveryLink } from "shared/types/api/schemas";
+import { addDeliveryLink, deleteDeliveryLink, updateDeliveryLink } from "@/api/restaurant";
 
 export const useAddDeliveryLink = () => {
   const queryClient = useQueryClient();

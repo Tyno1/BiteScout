@@ -1,7 +1,7 @@
-import { Badge, Button } from "@/components/atoms";
-import { Card } from "@/components/organisms";
 import { Edit, Eye, Trash2 } from "lucide-react";
 import type { AccessRoles } from "shared/types/api/schemas";
+import { Badge, Button } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 
 type UserCardProps = {
   user: {

@@ -1,7 +1,7 @@
-import { getUserMedia } from "@/api/media/queries";
 import type { GetMediaResponse } from "@shared/types";
 import type { PaginatedResponse } from "@shared/types/common";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { getUserMedia } from "@/api/media/queries";
 
 // Hook for fetching user's media with pagination
 export const useUserMedia = (userId: string, page = 1, limit = 10) => {

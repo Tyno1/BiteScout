@@ -1,9 +1,9 @@
 "use client";
 
-import { Card } from "@/components/organisms";
 import { MapPin, Star, Volume2 } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
+import { Card } from "@/components/organisms";
 
 export function TopMeals() {
   const [selectedType, setSelectedType] = useState<string>("Fine Dinning");

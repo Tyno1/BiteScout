@@ -1,10 +1,10 @@
+import type { ColumnDef } from "@tanstack/react-table";
+import type React from "react";
+import { useMemo, useState } from "react";
+import type { AccessRoles } from "shared/types/api/schemas";
 import { Badge } from "@/components/atoms";
 import { DataGrid } from "@/components/organisms/DataGrid";
 import { DataGridFilter } from "@/components/organisms/DataGridFilter/DataGridFilter";
-import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import type React from "react";
-import type { AccessRoles } from "shared/types/api/schemas";
 import { UserCard } from "./UserCard";
 
 type UserHeaderType = {

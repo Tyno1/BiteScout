@@ -1,7 +1,6 @@
-import { uploadFile } from "@/api/media/mutations";
-import type { CreateMediaResponse } from "@shared/types";
-import type { Media } from "@shared/types";
+import type { CreateMediaResponse, Media } from "@shared/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { uploadFile } from "@/api/media/mutations";
 
 // Upload metadata type
 export interface UploadMetadata {
@@ -50,7 +49,7 @@ export const useMediaUpload = (onProgress?: UploadProgressCallback) => {
       return uploadWithProgress();
     },
 
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate and refetch relevant queries
       queryClient.invalidateQueries({ queryKey: ["media"] });
 
@@ -131,7 +130,7 @@ export const useBatchMediaUpload = (onProgress?: UploadProgressCallback) => {
 
       return results;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate all media queries
       queryClient.invalidateQueries({ queryKey: ["media"] });
 

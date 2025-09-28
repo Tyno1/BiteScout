@@ -1,16 +1,17 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useId, useState } from "react";
 import { Button, Input } from "@/components/atoms";
 import { SearchResultCard } from "@/components/ui";
 import { useRestaurantsByName } from "@/hooks/restaurant";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
 
 const RestaurantSearch = () => {
   const { data: session } = useSession();
   const userId = session?.user?._id;
+  const searchId = useId();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [formError, setFormError] = useState("");
@@ -134,7 +135,7 @@ const RestaurantSearch = () => {
               type="text"
               onChange={handleSearchChange}
               label="Restaurant search"
-              id="restaurant-search"
+              id={searchId}
               value={searchTerm}
               fullWidth
               inputSize="md"

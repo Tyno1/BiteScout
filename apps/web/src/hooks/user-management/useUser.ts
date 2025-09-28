@@ -1,5 +1,5 @@
-import { getAllUsers, getUserById, getUserStats } from "@/api/user-management/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getAllUsers, getUserById, getUserStats } from "@/api/user-management/queries";
 
 export const useUsers = (
   params?: {

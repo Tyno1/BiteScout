@@ -1,9 +1,9 @@
 "use client";
 
-import { IconButton } from "@/components/atoms";
 import { X } from "lucide-react";
 import { useRef } from "react";
 import ReactDOM from "react-dom";
+import { IconButton } from "@/components/atoms";
 
 type ModalProps = {
   isOpen: boolean;

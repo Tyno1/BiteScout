@@ -1,7 +1,7 @@
-import { IconButton } from "@/components/atoms";
 import type { Media } from "@shared/types";
 import { FileText, X } from "lucide-react";
 import Image from "next/image";
+import { IconButton } from "@/components/atoms";
 
 interface ImageFullscreenProps {
   image: Media | null;

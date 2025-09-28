@@ -1,8 +1,8 @@
 "use client";
 
-import { RegisterForm } from "@/components/ui";
-import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { RegisterForm } from "@/components/ui";
 
 const Page = () => {
   const session = useSession();

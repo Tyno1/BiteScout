@@ -1,14 +1,13 @@
 "use client";
 
-import { Button, Input, Spinner, Textarea } from "@/components/atoms";
-import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
-import { Modal } from "@/components/organisms/Modal";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { CreateMediaResponse, User } from "shared/types";
-
 import { deleteMedia } from "@/api/media/mutations";
+import { Button, Input, Spinner, Textarea } from "@/components/atoms";
+import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
+import { Modal } from "@/components/organisms/Modal";
 import { useDeleteUser, useUpdateUser } from "@/hooks";
 import { MediaFolder, MediaUpload } from "../../media";
 
@@ -39,7 +38,7 @@ export function UserEditModal({
   isOpen,
   onClose,
   user,
-  onSave,
+  onSave: _onSave,
   isSubmitting = false,
 }: UserEditModalProps) {
   const [formData, setFormData] = useState<Partial<User>>({
@@ -86,7 +85,7 @@ export function UserEditModal({
       : null
   );
 
-  const { mutate: deleteUser, isPending: isDeleting, isSuccess: isDeleted } = useDeleteUser();
+  const { mutate: deleteUser } = useDeleteUser();
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
   useEffect(() => {
@@ -213,7 +212,7 @@ export function UserEditModal({
     }
   }, [updateUser, user._id, formData, onClose]);
 
-  const handlesDelete = useCallback(() => {
+  const _handlesDelete = useCallback(() => {
     if (user._id) {
       deleteUser(user._id);
       onClose();
