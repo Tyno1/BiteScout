@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { useId } from "react";
 import { Input } from "./Input";
 
 describe("Input", () => {
@@ -36,7 +35,7 @@ describe("Input", () => {
   });
 
   test("uses custom id when provided", () => {
-    const customId = useId();
+    const customId = "custom-input-id";
     render(<Input {...defaultProps} id={customId} useLabel />);
     const input = screen.getByRole("textbox");
     expect(input).toHaveAttribute("id", customId);
@@ -95,7 +94,7 @@ describe("Input", () => {
 
   test("applies fullWidth style when fullWidth is true", () => {
     render(<Input {...defaultProps} fullWidth />);
-    const container = screen.getByRole("textbox").closest("div").parentElement;
+    const container = screen.getByRole("textbox").closest("div")?.parentElement;
     expect(container).toHaveClass("w-full");
   });
 
@@ -197,7 +196,7 @@ describe("Input", () => {
 
   test("applies labelRow layout", () => {
     render(<Input {...defaultProps} useLabel labelRow />);
-    const container = screen.getByRole("textbox").closest("div").parentElement;
+    const container = screen.getByRole("textbox").closest("div")?.parentElement;
     expect(container).toHaveClass("flex", "flex-row", "gap-4", "items-center", "mb-3");
   });
 
