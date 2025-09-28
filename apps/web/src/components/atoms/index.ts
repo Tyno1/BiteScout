@@ -6,4 +6,3 @@ export * from "./IconButton";
 export * from "./inputs";
 export * from "./link";
 export * from "./loaders";
-export * from "./RefreshButton";

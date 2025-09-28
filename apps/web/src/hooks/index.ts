@@ -6,7 +6,6 @@ export * from "./food-catalogue";
 export * from "./media";
 export * from "./restaurant";
 export * from "./restaurant-access";
-export * from "./useForceSignOut";
 export * from "./useGalleryState";
 export * from "./useNotification";
 export * from "./usePlatform";

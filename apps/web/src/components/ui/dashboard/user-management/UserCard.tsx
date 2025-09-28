@@ -17,7 +17,12 @@ type UserCardProps = {
   onUserDelete: (id: string) => void;
 };
 
-export const UserCard = ({ user, onUserClick, onUserEdit, onUserDelete }: UserCardProps) => {
+export const UserCard = ({
+  user,
+  onUserClick,
+  onUserEdit,
+  onUserDelete,
+}: UserCardProps) => {
   return (
     <Card
       header={
@@ -49,7 +54,7 @@ export const UserCard = ({ user, onUserClick, onUserEdit, onUserDelete }: UserCa
     >
       <div className="space-y-3">
         {/* Role and Access ID */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge size="xs" variant="glass" color="primary">
             {user.userType || "Unknown"}
           </Badge>
