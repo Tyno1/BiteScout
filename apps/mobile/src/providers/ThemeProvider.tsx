@@ -58,7 +58,7 @@ const themes = {
   dark: vars({
     "--color-primary": "249 115 22", // orange-500
     "--color-primary-foreground": "0 0 0", // black
-    "--color-secondary": "255, 242, 192)", // indigo-300
+    "--color-secondary": "255 242 192", // indigo-300
     "--color-secondary-foreground": "30 27 75", // indigo-950
     "--color-background": "9 9 11", // zinc-950
     "--color-foreground": "243 244 246", // gray-100

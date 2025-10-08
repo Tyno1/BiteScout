@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Lightbulb, MoreHorizontal } from "lucide-react-native";
+import { Lightbulb, MenuIcon } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTheme } from "../../../../src/providers/ThemeProvider";
@@ -19,7 +19,7 @@ export default function Profile() {
 					<View className="flex-row flex-wrap justify-between mb-20">
 						{[...Array(12)].map((_, index) => (
 							<Image
-								key={index}
+								key={`post-${index}`}
 								source={require("../../../../assets/landing.png")}
 								contentFit="cover"
 								style={{
@@ -37,7 +37,7 @@ export default function Profile() {
 					<View className="flex-row flex-wrap justify-between mb-20">
 						{[...Array(12)].map((_, index) => (
 							<Image
-								key={index}
+								key={`video-${index}`}
 								source={require("../../../../assets/landing.png")}
 								contentFit="cover"
 								style={{
@@ -55,7 +55,7 @@ export default function Profile() {
 					<View className="flex-row flex-wrap justify-between mb-20">
 						{[...Array(12)].map((_, index) => (
 							<Image
-								key={index}
+								key={`saved-${index}`}
 								source={require("../../../../assets/landing.png")}
 								contentFit="cover"
 								style={{
@@ -73,7 +73,7 @@ export default function Profile() {
 					<View className="flex-row flex-wrap justify-between mb-20">
 						{[...Array(9)].map((_, index) => (
 							<Image
-								key={index}
+								key={`tagged-${index}`}
 								source={require("../../../../assets/landing.png")}
 								contentFit="cover"
 								style={{
@@ -101,31 +101,31 @@ export default function Profile() {
 					</Text>
 					<Pressable
 						onPress={() =>
-							router.push("/(protected)/(tabs)/(profile)/settings")
+							router.push("/(protected)/(tabs)/(profile)/(menu)")
 						}
 					>
-						<MoreHorizontal size={24} color="white" />
+						<MenuIcon size={24} color="white" />
 					</Pressable>
 				</View>
 
 				{/* Profile Info */}
-				<View className="flex-row items-center mb-6">
+				<View className="flex-row items-center mb-6 gap-4">
 					<Image
 						source={profileImage}
 						contentFit="cover"
 						style={{ width: 80, height: 80, borderRadius: 40 }}
 						className="mr-4"
 					/>
-					<View>
+					<View className="flex items-start">
 						<Text className="text-white text-2xl font-bold">Frank Milton</Text>
 						<Text className="text-gray-400 text-sm">Joined April 2025</Text>
 						<Pressable
-							className="mt-2 bg-card px-4 py-2 rounded-full"
+							className="flex items-center mt-2 bg-card px-6 py-2 rounded-2xl"
 							onPress={() =>
-								router.push("/(protected)/(tabs)/(profile)/edit-profile")
+								router.push("/(protected)/(tabs)/(profile)/(menu)/edit-profile")
 							}
 						>
-							<Text className="text-white font-semibold">Edit Profile</Text>
+							<Text className="text-secondary text-sm font-semibold">Edit Profile</Text>
 						</Pressable>
 					</View>
 				</View>

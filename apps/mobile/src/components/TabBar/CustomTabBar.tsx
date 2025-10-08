@@ -34,7 +34,7 @@ export function CustomTabBar({
       "(search)": <SearchIcon size={25} color={iconColor} />,
       "upload/index": <UploadIcon size={25} color={iconColor} />,
       "(dining)": <Utensils size={25} color={iconColor} />,
-      "(profile)/index": <User size={25} color={iconColor} />,
+      "(profile)": <User size={25} color={iconColor} />,
     };
     return iconMap[routeName] || <HomeIcon size={25} color={iconColor} />;
   };

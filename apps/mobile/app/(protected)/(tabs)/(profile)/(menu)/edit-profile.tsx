@@ -1,32 +1,20 @@
-import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { useTheme } from "../../../../src/providers/ThemeProvider";
+import { useTheme } from "../../../../../src/providers/ThemeProvider";
 
 export default function EditProfile() {
 	const { colors } = useTheme();
-
 	return (
 		<ScrollView className="flex-1 bg-background">
 			<View className="px-4 pt-16">
-				{/* Header */}
-				<View className="flex-row items-center mb-8">
-					<Pressable onPress={() => router.back()} className="mr-4">
-						<ArrowLeft size={24} color="white" />
-					</Pressable>
-					<Text className="text-white text-2xl font-bold">Edit Profile</Text>
-				</View>
 
 				{/* Profile Picture Placeholder */}
 				<View className="items-center mb-8">
 					<View className="w-32 h-32 bg-gray-700 rounded-full items-center justify-center mb-4">
 						<Text className="text-white text-lg">Change Photo</Text>
 					</View>
-					<Pressable>
 						<Text className="text-primary text-base font-semibold">
 							Upload New Photo
 						</Text>
-					</Pressable>
 				</View>
 
 				{/* Form Fields */}
