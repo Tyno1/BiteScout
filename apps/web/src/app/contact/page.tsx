@@ -59,7 +59,6 @@ export default function Contact() {
               alt="Contact Information"
               fill
               className="object-cover rounded-lg"
-              loading="lazy"
             />
           </div>
         </div>
@@ -257,7 +256,6 @@ export default function Contact() {
             alt="Support Options"
             fill
             className="object-cover"
-            loading="lazy"
           />
         </div>
       </section>

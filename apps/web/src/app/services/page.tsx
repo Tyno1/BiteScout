@@ -53,7 +53,6 @@ export default function Services() {
 							alt="Core Services"
 							fill
 							className="object-cover rounded-lg"
-							loading="lazy"
 						/>
 					</div>
 				</div>
@@ -202,7 +201,6 @@ export default function Services() {
 						alt="For Food Lovers"
 						fill
 						className="object-cover"
-						loading="lazy"
 					/>
 				</div>
 			</section>
