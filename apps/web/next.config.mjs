@@ -26,7 +26,7 @@ const nextConfig = {
       { protocol: "https", hostname: "*.s3.amazonaws.com" },
       { protocol: "https", hostname: "*.s3.*.amazonaws.com" },
     ],
-    formats: ['image/webp', 'image/avif'],
+    formats: ['image/webp', 'image/avif', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg+xml'],
     minimumCacheTTL: 60,
   },
   
