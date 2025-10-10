@@ -2,14 +2,13 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
-import img1 from "@/assets/hero/fabrizio-magoni-boaDpmC-_Xo-unsplash 2.jpg";
 
 export function Hero() {
   return (
     <section className="w-full h-screen flex justify-center">
       <div className="relative w-full h-full flex flex-col justify-center text-white overflow-hidden">
         <Image
-          src={img1}
+          src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090019/assets/fabrizio-magoni-boaDpmC-_Xo-unsplash_2_mpvonx.jpg"
           alt="Delicious local cuisine spread"
           fill
           className="object-cover"
