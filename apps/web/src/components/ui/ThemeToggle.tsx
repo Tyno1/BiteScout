@@ -38,9 +38,10 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
           setTheme("light");
           setSelectedButton("light");
         }}
-        variant="solid"
+        variant="outline"
         color={selectedButton === "light" ? "primary" : "neutral"}
         size={size}
+        className={`${selectedButton !== "light" && "border-white text-white"}`}
         ariaLabel="Light mode"
         icon={<Sun className={getIconSize()} />}
       />
@@ -51,9 +52,10 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
           setTheme("dark");
           setSelectedButton("dark");
         }}
-        variant="solid"
+        variant="outline"
         color={selectedButton === "dark" ? "primary" : "neutral"}
         size={size}
+		className={`${selectedButton !== "dark" && "border-white text-white hover:text-white"}`}
         ariaLabel="Dark mode"
         icon={<Moon className={getIconSize()} />}
       />
@@ -64,9 +66,10 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
           setTheme("system");
           setSelectedButton("system");
         }}
-        variant="solid"
+        variant="outline"
         color={selectedButton === "system" ? "primary" : "neutral"}
         size={size}
+        className={`${selectedButton !== "system" && "border-white text-white"}`}
         ariaLabel="System theme"
         icon={<Monitor className={getIconSize()} />}
       />
