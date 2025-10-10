@@ -38,7 +38,7 @@ export function Navbar({ theme }: NavTheme) {
             : "bg-background text-foreground"
       }`}
     >
-      <Link href="/" className="flex-shrink-0 text-primary-foreground">
+      <Link href="/" className="flex-shrink-0 flex items-center gap-2 text-primary">
         <Image src="/logo.png" alt="Bite Scout" width={120} height={40} />
       </Link>
       {/* web view */}
