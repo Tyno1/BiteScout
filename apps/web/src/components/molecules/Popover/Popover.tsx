@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { PopoverContent, PopoverTrigger, Popover as ShadcnPopover } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import type { ReactNode } from "react";
 
 interface PopoverProps {
   trigger: ReactNode;

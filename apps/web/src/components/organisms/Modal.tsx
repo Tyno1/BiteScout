@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Button, IconButton } from "@/components/atoms";
 
-
 type ModalType = {
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
@@ -55,54 +54,48 @@ export function Modal({
   }, [isModalOpen]);
 
   // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      setIsModalOpen(false);
-    }
+  // const handleKeyDown = (e: React.KeyboardEvent) => {
+  //   if (e.key === "Escape") {
+  //     setIsModalOpen(false);
+  //   }
 
-    // Trap focus within modal
-    if (e.key === "Tab") {
-      const focusableElements = modalRef.current?.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
+  //   // Trap focus within modal
+  //   if (e.key === "Tab") {
+  //     const focusableElements = modalRef.current?.querySelectorAll(
+  //       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  //     );
 
-      if (focusableElements && focusableElements.length > 0) {
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+  //     if (focusableElements && focusableElements.length > 0) {
+  //       const firstElement = focusableElements[0] as HTMLElement;
+  //       const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
-        if (e.shiftKey) {
-          // Shift + Tab
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          // Tab
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    }
-  };
+  //       if (e.shiftKey) {
+  //         // Shift + Tab
+  //         if (document.activeElement === firstElement) {
+  //           e.preventDefault();
+  //           lastElement.focus();
+  //         }
+  //       } else {
+  //         // Tab
+  //         if (document.activeElement === lastElement) {
+  //           e.preventDefault();
+  //           firstElement.focus();
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
 
   if (!isModalOpen) return null;
 
   return ReactDOM.createPortal(
     <>
       {/* Modal Backdrop */}
-      <div
+      <button
         className="fixed inset-0 bg-black/80 bg-opacity-50 z-40 backdrop-blur-sm"
         onClick={() => setIsModalOpen(false)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            setIsModalOpen(false);
-          }
-        }}
         aria-label="Close modal"
-        role="button"
-        tabIndex={-1}
+        type="button"
       />
 
       {/* Modal Content */}
@@ -112,7 +105,8 @@ export function Modal({
             ref={modalRef}
             className={`bg-card rounded-lg shadow-2xl w-full ${sizeMap[size]} border border-foreground/10`}
             tabIndex={-1}
-            onKeyDown={handleKeyDown}
+            role="dialog"
+            aria-modal="true"
           >
             {/* Modal Header */}
             <div className="flex justify-between items-start p-6">

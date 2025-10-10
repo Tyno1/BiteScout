@@ -1,10 +1,24 @@
 "use client";
 
-import { Button } from "@/components/atoms";
-import { UserList } from "@/components/ui/dashboard/user-management";
-import { useRestaurantAccess, useUsers } from "@/hooks";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import type React from "react";
+import { Button } from "@/components/atoms";
+import { useRestaurantAccess, useUsers } from "@/hooks";
+
+const UserList = dynamic(
+  () =>
+    import("@/components/ui/dashboard/user-management").then((mod) => ({
+      default: mod.UserList,
+    })),
+  {
+    loading: () => (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+        <p className="text-muted-foreground">Loading users...</p>
+      </div>
+    ),
+  }
+);
 
 const UserManagement = () => {
   const { restaurantData } = useRestaurantAccess();

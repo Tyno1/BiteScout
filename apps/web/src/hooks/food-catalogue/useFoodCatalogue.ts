@@ -1,5 +1,5 @@
-import { getFoodCatalogueById, getFoodCatalogueByRestaurant } from "@/api/food-catalogue/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getFoodCatalogueById, getFoodCatalogueByRestaurant } from "@/api/food-catalogue/queries";
 
 // Food Catalogue Query Hooks
 export const useFoodCatalogueByRestaurant = (restaurantId: string, enabled = true) => {

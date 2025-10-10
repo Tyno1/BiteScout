@@ -1,5 +1,5 @@
-import { getAllCourses, getCourseById } from "@/api/courses/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getAllCourses, getCourseById } from "@/api/courses/queries";
 
 // Course Query Hooks
 export const useCourses = (enabled = true) => {

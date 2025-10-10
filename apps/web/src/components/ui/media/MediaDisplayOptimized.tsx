@@ -1,6 +1,6 @@
-import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import Image from "next/image";
 import { memo } from "react";
+import { useMediaWithOptimizedUrl } from "@/hooks/media";
 
 interface MediaDisplayOptimizedProps {
   mediaId: string;

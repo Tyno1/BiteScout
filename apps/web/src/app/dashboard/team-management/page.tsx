@@ -1,17 +1,12 @@
 "use client";
 
+import { Ban, CheckCircle, Trash2, User } from "lucide-react";
+import type { RestaurantAccess } from "shared/types/api/schemas";
 import { Badge, IconButton } from "@/components/atoms";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { Ban, CheckCircle, Trash2, User } from "lucide-react";
-
-import type { RestaurantAccess } from "shared/types/api/schemas";
 
 export default function TeamManagement() {
   const { restaurantAccessList, deleteAccess, grantAccess, suspendAccess } = useRestaurantAccess();
-
-  // ✅ REMOVED: Redundant restaurant access validation
-  // Middleware and RouteProtection already handle this validation
-  // No need for client-side useEffect validation
 
   const handleStatusChange = async (accessId: string, status: RestaurantAccess["status"]) => {
     try {

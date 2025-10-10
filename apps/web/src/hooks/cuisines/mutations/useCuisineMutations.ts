@@ -1,6 +1,6 @@
-import { createCuisine, deleteCuisine, updateCuisine } from "@/api/cuisines/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateCuisineRequest, UpdateCuisineRequest } from "shared/types/cuisines";
+import { createCuisine, deleteCuisine, updateCuisine } from "@/api/cuisines/queries";
 
 // Cuisine Mutations
 export const useCreateCuisine = () => {

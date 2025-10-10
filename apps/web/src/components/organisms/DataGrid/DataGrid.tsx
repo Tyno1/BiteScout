@@ -1,13 +1,13 @@
-import { IconButton } from "@/components/atoms";
-import { Card } from "@/components/organisms";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowDownUp, ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
+import { IconButton } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 
 type DataGridProps<TData> = {
   data: TData[];

@@ -1,8 +1,8 @@
 "use client";
 
+import { Building2 } from "lucide-react";
 import { Card } from "@/components/organisms/Card";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { Building2 } from "lucide-react";
 
 export const RestaurantContextBanner = () => {
   const { restaurantData } = useRestaurantAccess();

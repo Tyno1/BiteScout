@@ -1,14 +1,14 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
 
 interface RouteProtectionProps {
   children: React.ReactNode;
 }
 
-export const RouteProtection = ({ children }: RouteProtectionProps) => {
+function RouteProtectionContent({ children }: RouteProtectionProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -44,4 +44,12 @@ export const RouteProtection = ({ children }: RouteProtectionProps) => {
   }, [pathname, currentRestaurantId, defaultRestaurantId, approvedRestaurantId, router]);
 
   return <>{children}</>;
+}
+
+export const RouteProtection = ({ children }: RouteProtectionProps) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RouteProtectionContent>{children}</RouteProtectionContent>
+    </Suspense>
+  );
 };

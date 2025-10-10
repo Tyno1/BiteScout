@@ -1,10 +1,10 @@
-import apiClient from "@/utils/authClient";
 import type { DeliveryLink } from "shared/types/api/schemas";
 import type {
   GetRestaurantByOwnerResponse,
   RestaurantDetailGetResponse,
   SearchRestaurantsResponse,
 } from "shared/types/restaurant";
+import apiClient from "@/utils/authClient";
 
 // Restaurant Queries
 export const getRestaurantById = async (id: string): Promise<RestaurantDetailGetResponse> => {

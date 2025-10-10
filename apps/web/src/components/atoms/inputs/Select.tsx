@@ -8,7 +8,7 @@ interface Option {
 }
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
+  label?: string;
   classname?: string;
   name: string;
   id?: string;
@@ -61,7 +61,7 @@ export function Select({
   options,
   ...props
 }: SelectProps) {
-  const uniqueId = id || `select-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  const uniqueId = id || `select-${label?.toLowerCase().replace(/\s+/g, "-") || "field"}`;
 
   const sizeMap = {
     sm: "text-sm px-2 py-3",

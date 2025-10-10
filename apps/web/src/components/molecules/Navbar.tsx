@@ -11,13 +11,15 @@ import { ThemeToggle } from "../ui/ThemeToggle";
 import { MobileNav } from "./MobileNav";
 
 type NavTheme = {
-  theme?: "dark" | "light";
+	theme?: "dark" | "light";
 };
 
 type MobileLinkProp = {
-  path: string;
-  text: string;
-  theme?: "dark" | "light";
+	path: string;
+	text: string;
+	theme?: "dark" | "light";
+	parentTheme?: "dark" | "light";
+	toggleMenu?: () => void;
 };
 
 type WebLinkProps = {
@@ -49,6 +51,33 @@ const MobileLinkItem = ({
         ? "text-black"
         : "text-foreground";
   };
+	path: string;
+	text: string;
+	theme?: "dark" | "light";
+	parentTheme?: "dark" | "light";
+	toggleMenu?: () => void;
+};
+
+const MobileLinkItem = ({
+	path,
+	text,
+	theme: linkTheme,
+	parentTheme,
+	toggleMenu,
+}: MobileLinkProp) => {
+	// Conditional theme-based styling
+	const getThemeStyles = () => {
+		if (linkTheme) {
+			// Use provided theme
+			return linkTheme === "dark" ? "text-white" : "text-black";
+		}
+		// Use parent theme as fallback
+		return parentTheme === "dark"
+			? "text-white"
+			: parentTheme === "light"
+				? "text-black"
+				: "text-foreground";
+	};
 
   const getHoverStyles = () => {
     if (linkTheme) {

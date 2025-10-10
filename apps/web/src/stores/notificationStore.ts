@@ -1,6 +1,6 @@
+import type { Notification } from "shared/types/api/schemas";
 import { create } from "zustand";
 import apiClient from "@/utils/authClient";
-import type { Notification } from "shared/types/api/schemas";
 
 type NotificationStore = {
   // State

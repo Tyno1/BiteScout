@@ -1,4 +1,3 @@
-import apiClient from "@/utils/authClient";
 import type {
   DeleteUserResponse,
   GetAllUsersResponse,
@@ -7,6 +6,7 @@ import type {
   UpdateUserRequest,
   UpdateUserResponse,
 } from "shared/types/user-management";
+import apiClient from "@/utils/authClient";
 
 export const getAllUsers = async (params?: {
   page?: number;

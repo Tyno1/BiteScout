@@ -1,7 +1,9 @@
+"use client";
+import { Globe, Mail, MapPin, Phone, Sparkles } from "lucide-react";
+import { useId } from "react";
+import type { Restaurant } from "shared/types/api/schemas";
 import { Alert, Input } from "@/components/atoms";
 import { Card } from "@/components/organisms";
-import { Globe, Mail, MapPin, Phone, Sparkles } from "lucide-react";
-import type { Restaurant } from "shared/types/api/schemas";
 
 type ContactInformationProps = {
   isEditing: boolean;
@@ -14,6 +16,7 @@ export function ContactInformation({
   displayData,
   handleInputChange,
 }: ContactInformationProps) {
+  const contactInfoHeadingId = useId();
   return (
     <Card
       component="section"
@@ -22,7 +25,7 @@ export function ContactInformation({
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Phone className="w-5 h-5 text-primary" />
-            <h2 id="contact-info-heading" className="text-lg font-semibold">
+            <h2 id={contactInfoHeadingId} className="text-lg font-semibold">
               Contact Information
             </h2>
           </div>

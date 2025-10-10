@@ -1,13 +1,17 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FoodCatalogue } from "shared/types/api/schemas";
+import type { Currency } from "shared/types/common";
 import { Alert, Button } from "@/components/atoms";
 import { AlertModal } from "@/components/molecules";
 import { type TabItem, Tabs } from "@/components/molecules/Tabs/Tabs";
 import { Modal } from "@/components/organisms";
 import { AddNewFood } from "@/components/ui";
-import { FoodCatalogueList } from "@/components/ui/dashboard/food-catalogue/FoodCatalogueList";
 import { MediaUpload } from "@/components/ui/media";
-
 import { useAllergens } from "@/hooks/allergens";
 import { useCourses } from "@/hooks/courses";
 import { useCuisines } from "@/hooks/cuisines";
@@ -17,12 +21,21 @@ import {
   useFoodCatalogueForm,
 } from "@/hooks/food-catalogue";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { useRouter } from "next/navigation";
-import type React from "react";
-import { useCallback, useEffect, useState } from "react";
 
-import type { FoodCatalogue } from "shared/types/api/schemas";
-import type { Currency } from "shared/types/common";
+const FoodCatalogueList = dynamic(
+  () =>
+    import("@/components/ui/dashboard/food-catalogue/FoodCatalogueList").then((mod) => ({
+      default: mod.FoodCatalogueList,
+    })),
+  {
+    loading: () => (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+        <p className="text-muted-foreground">Loading food catalogue...</p>
+      </div>
+    ),
+  }
+);
 
 export default function FoodCatalogueManagement(): React.ReactElement {
   const CURRENCIES: Currency[] = [

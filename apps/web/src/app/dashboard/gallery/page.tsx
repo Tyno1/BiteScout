@@ -1,23 +1,26 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { Suspense, useCallback, useEffect, useId, useState } from "react";
+import { toast } from "react-toastify";
+import type { Media } from "shared/types/api/schemas";
 import { Button } from "@/components/atoms";
 import { GallerySkeleton } from "@/components/ui/dashboard/gallery";
 import { useUpdateRestaurant } from "@/hooks";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import dynamic from "next/dynamic";
-import { Suspense, useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import type { Media } from "shared/types/api/schemas";
 
 const Gallery = dynamic(
-  () => import("@/components/ui/dashboard").then((mod) => ({ default: mod.Gallery })),
+  () =>
+    import("@/components/ui/dashboard").then((mod) => ({
+      default: mod.Gallery,
+    })),
   {
     loading: () => <GallerySkeleton count={8} />,
-    ssr: false,
   }
 );
 
 export default function GalleryPage() {
+  const autoSaveId = useId();
   const { restaurantData, isLoading } = useRestaurantAccess();
   const updateRestaurant = useUpdateRestaurant().mutateAsync;
   const [galleryImages, setGalleryImages] = useState<Media[]>([]);
@@ -162,7 +165,7 @@ export default function GalleryPage() {
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="auto-save"
+                id={autoSaveId}
                 checked={autoSave}
                 onChange={(e) => setAutoSave(e.target.checked)}
                 className="rounded border-gray-300 text-primary focus:ring-primary"

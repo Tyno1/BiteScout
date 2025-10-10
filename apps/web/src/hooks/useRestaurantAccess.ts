@@ -1,3 +1,6 @@
+import { useSession } from "next-auth/react";
+import { useCallback, useMemo } from "react";
+import type { RestaurantAccess } from "shared/types/api/schemas";
 import { useCuisines } from "@/hooks/cuisines";
 import {
   useAddDeliveryLink,
@@ -17,9 +20,6 @@ import {
   useSuspendRestaurantAccess,
   useUpdateRestaurantAccessRole,
 } from "@/hooks/restaurant-access";
-import { useSession } from "next-auth/react";
-import { useCallback, useMemo } from "react";
-import type { RestaurantAccess } from "shared/types/api/schemas";
 
 interface UseRestaurantAccessOptions {
   includeDeliveryLinks?: boolean;
@@ -151,10 +151,6 @@ export const useRestaurantAccess = (options: UseRestaurantAccessOptions = {}) =>
     restaurantData?._id,
     session?.user?.restaurantCount,
   ]);
-
-  // ✅ REMOVED: Redundant restaurant access validation functions
-  // These are now handled by middleware and RouteProtection
-  // No need for client-side validation that duplicates server-side logic
 
   // Helper function to get the first approved restaurant access
   const getFirstApprovedRestaurantId = useCallback(() => {

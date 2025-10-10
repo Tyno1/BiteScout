@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/atoms";
 import { AlertTriangle, Home, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/atoms";
 
 export default function UnauthorizedPage() {
   const router = useRouter();

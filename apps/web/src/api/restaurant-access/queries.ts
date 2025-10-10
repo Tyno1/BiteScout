@@ -1,5 +1,5 @@
-import apiClient from "@/utils/authClient";
 import type { RestaurantAccess } from "shared/types/api/schemas";
+import apiClient from "@/utils/authClient";
 
 // Restaurant Access Queries
 export const getRestaurantAccessByUserId = async (

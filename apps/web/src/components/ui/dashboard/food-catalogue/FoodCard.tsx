@@ -1,7 +1,7 @@
-import { IconButton } from "@/components/atoms";
-import { Card } from "@/components/organisms";
 import { Pen, Trash2 } from "lucide-react";
 import type { FoodCatalogue } from "shared/types/api/schemas";
+import { IconButton } from "@/components/atoms";
+import { Card } from "@/components/organisms";
 
 type FoodCardProps = {
   food: FoodCatalogue;

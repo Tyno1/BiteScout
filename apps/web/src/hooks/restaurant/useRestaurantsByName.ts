@@ -1,5 +1,5 @@
-import { getRestaurantsByName } from "@/api/restaurant";
 import { useQuery } from "@tanstack/react-query";
+import { getRestaurantsByName } from "@/api/restaurant";
 
 export const useRestaurantsByName = (name: string) => {
   return useQuery({

@@ -20,6 +20,7 @@ import { Card } from "@/components/organisms";
 
 export default function Contact() {
   const newsletterId = useId();
+  const newsletterId = useId();
   const subjectOptions = [
     { value: "general", label: "General Inquiry" },
     { value: "support", label: "Technical Support" },

@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { Button } from "@/components/atoms";
 import type { FileDropZoneProps } from "./types";
 
@@ -16,15 +17,18 @@ export const FileDropZone = ({
   uploadMode = "manual",
   singleUpload = false,
 }: FileDropZoneProps) => {
+  const fileInputId = useId();
   return (
-    <div
-      className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+    <button
+      type="button"
+      className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors w-full ${
         files.length > 0
           ? "border-green-500 bg-green-50"
           : "border-gray-300 hover:border-gray-400 bg-gray-50"
       }`}
       onDrop={onDrop}
       onDragOver={onDragOver}
+      aria-label="File drop zone"
     >
       <input
         ref={fileInputRef}
@@ -32,7 +36,7 @@ export const FileDropZone = ({
         accept="image/*,video/*"
         onChange={onFileSelect}
         className="hidden"
-        id="file-input"
+        id={fileInputId}
         multiple={singleUpload ? false : multiple}
       />
 
@@ -65,7 +69,7 @@ export const FileDropZone = ({
           <p className="text-base text-gray-600 mb-4">
             Drag and drop your {singleUpload ? "image" : "files"} here, or{" "}
             <label
-              htmlFor="file-input"
+              htmlFor={fileInputId}
               className="text-blue-600 hover:text-blue-500 font-medium cursor-pointer underline"
             >
               browse {singleUpload ? "image" : "files"}
@@ -104,7 +108,7 @@ export const FileDropZone = ({
           <div className="flex justify-center space-x-3">
             {(!singleUpload || files.length === 0) && (
               <label
-                htmlFor="file-input"
+                htmlFor={fileInputId}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {files.length === 0 ? "Select Files" : "Select More Files"}
@@ -147,6 +151,6 @@ export const FileDropZone = ({
           </div>
         </div>
       )}
-    </div>
+    </button>
   );
 };

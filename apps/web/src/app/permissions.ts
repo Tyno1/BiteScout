@@ -1,5 +1,5 @@
-import { AccessRoleEnumValues } from "shared/types/api/schemas";
 import type { AccessRoles } from "shared/types/api/schemas";
+import { AccessRoleEnumValues } from "shared/types/api/schemas";
 
 import { Routes } from "./routes";
 

@@ -1,5 +1,13 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type {
+  BusinessHour,
+  Cuisine,
+  DeliveryLink,
+  Restaurant,
+  RestaurantFeature,
+} from "shared/types/api/schemas";
 import { DEFAULT_BUSINESS_HOURS } from "@/app/onboarding/constants";
 import { Spinner } from "@/components/atoms";
 import { BasicInformation } from "@/components/ui/dashboard/restaurant-profile/BasicInformation";
@@ -11,14 +19,6 @@ import { RestaurantProfileFeatures } from "@/components/ui/dashboard/restaurant-
 import { RestaurantProfileHero } from "@/components/ui/dashboard/restaurant-profile/RestaurantProfileHero";
 import { useMediaWithOptimizedUrl } from "@/hooks/media";
 import { useRestaurantAccess } from "@/hooks/useRestaurantAccess";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type {
-  BusinessHour,
-  Cuisine,
-  DeliveryLink,
-  Restaurant,
-  RestaurantFeature,
-} from "shared/types/api/schemas";
 
 // Helper function to validate URLs
 const isValidUrl = (url: string): boolean => {

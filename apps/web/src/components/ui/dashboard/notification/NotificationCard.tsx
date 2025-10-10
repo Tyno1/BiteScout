@@ -1,5 +1,5 @@
-import type { Notification } from "shared/types/api/schemas";
 import React from "react";
+import type { Notification } from "shared/types/api/schemas";
 
 type NotificationCardType = {
   notification: Notification;

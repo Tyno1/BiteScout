@@ -1,10 +1,10 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { FoodCatalogue } from "shared/types/api/schemas";
 import {
   createFoodCatalogue,
   deleteFoodCatalogue,
   updateFoodCatalogue,
 } from "@/api/food-catalogue/queries";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { FoodCatalogue } from "shared/types/api/schemas";
 
 // Food Catalogue Mutations
 export const useCreateFoodCatalogue = () => {
@@ -34,7 +34,7 @@ export const useUpdateFoodCatalogue = () => {
       foodId: string;
       foodData: FoodCatalogue;
     }) => updateFoodCatalogue(restaurantId, foodId, foodData),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate and refetch food catalogue queries
       queryClient.invalidateQueries({
         queryKey: ["foodCatalogue", "restaurant", variables.restaurantId],

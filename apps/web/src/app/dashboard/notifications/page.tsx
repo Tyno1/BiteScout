@@ -1,12 +1,27 @@
 "use client";
-import { Button } from "@/components/atoms";
-import { NotificationCard } from "@/components/ui";
-import useNotificationStore from "@/stores/notificationStore";
 import { AlertCircle, Bell, Shield, UserCheck, UserX } from "lucide-react";
-import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import type { Notification } from "shared/types/api/schemas";
+import { Button } from "@/components/atoms";
+import useNotificationStore from "@/stores/notificationStore";
+
+const NotificationCard = dynamic(
+  () =>
+    import("@/components/ui").then((mod) => ({
+      default: mod.NotificationCard,
+    })),
+  {
+    loading: () => (
+      <div className="bg-white p-4 rounded-lg shadow-sm animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    ),
+  }
+);
 
 // Define notification categories based on the API spec types
 type FilteredNotificationType = {

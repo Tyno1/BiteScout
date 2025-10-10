@@ -1,10 +1,10 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
 import { MediaGallery } from "@/components/ui/media";
 import { useFoodCatalogueById } from "@/hooks/food-catalogue";
-import { ArrowLeft } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
 
 // Utility function to capitalize first character
 const CapitalizeFirstCharacter = (str: string): string => {

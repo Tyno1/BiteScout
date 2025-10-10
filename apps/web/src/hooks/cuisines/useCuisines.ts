@@ -1,5 +1,5 @@
-import { getAllCuisines, getCuisineById } from "@/api/cuisines/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getAllCuisines, getCuisineById } from "@/api/cuisines/queries";
 
 // Cuisine Query Hooks
 export const useCuisines = (enabled = true) => {

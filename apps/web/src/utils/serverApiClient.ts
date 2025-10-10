@@ -1,5 +1,5 @@
-import { getCurrentSession } from "@/app/actions/getSessionAction";
 import axios, { type AxiosInstance, type AxiosResponse } from "axios";
+import { getCurrentSession } from "@/app/actions/getSessionAction";
 import config from "./config";
 
 // Server-side API client for use in server actions

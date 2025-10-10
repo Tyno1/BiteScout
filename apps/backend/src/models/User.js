@@ -5,26 +5,26 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      unique: true,
-      sparse: true,
       trim: true,
+      default: "",
       validate: {
         validator: (v) => {
-          // Allow null/undefined (sparse) or non-empty strings
-          return v === null || v === undefined || v.trim().length > 0;
+          // Allow empty strings or non-empty strings
+          return v === "" || v.trim().length > 0;
         },
-        message: 'Username cannot be empty. Use null/undefined to remove username.'
+        message: 'Username cannot be empty. Use empty string to remove username.'
       }
     },
     phone: {
       type: String,
       trim: true,
+      default: "",
       validate: {
         validator: (v) => {
-          // Allow null/undefined or non-empty strings
-          return v === null || v === undefined || v.trim().length > 0;
+          // Allow empty strings or non-empty strings
+          return v === "" || v.trim().length > 0;
         },
-        message: 'Phone number cannot be empty. Use null/undefined to remove phone number.'
+        message: 'Phone number cannot be empty. Use empty string to remove phone number.'
       }
     },
     name: {
@@ -106,18 +106,21 @@ const userSchema = new mongoose.Schema(
 
 userSchema.index({ "location.geo": "2dsphere" }); // for location-based queries, e.g near me
 
+// Create a partial unique index for username that only applies to non-empty values
+userSchema.index(
+  { username: 1 }, 
+  { 
+    unique: true, 
+    partialFilterExpression: { 
+      username: { $exists: true, $ne: "" } 
+    } 
+  }
+);
+
 // Password hashing before saving the user
 userSchema.pre("save", async function (next) {
   if (this.isModified("password") || this.isNew) {
     this.password = await bcrypt.hash(this.password, 10);
-  }
-  
-  // Convert empty strings to null for sparse fields
-  if (this.phone === "") {
-    this.phone = null;
-  }
-  if (this.username === "") {
-    this.username = null;
   }
   
   next();
@@ -128,18 +131,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Pre-update hook to handle empty strings for sparse fields
-userSchema.pre("findOneAndUpdate", function(next) {
-  const update = this.getUpdate();
-  
-  if (update.phone === "") {
-    update.phone = null;
-  }
-  if (update.username === "") {
-    update.username = null;
-  }
-  
-  next();
-});
+// Pre-update hook removed - empty strings are now allowed
 
 export default mongoose.models.User || mongoose.model("User", userSchema);
