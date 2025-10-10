@@ -29,36 +29,6 @@ type WebLinkProps = {
 };
 
 const MobileLinkItem = ({
-  path,
-  text,
-  theme: linkTheme,
-  parentTheme,
-  toggleMenu,
-}: MobileLinkProp & {
-  parentTheme?: "dark" | "light";
-  toggleMenu: () => void;
-}) => {
-  // Conditional theme-based styling
-  const getThemeStyles = () => {
-    if (linkTheme) {
-      // Use provided theme
-      return linkTheme === "dark" ? "text-white" : "text-black";
-    }
-    // Use parent theme as fallback
-    return parentTheme === "dark"
-      ? "text-white"
-      : parentTheme === "light"
-        ? "text-black"
-        : "text-foreground";
-  };
-	path: string;
-	text: string;
-	theme?: "dark" | "light";
-	parentTheme?: "dark" | "light";
-	toggleMenu?: () => void;
-};
-
-const MobileLinkItem = ({
 	path,
 	text,
 	theme: linkTheme,
