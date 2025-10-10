@@ -1,555 +1,508 @@
 "use client";
 
 import {
-  Camera,
-  MapPin,
-  Monitor,
-  Search,
-  Shield,
-  Smartphone,
-  Star,
-  TrendingUp,
-  Users,
-  Zap,
+	Camera,
+	MapPin,
+	Monitor,
+	Search,
+	Shield,
+	Smartphone,
+	Star,
+	TrendingUp,
+	Users,
+	Zap,
 } from "lucide-react";
+import Image from "next/image";
+import img1 from "@/assets/hero/aboutus-2.jpg";
+import img2 from "@/assets/hero/aboutus3.jpg";
 import { Button } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
 
 export default function Services() {
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+	return (
+		<div className="min-h-screen bg-background text-foreground">
+			<Navbar />
 
-      {/* Hero Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-br from-black via-gray-900 to-black text-white">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
-            Our <span className="text-primary">Services</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            Discover how BiteScout serves both food lovers and restaurants with our comprehensive
-            platform
-          </p>
-        </div>
-      </section>
+			{/* Hero Section */}
+			<section className="bg-background flex flex-col gap-4 px-4 md:px-14 mb-4 md:mb-10">
+				<div className="max-w-5xl h-[40vh] flex flex-col justify-center items-start">
+					<h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
+						Services
+					</h2>
+					<h1 className="text-lg md:text-3xl w-full lg:max-w-[60vw] text-left leading-relaxed font-medium text-foreground">
+						Discover how BiteScout serves both food lovers and restaurants with
+						our comprehensive platform
+					</h1>
+				</div>
+			</section>
 
-      {/* Core Services Section */}
-      <section className="py-24 px-4 bg-card">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-              Core Services
-            </h2>
-            <p className="text-xl text-card-foreground max-w-4xl mx-auto font-light leading-relaxed">
-              BiteScout brings together food discovery, restaurant management, and community
-              building in one beautifully designed platform.
-            </p>
-          </div>
+			{/* Core Services Section */}
+			<section className="px-4 md:px-14 mb-4 md:mb-10">
+				<div className="flex flex-col md:flex-row gap-10 md:gap-20 mb-10 justify-between border border-foreground p-4">
+					<div className="flex flex-col justify-between items-start">
+						<h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
+							Core Services
+						</h2>
+						<h2 className="text-lg text-left leading-relaxed font-medium text-foreground">
+							BiteScout brings together food discovery, restaurant management,
+							and community building in one beautifully designed platform.
+						</h2>
+					</div>
+					<div className="relative h-[50vh] w-full md:min-w-[50vw] ml-auto rounded-lg">
+						<Image
+							src={img1}
+							alt="Core Services"
+							fill
+							className="object-cover rounded-lg"
+							loading="lazy"
+						/>
+					</div>
+				</div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card
-              className="border-l-4 border-l-primary"
-              containerClassName="bg-background"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-primary/10 rounded-2xl">
-                  <Camera className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Visual Food Discovery</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    Immersive TikTok-style scrolling through trending dishes, personalized
-                    suggestions, and infinite food exploration for food lovers everywhere.
-                  </p>
-                </div>
-              </div>
-            </Card>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+					<Card
+						className="border-l-1 border-l-primary transition-all duration-300"
+						containerClassName="bg-background border-1 border-foreground p-4 rounded-none shadow-none"
+						padding="lg"
+					>
+						<div className="flex items-start gap-6">
+							<div className="p-4 bg-primary/10">
+								<Camera className="w-8 h-8 text-primary" />
+							</div>
+							<div>
+								<h3 className="text-xl font-medium mb-4 text-card-foreground">
+									Visual Food Discovery
+								</h3>
+								<p className="leading-relaxed font-light text-muted-foreground">
+									Immersive TikTok-style scrolling through trending dishes,
+									personalized suggestions, and infinite food exploration for
+									food lovers everywhere.
+								</p>
+							</div>
+						</div>
+					</Card>
 
-            <Card
-              className="border-l-4 border-l-accent"
-              containerClassName="bg-background"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-accent/10 rounded-2xl">
-                  <Monitor className="w-8 h-8 text-accent" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Restaurant Management</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    Complete control over your restaurant&apos;s presence with powerful admin tools,
-                    food catalogue management, and customer engagement features.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
+					<Card
+						className="border-l-1 border-l-primary transition-all duration-300"
+						containerClassName="bg-background border border-foreground p-4 rounded-none shadow-none"
+						padding="lg"
+					>
+						<div className="flex items-start gap-6">
+							<div className="p-4 bg-primary/10">
+								<Monitor className="w-8 h-8 text-primary" />
+							</div>
+							<div>
+								<h3 className="text-xl font-medium mb-4 text-card-foreground">
+									Restaurant Management
+								</h3>
+								<p className="leading-relaxed font-light text-muted-foreground">
+									Complete control over your restaurant&apos;s presence with
+									powerful admin tools, food catalogue management, and
+									customer engagement features.
+								</p>
+							</div>
+						</div>
+					</Card>
+				</div>
+			</section>
 
-      {/* For Users Section */}
-      <section className="py-24 px-4 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-              For Food Lovers
-            </h2>
-            <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Everything you need to discover, explore, and share amazing food experiences
-            </p>
-          </div>
+			{/* For Users Section */}
+			<section className="py-10 px-4 md:px-14 mb-4 md:mb-10">
+				<div className="border border-foreground p-4">
+					<div className="text-center mb-8">
+						<h2 className="text-md md:text-lg font-light mb-4 tracking-tight text-foreground">
+							For Food Lovers
+						</h2>
+						<h2 className="text-lg text-center leading-relaxed font-medium text-foreground max-w-2xl mx-auto">
+							Everything you need to discover, explore, and share amazing food
+							experiences
+						</h2>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-4">
+								<Camera className="w-8 h-8 text-primary" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Visual Discovery Feed
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Immersive TikTok-style scrolling through trending dishes and
+								personalized suggestions
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+								<Search className="w-8 h-8 text-secondary" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Smart Search & Filters
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Find dishes by name, cuisine, restaurant, dietary needs, and
+								location
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-success/10 flex items-center justify-center mx-auto mb-4">
+								<TrendingUp className="w-8 h-8 text-success" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Content Creation
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Upload images/videos, add food details, tag restaurants, and
+								share adventures
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-accent/10 flex items-center justify-center mx-auto mb-4">
+								<Star className="w-8 h-8 text-accent" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Restaurant Profiles
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								View food highlights, see what others are eating, and order via
+								delivery
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+								<Users className="w-8 h-8 text-destructive" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Social Features
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Like, save, follow users and restaurants, and build your food
+								community
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+								<MapPin className="w-8 h-8 text-secondary" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Location Services
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Discover food near you with geolocation and distance-based
+								recommendations
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Camera className="w-10 h-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Visual Discovery Feed</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Immersive TikTok-style scrolling through trending dishes, personalized suggestions,
-                and infinite food exploration
-              </p>
-            </Card>
+			<section className="relative py-10 px-4 md:px-14 h-[50vh] w-full mb-4 md:mb-10">
+				<div className="absolute inset-0 bg-background/20 z-10" />
+				<div className="absolute inset-0">
+					<Image
+						src={img2}
+						alt="For Food Lovers"
+						fill
+						className="object-cover"
+						loading="lazy"
+					/>
+				</div>
+			</section>
 
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Search className="w-10 h-10 text-secondary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Smart Search & Filters</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Find dishes by name, cuisine, restaurant, dietary needs, allergens, price, and
-                location
-              </p>
-            </Card>
+			{/* For Restaurants Section */}
+			<section className="py-10 px-4 md:px-14 mb-4 md:mb-10">
+				<div className="flex flex-col md:flex-row gap-10 md:gap-20 mb-10 justify-between border border-foreground p-4">
+					<div className="flex flex-col justify-between items-start">
+						<h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
+							For Restaurants
+						</h2>
+						<h2 className="text-lg text-left leading-relaxed font-medium text-foreground">
+							Powerful tools to showcase your food, engage customers, and grow
+							your business
+						</h2>
+					</div>
+					<div className="w-full md:min-w-[50vw]">
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div className="p-6 border border-foreground/20 rounded-none">
+								<div className="flex flex-col lg:flex-row items-start gap-4 mb-6">
+									<div className="p-3 bg-primary/10">
+										<Monitor className="w-6 h-6 text-primary" />
+									</div>
+									<div>
+										<h3 className="text-lg font-medium text-foreground mb-2">
+											Web Admin Dashboard
+										</h3>
+										<p className="text-sm text-muted-foreground font-light">
+											Complete control over your restaurant&apos;s presence on
+											BiteScout
+										</p>
+									</div>
+								</div>
+								<div className="space-y-3">
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-primary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Manage food catalogue with detailed information
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-primary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Upload verified images and videos
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-primary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Set pricing, cuisine types, and course categories
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-primary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Manage allergen information and dietary tags
+										</span>
+									</div>
+								</div>
+							</div>
+							<div className="p-6 border border-foreground/20 rounded-none">
+							<div className="flex flex-col lg:flex-row items-start gap-4 mb-6">
+							<div className="p-3 bg-secondary/10">
+										<Zap className="w-6 h-6 text-secondary" />
+									</div>
+									<div>
+										<h3 className="text-lg font-medium text-foreground mb-2">
+											Customer Engagement
+										</h3>
+										<p className="text-sm text-muted-foreground font-light">
+											Build relationships with food lovers and increase your reach
+										</p>
+									</div>
+								</div>
+								<div className="space-y-3">
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-secondary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											View and manage user-tagged posts
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-secondary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Monitor customer engagement and feedback
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-secondary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Respond to customer interactions
+										</span>
+									</div>
+									<div className="flex items-center gap-3">
+										<div className="w-2 h-2 bg-secondary rounded-full" />
+										<span className="text-sm text-muted-foreground font-light">
+											Build your food community
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <TrendingUp className="w-10 h-10 text-success" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Content Creation</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Upload images/videos, add food details, tag restaurants, and share your culinary
-                adventures
-              </p>
-            </Card>
+			{/* Platform Features */}
+			<section className="py-10 px-4 md:px-14 mb-4 md:mb-10">
+				<div className="border border-foreground p-4">
+					<div className="text-center mb-8">
+						<h2 className="text-md md:text-lg font-light mb-4 tracking-tight text-foreground">
+							Platform Features
+						</h2>
+						<h2 className="text-lg text-center leading-relaxed font-medium text-foreground max-w-2xl mx-auto">
+							Advanced capabilities that make BiteScout the ultimate food
+							discovery platform
+						</h2>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-success/10 flex items-center justify-center mx-auto mb-4">
+								<Shield className="w-8 h-8 text-success" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Safety & Trust
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Manual restaurant verification, image moderation, and content
+								safety measures
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-accent/10 flex items-center justify-center mx-auto mb-4">
+								<Smartphone className="w-8 h-8 text-accent" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Mobile First
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Optimized for mobile devices with responsive design and
+								touch-friendly interface
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+								<Users className="w-8 h-8 text-secondary" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Community Driven
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Built around real people sharing real food experiences, not just
+								business listings
+							</p>
+						</div>
+						<div className="text-center p-6 border border-foreground/20 rounded-none">
+							<div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-4">
+								<TrendingUp className="w-8 h-8 text-primary" />
+							</div>
+							<h3 className="text-base font-medium mb-3 text-foreground">
+								Performance Optimized
+							</h3>
+							<p className="text-sm leading-relaxed font-light text-muted-foreground">
+								Fast loading, smooth scrolling, and efficient image handling for
+								the best user experience
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Star className="w-10 h-10 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Restaurant Profiles</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                View food highlights, see what others are eating, and order via delivery platforms
-              </p>
-            </Card>
+			{/* Pricing Plans */}
+			<section className="py-10 px-4 md:px-14 mb-4 md:mb-10">
+				<div className="flex flex-col md:flex-row gap-10 md:gap-20 mb-10 justify-between border border-foreground p-4">
+					<div className="flex flex-col justify-between items-start">
+						<h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
+							Pricing Plans
+						</h2>
+						<h2 className="text-lg text-left leading-relaxed font-medium text-foreground">
+							Simple, transparent pricing for everyone
+						</h2>
+					</div>
+					<div className="w-full md:min-w-[50vw]">
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div className="text-center p-4 border border-foreground/20 rounded-none">
+								<h3 className="text-lg font-medium mb-2 text-foreground">Free</h3>
+								<div className="text-2xl font-bold text-foreground mb-4">
+									$0<span className="text-sm text-muted-foreground">/month</span>
+								</div>
+								<ul className="space-y-2 text-left text-sm">
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Unlimited food discovery</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Basic search and filters</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Save up to 50 dishes</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Follow restaurants</span>
+									</li>
+								</ul>
+							</div>
+							<div className="text-center p-4 border border-foreground/20 rounded-none border-2 border-primary">
+								<div className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium mb-2 inline-block">
+									Popular
+								</div>
+								<h3 className="text-lg font-medium mb-2 text-foreground">Pro</h3>
+								<div className="text-2xl font-bold text-foreground mb-4">
+									$9.99<span className="text-sm text-muted-foreground">/month</span>
+								</div>
+								<ul className="space-y-2 text-left text-sm">
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Everything in Free</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Unlimited saved dishes</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Advanced filters</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Priority support</span>
+									</li>
+								</ul>
+							</div>
+							<div className="text-center p-4 border border-foreground/20 rounded-none">
+								<h3 className="text-lg font-medium mb-2 text-foreground">Restaurant</h3>
+								<div className="text-2xl font-bold text-foreground mb-4">
+									$29<span className="text-sm text-muted-foreground">/month</span>
+								</div>
+								<ul className="space-y-2 text-left text-sm">
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Full admin dashboard</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Unlimited dish uploads</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Analytics & insights</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<div className="w-1.5 h-1.5 bg-primary rounded-full" />
+										<span className="text-muted-foreground">Priority placement</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-danger/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-10 h-10 text-danger" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Social Features</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Like, save, follow users and restaurants, and build your food community
-              </p>
-            </Card>
+			{/* CTA Section */}
+			<section className="py-10 px-4 md:px-14">
+				<div className="border border-foreground p-8">
+					<div className="text-center">
+						<h2 className="text-md md:text-lg font-light mb-4 tracking-tight text-foreground">
+							Ready to Get Started?
+						</h2>
+						<h2 className="text-lg text-center leading-relaxed font-medium text-foreground max-w-3xl mx-auto mb-8">
+							Join thousands of users and restaurants already using BiteScout to
+							discover and share amazing food
+						</h2>
+						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+							<Button
+								text="Download App"
+								variant="solid"
+								color="neutral"
+								size="lg"
+								onClick={() => {}}
+								className="bg-card text-card-foreground hover:bg-card/90 border border-foreground/20 rounded-none w-full sm:w-auto"
+							/>
+							<Button
+								text="Restaurant Signup"
+								variant="solid"
+								color="neutral"
+								size="lg"
+								onClick={() => {}}
+								className="bg-background text-foreground hover:bg-background/90 border border-foreground/20 rounded-none w-full sm:w-auto"
+							/>
+						</div>
+					</div>
+				</div>
+			</section>
 
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <MapPin className="w-10 h-10 text-secondary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Location Services</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Discover food near you with geolocation and distance-based recommendations
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* For Restaurants Section */}
-      <section className="py-24 px-4 bg-card">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-              For Restaurants
-            </h2>
-            <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Powerful tools to showcase your food, engage customers, and grow your business
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <Card
-              className=""
-              containerClassName="bg-background hover:shadow-xl transition-all duration-300"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6 mb-8">
-                <div className="p-4 bg-primary/10 rounded-2xl">
-                  <Monitor className="w-10 h-10 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Web Admin Dashboard</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    Complete control over your restaurant&apos;s presence on BiteScout
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Manage food catalogue with detailed information
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Upload verified images and videos
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Set pricing, cuisine types, and course categories
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Manage allergen information and dietary tags
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Pin featured dishes for maximum visibility
-                  </span>
-                </div>
-              </div>
-            </Card>
-
-            <Card
-              className=""
-              containerClassName="bg-background hover:shadow-xl transition-all duration-300"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6 mb-8">
-                <div className="p-4 bg-secondary/10 rounded-2xl">
-                  <Zap className="w-10 h-10 text-secondary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Customer Engagement</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    Build relationships with food lovers and increase your reach
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    View and manage user-tagged posts
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Monitor customer engagement and feedback
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">
-                    Respond to customer interactions
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-secondary rounded-full" />
-                  <span className="text-card-foreground font-light">Build your food community</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Platform Features */}
-      <section className="py-24 px-4 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-              Platform Features
-            </h2>
-            <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Advanced capabilities that make BiteScout the ultimate food discovery platform
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-10 h-10 text-success" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Safety & Trust</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Manual restaurant verification, image moderation, and content safety measures
-              </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Smartphone className="w-10 h-10 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Mobile First</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Optimized for mobile devices with responsive design and touch-friendly interface
-              </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-10 h-10 text-secondary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Community Driven</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Built around real people sharing real food experiences, not just business listings
-              </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <TrendingUp className="w-10 h-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Performance Optimized</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Fast loading, smooth scrolling, and efficient image handling for the best user
-                experience
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Plans */}
-      <section className="py-24 px-4 bg-foreground text-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Pricing Plans</h2>
-            <p className="text-xl text-background/80 max-w-3xl mx-auto font-light">
-              Simple, transparent pricing for everyone
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card
-              className="text-center text-foreground"
-              containerClassName="bg-background hover:shadow-xl transition-all duration-300"
-              padding="lg"
-              shadow="lg"
-            >
-              <h3 className="text-2xl font-bold mb-6">Free</h3>
-              <div className="text-4xl font-bold mb-8">$0</div>
-              <ul className="space-y-4 mb-10 text-left">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Unlimited food discovery</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Basic search and filters</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Save up to 50 dishes</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Follow restaurants</span>
-                </li>
-              </ul>
-              <Button
-                text="Get Started"
-                variant="solid"
-                color="primary"
-                size="lg"
-                onClick={() => {}}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-              />
-            </Card>
-
-            <Card
-              className="text-center text-primary-foreground relative"
-              containerClassName="bg-primary hover:shadow-xl transition-all duration-300"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-danger text-white px-4 py-1 rounded-full text-sm font-bold">
-                Most Popular
-              </div>
-              <h3 className="text-2xl font-bold mb-6">Pro</h3>
-              <div className="text-4xl font-bold mb-8">
-                $9.99<span className="text-lg">/month</span>
-              </div>
-              <ul className="space-y-4 mb-10 text-left">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-foreground rounded-full" />
-                  <span className="font-light">Everything in Free</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-foreground rounded-full" />
-                  <span className="font-light">Unlimited saved dishes</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-foreground rounded-full" />
-                  <span className="font-light">Advanced filters</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary-foreground rounded-full" />
-                  <span className="font-light">Priority support</span>
-                </li>
-              </ul>
-              <Button
-                text="Start Pro"
-                variant="solid"
-                color="neutral"
-                size="lg"
-                onClick={() => {}}
-                className="w-full bg-background text-foreground hover:bg-background/90 shadow-lg hover:shadow-xl transition-all duration-200"
-              />
-            </Card>
-
-            <Card
-              className="text-center text-foreground"
-              containerClassName="bg-background hover:shadow-xl transition-all duration-300"
-              padding="lg"
-              shadow="lg"
-            >
-              <h3 className="text-2xl font-bold mb-6">Restaurant</h3>
-              <div className="text-4xl font-bold mb-8">
-                $29<span className="text-lg">/month</span>
-              </div>
-              <ul className="space-y-4 mb-10 text-left">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Full admin dashboard</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Unlimited dish uploads</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="text-card-foreground font-light">Analytics & insights</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="font-light">Priority placement</span>
-                </li>
-              </ul>
-              <Button
-                text="Contact Sales"
-                variant="solid"
-                color="primary"
-                size="lg"
-                onClick={() => {}}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-              />
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 px-4 bg-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-            Ready to Get Started?
-          </h2>
-          <p className="text-xl text-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Join thousands of users and restaurants already using BiteScout to discover and share
-            amazing food
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button
-              text="Download App"
-              variant="solid"
-              color="neutral"
-              size="lg"
-              onClick={() => {}}
-              className="bg-card text-foreground hover:bg-card/90 shadow-lg hover:shadow-xl transition-all duration-200"
-            />
-            <Button
-              text="Restaurant Signup"
-              variant="solid"
-              color="neutral"
-              size="lg"
-              onClick={() => {}}
-              className="w-full sm:w-auto bg-background text-foreground hover:bg-background/90 shadow-lg hover:shadow-xl transition-all duration-200"
-            />
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </div>
-  );
+			<Footer />
+		</div>
+	);
 }
