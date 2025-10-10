@@ -52,7 +52,6 @@ export default function About() {
               alt="Follow the Flavor"
               fill
               className="object-cover rounded-lg"
-              loading="lazy"
             />
           </div>
         </div>
@@ -176,7 +175,6 @@ export default function About() {
             alt="Follow the Flavor"
             fill
             className="object-cover"
-            loading="lazy"
           />
         </div>
       </section>
