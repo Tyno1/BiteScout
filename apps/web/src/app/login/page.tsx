@@ -1,8 +1,8 @@
 "use client";
 
-import { LoginForm } from "@/components/ui/forms/LoginForm";
-import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { LoginForm } from "@/components/ui/forms/LoginForm";
 
 const Page = () => {
   const session = useSession();
@@ -19,7 +19,11 @@ const Page = () => {
         <LoginForm />
         <div className="flex flex-col ">
           <p className="text-sm">You dont have an account?</p>
-          <button type="button" className="text-primary" onClick={() => router.push("/register")}>
+          <button
+            type="button"
+            className="text-primary"
+            onClick={() => router.push("/register")}
+          >
             Register
           </button>
         </div>

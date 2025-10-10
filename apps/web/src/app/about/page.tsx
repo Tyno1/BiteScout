@@ -1,327 +1,281 @@
 "use client";
 
-import { Button } from "@/components/atoms";
-import { Footer, Navbar } from "@/components/molecules";
-import { Card } from "@/components/organisms";
 import {
   Camera,
   Heart,
   MapPin,
-  Palette,
   Salad,
   Smartphone,
   Star,
   TrendingUp,
-  Trophy,
-  Type,
   Zap,
 } from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import img1 from "@/assets/hero/aboutus-2.jpg";
+import img2 from "@/assets/hero/aboutus3.jpg";
+import { Button } from "@/components/atoms";
+import { Footer, Navbar } from "@/components/molecules";
+import { Card } from "@/components/organisms";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-
       {/* Hero Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-br from-black via-gray-900 to-black text-white">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
-            Follow the <span className="text-primary">Flavor</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto leading-relaxed font-light">
-            BiteScout reimagines food discovery through immersive visuals. Instead of star ratings
-            and endless reviews, explore dishes by scrolling through photos and videos of real food
-            from real people.
-          </p>
+      <section className="bg-background flex flex-col gap-4 px-4 md:px-14 mb-4 md:mb-10">
+        <div className="max-w-5xl h-[40vh] flex flex-col justify-center items-start">
+          <h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
+            About
+          </h2>
+          <motion.h1 className="text-lg md:text-3xl w-full lg:max-w-[60vw] text-left leading-relaxed font-medium text-foreground">
+            BiteScout reimagines food discovery through immersive visuals.
+            Instead of star ratings and endless reviews, explore dishes by
+            scrolling through photos and videos of real food from real people.
+          </motion.h1>
         </div>
       </section>
 
-      {/* Vision Section */}
-      <section className="py-24 px-4 bg-card">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
+      <section className="px-4 md:px-14 mb-4 md:mb-10">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-20 mb-10 justify-between border border-foreground p-4">
+          <div className="flex flex-col justify-between items-start">
+            <h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
               Our Vision
             </h2>
-            <p className="text-xl text-card-foreground max-w-4xl mx-auto font-light leading-relaxed">
-              BiteScout brings together the joy of eating, the power of community, and the ease of
-              discovery in one beautifully curated platform.
-            </p>
+            <h2 className="text-lg text-left leading-relaxed font-medium text-foreground">
+              BiteScout brings together the joy of eating, the power of
+              community, and the ease of discovery in one beautifully curated
+              platform.
+            </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card
-              className="border-l-4 border-l-primary"
-              containerClassName="bg-background"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-primary/10 rounded-2xl">
-                  <Camera className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Visual Discovery</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    We don&apos;t ask users to read reviews. We show them exactly what they could
-                    eat next — via vibrant, full-screen food content that makes your mouth water.
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <Card
-              className="border-l-4 border-l-accent"
-              containerClassName="bg-background"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="flex items-start gap-6">
-                <div className="p-4 bg-accent/10 rounded-2xl">
-                  <Heart className="w-8 h-8 text-accent" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">Real Taste</h3>
-                  <p className="text-card-foreground leading-relaxed font-light">
-                    It&apos;s not about ratings. It&apos;s about recognition — great food,
-                    beautifully captured, socially shared, and effortlessly discovered by food
-                    lovers everywhere.
-                  </p>
-                </div>
-              </div>
-            </Card>
+          <div className="relative h-[50vh] w-full md:min-w-[50vw] ml-auto rounded-lg">
+            <Image
+              src={img1}
+              alt="Follow the Flavor"
+              fill
+              className="object-cover rounded-lg"
+              loading="lazy"
+            />
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <Card
+            className="border-l-1 border-l-primary transition-all duration-300 "
+            containerClassName="bg-background border-1 border-foreground p-4 rounded-none shadow-none"
+            padding="lg"
+          >
+            <div className="flex items-start gap-6">
+              <div className="p-4 bg-primary/10">
+                <Camera className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-medium mb-4 text-card-foreground">
+                  Visual Discovery
+                </h3>
+                <p className="leading-relaxed font-light text-muted-foreground">
+                  We don&apos;t ask users to read reviews. We show them exactly
+                  what they could eat next — via vibrant, full-screen food
+                  content that makes your mouth water.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card
+            className="border-l-1 border-l-primary transition-all duration-300"
+            containerClassName="bg-background border border-foreground p-4 rounded-none shadow-none"
+            padding="lg"
+          >
+            <div className="flex items-start gap-6">
+              <div className="p-4 bg-primary/10">
+                <Heart className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-medium mb-4 text-card-foreground">
+                  Real Taste
+                </h3>
+                <p className="leading-relaxed font-light text-muted-foreground">
+                  It&apos;s not about ratings. It&apos;s about recognition —
+                  great food, beautifully captured, socially shared, and
+                  effortlessly discovered by food lovers everywhere.
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-4 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
+      <section className="py-10 px-4 md:px-14 mb-4 md:mb-10">
+        <div className="border border-foreground p-4">
+          <div className="text-center mb-8">
+            <h2 className="text-md md:text-lg font-light mb-4 tracking-tight text-foreground">
               How It Works
             </h2>
-            <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
+            <h2 className="text-lg text-center leading-relaxed font-medium text-foreground max-w-2xl mx-auto">
               Discover, share, and explore food in a whole new way
-            </p>
+            </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <TrendingUp className="w-10 h-10 text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center p-6 border border-foreground/20 rounded-none">
+              <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Discover Visually</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Immersive TikTok-style feed with trending dishes, suggestions, and infinite food
-                exploration
+              <h3 className="text-base font-medium mb-3 text-foreground">
+                Discover Visually
+              </h3>
+              <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                Immersive TikTok-style feed with trending dishes and
+                personalized suggestions
               </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <MapPin className="w-10 h-10 text-secondary" />
+            </div>
+            <div className="text-center p-6 border border-foreground/20 rounded-none">
+              <div className="w-16 h-16 bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-8 h-8 text-secondary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Search & Filter</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Find dishes by name, cuisine, restaurant, dietary needs, allergens, and location
+              <h3 className="text-base font-medium mb-3 text-foreground">
+                Search & Filter
+              </h3>
+              <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                Find dishes by name, cuisine, restaurant, dietary needs, and
+                location
               </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Camera className="w-10 h-10 text-success" />
+            </div>
+            <div className="text-center p-6 border border-foreground/20 rounded-none">
+              <div className="w-16 h-16 bg-success/10 flex items-center justify-center mx-auto mb-4">
+                <Camera className="w-8 h-8 text-success" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Share Your Food</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                Upload images/videos, add food details, tag restaurants, and share your culinary
-                adventures
+              <h3 className="text-base font-medium mb-3 text-foreground">
+                Share Your Food
+              </h3>
+              <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                Upload images/videos, add food details, tag restaurants, and
+                share adventures
               </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-card/90 transition-all duration-300"
-              containerClassName="bg-card hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Star className="w-10 h-10 text-accent" />
+            </div>
+            <div className="text-center p-6 border border-foreground/20 rounded-none">
+              <div className="w-16 h-16 bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <Star className="w-8 h-8 text-accent" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-4">Explore Restaurants</h3>
-              <p className="text-card-foreground text-sm leading-relaxed font-light">
-                View food highlights, see what others are eating, and order via delivery platforms
+              <h3 className="text-base font-medium mb-3 text-foreground">
+                Explore Restaurants
+              </h3>
+              <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                View food highlights, see what others are eating, and order via
+                delivery
               </p>
-            </Card>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="relative py-10 px-4 md:px-14 h-[50vh] w-full mb-4 md:mb-10">
+        <div className="absolute inset-0 bg-background/20 z-10" />
+        <div className="absolute inset-0">
+          <Image
+            src={img2}
+            alt="Follow the Flavor"
+            fill
+            className="object-cover"
+            loading="lazy"
+          />
         </div>
       </section>
 
       {/* Target Users */}
-      <section className="py-24 px-4 bg-card">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
+      <section className="py-10 px-4 md:px-14">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-20 mb-10 justify-between border border-foreground p-4">
+          <div className="flex flex-col justify-between items-start">
+            <h2 className="text-md md:text-lg font-light mb-8 tracking-tight text-foreground">
               Built for Food Lovers
             </h2>
-            <p className="text-xl text-card-foreground max-w-3xl mx-auto font-light">
-              Whether you&apos;re a visual foodie, fast explorer, or dietary seeker, BiteScout has
-              you covered
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <Card
-              className="text-center hover:bg-background/90 transition-all duration-300"
-              containerClassName="bg-background hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Smartphone className="w-16 h-16 text-primary" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">The Visual Foodie</h3>
-              <p className="text-card-foreground mb-4 font-medium">Ages 18-35</p>
-              <p className="text-card-foreground font-light leading-relaxed">
-                Loves TikTok and Instagram, but craves real food inspiration. Wants to discover new
-                dishes through beautiful visuals and authentic content.
-              </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-background/90 transition-all duration-300"
-              containerClassName="bg-background hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-24 h-24 bg-secondary/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Zap className="w-16 h-16 text-secondary" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">The Fast Explorer</h3>
-              <p className="text-card-foreground mb-4 font-medium">Ages 25-45</p>
-              <p className="text-card-foreground font-light leading-relaxed">
-                Wants to find exactly what to eat nearby, without reading endless reviews. Values
-                quick, visual decision-making for food choices.
-              </p>
-            </Card>
-
-            <Card
-              className="text-center hover:bg-background/90 transition-all duration-300"
-              containerClassName="bg-background hover:shadow-xl"
-              padding="lg"
-              shadow="lg"
-            >
-              <div className="w-24 h-24 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Salad className="w-16 h-16 text-success" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">The Dietary Seeker</h3>
-              <p className="text-card-foreground mb-4 font-medium">Ages 21-50</p>
-              <p className="text-card-foreground font-light leading-relaxed">
-                Filters food based on specific needs: vegan, gluten-free, nut-free, and more. Needs
-                reliable, visual confirmation of dietary compliance.
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Brand Identity */}
-      <section className="py-24 px-4 bg-foreground text-background">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">
-              Our Brand Identity
+            <h2 className="text-lg text-left leading-relaxed font-medium text-foreground">
+              Whether you&apos;re a visual foodie, fast explorer, or dietary
+              seeker, BiteScout has you covered
             </h2>
-            <p className="text-xl text-background/80 max-w-3xl mx-auto font-light">
-              Modern, playful, classy, and inclusive — just like the food community we&apos;re
-              building
-            </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-3xl font-bold text-primary-foreground">B</span>
+          <div className="w-full md:min-w-[50vw]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 border border-foreground/20 rounded-none">
+                <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-medium mb-2 text-foreground">
+                  The Visual Foodie
+                </h3>
+                <p className="mb-2 text-sm font-medium text-muted-foreground">
+                  Ages 18-35
+                </p>
+                <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                  Loves TikTok and Instagram, but craves real food inspiration.
+                  Wants to discover new dishes through beautiful visuals.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-3">Name</h3>
-              <p className="text-background/70 font-light">
-                BiteScout – &quot;Follow the Flavor&quot;
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-accent rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Palette className="w-16 h-16 text-accent-foreground" />
+              <div className="text-center p-4 border border-foreground/20 rounded-none">
+                <div className="w-16 h-16 bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-8 h-8 text-secondary" />
+                </div>
+                <h3 className="text-lg font-medium mb-2 text-foreground">
+                  The Fast Explorer
+                </h3>
+                <p className="mb-2 text-sm font-medium text-muted-foreground">
+                  Ages 25-45
+                </p>
+                <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                  Wants to find exactly what to eat nearby, without reading
+                  endless reviews. Values quick, visual decision-making.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-3">Colors</h3>
-              <p className="text-background/70 font-light">
-                Deep black, toasted gold, warm red, cool cream
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-muted rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Type className="w-16 h-16 text-muted-foreground" />
+              <div className="text-center p-4 border border-foreground/20 rounded-none">
+                <div className="w-16 h-16 bg-success/10 flex items-center justify-center mx-auto mb-4">
+                  <Salad className="w-8 h-8 text-success" />
+                </div>
+                <h3 className="text-lg font-medium mb-2 text-foreground">
+                  The Dietary Seeker
+                </h3>
+                <p className="mb-2 text-sm font-medium text-muted-foreground">
+                  Ages 21-50
+                </p>
+                <p className="text-sm leading-relaxed font-light text-muted-foreground">
+                  Filters food based on specific needs: vegan, gluten-free,
+                  nut-free, and more. Needs reliable, visual confirmation.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-3">Typography</h3>
-              <p className="text-background/70 font-light">
-                Contemporary sans serif with personality
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Trophy className="w-16 h-16 text-secondary-foreground" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Icon</h3>
-              <p className="text-background/70 font-light">Stylized bite mark on a scout badge</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 bg-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">
-            Ready to Follow the Flavor?
-          </h2>
-          <p className="text-xl text-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-            Join thousands of food lovers discovering, sharing, and exploring the world&apos;s most
-            delicious dishes
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button
-              text="Download App"
-              variant="solid"
-              color="neutral"
-              size="lg"
-              onClick={() => {}}
-              className="bg-card text-foreground hover:bg-card/90 shadow-lg hover:shadow-xl transition-all duration-200"
-            />
-            <Button
-              text="Join Waitlist"
-              variant="solid"
-              color="neutral"
-              size="lg"
-              onClick={() => {}}
-              className="w-full sm:w-auto bg-background text-foreground hover:bg-background/90 shadow-lg hover:shadow-xl transition-all duration-200"
-            />
+      <section className="py-10 px-4 md:px-14">
+        <div className="border border-foreground p-8">
+          <div className="text-center">
+            <h2 className="text-md md:text-lg font-light mb-4 tracking-tight text-foreground">
+              Ready to Follow the Flavor?
+            </h2>
+            <h2 className="text-lg text-center leading-relaxed font-medium text-foreground max-w-3xl mx-auto mb-8">
+              Join thousands of food lovers discovering, sharing, and exploring
+              the world&apos;s most delicious dishes
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+              <Button
+                text="Download App"
+                variant="solid"
+                color="neutral"
+                size="lg"
+                onClick={() => {}}
+                className="bg-card text-card-foreground hover:bg-card/90 border border-foreground/20 rounded-none w-full sm:w-auto"
+              />
+              <Button
+                text="Join Waitlist"
+                variant="solid"
+                color="neutral"
+                size="lg"
+                onClick={() => {}}
+                className="bg-background text-foreground hover:bg-background/90 border border-foreground/20 rounded-none w-full sm:w-auto"
+              />
+            </div>
           </div>
         </div>
       </section>
