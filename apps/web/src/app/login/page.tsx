@@ -19,7 +19,11 @@ const Page = () => {
         <LoginForm />
         <div className="flex flex-col ">
           <p className="text-sm">You dont have an account?</p>
-          <button type="button" className="text-primary" onClick={() => router.push("/register")}>
+          <button
+            type="button"
+            className="text-primary"
+            onClick={() => router.push("/register")}
+          >
             Register
           </button>
         </div>
