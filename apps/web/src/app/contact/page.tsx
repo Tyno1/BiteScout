@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useId } from "react";
-import img1 from "@/assets/hero/about4.jpg";
-import img2 from "@/assets/hero/about5.jpg";
 import { Accordion, Button, Input, Select, Textarea } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
@@ -57,7 +55,7 @@ export default function Contact() {
           </div>
           <div className="relative h-[50vh] w-full md:min-w-[50vw] ml-auto rounded-lg">
             <Image
-              src={img1}
+              src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090019/assets/about4_f25sgq.jpg"
               alt="Contact Information"
               fill
               className="object-cover rounded-lg"
@@ -255,7 +253,7 @@ export default function Contact() {
         <div className="absolute inset-0 bg-background/20 z-10" />
         <div className="absolute inset-0">
           <Image
-            src={img2}
+            src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090020/assets/about5_nh8b8w.jpg"
             alt="Support Options"
             fill
             className="object-cover"
