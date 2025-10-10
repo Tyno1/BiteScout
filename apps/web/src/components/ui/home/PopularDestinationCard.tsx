@@ -1,5 +1,4 @@
 import Image from "next/image";
-import RestImg from "@/assets/hero/mgg-vitchakorn-DDn9I5V1ubE-unsplash.jpg";
 
 type DestinationCardType = {
   item: number;
@@ -9,7 +8,7 @@ export function PopularDestinationCard({ item }: DestinationCardType) {
     <div key={item} className="relative group cursor-pointer">
       <div className="relative h-80 w-full rounded-xl overflow-hidden">
         <Image
-          src={RestImg}
+          src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090022/assets/mgg-vitchakorn-DDn9I5V1ubE-unsplash_nljmjt.jpg"
           alt={`image${item}`}
           width={400}
           height={320}

@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import img1 from "@/assets/hero/aboutus-2.jpg";
-import img2 from "@/assets/hero/aboutus3.jpg";
 import { Button } from "@/components/atoms";
 import { Footer, Navbar } from "@/components/molecules";
 import { Card } from "@/components/organisms";
@@ -50,7 +48,7 @@ export default function About() {
           </div>
           <div className="relative h-[50vh] w-full md:min-w-[50vw] ml-auto rounded-lg">
             <Image
-              src={img1}
+              src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090019/assets/aboutus-2_jxazta.jpg"
               alt="Follow the Flavor"
               fill
               className="object-cover rounded-lg"
@@ -174,7 +172,7 @@ export default function About() {
         <div className="absolute inset-0 bg-background/20 z-10" />
         <div className="absolute inset-0">
           <Image
-            src={img2}
+            src="https://res.cloudinary.com/dr9md8vbd/image/upload/v1760090019/assets/aboutus3_fp3odi.jpg"
             alt="Follow the Flavor"
             fill
             className="object-cover"
