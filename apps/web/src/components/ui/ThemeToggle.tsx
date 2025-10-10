@@ -1,51 +1,75 @@
 "use client";
 
 import { Monitor, Moon, Sun } from "lucide-react";
+import { useState } from "react";
+import { IconButton } from "@/components/atoms";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
-export function ThemeToggle() {
-	const { theme, setTheme } = useTheme();
+type ThemeToggleProps = {
+  size?: "xs" | "sm" | "md" | "lg";
+};
 
-	return (
-		<div className="flex items-center space-x-2">
-			<button
-				type="button"
-				onClick={() => setTheme("light")}
-				className={`p-2 rounded-lg transition-colors ${
-					theme === "light"
-						? "bg-primary text-white"
-						: "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-				}`}
-				title="Light mode"
-			>
-				<Sun className="h-4 w-4" />
-			</button>
+export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
+  const { setTheme } = useTheme();
+  const [selectedButton, setSelectedButton] = useState<
+    "dark" | "light" | "system"
+  >("dark");
 
-			<button
-				type="button"
-				onClick={() => setTheme("dark")}
-				className={`p-2 rounded-lg transition-colors ${
-					theme === "dark"
-						? "bg-primary text-white"
-						: "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-				}`}
-				title="Dark mode"
-			>
-				<Moon className="h-4 w-4" />
-			</button>
+  const getIconSize = () => {
+    switch (size) {
+      case "xs":
+        return "h-3 w-3";
+      case "sm":
+        return "h-3.5 w-3.5";
+      case "md":
+        return "h-4 w-4";
+      case "lg":
+        return "h-5 w-5";
+      default:
+        return "h-4 w-4";
+    }
+  };
 
-			<button
-				type="button"
-				onClick={() => setTheme("system")}
-				className={`p-2 rounded-lg transition-colors ${
-					theme === "system"
-						? "bg-primary text-white"
-						: "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-				}`}
-				title="System theme"
-			>
-				<Monitor className="h-4 w-4" />
-			</button>
-		</div>
-	);
+  return (
+    <div className="flex items-center space-x-1">
+      <IconButton
+        type="button"
+        onClick={() => {
+          setTheme("light");
+          setSelectedButton("light");
+        }}
+        variant="solid"
+        color={selectedButton === "light" ? "primary" : "neutral"}
+        size={size}
+        ariaLabel="Light mode"
+        icon={<Sun className={getIconSize()} />}
+      />
+
+      <IconButton
+        type="button"
+        onClick={() => {
+          setTheme("dark");
+          setSelectedButton("dark");
+        }}
+        variant="solid"
+        color={selectedButton === "dark" ? "primary" : "neutral"}
+        size={size}
+        ariaLabel="Dark mode"
+        icon={<Moon className={getIconSize()} />}
+      />
+
+      <IconButton
+        type="button"
+        onClick={() => {
+          setTheme("system");
+          setSelectedButton("system");
+        }}
+        variant="solid"
+        color={selectedButton === "system" ? "primary" : "neutral"}
+        size={size}
+        ariaLabel="System theme"
+        icon={<Monitor className={getIconSize()} />}
+      />
+    </div>
+  );
 }
