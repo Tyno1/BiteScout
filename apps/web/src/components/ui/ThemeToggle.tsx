@@ -16,9 +16,6 @@ export function ThemeToggle({ size = "md", parentTheme }: ThemeToggleProps) {
     "dark" | "light" | "system"
   >(theme);
 
-  console.log(parentTheme);
-  console.log(theme);
-  // Sync selectedButton with theme when theme changes externally
   useEffect(() => {
     setSelectedButton(theme);
   }, [theme]);

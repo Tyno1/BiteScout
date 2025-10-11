@@ -2,34 +2,45 @@
 
 import { redirect, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Navbar } from "@/components/molecules";
 import { LoginForm } from "@/components/ui/forms/LoginForm";
 
 const Page = () => {
-  const session = useSession();
-  const router = useRouter();
+	const session = useSession();
+	const router = useRouter();
 
-  if (session?.data?.user) {
-    redirect("/login/loading");
-  }
+	if (session?.data?.user) {
+		redirect("/login/loading");
+	}
 
-  return (
-    <div className="bg-background w-[100vw] h-[100vh] flex items-center justify-center">
-      <div className="text-foreground w-[80vw] md:w-[50vw] lg:w-[30vw] min-h-[50%] flex flex-col items-center gap-6">
-        <h2 className="font-bold text-2xl">Sign In</h2>
-        <LoginForm />
-        <div className="flex flex-col ">
-          <p className="text-sm">You dont have an account?</p>
-          <button
-            type="button"
-            className="text-primary"
-            onClick={() => router.push("/register")}
-          >
-            Register
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="min-h-screen bg-background text-foreground">
+			<Navbar />
+			<div className="flex items-center justify-center min-h-[calc(100vh-10rem)] px-4">
+				<div className="w-full max-w-md space-y-8">
+					<div className="text-center">
+						<h2 className="text-3xl font-bold text-foreground">Sign In</h2>
+						<p className="mt-2 text-sm text-muted-foreground">
+							Welcome back! Please sign in to your account.
+						</p>
+					</div>
+					<LoginForm />
+					<div className="text-center">
+						<p className="text-sm text-muted-foreground">
+							Don't have an account?{" "}
+							<button
+								type="button"
+								className="text-primary hover:text-primary/80 font-medium transition-colors"
+								onClick={() => router.push("/register")}
+							>
+								Register here
+							</button>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Page;

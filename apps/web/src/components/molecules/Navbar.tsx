@@ -18,9 +18,8 @@ type NavTheme = {
 
 export function Navbar({ theme }: NavTheme) {
   const [isOpen, setIsOpen] = useState(false);
-  const { theme: rootTheme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const router = useRouter();
-  console.log(rootTheme);
 
   const handleRoute = (path: string) => {
     router.push(path);
@@ -33,7 +32,7 @@ export function Navbar({ theme }: NavTheme) {
 
   return (
     <nav
-      className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none ${
+      className={`w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 sticky top-0 z-50 overflow-none shadow-md ${
         theme === "dark"
           ? "bg-black text-white"
           : theme === "light"
