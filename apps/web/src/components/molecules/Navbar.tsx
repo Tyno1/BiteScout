@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useCallback, useState } from "react";
+import { useTheme } from "@/hooks/useTheme";
 import { Button } from "../atoms";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { MobileNav } from "./MobileNav";
@@ -17,7 +18,9 @@ type NavTheme = {
 
 export function Navbar({ theme }: NavTheme) {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme: rootTheme, resolvedTheme } = useTheme();
   const router = useRouter();
+  console.log(rootTheme);
 
   const handleRoute = (path: string) => {
     router.push(path);
@@ -38,8 +41,20 @@ export function Navbar({ theme }: NavTheme) {
             : "bg-background text-foreground"
       }`}
     >
-      <Link href="/" className="flex-shrink-0 flex items-center gap-2 text-primary">
-        <Image src="/logo.png" alt="Bite Scout" width={120} height={40} />
+      <Link
+        href="/"
+        className="flex-shrink-0 flex items-center gap-2 text-primary"
+      >
+        <Image
+          src={
+            resolvedTheme === "dark" ||theme === "dark"
+              ? "https://res.cloudinary.com/dr9md8vbd/image/upload/v1760182203/Group_169_av8dfd.png"
+              : "https://res.cloudinary.com/dr9md8vbd/image/upload/v1760182163/Group_168_fgp8b5.png"
+          }
+          alt="Bite Scout"
+          width={120}
+          height={40}
+        />
       </Link>
       {/* web view */}
       <ul className="hidden md:flex ml-4 flex items-center">
@@ -126,7 +141,7 @@ export function Navbar({ theme }: NavTheme) {
           )}
         </li>
         <li className="hidden lg:block ml-4">
-          <ThemeToggle size="sm" />
+          <ThemeToggle size="sm" parentTheme={theme} />
         </li>
       </ul>
       <button
@@ -141,12 +156,7 @@ export function Navbar({ theme }: NavTheme) {
       </button>
 
       {/* mobile view */}
-      {isOpen && (
-        <MobileNav
-          toggleMenu={toggleMenu}
-          session={session}
-        />
-      )}
+      {isOpen && <MobileNav toggleMenu={toggleMenu} session={session} />}
     </nav>
   );
 }

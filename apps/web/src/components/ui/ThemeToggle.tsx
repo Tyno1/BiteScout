@@ -1,19 +1,27 @@
 "use client";
 
 import { Monitor, Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconButton } from "@/components/atoms";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 type ThemeToggleProps = {
   size?: "xs" | "sm" | "md" | "lg";
+  parentTheme?: "dark" | "light";
 };
 
-export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
-  const { setTheme } = useTheme();
+export function ThemeToggle({ size = "md", parentTheme }: ThemeToggleProps) {
+  const { theme, setTheme } = useTheme();
   const [selectedButton, setSelectedButton] = useState<
     "dark" | "light" | "system"
-  >("dark");
+  >(theme);
+
+  console.log(parentTheme);
+  console.log(theme);
+  // Sync selectedButton with theme when theme changes externally
+  useEffect(() => {
+    setSelectedButton(theme);
+  }, [theme]);
 
   const getIconSize = () => {
     switch (size) {
@@ -41,7 +49,7 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
         variant="outline"
         color={selectedButton === "light" ? "primary" : "neutral"}
         size={size}
-        className={`${selectedButton !== "light" && "border-white text-white"}`}
+        className={`${selectedButton !== "light" && (theme === "dark" ? "border-white text-white" : "border-black text-black")}`}
         ariaLabel="Light mode"
         icon={<Sun className={getIconSize()} />}
       />
@@ -55,7 +63,7 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
         variant="outline"
         color={selectedButton === "dark" ? "primary" : "neutral"}
         size={size}
-		className={`${selectedButton !== "dark" && "border-white text-white hover:text-white"}`}
+        className={`${selectedButton !== "dark" && (theme === "dark" || parentTheme === "dark" ? "border-white text-white hover:text-white" : "border-black text-black hover:text-black")}`}
         ariaLabel="Dark mode"
         icon={<Moon className={getIconSize()} />}
       />
@@ -69,7 +77,7 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
         variant="outline"
         color={selectedButton === "system" ? "primary" : "neutral"}
         size={size}
-        className={`${selectedButton !== "system" && "border-white text-white"}`}
+        className={`${selectedButton !== "system" && (theme === "dark" || parentTheme === "dark" ? "border-white text-white hover:text-white" : "border-black text-black hover:text-black")}`}
         ariaLabel="System theme"
         icon={<Monitor className={getIconSize()} />}
       />
