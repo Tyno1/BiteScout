@@ -12,11 +12,13 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme;
+  resolvedTheme: "dark" | "light";
   setTheme: (theme: Theme) => void;
 };
 
 const initialState: ThemeProviderState = {
   theme: "system",
+  resolvedTheme: "light",
   setTheme: () => null,
 };
 
@@ -29,6 +31,7 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("light");
   const [mounted, setMounted] = useState(false);
 
   // Only access localStorage after component mounts to prevent hydration mismatch
@@ -51,16 +54,20 @@ export function ThemeProvider({
     if (theme === "system") {
       // For system theme, detect the actual system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+      const actualTheme = prefersDark ? "dark" : "light";
+      root.setAttribute("data-theme", actualTheme);
+      setResolvedTheme(actualTheme);
       return;
     }
 
     // Set the data-theme attribute for user preference
     root.setAttribute("data-theme", theme);
+    setResolvedTheme(theme);
   }, [theme, mounted]);
 
   const value = {
     theme,
+    resolvedTheme,
     setTheme: (theme: Theme) => {
       // Only access localStorage in the browser
       if (typeof window !== "undefined") {
