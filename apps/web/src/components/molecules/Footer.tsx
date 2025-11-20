@@ -20,7 +20,6 @@ export function Footer() {
         <div className="w-full md:w-60">
           <div className="md:mt-40 flex flex-col md:gap-10 text-sm">
             <p>(790) 945-3041</p>
-            <p>tynodesignz@gmail.com</p>
           </div>
         </div>
         <div className="flex flex-col justify-between md:items-start">
@@ -40,7 +39,7 @@ export function Footer() {
               <li>Instagram</li>
             </ul>
           </div>
-          <p className="text-sm mt-10 md:mt-0">© 2024 Anthony Ukutegbe. All rights reserved.</p>
+          <p className="text-sm mt-10 md:mt-0">© 2024 Ukutegbe. All rights reserved.</p>
         </div>
         <Button
           text="Back to Top"
